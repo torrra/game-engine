@@ -8,8 +8,8 @@
 //#include <physx/foundation/PxFoundation.h>
 //#include <imgui/imgui.h>
 
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <stb/stb_image.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -57,9 +57,9 @@ int main()
     //    gDefaultErrorCallback);
     //IMGUI_CHECKVERSION();
     //ImGui::CreateContext();
-    //int width, height, nbrChannels;
-    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    //unsigned char* texData = stbi_load("asset/padoru.png", &width, &height, &nbrChannels, 0);
+    int width, height, nbrChannels;
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    unsigned char* texData = stbi_load("asset/padoru.png", &width, &height, &nbrChannels, 0);
 
     // render loop
     // -----------
