@@ -6,7 +6,7 @@
 //#include <assimp/Importer.hpp>
 #include <fmod/fmod_studio.hpp>
 //#include <physx/foundation/PxFoundation.h>
-//#include <imgui/imgui.h>
+#include <imgui/imgui.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -55,8 +55,8 @@ int main()
     FMOD::Studio::System* system; /// Work
     //physx::PxFoundation* foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
     //    gDefaultErrorCallback);
-    //IMGUI_CHECKVERSION();
-    //ImGui::CreateContext();
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
     int width, height, nbrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     unsigned char* texData = stbi_load("asset/padoru.png", &width, &height, &nbrChannels, 0);
