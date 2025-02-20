@@ -1,1 +1,14 @@
-[Bb]uild/*
+# IDE-specific user folders
+.vs/
+.vscode/
+.idea/
+
+# notepad++ backup folder
+nppBackup/
+
+# Build folder
+*[Bb]uild*/*
+
+# vim files
+*.swp
+
