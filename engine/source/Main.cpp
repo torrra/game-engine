@@ -4,7 +4,7 @@
 #include <iostream>
 
 //#include <assimp/Importer.hpp>
-//#include <fmod/fmod_studio.hpp>
+#include <fmod/fmod_studio.hpp>
 //#include <physx/foundation/PxFoundation.h>
 //#include <imgui/imgui.h>
 
@@ -52,7 +52,7 @@ int main()
     }
 
     //Assimp::Importer importer;
-    //FMOD::Studio::System* system; /// Work
+    FMOD::Studio::System* system; /// Work
     //physx::PxFoundation* foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
     //    gDefaultErrorCallback);
     //IMGUI_CHECKVERSION();
