@@ -6,6 +6,9 @@
 //#include <assimp/Importer.hpp>
 #include <fmod/fmod_studio.hpp>
 //#include <physx/foundation/PxFoundation.h>
+//#include <physx/foundation/PxPhysicsVersion.h>
+//#include <physx/extensions/PxDefaultAllocator.h>
+//#include <physx/extensions/PxDefaultErrorCallback.h>
 #include <imgui/imgui.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -31,6 +34,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+    /// GLFW => WORK
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
@@ -43,6 +47,7 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    /// GLAD => WORK
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -51,15 +56,41 @@ int main()
         return -1;
     }
 
+    /// ASSIMP
     //Assimp::Importer importer;
-    FMOD::Studio::System* system; /// Work
+
+    /// FMOD => WORK
+    FMOD::Studio::System* system;
+    if (FMOD::Studio::System::create(&system) != FMOD_OK)
+	{
+		std::cout << "Failed to create FMOD system" << std::endl;
+		return -1;
+	}
+
+    /// PHYSX
+    //static physx::PxDefaultErrorCallback gDefaultErrorCallback;
+    //static physx::PxDefaultAllocator gDefaultAllocatorCallback;
     //physx::PxFoundation* foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
     //    gDefaultErrorCallback);
+
+    /// IMGUI => WORK
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    if (ImGui::GetCurrentContext() == NULL)
+	{
+		std::cout << "Failed to initialize IMGUI" << std::endl;
+		return -1;
+	}
+
+    /// STB => WORK
     int width, height, nbrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     unsigned char* texData = stbi_load("asset/padoru.png", &width, &height, &nbrChannels, 0);
+    if (!texData)
+    {
+		std::cout << "Failed to load texture" << std::endl;
+		return -1;
+    }
 
     // render loop
     // -----------
