@@ -11,6 +11,7 @@
 
 // FMod
 #include <fmod/fmod_studio.hpp>
+#include <fmod/fmod_errors.h>
 
 // UI includes
 #include <imgui/imgui.h>
@@ -71,11 +72,24 @@ int main()
     }
 
 
-    /// ASSIMP
+    /// ASSIMP => WORK
     loadModel("../asset/padoru.obj");
 
-    /// FMOD
-    //FMOD::Studio::System* system;
+    /// FMOD => WORK
+    FMOD_RESULT result;
+    FMOD::System* system;
+    result = FMOD::System_Create(&system);      // Create the main system object.
+    if (result != FMOD_OK)
+    {
+        printf("FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
+        exit(-1);
+    }
+    result = system->init(100, FMOD_INIT_NORMAL, 0);    // Initialize FMOD.
+    if (result != FMOD_OK)
+    {
+        printf("FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
+        exit(-1);
+    }
 
     /// IMGUI => WORK
     IMGUI_CHECKVERSION();
@@ -129,6 +143,7 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+    system->FMOD::System::release();
     return 0;
 }
 
