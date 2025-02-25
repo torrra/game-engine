@@ -49,6 +49,7 @@ target_include_directories(${TARGET_NAME}
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/physx
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/assimp
 	
 )
 

@@ -2,9 +2,12 @@
 #include <glfw/glfw3.h>
 #include <math/Arithmetic.hpp>
 #include <iostream>
+#include <string>
 
 // Model loader
-//#include <assimp/Importer.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 // FMod
 #include <fmod/fmod_studio.hpp>
@@ -21,6 +24,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void loadModel(std::string path);
 using namespace physx;
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -44,6 +48,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+    /// GLFW => WORK
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
@@ -56,6 +61,7 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    /// GLAD => WORK
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -65,21 +71,23 @@ int main()
     }
 
 
-//    Assimp::Importer importer;
+    /// ASSIMP
+    loadModel("../asset/padoru.obj");
 
-
+    /// FMOD
     //FMOD::Studio::System* system;
 
-
+    /// IMGUI => WORK
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
+    /// STB => WORK
     int width, height, nbrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     unsigned char* texData = stbi_load("asset/padoru.png", &width, &height, &nbrChannels, 0);
     (void) texData;
 
-
+    /// PHYSX => WORK
     gFoundation = PxCreateFoundation(
         PX_PHYSICS_VERSION,
         gDefaultAllocatorCallback,
@@ -140,4 +148,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void loadModel(std::string path)
+{
+    Assimp::Importer import;
+    const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return;
+    }
 }
