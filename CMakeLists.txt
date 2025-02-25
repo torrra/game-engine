@@ -9,7 +9,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 project(${PROJECT_NAME})
 
-add_subdirectory(librairies)
+include(FetchContent)
+FetchContent_Declare(
+    mathlib
+    GIT_REPOSITORY			   https://github.com/torrra/mathlib.git    # Fetch our math library from github
+    GIT_TAG                    main										# Get main branch
+    GIT_SHALLOW                ON                                       # Allow branch names as GIT_TAG argument
+)
+FetchContent_MakeAvailable(mathlib)
+
+add_subdirectory(dependencies)
 add_subdirectory(engine)
 
 if (MSVC)

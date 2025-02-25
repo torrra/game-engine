@@ -1,25 +1,35 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
-
+#include <math/Arithmetic.hpp>
 #include <iostream>
 
+// Model loader
 //#include <assimp/Importer.hpp>
+
+// FMod
 #include <fmod/fmod_studio.hpp>
-//#include <physx/foundation/PxFoundation.h>
-//#include <physx/foundation/PxPhysicsVersion.h>
-//#include <physx/extensions/PxDefaultAllocator.h>
-//#include <physx/extensions/PxDefaultErrorCallback.h>
+
+// UI includes
 #include <imgui/imgui.h>
+
+// PhysX includes
+#include <physx/PxPhysics.h>
+#include <physx/PxPhysicsAPI.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-
+using namespace physx;
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+static PxPhysics* gPhysicsSDK = NULL;
+static PxDefaultErrorCallback gDefaultErrorCallback;
+static PxDefaultAllocator gDefaultAllocatorCallback;
+static PxFoundation* gFoundation = NULL;
 
 int main()
 {
@@ -34,7 +44,6 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    /// GLFW => WORK
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
@@ -47,7 +56,6 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    /// GLAD => WORK
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -56,40 +64,39 @@ int main()
         return -1;
     }
 
-    /// ASSIMP
-    //Assimp::Importer importer;
 
-    /// FMOD => WORK
-    FMOD::Studio::System* system;
-    if (FMOD::Studio::System::create(&system) != FMOD_OK)
-	{
-		std::cout << "Failed to create FMOD system" << std::endl;
-		return -1;
-	}
+//    Assimp::Importer importer;
 
-    /// PHYSX
-    //static physx::PxDefaultErrorCallback gDefaultErrorCallback;
-    //static physx::PxDefaultAllocator gDefaultAllocatorCallback;
-    //physx::PxFoundation* foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-    //    gDefaultErrorCallback);
 
-    /// IMGUI => WORK
+    //FMOD::Studio::System* system;
+
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    if (ImGui::GetCurrentContext() == NULL)
-	{
-		std::cout << "Failed to initialize IMGUI" << std::endl;
-		return -1;
-	}
 
-    /// STB => WORK
     int width, height, nbrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     unsigned char* texData = stbi_load("asset/padoru.png", &width, &height, &nbrChannels, 0);
-    if (!texData)
+    (void) texData;
+
+
+    gFoundation = PxCreateFoundation(
+        PX_PHYSICS_VERSION,
+        gDefaultAllocatorCallback,
+        gDefaultErrorCallback);
+
+    // Creating instance of PhysX SDK
+    gPhysicsSDK = PxCreatePhysics(
+        PX_PHYSICS_VERSION,
+        *gFoundation,
+        PxTolerancesScale());
+
+    if (gPhysicsSDK == NULL)
     {
-		std::cout << "Failed to load texture" << std::endl;
-		return -1;
+        std::cerr << "Error creating PhysX device." << std::endl;
+        std::cerr << "Exiting..." << std::endl;
+        __debugbreak();
+        exit(1);
     }
 
     // render loop
@@ -129,6 +136,7 @@ void processInput(GLFWwindow* window)
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+    (void) window;
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
