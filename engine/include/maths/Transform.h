@@ -59,7 +59,7 @@ namespace Engine
 
 		/// Private members
 		lm::Vector3f	m_position	= lm::Vector3f(0.f, 0.f, 0.f);
-		lm::Quatf		m_rotation	= lm::Quatf(0.f, 0.f, 0.f, 1.f);
+		lm::Quatf		m_rotation	= lm::Quatf(1.f, 0.f, 0.f, 0.f);
 		lm::Vector3f	m_scale		= lm::Vector3f(1.f, 1.f, 1.f);
 
 	}; // !Class Transform
