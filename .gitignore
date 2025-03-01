@@ -8,6 +8,8 @@ nppBackup/
 
 # Build folder
 *[Bb]uild*/*
+![Bb]uild/assets
+![Bb]uild/shaders
 
 # vim files
 *.swp
