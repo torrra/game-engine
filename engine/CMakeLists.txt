@@ -3,9 +3,7 @@
 # CMake Prototype
 get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-set(Green       "${Esc}[32m")
-set(ColorReset "${Esc}[m")
-message("[${TARGET_NAME}] Starting source file fetching..")
+message(STATUS "[${TARGET_NAME}] Starting source file fetching..")
 
 # -- Header files -- #
 file(GLOB_RECURSE TARGET_HEADER_FILES
@@ -37,14 +35,13 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
 source_group("Extra files" FILES ${TARGET_EXTRA_FILES})
 
 add_library(${TARGET_NAME} SHARED)
-message("[${TARGET_NAME}] The library is being linked with the project's dependencies..")
 
 target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES})
 
 target_include_directories(${TARGET_NAME}
 	PUBLIC ${MATHLIB_INCLUDE_DIR} 
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine
+	)
 
 set_target_properties(${DEPENDENCY_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${TARGET_NAME}
@@ -61,4 +58,4 @@ endif()
 set(ENGINE_LIB ${TARGET_NAME} PARENT_SCOPE)
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include PARENT_SCOPE)
 
-message("[${TARGET_NAME}] Done..")
+message(STATUS "[${TARGET_NAME}] Done..")

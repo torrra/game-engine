@@ -1,7 +1,7 @@
 # ~ 2024_moteur_gpm_2027_gpm_2027_projet_moteur-mustang/editor/CMakeLists.txt
 
 get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-message("[${TARGET_NAME}] Starting source file fetching..")
+message(STATUS "[${TARGET_NAME}] Starting source file fetching..")
 
 # -- C++ version -- #
 set(CMAKE_CXX_STANDARD 20)
@@ -26,7 +26,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
 
 # -- Create target library -- #
 add_executable(${TARGET_NAME})
-message("[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
+message(STATUS "[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
 
 # -- Add sources to target -- #
 target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES})
@@ -41,4 +41,4 @@ target_link_libraries(${TARGET_NAME}
 	PRIVATE ${ENGINE_LIB}
 )
 
-message("[${TARGET_NAME}] Done..")
+message(STATUS "[${TARGET_NAME}] Done..")
