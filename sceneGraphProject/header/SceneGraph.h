@@ -37,12 +37,24 @@ namespace engine
 		EntityHandle CreateEntity(const std::string& name,
 								  EntityHandle parent = Entity::INVALID_HANDLE);
 
+		template <CValidComponent TComponentType>
+		TComponentType* CreateComponent(EntityHandle ownerEntity);
+
+		template <CValidComponent TComponentType>
+		TComponentType* GetComponent(EntityHandle ownerEntity);
+
 		Entity* GetEntity(EntityHandle& handle);
 
 		Entity* GetEntityUnchecked(EntityHandle handle);
 
 		Entity* GetEntity(const std::string& name);
 
+		void	DestroyEntity(EntityHandle entity);
+
+		std::vector<EntityHandle> GetChildren(EntityHandle parent);
+		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
+
+		
 
 		static uint64 RandomNumber(void);
 
@@ -54,9 +66,12 @@ namespace engine
 
 		EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
 		EntityHandle ReparentEntity(Entity& toReparent, EntityHandle newParent, 
-								    uint64 basePos = 0);
+								    uint64 basePos);
+
+		void		 ReparentEntity(Entity& toReparent, EntityHandle newParent);
 
 		EntityHandle MoveEntityToBack(Entity& toMove, EntityHandle newParent);
+		void AddChildrenToArray(std::vector<EntityHandle>& array, EntityHandle parent);
 
 		ComponentArray<Transform>			m_sceneTransforms;
 		std::vector<Entity>					m_sceneEntities;
@@ -71,6 +86,41 @@ namespace engine
 	inline ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void)
 	{
 		return m_sceneTransforms;
+	}
+
+
+	template<CValidComponent TComponentType>
+	inline TComponentType* SceneGraph::GetComponent(EntityHandle ownerEntity)
+	{
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		Entity* ownerPtr = GetEntity(ownerEntity);
+
+		if (!ownerPtr)
+			return nullptr;
+
+		if (ownerPtr->HasComponent<TComponentType>())
+			return array.GetComponent(ownerEntity);
+
+		return nullptr;
+	}
+
+
+	template<CValidComponent TComponentType>
+	inline TComponentType* SceneGraph::CreateComponent(EntityHandle ownerEntity)
+	{
+		Entity* ownerPtr = GetEntity(ownerEntity);
+
+		if (!ownerPtr)
+			return nullptr;
+
+		if (ownerPtr->HasComponent<TComponentType>())
+			return GetComponent<TComponentType>(ownerEntity);
+
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
+		return array.CreateComponent(ownerEntity, ownerPtr->m_parent);
 	}
 
 }

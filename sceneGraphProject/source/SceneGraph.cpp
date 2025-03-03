@@ -23,21 +23,22 @@ namespace engine
 
 			if (!currentEntity.IsValid())
 			{
-				printf("filling invalid slot\n");
+				printf("[Scene graph]: filling invalid slot\n");
 
 				currentEntity = Entity(name, MakeHandle(newIndex, newUID), parent);
-				return ReparentEntity(currentEntity, parent, newIndex);
+
+				return currentEntity.m_handle;
 			}
 		}
 
-		printf("creating new slot\n");
+		printf("[Scene graph]: creating new slot\n");
 
 		EntityHandle newHandle = MakeHandle(newIndex, newUID);
 
 		if (newHandle != Entity::INVALID_HANDLE)
 			m_sceneEntities.emplace_back(name, newHandle, parent);
 		else
-			printf("no entity created\n");
+			printf("[Scene graph]: no entity created\n");
 
 		return newHandle;
 	}
@@ -59,12 +60,12 @@ namespace engine
 			if (uid == (currentEntity.m_handle & Entity::UID_MASK))
 			{
 				handle = currentEntity.m_handle;
-				printf("found entity elsewhere, handle updated\n");
+				printf("[Scene graph]: found entity elsewhere, handle updated\n");
 				return &currentEntity;
 			}
 		}
 
-		printf("entity not found\n");
+		printf("[Scene graph]: entity not found\n");
 		return nullptr;
 	}
 
@@ -87,7 +88,7 @@ namespace engine
 		if (!entity.IsValid())
 			return nullptr;
 
-		printf("found entity with matching handle\n");
+		printf("[Scene graph]: found entity with matching handle\n");
 		return &entity;
 	}
 
@@ -101,6 +102,53 @@ namespace engine
 		}
 
 		return nullptr;
+	}
+
+	void SceneGraph::DestroyEntity(EntityHandle entity)
+	{
+		if (Entity* entityPtr = GetEntity(entity))
+		{
+			if (entityPtr->m_statusFlags & Entity::TRANSFORM)
+				m_sceneTransforms.InvalidateComponent(entity);
+
+			entityPtr->Invalidate();
+		}
+	}
+
+	std::vector<EntityHandle> SceneGraph::GetChildren(EntityHandle parent)
+	{
+		std::vector<EntityHandle> children;
+
+		for (Entity& entity : m_sceneEntities)
+		{
+			if (!entity.IsValid())
+				continue;
+
+			if (entity.m_parent == parent)
+				children.push_back(entity.m_handle);
+		}
+
+		return children;
+	}
+
+	std::vector<EntityHandle> SceneGraph::GetChildrenAllLevels(EntityHandle parent)
+	{
+		std::vector<EntityHandle> children = GetChildren(parent);	
+
+		uint64 index = 0;
+
+		while(index < children.size())
+		{
+			for (Entity& entity : m_sceneEntities)
+			{
+				if (entity.m_parent == children[index])
+					children.push_back(entity.m_handle);
+			}
+
+			++index;
+		}
+
+		return children;
 	}
 
 	EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
@@ -124,20 +172,47 @@ namespace engine
 
 		if (toReparentIndex >= parentIndex)
 		{
-			printf("reparent complete with no layout changes\n");
+			printf("[Scene graph]: reparent complete with no layout changes\n");
 
-			toReparent.m_parent = newParent;
 			return toReparent.m_handle;
 		}
 		else
 		{
-			printf("moving child to back of array\n");
+			printf("[Scene graph]: moving child to back of array\n");
 
 			m_sceneTransforms.MoveReparentedComponent(toReparent.m_handle);
 
 			return toReparent.m_handle;
 		}
-		
+
+		toReparent.m_parent = newParent;
+	}
+
+	void SceneGraph::ReparentEntity(Entity& toReparent, EntityHandle newParent)
+	{
+		if (newParent == Entity::INVALID_HANDLE || newParent == toReparent.m_handle)
+			return;
+
+		EntityHandle parentIndex = (newParent & Entity::INDEX_MASK);
+		EntityHandle toReparentIndex = (toReparent.m_handle & Entity::INDEX_MASK);
+
+		if (toReparentIndex < parentIndex)
+		{
+			printf("[Scene graph]: moving child to back of array\n");
+			m_sceneTransforms.MoveReparentedComponent(toReparent.m_handle);
+
+			std::vector<EntityHandle> allChildren = GetChildrenAllLevels(toReparent.m_handle);
+
+			for (EntityHandle child : allChildren)
+			{
+				m_sceneTransforms.MoveReparentedComponent(child);
+			}
+		}
+
+		else
+			printf("[Scene graph]: reparent complete with no layout changes\n");
+
+		toReparent.m_parent = newParent;
 	}
 
 	EntityHandle SceneGraph::MoveEntityToBack(Entity& toMove, EntityHandle newParent)
@@ -150,15 +225,22 @@ namespace engine
 		Entity& reparentedEntity = m_sceneEntities.emplace_back(toMove);
 		reparentedEntity.m_parent = newParent;
 		reparentedEntity.m_handle = newHandle;
-		reparentedEntity.m_flags &= (~ecs::INVALID_OBJECT);
+		reparentedEntity.m_statusFlags &= (~ecs::INVALID_OBJECT);
 
 		return newHandle;
 	}
 
+	void SceneGraph::AddChildrenToArray(std::vector<EntityHandle>& array, EntityHandle parent)
+	{
+		for (Entity& entity : m_sceneEntities)
+		{
+			if (!entity.IsValid())
+				continue;
 
-
-
-
+			if (entity.m_parent == parent)
+				array.push_back(entity.m_handle);
+		}
+	}
 
 	SceneGraph::Random::Random(std::random_device randomDevice)
 		: m_generator(randomDevice()), m_distribution(0, ULONG_MAX)
