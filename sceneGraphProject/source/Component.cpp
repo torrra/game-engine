@@ -1,0 +1,28 @@
+#include "Component.h"
+
+namespace engine
+{
+	bool Component::IsValid(void) const
+	{
+		return !(m_flags & ecs::INVALID_OBJECT);
+	}
+
+	bool Component::IsActive(void) const
+	{
+		return !(m_flags & ecs::INACTIVE_OBJECT);
+	}
+
+	void Component::Activate(bool activeState)
+	{
+		if (activeState)
+			m_flags &= (~ecs::EFlags::INACTIVE_OBJECT);
+
+		else
+			m_flags |= ecs::EFlags::INACTIVE_OBJECT;
+	}
+
+	void Component::Invalidate(void)
+	{
+		m_flags |= ecs::INVALID_OBJECT;
+	}
+}
