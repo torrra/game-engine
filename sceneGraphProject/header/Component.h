@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "TypesECS.h"
+#include "Entity.h"
 
 namespace engine
 {
@@ -15,6 +16,8 @@ namespace engine
 
 	public:
 
+		Component(EntityHandle owner);
+
 		virtual void Update(void) = 0;
 
 
@@ -22,15 +25,12 @@ namespace engine
 		bool IsActive(void) const;
 
 		void Activate(bool activeState);
-
-	private:
-
 		void Invalidate(void);
 
 	protected:
 
 		EntityHandle	m_owner;
-		uint64			m_flags;
+		uint64			m_flags = 0;
 	};
 
 	template <CValidComponent TComponentType>

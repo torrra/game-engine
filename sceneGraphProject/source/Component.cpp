@@ -2,6 +2,11 @@
 
 namespace engine
 {
+	Component::Component(EntityHandle owner)
+		: m_owner(owner)
+	{
+	}
+
 	bool Component::IsValid(void) const
 	{
 		return !(m_flags & ecs::INVALID_OBJECT);
