@@ -20,37 +20,12 @@ file(GLOB_RECURSE TARGET_SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
 
+# -- Extra files -- #
 file(GLOB TARGET_EXTRA_FILES
 	${CMAKE_SOURCE_DIR}/.gitignore
 	${CMAKE_SOURCE_DIR}/.gitattributes
 	${CMAKE_SOURCE_DIR}/*.md
     ${CMAKE_SOURCE_DIR}/*.txt
-)
-
-# -- Shader files -- #
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(GLOB_RECURSE SHADER_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.shader
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.vert
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.vs
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.frag
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.fs
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.glsl
-)
-
-# -- Asset files -- #
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/asset DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(GLOB_RECURSE TARGET_ASSET_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.jpg
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.jpeg
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.png
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.obj
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.mtl
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.wav
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.mp3
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.mp4
 )
 
 file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug/)
@@ -59,21 +34,16 @@ file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release/)
 set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
-source_group("Shaders" ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SHADER_FILES})
 source_group("Extra files" FILES ${TARGET_EXTRA_FILES})
 
-add_executable(${TARGET_NAME})
-message("[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
+add_library(${TARGET_NAME} SHARED)
+message("[${TARGET_NAME}] The library is being linked with the project's dependencies..")
 
-
-#target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_ASSET_FILES})
-#set_source_files_properties(${TARGET_ASSET_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
-
-target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES} ${SHADER_FILES})
+target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES})
 
 target_include_directories(${TARGET_NAME}
-	PRIVATE ${MATHLIB_INCLUDE_DIR} 
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+	PUBLIC ${MATHLIB_INCLUDE_DIR} 
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 set_target_properties(${DEPENDENCY_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
@@ -86,5 +56,8 @@ if (MSVC)
 	target_link_options(${TARGET_NAME} PRIVATE /IGNORE:4099)
 	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 endif()
+
+set(ENGINE_LIB ${TARGET_NAME} PARENT_SCOPE)
+set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include PARENT_SCOPE)
 
 message("[${TARGET_NAME}] Done..")
