@@ -24,8 +24,4 @@ namespace engine
 	template <typename TComponentType>
 	concept CValidComponent = std::derived_from<TComponentType, Component>;
 
-
-
-	class Transform;
-
 }
