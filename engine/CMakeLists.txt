@@ -36,22 +36,19 @@ set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
 source_group("Extra files" FILES ${TARGET_EXTRA_FILES})
 
-###### TODO : CHANGE TO LIBRARY IN THE FUTURE
-add_executable(${TARGET_NAME})
-message("[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
+add_library(${TARGET_NAME} SHARED)
+message("[${TARGET_NAME}] The library is being linked with the project's dependencies..")
 
 target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES})
 
 target_include_directories(${TARGET_NAME}
-	PRIVATE ${MATHLIB_INCLUDE_DIR} 
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+	PUBLIC ${MATHLIB_INCLUDE_DIR} 
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 set_target_properties(${DEPENDENCY_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
-set_target_properties(${EDITOR_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${TARGET_NAME}
 	PRIVATE ${DEPENDENCIES_LIBRARY}
-	PRIVATE ${EDITOR_LIBRARY}
 )
 
 if (MSVC)
@@ -59,5 +56,8 @@ if (MSVC)
 	target_link_options(${TARGET_NAME} PRIVATE /IGNORE:4099)
 	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 endif()
+
+set(ENGINE_LIB ${TARGET_NAME} PARENT_SCOPE)
+set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include PARENT_SCOPE)
 
 message("[${TARGET_NAME}] Done..")

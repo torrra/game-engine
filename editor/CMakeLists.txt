@@ -25,7 +25,7 @@ set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
 
 # -- Create target library -- #
-add_library(${TARGET_NAME} STATIC)
+add_executable(${TARGET_NAME})
 message("[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
 
 # -- Add sources to target -- #
@@ -33,8 +33,12 @@ target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES})
 
 # -- Set public include directory for this and other projects -- #
 target_include_directories(${TARGET_NAME}
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-	
-# -- Set name as exposed variable to build other projects -- #
-set(EDITOR_LIBRARY ${TARGET_NAME} PARENT_SCOPE)
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+	PRIVATE ${ENGINE_INCLUDE_DIR}
+)
+
+target_link_libraries(${TARGET_NAME}
+	PRIVATE ${ENGINE_LIB}
+)
+
 message("[${TARGET_NAME}] Done..")
