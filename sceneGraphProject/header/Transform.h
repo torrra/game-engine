@@ -10,6 +10,13 @@ namespace engine
     class Transform final : public Component
     {
 
+		using Component::Component;
+
+		void Update(void) override
+		{
+
+		}
+
     private:
 
 	    math::Quatf    m_localRotation;
@@ -27,4 +34,11 @@ namespace engine
 	{
 		static constexpr bool m_value = true;
 	};
+
+	template<>
+	inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Transform>()
+	{
+		return TRANSFORM;
+	}
+
 }
