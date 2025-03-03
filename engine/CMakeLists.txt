@@ -49,6 +49,7 @@ target_include_directories(${TARGET_NAME}
 set_target_properties(${DEPENDENCY_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${TARGET_NAME}
 	PRIVATE ${DEPENDENCIES_LIBRARY}
+	PUBLIC ${MATHLIB_LIB}
 )
 
 if (MSVC)
