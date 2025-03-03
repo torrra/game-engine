@@ -20,19 +20,35 @@ namespace engine
 
 		virtual void Update(void) = 0;
 
-
+		// Is this component a valid object?
+		// true: this object is a valid component instance
+		// false: this object is 'dead' and subject to overwrite
 		bool IsValid(void) const;
+
+		// Is this component included when updating the scene?
 		bool IsActive(void) const;
 
+		// Set the component's active status
+		// true: will be included in update
+		// false: will be excluded in update
 		void Activate(bool activeState);
+
+		// Permanently set object up for destruction
 		void Invalidate(void);
 
 	protected:
 
+		// which entity in scene graph owns this component
 		EntityHandle	m_owner;
+
+		// status modifiers that affect behavior (inactive, invalid)
 		uint64			m_flags = 0;
 	};
 
+
+	// Defines whether a type has objects that NEED to be updated after their parents
+	// e.g. a transform component should be updated after its owner's transform.
+	// False by default, must be manually instanciated and defined as true if needed
 	template <CValidComponent TComponentType>
 	struct UpdateAfterParent
 	{

@@ -19,9 +19,11 @@ namespace engine
 
 	void Component::Activate(bool activeState)
 	{
+		// Reset inactive bit
 		if (activeState)
 			m_flags &= (~ecs::EFlags::INACTIVE_OBJECT);
 
+		// Toggle inactive bit
 		else
 			m_flags |= ecs::EFlags::INACTIVE_OBJECT;
 	}
