@@ -24,6 +24,26 @@ namespace engine
 		m_statusFlags |= ecs::INVALID_OBJECT;
 	}
 
+	EntityHandle Entity::GetHandle(void) const
+	{
+		return m_handle;
+	}
+
+	EntityHandle Entity::GetParent(void) const
+	{
+		return m_parent;
+	}
+
+	std::string Entity::GetName(void) const
+	{
+		return m_name;
+	}
+
+	void Entity::SetName(const std::string& name)
+	{
+		m_name = name;
+	}
+
 	bool Entity::IsValid() const
 	{
 		return !(m_statusFlags & ecs::INVALID_OBJECT);
@@ -31,14 +51,16 @@ namespace engine
 
 	void Entity::Activate(bool activeState)
 	{
+		// Reset inactive bit
 		if (activeState)
 			m_statusFlags &= (~ecs::EFlags::INACTIVE_OBJECT);
 
+		// Toggle inactive bit
 		else
 			m_statusFlags |= ecs::EFlags::INACTIVE_OBJECT;
 	}
 
-	void Entity::Print(void)
+	void Entity::Print(void) const
 	{
 		printf("\n[Entity]\nname: %s\nhandle: %zu\nparent: %zu\nflags: %zu\ncomponents: \
 %zu\n\n", m_name.c_str(), m_handle, m_parent, m_statusFlags, m_components);
