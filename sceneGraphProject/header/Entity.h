@@ -42,6 +42,9 @@ namespace engine
 
 		void Print(void);
 
+		template<CValidComponent TComponentType>
+		bool HasComponent(void);
+
 	//private:
 
 
@@ -49,12 +52,29 @@ namespace engine
 
 		void Invalidate(void);
 
+		template<CValidComponent TComponentType>
+		static constexpr EComponentFlags GetComponentFlag();
+
 		std::string			m_name;
 		EntityHandle		m_handle;
 		EntityHandle		m_parent = INVALID_HANDLE;
-		uint64				m_flags = ecs::NONE;
+		uint64				m_statusFlags = ecs::NONE;
 		uint64				m_components = NO_COMPONENTS;
 
 	};
+
+	template<CValidComponent TComponentType>
+	inline constexpr Entity::EComponentFlags Entity::GetComponentFlag()
+	{
+		return NO_COMPONENTS;
+	}
+
+
+	template<CValidComponent TComponentType>
+	inline bool Entity::HasComponent(void)
+	{
+		return m_components & GetComponentFlag<TComponentType>();
+	}
+
 
 }
