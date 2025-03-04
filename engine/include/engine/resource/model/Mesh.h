@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model/Vertex.h"
+#include "Vertex.h"
 
 #include <vector>
 

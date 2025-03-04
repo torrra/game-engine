@@ -1,5 +1,5 @@
-#include "model/Buffer.h"
-#include "model/Vertex.h"
+#include "resource/model/Buffer.h"
+#include "resource/model/Vertex.h"
 
 #include <glad/glad.h>
 

@@ -1,6 +1,6 @@
-#include "model/Model.h"
-#include "model/Buffer.h"
-#include "model/Vertex.h"
+#include "resource/model/Model.h"
+#include "resource/model/Buffer.h"
+#include "resource/model/Vertex.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

@@ -1,5 +1,5 @@
-#include "model/Mesh.h"
-#include "model/Buffer.h"
+#include "resource/model/Mesh.h"
+#include "resource/model/Buffer.h"
 
 #include <assimp/mesh.h>
 #include <assimp/vector3.h>
