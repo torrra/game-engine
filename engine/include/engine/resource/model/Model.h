@@ -1,10 +1,10 @@
 #pragma once
 
-#include "resource/Resource.h"
+#include "engine/resource/Resource.h"
 #include "Mesh.h"
 
 #include <vector>
-#include "EngineExport.h"
+#include "engine/EngineExport.h"
 
 struct aiNode;
 struct aiScene;
@@ -22,7 +22,7 @@ namespace engine
 		ENGINE_API virtual		~Model(void) = default;
 
 		ENGINE_API virtual void	LoadResource(const char* fileName) override;
-		void			Update(void); // TODO: temporary function remove
+		ENGINE_API void			Update(void); // TODO: temporary function remove
 
 	private:
 		void			ProcessNodes(aiNode* node, const aiScene* scene);
