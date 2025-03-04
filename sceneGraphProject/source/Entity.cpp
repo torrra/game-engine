@@ -15,6 +15,7 @@ namespace engine
 		m_statusFlags = rhs.m_statusFlags;
 		m_components = rhs.m_components;
 		m_handle = rhs.m_handle;
+		m_parent = rhs.m_parent;
 
 		return (*this);
 	}

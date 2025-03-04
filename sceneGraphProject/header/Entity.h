@@ -54,9 +54,6 @@ namespace engine
 		template<CValidComponent TComponentType>
 		bool HasComponent(void) const;
 
-		// Permanently set object up for destruction
-		void Invalidate(void);
-
 		EntityHandle GetHandle(void) const;
 		EntityHandle GetParent(void) const;
 
@@ -66,6 +63,9 @@ namespace engine
 		Entity& operator=(const Entity& rhs);
 
 	private:
+
+		// Permanently set object up for destruction
+		void Invalidate(void);
 
 		// Get EComponentFlag corresponding to the component type
 		// NO_COMPONENT by default, must be manually instanciated for
