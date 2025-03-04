@@ -1,5 +1,5 @@
-#include "SceneGraph.h"
-#include "Entity.h"
+#include "core/SceneGraph.h"
+#include "core/Entity.h"
 
 #include <iostream>
 
@@ -105,7 +105,7 @@ namespace engine
 	void SceneGraph::ReparentEntity(EntityHandle toReparent, EntityHandle newParent)
 	{
 		if (Entity* toReparentPtr = GetEntity(toReparent))
-			ReparentEntity(toReparent, newParent);
+			ReparentEntity(toReparentPtr, newParent);
 	}
 
 	std::vector<EntityHandle> SceneGraph::GetChildren(EntityHandle parent)

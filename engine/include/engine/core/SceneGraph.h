@@ -4,11 +4,12 @@
 #include <vector>
 #include <string>
 
+#include "engine/EngineExport.h"
 #include "TypesECS.h"
 #include "Component.h"
 #include "Entity.h"
 #include "ComponentArray.h"
-#include "Transform.h"
+#include "components/Transform.h"
 
 namespace engine
 {
@@ -38,6 +39,7 @@ namespace engine
 		// Create a new entity in the current scene.
 		// Returns a unique handle that is used to retrieve the handle from its
 		// memory location, and is used to check the entity's existence/validity.
+		ENGINE_API	
 		EntityHandle CreateEntity(const std::string& name,
 								  EntityHandle parent = Entity::INVALID_HANDLE);
 

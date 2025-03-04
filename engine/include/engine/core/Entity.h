@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "TypesECS.h"
+#include "engine/core/TypesECS.h"
 
 namespace engine
 {

@@ -68,7 +68,10 @@ namespace engine
 		TComponentType&		toMove = m_components[m_entityIndexMap[owner]];
 
 		m_components.emplace_back(toMove);
+
 		toMove.Invalidate();
+		m_entityIndexMap[owner] = newIndex;
+
 		printf("yea we moving the component\n");
 		return true;
 
@@ -85,7 +88,10 @@ namespace engine
 
 		// copy component to move in the back of the array and invalidate old version
 		m_components.emplace_back(toMove);
+
 		toMove.Invalidate();
+		m_entityIndexMap[owner] = newIndex;
+
 		printf("yea we moving the component\n");
 		return true;
 	}

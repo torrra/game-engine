@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include "Entity.h"
+#include "core/Entity.h"
 
 namespace engine
 {
