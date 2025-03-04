@@ -17,6 +17,7 @@ namespace engine
 
 	private:
 
+		// Random uint64 generator.
 		class Random
 		{
 		public:
@@ -34,48 +35,81 @@ namespace engine
 
 	public:
 
+		// Create a new entity in the current scene.
+		// Returns a unique handle that is used to retrieve the handle from its
+		// memory location, and is used to check the entity's existence/validity.
 		EntityHandle CreateEntity(const std::string& name,
 								  EntityHandle parent = Entity::INVALID_HANDLE);
 
+		// Create a component to attach to an existing entity.
+		// An entity can only have one component of each type
+		// NOTE: Pointers are not guaranteed to persist through the
+		// program's lifetime. GetComponent() should be called frequently to
+		// ensure the reference is up-to-date
 		template <CValidComponent TComponentType>
 		TComponentType* CreateComponent(EntityHandle ownerEntity);
 
+		// Get an existing component from an entity.
+		// Returns nullptr if:
+		// - the entity does not own such a component
+		// - the entity does not exist or is invalid
+		// NOTE: Pointers are not guaranteed to persist through the
+		// program's lifetime. This function should be called frequently to
+		// ensure the reference is up-to-date
 		template <CValidComponent TComponentType>
 		TComponentType* GetComponent(EntityHandle ownerEntity);
 
-		Entity* GetEntity(EntityHandle& handle);
+		// Get a raw pointer to the entity from its handle.
+		// Returns nullptr if:
+		// - the entity does not exist
+		// - the entity exists but was flagged as invalid
+		// NOTE: Pointers are not guaranteed to persist through the
+		// program's lifetime. This function should be called frequently to
+		// ensure the reference is up-to-date
+		Entity* GetEntity(EntityHandle handle);
 
-		Entity* GetEntityUnchecked(EntityHandle handle);
-
+		// Get the first entity encountered with that name. May not be the highest
+		// object displayed in the hierarchy. Entity must have a unique name to 
+		// guarantee the entity you're getting is the right one
+		// NOTE: Pointers are not guaranteed to persist through the
+		// program's lifetime. This function should be called frequently to
+		// ensure the reference is up-to-date
 		Entity* GetEntity(const std::string& name);
 
+		// Permanently set an entity for destruction/overwrite.
 		void	DestroyEntity(EntityHandle entity);
 
+		// Give a new parent to an entity
+		void	ReparentEntity(EntityHandle toReparent, EntityHandle newParent);
+
+		// Get an entity's direct children (no grandchildren, etc)
 		std::vector<EntityHandle> GetChildren(EntityHandle parent);
-		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
 
-		
+		// Get all of entity's children, grandchildren, etc
+		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);		
 
+		// Output a uint64 between 0 and ULONG_MAX
 		static uint64 RandomNumber(void);
 
-	//private:
+	private:
 
+		// Get the component array corresponding to a type
 		template <CValidComponent TComponentType>
 		ComponentArray<TComponentType>& GetComponentArray(void);
 
-
+		// Group the index and uid bits together in a 64-bit handle
 		EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
-		EntityHandle ReparentEntity(Entity& toReparent, EntityHandle newParent, 
-								    uint64 basePos);
 
-		void		 ReparentEntity(Entity& toReparent, EntityHandle newParent);
+		// Internal ReparentEntity overload. Direclty uses an entity's pointer
+		void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
 
-		EntityHandle MoveEntityToBack(Entity& toMove, EntityHandle newParent);
-		void AddChildrenToArray(std::vector<EntityHandle>& array, EntityHandle parent);
-
+		// All transform components in the scene
 		ComponentArray<Transform>			m_sceneTransforms;
+
+		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
 
+		// Random uint64 generator. We only need a unique instance
 		static Random						m_randomNumGen;
 	};
 
@@ -94,15 +128,7 @@ namespace engine
 	{
 		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
-		Entity* ownerPtr = GetEntity(ownerEntity);
-
-		if (!ownerPtr)
-			return nullptr;
-
-		if (ownerPtr->HasComponent<TComponentType>())
-			return array.GetComponent(ownerEntity);
-
-		return nullptr;
+		return array.GetComponent(ownerEntity);
 	}
 
 
@@ -114,13 +140,18 @@ namespace engine
 		if (!ownerPtr)
 			return nullptr;
 
+		// return existing component instead
 		if (ownerPtr->HasComponent<TComponentType>())
 			return GetComponent<TComponentType>(ownerEntity);
 
 		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
+		// set owner flag to tell that it owns a component of this type
 		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
 		return array.CreateComponent(ownerEntity, ownerPtr->m_parent);
 	}
 
 }
+
+// short, convenient namespace alias
+namespace mustang_2024_moteur_gpm_2027_gpm_2027_projet_moteur = engine;
