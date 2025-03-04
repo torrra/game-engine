@@ -36,6 +36,10 @@ namespace engine
 
 	public:
 
+		ENGINE_API SceneGraph(void) = default;
+		ENGINE_API SceneGraph(const SceneGraph&) = default;
+		ENGINE_API ~SceneGraph(void) = default;
+
 		// Create a new entity in the current scene.
 		// Returns a unique handle that is used to retrieve the handle from its
 		// memory location, and is used to check the entity's existence/validity.
@@ -68,6 +72,7 @@ namespace engine
 		// NOTE: Pointers are not guaranteed to persist through the
 		// program's lifetime. This function should be called frequently to
 		// ensure the reference is up-to-date
+		ENGINE_API
 		Entity* GetEntity(EntityHandle handle);
 
 		// Get the first entity encountered with that name. May not be the highest
@@ -76,21 +81,30 @@ namespace engine
 		// NOTE: Pointers are not guaranteed to persist through the
 		// program's lifetime. This function should be called frequently to
 		// ensure the reference is up-to-date
+		ENGINE_API
 		Entity* GetEntity(const std::string& name);
 
 		// Permanently set an entity for destruction/overwrite.
+		ENGINE_API
 		void	DestroyEntity(EntityHandle entity);
 
 		// Give a new parent to an entity
+		ENGINE_API
 		void	ReparentEntity(EntityHandle toReparent, EntityHandle newParent);
 
 		// Get an entity's direct children (no grandchildren, etc)
+		ENGINE_API
 		std::vector<EntityHandle> GetChildren(EntityHandle parent);
 
 		// Get all of entity's children, grandchildren, etc
-		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);		
+		ENGINE_API
+		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
+
+		ENGINE_API
+		SceneGraph& operator=(const SceneGraph&) = default;
 
 		// Output a uint64 between 0 and ULONG_MAX
+		ENGINE_API
 		static uint64 RandomNumber(void);
 
 	private:
