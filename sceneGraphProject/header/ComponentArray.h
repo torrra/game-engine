@@ -9,12 +9,34 @@ namespace engine
 	{
 	public:
 
-		void			MoveReparentedComponent(EntityHandle owner);
+		// Check if a component should be moved to the back of the array. The component will
+		// only be moved if the component type requires children to be updated after parents,
+		// and if the child is found before the parent.
+		// false: component has not been found or has not been moved
+		// true: component was found and moved to the back of the array
+		bool			MoveReparentedComponent(EntityHandle owner, EntityHandle parent);
+
+		// Force component to move to the back of the array. Only check if the component
+		// exists
+		// false: component has not been found
+		// true: component was found and moved
+		bool			MoveReparentedComponent(EntityHandle owner);
+
+		// Permanently et a component up for destruction
 		void			InvalidateComponent(EntityHandle owner);
+
+		// Create a new component
 		TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent);
 		TComponentType* GetComponent(EntityHandle owner);
 
+		// Check if an entity owns a component in this array
+		bool			HasComponent(EntityHandle entity);
+
 	private:
+
+		// Create a component without checking if the object's parent is
+		// before its new memory location
+		TComponentType* CreateComponentUnordered(EntityHandle owner);
 
 		std::unordered_map<EntityHandle, uint64>	m_entityIndexMap;
 		std::vector<TComponentType>					m_components;
@@ -22,37 +44,76 @@ namespace engine
 
 
 	template<CValidComponent TComponentType>
-	inline void ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner)
+	inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner, EntityHandle parent)
 	{
+		// do not do anything if the contained type is not sensitive to
+		// the memory layout (if parents don't need to be updated before children)
 		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
 		{
 			printf("not moving component");
-			return;
+			return false;
 		}
 
-		printf("yea we moving the component\n");
+		if ((!m_entityIndexMap.contains(owner)))
+			return false;
 
-		if ((!m_entityIndexMap.contains(owner)) || m_components.empty())
-			return;
+		if (!m_entityIndexMap.contains(parent) ||
+			m_entityIndexMap[parent] < m_entityIndexMap[owner])
+		{
+			printf("parent is already before child\n");
+			return false;
+		}
 
 		uint64				newIndex = m_components.size();
 		TComponentType&		toMove = m_components[m_entityIndexMap[owner]];
 
 		m_components.emplace_back(toMove);
 		toMove.Invalidate();
+		printf("yea we moving the component\n");
+		return true;
 
+	}
+
+	template<CValidComponent TComponentType>
+	inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner)
+	{	
+		if (!m_entityIndexMap.contains(owner))
+			return false;
+
+		uint64			newIndex = m_components.size();
+		TComponentType& toMove = m_components[m_entityIndexMap[owner]];
+
+		// copy component to move in the back of the array and invalidate old version
+		m_components.emplace_back(toMove);
+		toMove.Invalidate();
+		printf("yea we moving the component\n");
+		return true;
 	}
 
 	template<CValidComponent TComponentType>
 	inline void ComponentArray<TComponentType>::InvalidateComponent(EntityHandle owner)
 	{
+		if (!m_entityIndexMap.contains(owner))
+			return;
+
+		// set component to be written over
 		m_components[m_entityIndexMap[owner]].Invalidate();
+
+		// erase mapping to owner entity
 		m_entityIndexMap.erase(owner);
 	}
 
 	template<CValidComponent TComponentType>
 	inline TComponentType* ComponentArray<TComponentType>::CreateComponent(EntityHandle owner, EntityHandle parent)
-	{		
+	{	
+		// Creates new component with no regard for ordering if new component does not
+		// need to be updated after parent
+		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
+			return CreateComponentUnordered(owner);
+
+		// parentIndex is 0 by default so that it is always considered 'before'
+		// the new component when the latter has no actual parent, makes it so it
+		// fails later 'parentIndex > newIndex' check and does not stop overwrite
 		EntityHandle    parentIndex = 0;
 
 		if (m_entityIndexMap.contains(parent))
@@ -62,6 +123,7 @@ namespace engine
 		{
 			TComponentType& currentComponent = m_components[newIndex];
 
+			// Do not overwrite component if it is valid or before parent
 			if (currentComponent.IsValid() || parentIndex > newIndex)
 				continue;
 
@@ -84,5 +146,36 @@ namespace engine
 			return nullptr;
 
 		return &m_components[m_entityIndexMap[owner]];
+	}
+
+	template<CValidComponent TComponentType>
+	inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity)
+	{
+		return m_entityIndexMap.contains(entity);
+	}
+
+	template<CValidComponent TComponentType>
+	inline TComponentType* ComponentArray<TComponentType>::CreateComponentUnordered(EntityHandle owner)
+	{
+		// write over invalid component if possible
+		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
+		{
+			TComponentType& currentComponent = m_components[newIndex];
+
+			if (currentComponent.IsValid())
+				continue;
+
+			printf("[Component array]: filling invalid slot\n");
+
+			currentComponent = TComponentType(owner);
+			m_entityIndexMap[owner] = newIndex;
+			return &currentComponent;
+		}
+
+		printf("[Component array]: creating new slot\n");
+
+		// create new component if no invalid component was found
+		m_entityIndexMap[m_components.size()] = owner;
+		return &m_components.emplace_back(owner);
 	}
 }
