@@ -68,7 +68,7 @@ bool engine::Input::IsInputReleased(int input)
 	return result;
 }
 
-void engine::Input::StaticKeyboardCallback(GLFWwindow* window, int key, int scanCode, int action, int mods)
+void engine::Input::KeyboardCallback(GLFWwindow* window, int key, int scanCode, int action, int mods)
 {
 	/*
 	*	Keyboard Callback
@@ -111,6 +111,14 @@ void engine::Input::CursorPosCallback(GLFWwindow* window, double xPos, double yP
 	(void) window;
 
 	GetInstance()->m_cursorPos = math::Vector2<double>(xPos, yPos);
+}
+
+ENGINE_API void engine::Input::SetInputCallbacks(GLFWwindow* window)
+{
+	glfwSetKeyCallback(window, KeyboardCallback);
+	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+	glfwSetScrollCallback(window, MouseScrollCallback);
+	glfwSetCursorPosCallback(window, CursorPosCallback);
 }
 
 void engine::Input::ShutDownInputManager(void)

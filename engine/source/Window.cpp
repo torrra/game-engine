@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "input/Input.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -134,6 +135,8 @@ int engine::Window::CreateWindow()
 	glfwMakeContextCurrent(m_windowPtr);
 	glfwSetWindowUserPointer(m_windowPtr, this);
 	glfwSetWindowSizeCallback(m_windowPtr, SizeCallback);
+
+	Input::SetInputCallbacks(m_windowPtr);
 
 	// Set screen aspect ratio
 	SetAspectRatio();

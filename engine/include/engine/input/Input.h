@@ -9,8 +9,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "utility/MemoryCheck.h"
-#include "EngineExport.h"
+#include "engine/utility/MemoryCheck.h"
+#include "engine/EngineExport.h"
 
 /*
 *	--------- Keyboard Input ---------
@@ -63,30 +63,31 @@ namespace engine
 
 		// Mouse getter functions
 		template <math::CScalarType TValueType>
-		static math::Vector2<TValueType> ENGINE_API GetCursorPosition(void);
+		static math::Vector2<TValueType> GetCursorPosition(void);
 
 		template <math::CScalarType TValueType>
-		static math::Vector2<TValueType> ENGINE_API GetCursorDeltaPos(void);
+		static math::Vector2<TValueType> GetCursorDeltaPos(void);
 
 		template <math::CScalarType TValueType>
-		static math::Vector2<TValueType> ENGINE_API GetScrollDelta(void);
+		static math::Vector2<TValueType> GetScrollDelta(void);
 
 		// Input state functions
-		static bool ENGINE_API IsInputPressed(int input);
-		static bool ENGINE_API IsInputHeld(int input);
-		static bool ENGINE_API IsInputReleased(int input);
+		ENGINE_API static bool IsInputPressed(int input);
+		ENGINE_API static bool IsInputHeld(int input);
+		ENGINE_API static bool IsInputReleased(int input);
 
 		// Callback functions
-		static void ENGINE_API StaticKeyboardCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
-		static void ENGINE_API MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void ENGINE_API MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
-		static void ENGINE_API CursorPosCallback(GLFWwindow* window, double xPos, double yPos);
+		ENGINE_API static void KeyboardCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
+		ENGINE_API static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+		ENGINE_API static void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+		ENGINE_API static void CursorPosCallback(GLFWwindow* window, double xPos, double yPos);
+		ENGINE_API static void SetInputCallbacks(GLFWwindow* window);
 	private:
 						Input(void) = default;
 						Input(Input const& inputManager) = delete;
 		Input&			operator=(Input const& inputManager) = delete;
 		static bool		HasKey(int keyCode) noexcept;
-		static Input*	GetInstance(void);
+		ENGINE_API static Input*	GetInstance(void);
 
 		std::unordered_map<int, EInputState> m_keyMap;
 
