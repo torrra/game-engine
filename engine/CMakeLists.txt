@@ -1,41 +1,32 @@
 # ~ 2024_moteur_gpm_2027_gpm_2027_projet_moteur-mustang/engine/CMakeLists.txt
 
+# CMake Prototype
 get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-# -- Source files -- #
+set(Green       "${Esc}[32m")
+set(ColorReset "${Esc}[m")
 message("[${TARGET_NAME}] Starting source file fetching..")
 
 # -- Header files -- #
 file(GLOB_RECURSE TARGET_HEADER_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/*.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/*.inl)
-	
+	${CMAKE_CURRENT_SOURCE_DIR}/*.inl
+)
+
 # -- Source files -- #
 file(GLOB_RECURSE TARGET_SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+)
 
-# -- Shader files -- #
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(GLOB_RECURSE TARGET_SHADER_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.vert
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.frag
-	${CMAKE_CURRENT_SOURCE_DIR}/shader/*.glsl)
-
-# -- Asset files -- #
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/asset DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(GLOB_RECURSE TARGET_ASSET_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.jpg
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.jpeg
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.png
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.obj
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.mtl
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.wav
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.mp3
-	${CMAKE_CURRENT_SOURCE_DIR}/asset/*.mp4)
+# -- Extra files -- #
+file(GLOB TARGET_EXTRA_FILES
+	${CMAKE_SOURCE_DIR}/.gitignore
+	${CMAKE_SOURCE_DIR}/.gitattributes
+	${CMAKE_SOURCE_DIR}/*.md
+    ${CMAKE_SOURCE_DIR}/*.txt
+)
 
 file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug/)
 file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release/)
@@ -43,15 +34,30 @@ file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release/)
 set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_ASSET_FILES})
+source_group("Extra files" FILES ${TARGET_EXTRA_FILES})
 
-add_executable(${TARGET_NAME})
-message("[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
+add_library(${TARGET_NAME} SHARED)
+message("[${TARGET_NAME}] The library is being linked with the project's dependencies..")
 
-target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_ASSET_FILES})
-set_source_files_properties(${TARGET_ASSET_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES})
 
-target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/header)
-target_link_libraries(${TARGET_NAME} PRIVATE ${ENGINE_LIBRARY})
+target_include_directories(${TARGET_NAME}
+	PUBLIC ${MATHLIB_INCLUDE_DIR} 
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
-message("[${TARGET_NAME}] Done.")
+set_target_properties(${DEPENDENCY_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(${TARGET_NAME}
+	PRIVATE ${DEPENDENCIES_LIBRARY}
+)
+
+if (MSVC)
+	# Disable linker warning for glfw3's missing debug info
+	target_link_options(${TARGET_NAME} PRIVATE /IGNORE:4099)
+	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
+endif()
+
+set(ENGINE_LIB ${TARGET_NAME} PARENT_SCOPE)
+set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include PARENT_SCOPE)
+
+message("[${TARGET_NAME}] Done..")
