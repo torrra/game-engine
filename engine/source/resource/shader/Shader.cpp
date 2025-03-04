@@ -49,12 +49,12 @@ ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector
 
 ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector3<int> const& vec)
 {
-	glUniform3i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[3]);
+	glUniform3i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2]);
 }
 
 ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector4<int> const& vec)
 {
-	glUniform4i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[3], vec[4]);
+	glUniform4i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2], vec[3]);
 }
 
 // Vector floats
@@ -65,12 +65,12 @@ ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector
 
 ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector3<float> const& vec)
 {
-	glUniform3f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[3]);
+	glUniform3f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2]);
 }
 
 ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector4<float> const& vec)
 {
-	glUniform4f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[3], vec[4]);
+	glUniform4f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2], vec[3]);
 }
 
 // Vector double
@@ -81,12 +81,12 @@ ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector
 
 ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector3<double> const& vec)
 {
-	glUniform3d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[3]);
+	glUniform3d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2]);
 }
 
 ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector4<double> const& vec)
 {
-	glUniform4d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[3], vec[4]);
+	glUniform4d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2], vec[3]);
 }
 
 // Matrix float
