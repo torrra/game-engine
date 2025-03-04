@@ -7,8 +7,6 @@ project(MustangEngine)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-project(${PROJECT_NAME})
-
 include(FetchContent)
 FetchContent_Declare(
     mathlib
