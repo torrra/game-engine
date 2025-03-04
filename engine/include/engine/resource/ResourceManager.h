@@ -6,8 +6,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "EngineExport.h"
-#include "utility/MemoryCheck.h"
+#include "engine/utility/MemoryCheck.h"
+#include "engine/EngineExport.h"
 
 /*
 *	-------- Resource Manager --------
@@ -39,8 +39,8 @@ namespace engine
 									ResourceManager(ResourceManager const& rManager) = delete;
 		ResourceManager&			operator=(ResourceManager const& rManager) = delete;
 
-		static ResourceManager*		GetInstance(void);
-		static bool					HasResource(std::string const& fileName);
+		ENGINE_API static ResourceManager*		GetInstance(void);
+		ENGINE_API static bool					HasResource(std::string const& fileName);
 
 		static std::mutex			m_mutex;
 		static ResourceManager*		m_instance;
