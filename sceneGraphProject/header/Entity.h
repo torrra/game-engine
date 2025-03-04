@@ -23,7 +23,7 @@ namespace engine
 		};
 
 
-		// Makes it easier to knoz which components an entity has
+		// Makes it easier to know which components an entity has
 		enum EComponentFlags : uint64
 		{
 			NO_COMPONENTS = 0,
@@ -68,7 +68,7 @@ namespace engine
 		void Invalidate(void);
 
 		// Get EComponentFlag corresponding to the component type
-		// NO_COMPONENT by default, must be manually instanciated for
+		// NO_COMPONENT by default, must be manually instantiated for
 		// each component type in their respective headers
 		template<CValidComponent TComponentType>
 		static constexpr EComponentFlags GetComponentFlag();
