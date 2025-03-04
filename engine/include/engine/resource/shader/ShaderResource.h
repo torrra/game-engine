@@ -1,0 +1,33 @@
+#pragma once
+
+#include "engine/resource/Resource.h"
+
+#include <cstdint>
+
+namespace engine
+{
+	enum EShaderType
+	{
+		INVALID_SHADER,
+		VERTEX_SHADER = 0x8B31,
+		FRAGMENT_SHADER = 0x8B30,
+		GEOMETRY_SHADER = 0x8DD9
+	};
+
+	class Shader : public IResource
+	{
+	public:
+		Shader(void);
+		~Shader(void) = default;
+
+		virtual void LoadResource(const char* fileName) override;
+
+		uint32_t GetShader(void) const noexcept;
+		EShaderType GetShaderType(void) const noexcept;
+
+	private:
+		EShaderType ShaderType(const char* fileName) const;
+		EShaderType m_shaderType;
+		uint32_t m_shader;
+	};
+}
