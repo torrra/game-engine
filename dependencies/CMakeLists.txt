@@ -2,7 +2,7 @@
 # CMake Dependency
 get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-message("[${TARGET_NAME}] Starting source file fetching..")
+message(STATUS "[${TARGET_NAME}] Starting source file fetching..")
 
 # C++ version
 set(CMAKE_CXX_STANDARD 20)
@@ -39,7 +39,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES} ${TARGET_STA
 
 # Create target library
 add_library(${TARGET_NAME} STATIC)
-message("[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
+message(STATUS "[${TARGET_NAME}] The executable is being linked with the project's dependencies..")
 
 # Add sources to target
 target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES})
@@ -58,4 +58,4 @@ target_link_libraries(${TARGET_NAME} PRIVATE ${TARGET_STATIC_LIBS})
 
 # Set name as exposed variable to build other   projects
 set(DEPENDENCIES_LIBRARY ${TARGET_NAME} PARENT_SCOPE)
-message("[${TARGET_NAME}] Done..")
+message(STATUS "[${TARGET_NAME}] Done..")
