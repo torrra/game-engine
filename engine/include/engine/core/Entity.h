@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include "engine/core/TypesECS.h"
+#include "TypesECS.h"
+#include "engine/EngineExport.h"
 
 namespace engine
 {
@@ -34,32 +35,42 @@ namespace engine
 
 	public:
 
-			 Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
-			 Entity(void) = delete;
-			 Entity(const Entity&) = default;
+			 ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
+			 ENGINE_API Entity(void) = delete;
+			 ENGINE_API Entity(const Entity&) = default;
 
 		// Is this entity a valid object?
 		// true: this object is a valid entity instance
 		// false: this object is 'dead' and subject to overwrite
+		ENGINE_API
 		bool IsValid(void) const;
 
 		// Are this entity and its components included when updating the scene?
+		ENGINE_API
 		void Activate(bool activeState);
 
 		// Display this entity's information:
 		// name, handle, parent, status flags, component flags
+		ENGINE_API
 		void Print(void) const;
 
 		// Does this entity have a component of a given type?
 		template<CValidComponent TComponentType>
 		bool HasComponent(void) const;
 
+		ENGINE_API
 		EntityHandle GetHandle(void) const;
+
+		ENGINE_API
 		EntityHandle GetParent(void) const;
 
+		ENGINE_API
 		std::string  GetName(void) const;
+
+		ENGINE_API
 		void		 SetName(const std::string& name);
 
+		ENGINE_API
 		Entity& operator=(const Entity& rhs);
 
 	private:
