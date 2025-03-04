@@ -38,8 +38,28 @@ add_library(${TARGET_NAME} SHARED)
 
 target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES})
 
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
+SUBDIRLIST(SUB_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+
+foreach(DIR ${SUB_DIRS})
+	target_include_directories(${TARGET_NAME} 
+	PRIVATE ${DIR}
+	)
+endforeach()
+
 target_include_directories(${TARGET_NAME}
 	PUBLIC ${MATHLIB_INCLUDE_DIR} 
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine
 	)
 
