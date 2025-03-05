@@ -6,7 +6,7 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/input/Input.h>
-#include <engine/camera/Camera.h>
+#include <engine/camera/CameraV2.h>
 #include <engine/utility/Timer.h>
 
 int main(void)
@@ -27,21 +27,51 @@ int main(void)
 	engine::Input::RegisterInput(KEY_D);
 	engine::Input::RegisterInput(KEY_E);
 	engine::Input::RegisterInput(KEY_Q);
+	engine::Input::RegisterInput(KEY_ESCAPE);
 
 	engine::Input::SetCursorMode(engine::ECursorMode::DISABLED);
-	engine::Camera camera({0.0f, 0.0f, 0.0f}, 2.5f);
+
+	engine::Frustum frustum(0.01f, 250.0f, 80.0f, window.GetAspectRatio());
+	engine::CameraV2 camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 30.0f);
+	
+
+	//engine::Camera camera({0.0f, 0.0f, 0.0f}, 2.5f);
 
 	math::Matrix4f cameraVal;
 	cameraVal.Identity();
 
 	while (!window.ShouldWindowClose())
 	{
-	
-		camera.CameraInput(engine::DeltaTime());
-		camera.MouseMotion(engine::Input::GetCursorPosition<float>(), engine::DeltaTime());
+		if (engine::Input::IsInputHeld(KEY_W))
+			camera.Move({0.0f, 0.0f, -1.0f});
+		else if (engine::Input::IsInputHeld(KEY_S))
+			camera.Move({0.0f, 0.0f, 1.0f});
+		if (engine::Input::IsInputHeld(KEY_A))
+			camera.Move({-1.0f, 0.0f, 0.0f});
+		else if (engine::Input::IsInputHeld(KEY_D))
+			camera.Move({1.0f, 0.0f, 0.0f});
 		
-		auto perspective = camera.GetPerspectiveMatrix(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
-		auto view = camera.GetViewMatrix();
+		math::Vector2<float> cursorPos = engine::Input::GetCursorPosition<float>();
+		static math::Vector2<float> lastCursorPos(cursorPos);
+
+		math::Vector2<float> deltaPos = cursorPos - lastCursorPos;
+
+		lastCursorPos = cursorPos;
+		static float pitch = 0.0f;
+		
+		// Rotate camera, pass the amount to rotate camera
+		camera.Rotate({
+			deltaPos.GetY(),
+			deltaPos.GetX(),
+			0.0f
+		});
+		
+		
+		pitch += 0.1f;
+		auto viewProjection = camera.ViewProjection();
+
+		if (engine::Input::IsInputPressed(KEY_ESCAPE))
+			break;
 
 		window.ClearWindow();
 		shader.Use();
@@ -50,9 +80,7 @@ int main(void)
 		shader.Set("lightColor", math::Vector3<float>(1.0f, 1.0f, 1.0f));
 		shader.Set("objectColor", math::Vector3<float>(0.0f, 0.0f, 1.0f));
 		shader.Set("model", &cameraVal);
-		shader.Set("view", &view);
-		shader.Set("projection", &perspective);
-
+		shader.Set("viewProjection", &viewProjection);
 
 		engine::ResourceManager::GetResource<engine::Texture>("padoru.png")->UseTexture();
 		engine::ResourceManager::GetResource<engine::Model>("padoru.obj")->Update();

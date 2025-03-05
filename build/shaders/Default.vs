@@ -7,8 +7,7 @@ layout (location = 3) in vec3 aBiTangent;
 layout (location = 4) in vec2 aTexCoord;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 viewProjection;
 
 out vec3 normal;
 out vec3 tangent;
@@ -27,5 +26,5 @@ void main()
 	biTangent = aBiTangent;
 	texCoord = aTexCoord;
 
-	gl_Position = projection * view * model * vec4(aPosition, 1.0);
+	gl_Position = viewProjection * model * vec4(aPosition, 1.0);
 }

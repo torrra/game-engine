@@ -36,5 +36,5 @@ void main()
     vec3 result = (ambient + diffuse + specular);
 
     fragColor = texture(texture1, texCoord) * vec4(result, 1.0);
-    //fragColor = objectColor *  vec4(result, 1.0);
+    //fragColor = objectColor * vec4(result, 1.0);
 } 
