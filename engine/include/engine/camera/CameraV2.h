@@ -33,30 +33,43 @@ namespace engine
 			float angularSpeed = 30.0f
 		);
 
-		ENGINE_API void Move(math::Vector3<float> dir);
-		ENGINE_API void Rotate(math::Vector3<float> const& deltaAxis);
+		ENGINE_API ~CameraV2(void) = default;
+
+		ENGINE_API void Move(float x, float y, float z);
+		ENGINE_API void Rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 		ENGINE_API math::Matrix4<float> ViewProjection(void);
 
 		ENGINE_API math::Vector3<float> GetPosition(void) const noexcept;
+		ENGINE_API math::Vector3<float> GetRotation(void) const noexcept;
+		ENGINE_API float GetSpeed(void) const noexcept;
+		ENGINE_API float GetRotationSpeed(void) const noexcept;
+		ENGINE_API float GetFOV(void) const noexcept;
+		ENGINE_API float GetNearPlane(void) const noexcept;
+		ENGINE_API float GetFarPlane(void) const noexcept;
+
+		ENGINE_API math::Vector3<float>& Position(void);
+		ENGINE_API math::Vector3<float>& Rotation(void);
+		ENGINE_API float& Speed(void);
+		ENGINE_API float& RotationSpeed(void);
+		ENGINE_API float& FOV(void);
+		ENGINE_API float& NearPlane(void);
+		ENGINE_API float& FarPlane(void);
 	
 	private:
 		math::Matrix4<float> GetViewMatrix(void);
 		math::Matrix4<float> GetProjectionMatrix(void);
-		float RotateAxis(float angle, float delta, float maxDelta);
+		float RotateAxis(float angle, float delta);
 
 		Frustum m_frustum;
 		math::Matrix4<float> m_rotationMatrix;
 		math::Vector3<float> m_position;
+		math::Vector3<float> m_rotation;
 		math::Vector3<float> m_forward;
 		math::Vector3<float> m_up;
 		math::Vector3<float> m_right;
-		math::Vector3<float> m_rotationAxis;
 
 		float m_speed;
 		float m_angularSpeed;
-		float m_maxDeltaPitch;
-		float m_maxDeltaRoll;
-		float m_maxDeltaYaw;
 		float m_deltaTime;
 	};
 }

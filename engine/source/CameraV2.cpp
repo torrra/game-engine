@@ -11,34 +11,30 @@ engine::CameraV2::CameraV2(Frustum const& frustum, math::Vector3<float> const& p
 	m_forward = math::Vector3f::Front();
 	m_right = math::Vector3f::Right();
 	m_up = math::Vector3f::Up();
-	m_rotationAxis = math::Vector3f::Zero();
 	m_rotationMatrix.Identity();
-
-	m_maxDeltaPitch = 5.0f;
-	m_maxDeltaYaw = 5.0f;
-	m_maxDeltaRoll = 5.0f;
+	m_rotation = math::Vector3f::Zero();
 }
 
-void engine::CameraV2::Move(math::Vector3<float> dir)
+void engine::CameraV2::Move(float x, float y, float z)
 {
 	math::Matrix4f camSpace = GetViewMatrix();
-	math::Vector4<float> camSpaceDir = camSpace * math::Vector4<float>(dir[0], dir[1], dir[2], 1.0f);
+	math::Vector4<float> camSpaceDir = camSpace * math::Vector4<float>(x, y, z, 1.0f);
 	math::Vector3<float> camSpaceDirVec3(camSpaceDir[0], camSpaceDir[1], camSpaceDir[2]);
 
 	m_position += camSpaceDirVec3 * m_speed * m_deltaTime;
 }
 
-void engine::CameraV2::Rotate(math::Vector3<float> const& deltaAxis)
+void engine::CameraV2::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 {
 	static float pitch, yaw, roll = 0.0f;
 
-	pitch = RotateAxis(pitch, deltaAxis[0], m_maxDeltaPitch);
-	yaw = RotateAxis(yaw, deltaAxis[1], m_maxDeltaYaw);
-	roll = RotateAxis(roll, deltaAxis[2], m_maxDeltaRoll);
+	m_rotation[0] = RotateAxis(m_rotation[0], deltaPitch);	// Pitch
+	m_rotation[1] = RotateAxis(m_rotation[1], deltaYaw);	// Yaw
+	m_rotation[2] = RotateAxis(m_rotation[2], deltaRoll);	// Roll
 	
-	math::Quaternion<float> pitchQuat(math::Vector3f(1.0F, 0.0F, 0.0F), math::Radian(pitch * DEG2RAD));
-	math::Quaternion<float>   yawQuat(math::Vector3f(0.0F, 1.0F, 0.0F), math::Radian(yaw * DEG2RAD));
-	math::Quaternion<float>  rollQuat(math::Vector3f(0.0F, 0.0F, 0.1F), math::Radian(roll * DEG2RAD));
+	math::Quaternion<float> pitchQuat(math::Vector3f(1.0F, 0.0F, 0.0F), math::Radian(m_rotation[0] * DEG2RAD));
+	math::Quaternion<float>   yawQuat(math::Vector3f(0.0F, 1.0F, 0.0F), math::Radian(m_rotation[1] * DEG2RAD));
+	math::Quaternion<float>  rollQuat(math::Vector3f(0.0F, 0.0F, 0.1F), math::Radian(m_rotation[2] * DEG2RAD));
 	math::Quaternion<float> combinedRotation = yawQuat * pitchQuat * rollQuat;
 
 	m_rotationMatrix = combinedRotation.RotationMatrix();
@@ -57,6 +53,71 @@ math::Matrix4<float> engine::CameraV2::ViewProjection(void)
 ENGINE_API math::Vector3<float> engine::CameraV2::GetPosition(void) const noexcept
 {
 	return m_position;
+}
+
+ENGINE_API math::Vector3<float> engine::CameraV2::GetRotation(void) const noexcept
+{
+	return m_rotation;
+}
+
+ENGINE_API float engine::CameraV2::GetSpeed(void) const noexcept
+{
+	return m_speed;
+}
+
+ENGINE_API float engine::CameraV2::GetRotationSpeed(void) const noexcept
+{
+	return m_angularSpeed;
+}
+
+ENGINE_API float engine::CameraV2::GetFOV(void) const noexcept
+{
+	return m_frustum.m_fovRad;
+}
+
+ENGINE_API float engine::CameraV2::GetNearPlane(void) const noexcept
+{
+	return m_frustum.m_near;
+}
+
+ENGINE_API float engine::CameraV2::GetFarPlane(void) const noexcept
+{
+	return m_frustum.m_far;
+}
+
+ENGINE_API math::Vector3<float>& engine::CameraV2::Position(void)
+{
+	return m_position;
+}
+
+ENGINE_API math::Vector3<float>& engine::CameraV2::Rotation(void)
+{
+	return m_rotation;
+}
+
+ENGINE_API float& engine::CameraV2::Speed(void)
+{
+	return m_speed;
+}
+
+ENGINE_API float& engine::CameraV2::RotationSpeed(void)
+{
+	return m_angularSpeed;
+}
+
+ENGINE_API float& engine::CameraV2::FOV(void)
+{
+	return m_frustum.m_fovRad;
+}
+
+ENGINE_API float& engine::CameraV2::NearPlane(void)
+{
+	return m_frustum.m_near;
+}
+
+ENGINE_API float& engine::CameraV2::FarPlane(void)
+{
+	return m_frustum.m_far;
 }
 
 math::Matrix4<float> engine::CameraV2::GetViewMatrix(void)
@@ -92,8 +153,10 @@ math::Matrix4<float> engine::CameraV2::GetProjectionMatrix(void)
 	return math::Matrix4<float>(perspectiveValues);
 }
 
-float engine::CameraV2::RotateAxis(float angle, float delta, float maxDelta)
+float engine::CameraV2::RotateAxis(float angle, float delta)
 {
+	float maxDelta = 5.0f;
+
 	// Limits
 	if (delta < -maxDelta)
 		delta = -maxDelta;
