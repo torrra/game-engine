@@ -23,8 +23,8 @@ int main(void)
 	
 	engine::ShaderProgram shader("Default.vs", "Default.frag");
 	
-	engine::ResourceManager::Load<engine::Model>("bunny.obj");
-	//engine::ResourceManager::Load<engine::Texture>("padoru.png");
+	engine::ResourceManager::Load<engine::Model>("padoru.obj");
+	engine::ResourceManager::Load<engine::Texture>("padoru.png");
 
 	engine::Input::RegisterInput(KEY_W);
 	engine::Input::RegisterInput(KEY_A);
@@ -37,7 +37,7 @@ int main(void)
 	engine::Input::SetCursorMode(engine::ECursorMode::DISABLED);
 
 	engine::Frustum frustum(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
-	engine::CameraV2 camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 30.0f);
+	engine::CameraV2 camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 80.0f);
 	
 
 	//engine::Camera camera({0.0f, 0.0f, 0.0f}, 2.5f);
@@ -61,7 +61,6 @@ int main(void)
 
 		math::Vector2<float> deltaPos = cursorPos - lastCursorPos;
 
-		lastCursorPos = cursorPos;
 		static float pitch = 0.0f;
 		
 		// Rotate camera, pass the amount to rotate camera
@@ -70,6 +69,7 @@ int main(void)
 			deltaPos.GetX(),
 			0.0f
 		);
+		lastCursorPos = cursorPos;
 		
 		
 		pitch += 0.1f;
@@ -87,8 +87,8 @@ int main(void)
 		shader.Set("model", &cameraVal);
 		shader.Set("viewProjection", &viewProjection);
 
-		//engine::ResourceManager::GetResource<engine::Texture>("padoru.png")->UseTexture();
-		engine::ResourceManager::GetResource<engine::Model>("bunny.obj")->Update();
+		engine::ResourceManager::GetResource<engine::Texture>("padoru.png")->UseTexture();
+		engine::ResourceManager::GetResource<engine::Model>("padoru.obj")->Update();
 
 		window.UpdateBuffers();
 	}

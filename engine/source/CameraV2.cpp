@@ -19,30 +19,25 @@ engine::CameraV2::CameraV2(Frustum const& frustum, math::Vector3<float> const& p
 void engine::CameraV2::Move(float x, float y, float z)
 {
 	math::Vector3<float> camSpaceDir = m_rotQuat.Rotate({x, y, z});
-	m_position += camSpaceDir * m_speed * m_deltaTime;
+	m_position += camSpaceDir.Normalized() * m_speed * m_deltaTime;
 }
 
 void engine::CameraV2::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 {
-	m_rotation[1] = RotateAxis(m_rotation[1], deltaYaw);	// Yaw
-	m_rotation[0] = RotateAxis(m_rotation[0], deltaPitch);	// Pitch
-	m_rotation[2] = RotateAxis(m_rotation[2], deltaRoll);	// Roll
-	
-	//math::Quaternion<float> pitchQuat(math::Vector3f(1.0F, 0.0F, 0.0F), math::Radian(m_rotation[0] * DEG2RAD));
-	//math::Quaternion<float>   yawQuat(math::Vector3f(0.0F, 1.0F, 0.0F), math::Radian(m_rotation[1] * DEG2RAD));
-	//math::Quaternion<float>  rollQuat(math::Vector3f(0.0F, 0.0F, 0.1F), math::Radian(m_rotation[2] * DEG2RAD));
-	//math::Quaternion<float> combinedRotation = yawQuat * pitchQuat * rollQuat;
+	m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
+	m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);		// Yaw
+	m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);		// Roll
 
-	//math::Quaternion<float> rotationQuat(
-	//	math::Radian(m_rotation[0] * DEG2RAD),
-	//	math::Radian(m_rotation[1] * DEG2RAD),
-	//	math::Radian(m_rotation[2] * DEG2RAD)
-	//);
+	// Clamp pitch // TODO: fix pitch
+	if (m_rotation[0] > 90.0f)
+		m_rotation[0] = 90.0f;
+	else if (m_rotation[0] < -90.0f)
+		m_rotation[0] = -90.0f;
 
 	m_rotQuat = math::Quaternion<float>(
 		math::Radian(m_rotation[0] * DEG2RAD),
 		math::Radian(m_rotation[1] * DEG2RAD),
-		/*math::Radian(m_rotation[2] * DEG2RAD)*/math::Radian(0.0f)
+		math::Radian(m_rotation[2] * DEG2RAD)
 	);
 }
 
@@ -50,9 +45,7 @@ math::Matrix4<float> engine::CameraV2::ViewProjection(void)
 {
 	m_deltaTime = DeltaTime();
 
-	math::Matrix4<float> view = GetViewMatrix();
-	
-	return m_projectionMatrix * view;
+	return m_projectionMatrix * GetViewMatrix();;
 }
 
 ENGINE_API math::Vector3<float> engine::CameraV2::GetPosition(void) const noexcept
@@ -133,58 +126,39 @@ ENGINE_API void engine::CameraV2::SetFarPlane(float farPlane)
 
 math::Matrix4<float> engine::CameraV2::GetViewMatrix(void)
 {
-	//math::Vector3<float> forward = (m_forward).Normalized();
-	//m_right = (forward.Cross(m_up)).Normalized();
-	//math::Vector3<float> up = m_right.Cross(forward);
-	//
-	//const float viewValues[16] =
-	//{
-	//	m_right[0], up[0], -forward[0], 0.0f,
-	//	m_right[1], up[1], -forward[1], 0.0f,
-	//	m_right[2], up[2], -forward[2], 0.0f,
-	//	-(m_right.Dot(-m_position)), -(up.Dot(m_position)), forward.Dot(-m_position), 1.0f
-	//};
-
-	//viewValues;
-	math::Matrix4<float> matrix;
-	matrix.Identity();
+	math::Matrix4<float> matrix(1.0f);
 
 	matrix[3][0] = -m_position.X();
 	matrix[3][1] = -m_position.Y();
 	matrix[3][2] = -m_position.Z();
-
-	//static math::Quatf lastFrame = m_rotQuat;
-	math::Vector3f euler((m_rotQuat.EulerAngles() * RAD2DEG));
-	static math::Vector3f lastEuler = euler;
 	
-	float mag = (euler - lastEuler).Magnitude();
-
-	if (mag != 0.0f && mag < 360.0f)
-	std::printf("%d, %d, %d\t %f\n", 
-		(int)euler[0],
-		(int)euler[1],
-		(int)euler[2],
-		mag
-	);
-
-	lastEuler = euler;
 	return m_rotQuat.RotationMatrix() * matrix;
 }
 
 void engine::CameraV2::GetProjectionMatrix(void)
 {
 	const float tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
-	const float farMinusNear = m_frustum.m_far - m_frustum.m_near;
+	const float farMinusNearDenom = 1.0f / (m_frustum.m_far - m_frustum.m_near);
 
-	const float perspectiveValues[16] =
-	{
-		1.0f / (m_frustum.m_ratio * tanAngle), 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f / tanAngle, 0.0f, 0.0f,
-		0.0f, 0.0f, -(m_frustum.m_far + m_frustum.m_near) / (farMinusNear),			-1.0f,
-		0.0f, 0.0f, -((2.0f * m_frustum.m_far * m_frustum.m_near) / (farMinusNear)), 0.0f
-	};
+	m_projectionMatrix[0][0] = 1.0f / (m_frustum.m_ratio * tanAngle);
+	m_projectionMatrix[1][0] = 0.0f;
+	m_projectionMatrix[2][0] = 0.0f;
+	m_projectionMatrix[3][0] = 0.0f;
 
-	m_projectionMatrix = math::Matrix4<float>(perspectiveValues);
+	m_projectionMatrix[0][1] = 0.0f;
+	m_projectionMatrix[1][1] = 1.0f / tanAngle;
+	m_projectionMatrix[2][1] = 0.0f;
+	m_projectionMatrix[3][1] = 0.0f;
+
+	m_projectionMatrix[0][2] = 0.0f;
+	m_projectionMatrix[1][2] = 0.0f;
+	m_projectionMatrix[2][2] = -(m_frustum.m_far + m_frustum.m_near) * farMinusNearDenom;
+	m_projectionMatrix[3][2] = -((2.0f * m_frustum.m_far * m_frustum.m_near) * farMinusNearDenom);
+
+	m_projectionMatrix[0][3] = 0.0f;
+	m_projectionMatrix[1][3] = 0.0f;
+	m_projectionMatrix[2][3] = -1.0f;
+	m_projectionMatrix[3][3] = 0.0f;
 }
 
 float engine::CameraV2::RotateAxis(float angle, float delta)
@@ -197,8 +171,8 @@ float engine::CameraV2::RotateAxis(float angle, float delta)
 	else if (delta > maxDelta)
 		delta = maxDelta;
 
-	angle += -delta * m_angularSpeed * m_deltaTime;
+	angle += delta * m_angularSpeed * m_deltaTime;
 
 	// Wrap angle
-	return /*math::Wrap<float>(angle, 0.0f, 360.0f)*/angle;
+	return angle;
 }
