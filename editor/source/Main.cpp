@@ -9,6 +9,11 @@
 #include <engine/camera/Camera.h>
 #include <engine/utility/Timer.h>
 
+extern "C" {
+	_declspec(dllexport) unsigned int NvOptimusEnablement = 1;
+	_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 int main(void)
 {
 	// TODO: move all main code
