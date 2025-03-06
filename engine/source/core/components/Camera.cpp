@@ -1,10 +1,10 @@
-#include "camera/CameraV2.h"
+#include "core/components/Camera.h"
 #include "utility/Timer.h"
 
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
 
-engine::CameraV2::CameraV2(Frustum const& frustum, math::Vector3<float> const& position, float speed, float angularSpeed)
+engine::Camera::Camera(Frustum const& frustum, math::Vector3<float> const& position, float speed, float angularSpeed)
 	: m_frustum(frustum), m_position(position), m_speed(speed), m_angularSpeed(angularSpeed)
 {
 	m_forward = math::Vector3f::Front();
@@ -16,13 +16,13 @@ engine::CameraV2::CameraV2(Frustum const& frustum, math::Vector3<float> const& p
 	GetProjectionMatrix();
 }
 
-void engine::CameraV2::Move(float x, float y, float z)
+void engine::Camera::Move(float x, float y, float z)
 {
 	math::Vector3<float> camSpaceDir = m_rotQuat.Rotate({x, y, z});
 	m_position += camSpaceDir.Normalized() * m_speed * m_deltaTime;
 }
 
-void engine::CameraV2::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
+void engine::Camera::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 {
 	m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
 	m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);		// Yaw
@@ -41,90 +41,90 @@ void engine::CameraV2::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 	);
 }
 
-math::Matrix4<float> engine::CameraV2::ViewProjection(void)
+math::Matrix4<float> engine::Camera::ViewProjection(void)
 {
 	m_deltaTime = DeltaTime();
 
 	return m_projectionMatrix * GetViewMatrix();;
 }
 
-ENGINE_API math::Vector3<float> engine::CameraV2::GetPosition(void) const noexcept
+ENGINE_API math::Vector3<float> engine::Camera::GetPosition(void) const noexcept
 {
 	return m_position;
 }
 
-ENGINE_API math::Vector3<float> engine::CameraV2::GetRotation(void) const noexcept
+ENGINE_API math::Vector3<float> engine::Camera::GetRotation(void) const noexcept
 {
 	return m_rotation;
 }
 
-ENGINE_API float engine::CameraV2::GetSpeed(void) const noexcept
+ENGINE_API float engine::Camera::GetSpeed(void) const noexcept
 {
 	return m_speed;
 }
 
-ENGINE_API float engine::CameraV2::GetRotationSpeed(void) const noexcept
+ENGINE_API float engine::Camera::GetRotationSpeed(void) const noexcept
 {
 	return m_angularSpeed;
 }
 
-ENGINE_API float engine::CameraV2::GetFOV(void) const noexcept
+ENGINE_API float engine::Camera::GetFOV(void) const noexcept
 {
 	return m_frustum.m_fovRad;
 }
 
-ENGINE_API float engine::CameraV2::GetNearPlane(void) const noexcept
+ENGINE_API float engine::Camera::GetNearPlane(void) const noexcept
 {
 	return m_frustum.m_near;
 }
 
-ENGINE_API float engine::CameraV2::GetFarPlane(void) const noexcept
+ENGINE_API float engine::Camera::GetFarPlane(void) const noexcept
 {
 	return m_frustum.m_far;
 }
 
-ENGINE_API math::Vector3<float>& engine::CameraV2::Position(void)
+ENGINE_API math::Vector3<float>& engine::Camera::Position(void)
 {
 	return m_position;
 }
 
-ENGINE_API math::Vector3<float>& engine::CameraV2::Rotation(void)
+ENGINE_API math::Vector3<float>& engine::Camera::Rotation(void)
 {
 	return m_rotation;
 }
 
-ENGINE_API float& engine::CameraV2::Speed(void)
+ENGINE_API float& engine::Camera::Speed(void)
 {
 	return m_speed;
 }
 
-ENGINE_API float& engine::CameraV2::RotationSpeed(void)
+ENGINE_API float& engine::Camera::RotationSpeed(void)
 {
 	return m_angularSpeed;
 }
 
-ENGINE_API void engine::CameraV2::SetFOV(float fov)
+ENGINE_API void engine::Camera::SetFOV(float fov)
 {
 	m_frustum.m_fovRad = fov;
 
 	GetProjectionMatrix();
 }
 
-ENGINE_API void engine::CameraV2::SetNearPlane(float nearPlane)
+ENGINE_API void engine::Camera::SetNearPlane(float nearPlane)
 {
 	m_frustum.m_near = nearPlane;
 
 	GetProjectionMatrix();
 }
 
-ENGINE_API void engine::CameraV2::SetFarPlane(float farPlane)
+ENGINE_API void engine::Camera::SetFarPlane(float farPlane)
 {
 	m_frustum.m_far = farPlane;
 
 	GetProjectionMatrix();
 }
 
-math::Matrix4<float> engine::CameraV2::GetViewMatrix(void)
+math::Matrix4<float> engine::Camera::GetViewMatrix(void)
 {
 	math::Matrix4<float> matrix(1.0f);
 
@@ -135,7 +135,7 @@ math::Matrix4<float> engine::CameraV2::GetViewMatrix(void)
 	return m_rotQuat.RotationMatrix() * matrix;
 }
 
-void engine::CameraV2::GetProjectionMatrix(void)
+void engine::Camera::GetProjectionMatrix(void)
 {
 	const float tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
 	const float farMinusNearDenom = 1.0f / (m_frustum.m_far - m_frustum.m_near);
@@ -161,7 +161,7 @@ void engine::CameraV2::GetProjectionMatrix(void)
 	m_projectionMatrix[3][3] = 0.0f;
 }
 
-float engine::CameraV2::RotateAxis(float angle, float delta)
+float engine::Camera::RotateAxis(float angle, float delta)
 {
 	float maxDelta = 5.0f;
 

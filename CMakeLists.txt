@@ -7,13 +7,11 @@ project(MustangEngine)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-project(${PROJECT_NAME})
-
 include(FetchContent)
 FetchContent_Declare(
     mathlib
     GIT_REPOSITORY			   ssh://git@git.isartintra.com:2424/2023/Math_Lib_/Noah.git    # Fetch our math library from github
-    GIT_TAG                    main										                    # Get main branch
+    GIT_TAG                    master										                # Get master branch
     GIT_SHALLOW                ON                                                           # Allow branch names as GIT_TAG argument
 )
 FetchContent_MakeAvailable(mathlib)

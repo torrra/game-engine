@@ -5,7 +5,6 @@
 #include <math/Quaternion.hpp>
 #include "engine/EngineExport.h"
 
-
 namespace engine
 {
 	struct Frustum
@@ -22,18 +21,18 @@ namespace engine
 	};
 
 
-	class CameraV2
+	class Camera
 	{
 	public:
-		CameraV2(void) = delete;
-		ENGINE_API CameraV2(
+		Camera(void) = delete;
+		ENGINE_API Camera(
 			Frustum const& frustum,
 			math::Vector3<float> const& position = math::Vector3<float>(0.0f),
 			float speed = 2.5f,
 			float angularSpeed = 30.0f
 		);
 
-		ENGINE_API ~CameraV2(void) = default;
+		ENGINE_API ~Camera(void) = default;
 
 		ENGINE_API void Move(float x, float y, float z);
 		ENGINE_API void Rotate(float deltaPitch, float deltaYaw, float deltaRoll);

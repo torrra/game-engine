@@ -6,7 +6,7 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/input/Input.h>
-#include <engine/camera/CameraV2.h>
+#include <engine/core/components/Camera.h>
 #include <engine/utility/Timer.h>
 
 extern "C" {
@@ -37,10 +37,7 @@ int main(void)
 	engine::Input::SetCursorMode(engine::ECursorMode::DISABLED);
 
 	engine::Frustum frustum(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
-	engine::CameraV2 camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 80.0f);
-	
-
-	//engine::Camera camera({0.0f, 0.0f, 0.0f}, 2.5f);
+	engine::Camera camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 80.0f);
 
 	math::Matrix4f cameraVal;
 	cameraVal.Identity();
