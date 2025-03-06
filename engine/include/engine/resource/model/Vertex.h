@@ -11,6 +11,6 @@ namespace engine
 		math::Vector3<float>	m_normal;
 		math::Vector3<float>	m_tangent;
 		math::Vector3<float>	m_biTangent;
-		math::Vector2<int>		m_texCoord;
+		math::Vector2<float>	m_texCoord;
 	};
 }

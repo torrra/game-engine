@@ -139,11 +139,11 @@ engine::Mesh& engine::Mesh::operator=(const aiMesh* mesh)
 	return *this;
 }
 
-math::Vector2<int> engine::Mesh::ConvertVec2(aiVector3t<float> const& vec3) const noexcept
+math::Vector2<float> engine::Mesh::ConvertVec2(aiVector3t<float> const& vec3) const noexcept
 {
-	return math::Vector2<int>(
-		static_cast<int>(vec3.x),
-		static_cast<int>(vec3.y)
+	return math::Vector2<float>(
+		static_cast<float>(vec3.x),
+		static_cast<float>(vec3.y)
 	);
 }
 

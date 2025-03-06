@@ -32,7 +32,7 @@ namespace engine
 		Buffer		CreateEBO(void);
 		void		PostLoad(void);
 
-		math::Vector2<int>		ConvertVec2(aiVector3t<float> const& vec3) const noexcept;
+		math::Vector2<float>	ConvertVec2(aiVector3t<float> const& vec3) const noexcept;
 		math::Vector3<float>	ConvertVec3(aiVector3t<float> const& vec3) const noexcept;
 	public:
 		std::vector<Vertex>		m_vertices;
