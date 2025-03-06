@@ -17,7 +17,9 @@ namespace engine
 		EntityHandle newIndex = 0;
 		EntityHandle newUID = RandomNumber();
 
-		for (; newIndex < m_sceneEntities.size(); ++newIndex)
+		EntityHandle entityCount = static_cast<EntityHandle>(m_sceneEntities.size());
+
+		for (; newIndex < entityCount; ++newIndex)
 		{
 			Entity& currentEntity = m_sceneEntities[newIndex];
 
@@ -55,7 +57,7 @@ namespace engine
 		EntityHandle index = (handle & Entity::INDEX_MASK);
 
 		// out of bounds
-		if (index >= m_sceneEntities.size())
+		if (index >= static_cast<EntityHandle>(m_sceneEntities.size()))
 			return nullptr;
 
 		Entity& entity = m_sceneEntities[index];
@@ -197,12 +199,12 @@ namespace engine
 	}
 
 	SceneGraph::Random::Random(std::random_device randomDevice)
-		: m_generator(randomDevice()), m_distribution(0, ULONG_MAX)
+		: m_generator(randomDevice()), m_distribution(LONG_MIN, LONG_MAX)
 	{
 
 	}
 
-	uint64 SceneGraph::Random::Generate()
+	int64 SceneGraph::Random::Generate()
 	{
 		return m_distribution(m_generator);
 	}

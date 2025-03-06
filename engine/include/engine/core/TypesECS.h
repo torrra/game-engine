@@ -25,7 +25,7 @@ namespace engine
 	// The index bits refer to the entity's position in memory, and the UID is meant to
 	// differentiate between unique entities, as two entities could have the same memory
 	// locations at different points in time.
-	using EntityHandle = uint64;
+	using EntityHandle = int64;
 
 	// Component abstract class. All component types must inherit from it to be
 	// considerred valid components

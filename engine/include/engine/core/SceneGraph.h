@@ -27,11 +27,11 @@ namespace engine
 			Random(Random&&) = delete;
 			Random(std::random_device randomDevice);
 
-			uint64 Generate();
+			int64 Generate();
 
 		private:
 			std::mt19937_64							m_generator;
-			std::uniform_int_distribution<uint64>	m_distribution;
+			std::uniform_int_distribution<int64>	m_distribution;
 		};
 
 	public:
