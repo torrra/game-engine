@@ -114,6 +114,7 @@ int engine::Window::InitGlad(void)
 	}
 
 	glEnable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	return 0;
 }

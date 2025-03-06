@@ -51,17 +51,18 @@ namespace engine
 		ENGINE_API math::Vector3<float>& Rotation(void);
 		ENGINE_API float& Speed(void);
 		ENGINE_API float& RotationSpeed(void);
-		ENGINE_API float& FOV(void);
-		ENGINE_API float& NearPlane(void);
-		ENGINE_API float& FarPlane(void);
+		ENGINE_API void SetFOV(float fov);
+		ENGINE_API void SetNearPlane(float nearPlane);
+		ENGINE_API void SetFarPlane(float farPlane);
 	
 	private:
 		math::Matrix4<float> GetViewMatrix(void);
-		math::Matrix4<float> GetProjectionMatrix(void);
+		void GetProjectionMatrix(void);
 		float RotateAxis(float angle, float delta);
 
 		Frustum m_frustum;
 		math::Quaternion<float> m_rotQuat;
+		math::Matrix4<float> m_projectionMatrix;
 		math::Vector3<float> m_position;
 		math::Vector3<float> m_rotation;
 		math::Vector3<float> m_forward;
