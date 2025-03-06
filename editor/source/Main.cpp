@@ -23,8 +23,8 @@ int main(void)
 	
 	engine::ShaderProgram shader("Default.vs", "Default.frag");
 	
-	engine::ResourceManager::Load<engine::Model>("padoru.obj");
-	engine::ResourceManager::Load<engine::Texture>("padoru.png");
+	engine::ResourceManager::Load<engine::Model>("bunny.obj");
+	//engine::ResourceManager::Load<engine::Texture>("padoru.png");
 
 	engine::Input::RegisterInput(KEY_W);
 	engine::Input::RegisterInput(KEY_A);
@@ -36,7 +36,7 @@ int main(void)
 
 	engine::Input::SetCursorMode(engine::ECursorMode::DISABLED);
 
-	engine::Frustum frustum(0.01f, 250.0f, 80.0f, window.GetAspectRatio());
+	engine::Frustum frustum(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
 	engine::CameraV2 camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 30.0f);
 	
 
@@ -48,13 +48,13 @@ int main(void)
 	while (!window.ShouldWindowClose())
 	{
 		if (engine::Input::IsInputHeld(KEY_W))
-			camera.Move({0.0f, 0.0f, -1.0f});
+			camera.Move(0.0f, 0.0f, -1.0f);
 		else if (engine::Input::IsInputHeld(KEY_S))
-			camera.Move({0.0f, 0.0f, 1.0f});
+			camera.Move(0.0f, 0.0f, 1.0f);
 		if (engine::Input::IsInputHeld(KEY_A))
-			camera.Move({-1.0f, 0.0f, 0.0f});
+			camera.Move(-1.0f, 0.0f, 0.0f);
 		else if (engine::Input::IsInputHeld(KEY_D))
-			camera.Move({1.0f, 0.0f, 0.0f});
+			camera.Move(1.0f, 0.0f, 0.0f);
 		
 		math::Vector2<float> cursorPos = engine::Input::GetCursorPosition<float>();
 		static math::Vector2<float> lastCursorPos(cursorPos);
@@ -65,11 +65,11 @@ int main(void)
 		static float pitch = 0.0f;
 		
 		// Rotate camera, pass the amount to rotate camera
-		camera.Rotate({
+		camera.Rotate(
 			deltaPos.GetY(),
 			deltaPos.GetX(),
 			0.0f
-		});
+		);
 		
 		
 		pitch += 0.1f;
@@ -87,8 +87,8 @@ int main(void)
 		shader.Set("model", &cameraVal);
 		shader.Set("viewProjection", &viewProjection);
 
-		engine::ResourceManager::GetResource<engine::Texture>("padoru.png")->UseTexture();
-		engine::ResourceManager::GetResource<engine::Model>("padoru.obj")->Update();
+		//engine::ResourceManager::GetResource<engine::Texture>("padoru.png")->UseTexture();
+		engine::ResourceManager::GetResource<engine::Model>("bunny.obj")->Update();
 
 		window.UpdateBuffers();
 	}

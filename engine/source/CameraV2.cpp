@@ -3,7 +3,6 @@
 
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
-#include <math/Quaternion.hpp>
 
 engine::CameraV2::CameraV2(Frustum const& frustum, math::Vector3<float> const& position, float speed, float angularSpeed)
 	: m_frustum(frustum), m_position(position), m_speed(speed), m_angularSpeed(angularSpeed)
@@ -11,33 +10,38 @@ engine::CameraV2::CameraV2(Frustum const& frustum, math::Vector3<float> const& p
 	m_forward = math::Vector3f::Front();
 	m_right = math::Vector3f::Right();
 	m_up = math::Vector3f::Up();
-	m_rotationMatrix.Identity();
+	m_projectionMatrix.Identity();
 	m_rotation = math::Vector3f::Zero();
 }
 
 void engine::CameraV2::Move(float x, float y, float z)
 {
-	math::Matrix4f camSpace = GetViewMatrix();
-	math::Vector4<float> camSpaceDir = camSpace * math::Vector4<float>(x, y, z, 1.0f);
-	math::Vector3<float> camSpaceDirVec3(camSpaceDir[0], camSpaceDir[1], camSpaceDir[2]);
-
-	m_position += camSpaceDirVec3 * m_speed * m_deltaTime;
+	math::Vector3<float> camSpaceDir = m_rotQuat.Rotate({x, y, z});
+	m_position += camSpaceDir * m_speed * m_deltaTime;
 }
 
 void engine::CameraV2::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 {
-	static float pitch, yaw, roll = 0.0f;
-
 	m_rotation[0] = RotateAxis(m_rotation[0], deltaPitch);	// Pitch
 	m_rotation[1] = RotateAxis(m_rotation[1], deltaYaw);	// Yaw
 	m_rotation[2] = RotateAxis(m_rotation[2], deltaRoll);	// Roll
 	
-	math::Quaternion<float> pitchQuat(math::Vector3f(1.0F, 0.0F, 0.0F), math::Radian(m_rotation[0] * DEG2RAD));
-	math::Quaternion<float>   yawQuat(math::Vector3f(0.0F, 1.0F, 0.0F), math::Radian(m_rotation[1] * DEG2RAD));
-	math::Quaternion<float>  rollQuat(math::Vector3f(0.0F, 0.0F, 0.1F), math::Radian(m_rotation[2] * DEG2RAD));
-	math::Quaternion<float> combinedRotation = yawQuat * pitchQuat * rollQuat;
+	//math::Quaternion<float> pitchQuat(math::Vector3f(1.0F, 0.0F, 0.0F), math::Radian(m_rotation[0] * DEG2RAD));
+	//math::Quaternion<float>   yawQuat(math::Vector3f(0.0F, 1.0F, 0.0F), math::Radian(m_rotation[1] * DEG2RAD));
+	//math::Quaternion<float>  rollQuat(math::Vector3f(0.0F, 0.0F, 0.1F), math::Radian(m_rotation[2] * DEG2RAD));
+	//math::Quaternion<float> combinedRotation = yawQuat * pitchQuat * rollQuat;
 
-	m_rotationMatrix = combinedRotation.RotationMatrix();
+	//math::Quaternion<float> rotationQuat(
+	//	math::Radian(m_rotation[0] * DEG2RAD),
+	//	math::Radian(m_rotation[1] * DEG2RAD),
+	//	math::Radian(m_rotation[2] * DEG2RAD)
+	//);
+
+	m_rotQuat = math::Quaternion<float>(
+		math::Radian(m_rotation[0] * DEG2RAD),
+		math::Radian(m_rotation[1] * DEG2RAD),
+		math::Radian(m_rotation[2] * DEG2RAD)
+	);
 }
 
 math::Matrix4<float> engine::CameraV2::ViewProjection(void)
@@ -134,12 +138,12 @@ math::Matrix4<float> engine::CameraV2::GetViewMatrix(void)
 		-(m_right.Dot(m_position)), -(up.Dot(m_position)), forward.Dot(m_position), 1.0f
 	};
 
-	return m_rotationMatrix * math::Matrix4<float>(viewValues);
+	return m_rotQuat.RotationMatrix() * math::Matrix4<float>(viewValues);
 }
 
 math::Matrix4<float> engine::CameraV2::GetProjectionMatrix(void)
 {
-	static const float tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
+	const float tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
 	const float farMinusNear = m_frustum.m_far - m_frustum.m_near;
 
 	const float perspectiveValues[16] =

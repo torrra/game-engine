@@ -2,7 +2,7 @@
 
 #include <math/Vector3.hpp>
 #include <math/Matrix4.hpp>
-
+#include <math/Quaternion.hpp>
 #include "engine/EngineExport.h"
 
 
@@ -15,7 +15,7 @@ namespace engine
 		float m_fovRad;
 		float m_ratio;
 		
-		ENGINE_API Frustum(float near, float far, float fovDeg, float ratio)
+		ENGINE_API Frustum(float near = 0.005f, float far = 250.0f, float fovDeg = 60.0f, float ratio = 1.77777777778f)
 			: m_near(near), m_far(far), m_fovRad(fovDeg * DEG2RAD), m_ratio(ratio)
 		{
 		}
@@ -61,7 +61,7 @@ namespace engine
 		float RotateAxis(float angle, float delta);
 
 		Frustum m_frustum;
-		math::Matrix4<float> m_rotationMatrix;
+		math::Quaternion<float> m_rotQuat;
 		math::Vector3<float> m_position;
 		math::Vector3<float> m_rotation;
 		math::Vector3<float> m_forward;
