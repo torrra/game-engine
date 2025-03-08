@@ -125,7 +125,7 @@ namespace engine
 		if (m_entityIndexMap.contains(parent))
 			parentIndex = m_entityIndexMap[parent];
 
-		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
+		for (EntityHandle newIndex = 0; newIndex < static_cast<EntityHandle>(m_components.size()); ++newIndex)
 		{
 			TComponentType& currentComponent = m_components[newIndex];
 
