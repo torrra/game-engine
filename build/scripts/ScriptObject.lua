@@ -16,6 +16,14 @@ function ScriptObject._Register(type, handle, owner)
 
 end
 
+function ScriptObject:_new(object)
+	object = object or {}
+	self.__index = self
+	setmetatable(object, self)
+	return object
+end
+
+
 function ScriptObject.typename()
 	return "ScriptObject"
 end
