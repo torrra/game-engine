@@ -9,6 +9,8 @@
 #include "Component.h"
 #include "Entity.h"
 #include "ComponentArray.h"
+
+#include "components/Script.h"
 #include "components/Transform.h"
 
 namespace engine
@@ -134,6 +136,9 @@ namespace engine
 		// All transform components in the scene
 		ComponentArray<Transform>			m_sceneTransforms;
 
+		// All script components in the scene
+		ComponentArray<Script>				m_sceneScripts;
+
 		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
 
@@ -148,6 +153,12 @@ namespace engine
 	inline ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void)
 	{
 		return m_sceneTransforms;
+	}
+
+	template<>
+	inline ComponentArray<Script>& SceneGraph::GetComponentArray<Script>(void)
+	{
+		return m_sceneScripts;
 	}
 
 
@@ -176,7 +187,11 @@ namespace engine
 
 		// set owner flag to tell that it owns a component of this type
 		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
-		return array.CreateComponent(ownerEntity, ownerPtr->m_parent);
+
+		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_parent);
+
+		newComponent->Register();
+		return newComponent;
 	}
 
 }
