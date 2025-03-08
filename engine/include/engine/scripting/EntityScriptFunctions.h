@@ -16,5 +16,4 @@ extern "C"
 namespace engine
 {
 	void RegisterEntityFunctions(struct lua_State* luaState);
-	void RunEntityConfigScript(struct lua_State* luaState);
 }

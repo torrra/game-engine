@@ -66,7 +66,7 @@ int script_ActivateEntity(lua_State* luaState)
 
 namespace engine
 {
-	void RegisterEntityFunctions(lua_State * luaState)
+	void RegisterEntityFunctions(lua_State* luaState)
 	{
 		constexpr luaL_Reg entityFuncs[]
 		{
@@ -81,13 +81,4 @@ namespace engine
 		lua_setglobal(luaState, "EntityRef");
 	}
 
-	void RunEntityConfigScript(lua_State* luaState)
-	{
-		std::string path = ScriptSystem::GetConfigScriptsLocation() + "Entity.lua";
-
-		if (luaL_dofile(luaState, path.c_str()) != LUA_OK)
-		{
-			std::cout << "[SCRIPT ERROR] " << lua_tostring(luaState, -1) << '\n';
-		}
-	}
 }
