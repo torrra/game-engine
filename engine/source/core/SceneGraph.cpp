@@ -1,6 +1,8 @@
 #include "core/SceneGraph.h"
 #include "core/Entity.h"
 
+#include "core/systems/ScriptSystem.h"
+
 #include <iostream>
 
 namespace engine
@@ -26,9 +28,11 @@ namespace engine
 			if (!currentEntity.IsValid())
 			{
 				printf("[Scene graph]: filling invalid slot\n");
+				EntityHandle newHandle = MakeHandle(newIndex, newUID);
 
 				// write over dead entity to avoid reallocation
-				currentEntity = Entity(name, MakeHandle(newIndex, newUID), parent);
+				currentEntity = Entity(name, newHandle, parent);
+				ScriptSystem::RegisterNewEntity(newHandle, GetFullEntityName(newHandle));
 				return currentEntity.m_handle;
 			}
 		}
@@ -39,7 +43,10 @@ namespace engine
 		EntityHandle newHandle = MakeHandle(newIndex, newUID);
 
 		if (newHandle != Entity::INVALID_HANDLE)
+		{
 			m_sceneEntities.emplace_back(name, newHandle, parent);
+			ScriptSystem::RegisterNewEntity(newHandle, GetFullEntityName(newHandle));
+		}
 
 		// TODO: log error?
 		else
@@ -85,6 +92,50 @@ namespace engine
 		}
 
 		return nullptr;
+	}
+
+	std::string SceneGraph::GetFullEntityName(EntityHandle entity)
+	{
+		std::string name;
+		Entity* entityPtr = GetEntity(entity);
+
+		if (!entityPtr)
+			return name;
+
+		std::vector<EntityHandle> allParents = GetAllParents(entity);
+
+		// iterate backwards to start from parent closest to root
+		for (auto parentIt = allParents.rbegin(); parentIt != allParents.rend(); ++parentIt)
+		{
+			if (Entity* parent = GetEntity(*parentIt))
+				name += parent->GetName() + '.';
+		}
+
+		return name + entityPtr->GetName();
+	}
+
+	std::vector<EntityHandle> SceneGraph::GetAllParents(EntityHandle entity)
+	{
+		std::vector<EntityHandle>	parents;
+
+		if (Entity* entityPtr = GetEntity(entity))
+		{
+			EntityHandle currentParent = entityPtr->m_parent;
+
+			while (currentParent != Entity::INVALID_HANDLE)
+			{
+				parents.push_back(currentParent);
+				entityPtr = GetEntity(currentParent);
+
+				// No need to keep iterating if parent is invalid
+				if (!entityPtr)
+					break;
+				else
+					currentParent = entityPtr->m_parent;
+			}
+		}
+
+		return parents;
 	}
 
 	void SceneGraph::DestroyEntity(EntityHandle entity)

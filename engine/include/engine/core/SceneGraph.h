@@ -84,6 +84,18 @@ namespace engine
 		ENGINE_API
 		Entity* GetEntity(const std::string& name);
 
+		// Get the entity's name with its parents names in front of it,
+		// separated with a dot.
+		ENGINE_API
+		std::string GetFullEntityName(EntityHandle entity);
+
+		// Get the handles of every entity that is a parent/grandparent/etc of
+		// an entity.The first element in the returned array is the entity's direct
+		// parent, and the last one is the one on top of the hierarchy
+		ENGINE_API
+		std::vector<EntityHandle> GetAllParents(EntityHandle entity);
+
+
 		// Permanently set an entity for destruction/overwrite.
 		ENGINE_API
 		void	DestroyEntity(EntityHandle entity);
