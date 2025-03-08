@@ -3,7 +3,7 @@
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
 
-#include "Component.h"
+#include "core/Component.h"
 
 namespace engine
 {
@@ -12,10 +12,8 @@ namespace engine
 
 		using Component::Component;
 
-		void Update(void) override
-		{
+		void Register(void) {}
 
-		}
 
     private:
 
