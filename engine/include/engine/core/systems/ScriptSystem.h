@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include "core/TypesECS.h"
+
 namespace engine
 {
 	class ScriptSystem
@@ -17,20 +19,23 @@ namespace engine
 
 		static void SetCurrentScene(class SceneGraph* graph);
 
-		static void ExecuteStart(void);
-
-		static void ExecuteUpdate(void);
+		/*static void ExecuteUpdate(void);
 		static void ExecuteFixedUpdate(void);
 
 
-		static void ExecuteDestroyAll(void);
+		static void ExecuteDestroyAll(void);*/
 
 		static SceneGraph* GetCurrentScene(void);
 		static const std::string& GetConfigScriptsLocation(void);
 
-	//private:
-
+		static void RegisterNewEntity(EntityHandle newEntity, const std::string& name);
 		static std::string FindConfigScripts(void);
+
+		static void RunInterpreter(void);
+
+
+	private:
+
 
 		static class	SceneGraph* m_currentScene;
 		static struct	lua_State* m_luaState;

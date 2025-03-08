@@ -58,6 +58,22 @@ namespace engine
 		return m_configScriptsLocation;
 	}
 
+	void ScriptSystem::RegisterNewEntity(EntityHandle newEntity, const std::string& name)
+	{
+		if (name.empty())
+			return;
+
+		lua_getglobal(m_luaState, "_AddEntityHandle");
+		lua_pushinteger(m_luaState, newEntity);
+		lua_pushstring(m_luaState, name.c_str());
+
+		if (lua_pcall(m_luaState, 2, 0, 0) != LUA_OK)
+		{
+			std::cout << lua_tostring(m_luaState, -1);
+			lua_pop(m_luaState, 1);
+		}
+	}
+
 	std::string ScriptSystem::FindConfigScripts(void)
 	{
 		FilePath currentPath = std::filesystem::current_path();
@@ -68,6 +84,22 @@ namespace engine
 
 		else
 			return parentPath.append("scripts\\").string();
+	}
+
+	void ScriptSystem::RunInterpreter(void)
+	{
+		char buff[256];
+		//int  error;
+
+		while (fgets(buff, sizeof(buff), stdin) != NULL)
+		{		
+			//error = luaL_loadstring(engine::ScriptSystem::m_luaState, buff) | lua_pcall(engine::ScriptSystem::m_luaState, 0, 0, 0);
+			if (luaL_dostring(m_luaState, buff) != LUA_OK)
+			{
+				fprintf(stderr, "%s\n", lua_tostring(engine::ScriptSystem::m_luaState, -1));
+				lua_pop(m_luaState, 1); /* pop error message from the stack */
+			}
+		}
 	}
 
 }
