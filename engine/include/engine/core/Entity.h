@@ -28,7 +28,8 @@ namespace engine
 		enum EComponentFlags : uint64
 		{
 			NO_COMPONENTS = 0,
-			TRANSFORM = 1
+			TRANSFORM = 1,
+			SCRIPT = 2
 		};
 
 		friend class SceneGraph;
