@@ -19,7 +19,7 @@ namespace engine
 		ENGINE_API Component(EntityHandle owner);
 		ENGINE_API ~Component(void) = default;
 
-		virtual void Update(void) = 0;
+		virtual void Register(void) = 0;
 
 		// Is this component a valid object?
 		// true: this object is a valid component instance
