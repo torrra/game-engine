@@ -231,22 +231,30 @@ namespace engine
 		if (toReparentIndex < parentIndex)
 		{
 			printf("[Scene graph]: moving child to back of array\n");
-
-			// no need to move the reparented component's children if it hasn't moved itself
-			bool transformMoved = m_sceneTransforms.MoveReparentedComponent(toReparent->m_handle, newParent);
-
-			std::vector<EntityHandle> allChildren = GetChildrenAllLevels(toReparent->m_handle);
-
-			for (EntityHandle child : allChildren)
-			{
-				if (transformMoved)
-					m_sceneTransforms.MoveReparentedComponent(child);
-			}
+			MoveReparentedComponents(toReparent->m_handle, newParent);			
 		}
 
 		else
 			printf("[Scene graph]: reparent complete with no layout changes\n");
 
+	}
+
+	void SceneGraph::MoveReparentedComponents(EntityHandle reparented, EntityHandle newParent)
+	{
+		// no need to move the reparented component's children if it hasn't moved itself
+		bool transformMoved = m_sceneTransforms.MoveReparentedComponent(reparented, newParent);
+		bool scriptMoved = m_sceneScripts.MoveReparentedComponent(reparented, newParent);
+
+		std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
+
+		for (EntityHandle child : allChildren)
+		{
+			if (transformMoved)
+				m_sceneTransforms.MoveReparentedComponent(child);
+
+			if (scriptMoved)
+				m_sceneScripts.MoveReparentedComponent(child);
+		}
 	}
 
 	SceneGraph::Random::Random(std::random_device randomDevice)

@@ -114,10 +114,10 @@ namespace engine
 		ENGINE_API
 		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
 
-
+		// Tick all components of a given type, provided that this typed
+		// has its UpdateComponent trait set to true
 		template <CValidComponent TComponentType>
 		void UpdateComponents(float deltaTime);
-
 
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
@@ -137,6 +137,12 @@ namespace engine
 
 		// Internal ReparentEntity overload. Directly uses an entity's pointer
 		void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
+
+
+		// Check if components need to be moved after reparenting an entity, and move them if so
+		void MoveReparentedComponents(EntityHandle reparented, EntityHandle newParent);
+
+
 
 		// All transform components in the scene
 		ComponentArray<Transform>			m_sceneTransforms;
