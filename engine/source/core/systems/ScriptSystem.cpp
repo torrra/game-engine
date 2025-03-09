@@ -12,7 +12,7 @@ extern "C"
 #include "core/SceneGraph.h"
 
 #include "scripting/EntityScriptFunctions.h"
-#include "scripting/ScriptComponentFunctions.h"
+#include "scripting/ComponentFunctions.h"
 
 
 namespace engine
@@ -37,11 +37,13 @@ namespace engine
 		luaL_openlibs(m_luaState);
 
 		RegisterEntityFunctions(m_luaState);
+		RegisterComponentFunctions(m_luaState);
 
+		RunConfigScript("Component.lua");
 		RunConfigScript("Entity.lua");
+
 		RunConfigScript("ScriptObject.lua");
 		RunConfigScript("Script.lua");
-		RunConfigScript("TestChild.lua");
 	}
 
 	void ScriptSystem::Shutdown(void)
