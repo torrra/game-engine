@@ -1,4 +1,3 @@
-Components = {Transform = 1}
 Entity = {handle = 0, ref = nil}
 
 local ExistingEntities = {}
@@ -7,6 +6,16 @@ local ExistingEntities = {}
 function Entity:IsValid()
 
 	return EntityRef.IsValid(self.ref)
+end
+
+function Entity:IsActive()
+
+	return EntityRef.IsActive(self.ref)
+end
+
+function Entity:Invalidate()
+
+	return EntityRef.Invalidate(self.ref)
 end
 
 function Entity:RefreshRef()
