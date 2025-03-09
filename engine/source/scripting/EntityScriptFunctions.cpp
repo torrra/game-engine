@@ -53,13 +53,44 @@ int script_ActivateEntity(lua_State* luaState)
 	int argumentCount = lua_gettop(luaState);
 
 	if (argumentCount != 2)
-		luaL_error(luaState, "Expected 2 arguments (handle)");
+		luaL_error(luaState, "Expected 2 arguments (self, active)");
 
 	else if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
 	{
 		bool activeState = lua_toboolean(luaState, 2);
 		entity->Activate(activeState);
 	}
+
+	return 0;
+}
+
+int script_IsEntityActive(lua_State* luaState)
+{
+	int result = false;
+	int argumentCount = lua_gettop(luaState);
+
+	if (argumentCount != 1)
+		luaL_error(luaState, "Expected 1 argument (self)");
+
+	else
+	{
+		if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
+			result = entity->IsActive();
+	}
+
+	lua_pushboolean(luaState, result);
+	return 1;
+}
+
+int script_InvalidateEntity(lua_State* luaState)
+{
+	int argumentCount = lua_gettop(luaState);
+
+	if (argumentCount != 1)
+		luaL_error(luaState, "Expected 1 argument (self)");
+
+	else if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
+		entity->Invalidate();
 
 	return 0;
 }
@@ -73,6 +104,8 @@ namespace engine
 			{"IsValid", script_IsEntityValid},
 			{"GetEntityRef", script_GetEntityRef},
 			{"Activate", script_ActivateEntity},
+			{"IsActive", script_IsEntityActive},
+			{"Invalidate", script_InvalidateEntity},
 			{NULL, NULL}
 		};
 

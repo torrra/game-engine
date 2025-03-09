@@ -11,6 +11,11 @@ extern "C"
 	// Entity:Activate() native implementation. Calls Entity::Activate()
 	int script_ActivateEntity(struct lua_State* luaState);
 
+	// Entity:IsActive() native implementation. Calls Entity::IsActive()
+	int script_IsEntityActive(struct lua_State* luaState);
+
+	// Entity:Invalidate() native implementation. Calls Entity::Invalidate()
+	int script_InvalidateEntity(struct lua_State* luaState);
 }
 
 namespace engine
