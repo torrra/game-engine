@@ -35,6 +35,12 @@ namespace engine
 		static constexpr bool m_value = true;
 	};
 
+	template <>
+	struct UpdateComponent<Script>
+	{
+		static constexpr bool m_value = true;
+	};
+
 	template<>
 	inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Script>()
 	{
