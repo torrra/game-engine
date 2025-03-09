@@ -16,28 +16,9 @@ function Script:_RegisterScriptObject(type)
 end
 
 
-function _NewScriptComponent(handle)
-	Script:_RegisterScriptComponent(handle)
-end
-
-function _NewScriptObject(type, handle)
-	local ownerComponent = ExistingScriptComponents[handle]
-	ScriptObject._Register(type, handle, ownerComponent)	
-end
-
-
-function _UpdateScript(handle, deltaTime)
-
-	print("\n[Script component] updating script component owned by "..handle.."\n")
-	local component = ExistingScriptComponents[handle]
-	component:_UpdateComponent(deltaTime)
-end
-
-function _StartScript(handle)
-
-	print("\n[Script component] starting script component owned by "..handle.."\n")
-	local component = ExistingScriptComponents[handle]
-	component:_StartComponent()
+function Script:RefreshRef()
+	
+	self.ref = ScriptRef.GetScriptRef(self.entity)
 end
 
 
@@ -66,5 +47,39 @@ function Script:_StartComponent()
 		end
 	end
 end
+
+
+
+function GetScriptComponent(ownerHandle)
+
+	return ExistingScriptComponents[ownerHandle]
+end
+
+
+function _NewScriptComponent(handle)
+	Script:_RegisterScriptComponent(handle)
+end
+
+function _NewScriptObject(type, handle)
+	local ownerComponent = ExistingScriptComponents[handle]
+	ScriptObject._Register(type, handle, ownerComponent)	
+end
+
+
+function _UpdateScript(handle, deltaTime)
+
+	print("\n[Script component] updating script component owned by "..handle.."\n")
+	local component = ExistingScriptComponents[handle]
+	component:_UpdateComponent(deltaTime)
+end
+
+function _StartScript(handle)
+
+	print("\n[Script component] starting script component owned by "..handle.."\n")
+	local component = ExistingScriptComponents[handle]
+	component:_StartComponent()
+end
+
+
 
 return Script
