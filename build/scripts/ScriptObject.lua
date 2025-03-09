@@ -31,7 +31,14 @@ end
 
 function ScriptObject:_PreExecute()
 
-	self.entity:RefreshRef()
+	for _, object in pairs(self) do
+		if type(object) == "table" and
+		object.RefreshRef ~= nil then
+			print("[Script object]: refreshing ref "..tostring(object))
+			object:RefreshRef()
+		end
+	end
+
 end
 
 function ScriptObject:Start()
