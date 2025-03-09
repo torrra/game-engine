@@ -20,6 +20,9 @@ namespace engine
 	void Script::Register(void)
 	{
 		ScriptSystem::RegisterNewScriptComponent(m_owner);
+
+		for (const ScriptObject& object : m_scriptObjects)
+			object.Register();
 	}
 
 	void Script::AddScriptObject(const std::string& type)
