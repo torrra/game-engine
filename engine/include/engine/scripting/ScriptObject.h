@@ -6,6 +6,8 @@
 
 namespace engine
 {
+	// Class meant to represent an instance of a user-defined lua object
+	// does not store any script data, only the name and owner of the instance
 	class ScriptObject
 	{
 	public:
@@ -14,6 +16,9 @@ namespace engine
 		ScriptObject(EntityHandle entity, const std::string& type);
 		ScriptObject(const ScriptObject&) = default;
 		~ScriptObject(void) = default;
+
+		// Create lua instance
+		void Register(void) const;
 
 	private:
 
