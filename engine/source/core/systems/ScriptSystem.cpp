@@ -41,6 +41,7 @@ namespace engine
 		RunConfigScript("Entity.lua");
 		RunConfigScript("ScriptObject.lua");
 		RunConfigScript("Script.lua");
+		RunConfigScript("TestChild.lua");
 	}
 
 	void ScriptSystem::Shutdown(void)
@@ -80,7 +81,7 @@ namespace engine
 	{
 		lua_getglobal(m_luaState, "_NewScriptComponent");
 		lua_pushinteger(m_luaState, owner);
-
+		  
 		if (lua_pcall(m_luaState, 1, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
@@ -97,12 +98,16 @@ namespace engine
 
 	std::string ScriptSystem::FindConfigScripts(void)
 	{
+		// scripts/ directory should either be in child or sibling folder
+		// (relative to the executable's working directory)
 		FilePath currentPath = std::filesystem::current_path();
 		FilePath parentPath = currentPath.parent_path();
 
+		// look for child folder
 		if (std::filesystem::is_directory(currentPath.append("scripts\\")))
 			return parentPath.string();
 
+		// default to sibling folder
 		else
 			return parentPath.append("scripts\\").string();
 	}
