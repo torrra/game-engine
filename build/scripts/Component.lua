@@ -1,4 +1,4 @@
-Component = {entity = nil}
+Component = {entity = nil, ref = nil}
 ComponentTypes = {Transform = 1, Script = 2}
 
 function Component:IsValid()
