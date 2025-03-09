@@ -32,6 +32,15 @@ namespace engine
 		// Check if an entity owns a component in this array
 		bool			HasComponent(EntityHandle entity);
 
+
+		// Standard functions necessary to use ranged for loops.
+		// Cannot use PascalCase for these two functions as they must
+		// match a precise syntax. Their return types are STL vector
+		// iterators
+
+		auto begin(void);
+		auto end(void);
+
 	private:
 
 		// Create a component without checking if the object's parent is
@@ -158,6 +167,18 @@ namespace engine
 	inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity)
 	{
 		return m_entityIndexMap.contains(entity);
+	}
+
+	template<CValidComponent TComponentType>
+	inline auto ComponentArray<TComponentType>::begin(void)
+	{
+		return m_components.begin();
+	}
+
+	template<CValidComponent TComponentType>
+	inline auto ComponentArray<TComponentType>::end(void)
+	{
+		return m_components.end();
 	}
 
 	template<CValidComponent TComponentType>
