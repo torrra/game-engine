@@ -7,7 +7,7 @@ namespace engine
 	{
 	}
 
-	void Component::Update(float deltaTime)
+	void Component::Update(float)
 	{
 	}
 
