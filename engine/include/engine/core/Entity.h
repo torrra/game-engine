@@ -46,6 +46,10 @@ namespace engine
 		ENGINE_API
 		bool IsValid(void) const;
 
+		// Is this entity's components updated each tick?
+		ENGINE_API
+		bool IsActive(void) const;
+
 		// Are this entity and its components included when updating the scene?
 		ENGINE_API
 		void Activate(bool activeState);
@@ -74,11 +78,11 @@ namespace engine
 		ENGINE_API
 		Entity& operator=(const Entity& rhs);
 
-	private:
-
 		// Permanently set object up for destruction
+		ENGINE_API
 		void Invalidate(void);
 
+	private:
 		// Get EComponentFlag corresponding to the component type
 		// NO_COMPONENT by default, must be manually instantiated for
 		// each component type in their respective headers
