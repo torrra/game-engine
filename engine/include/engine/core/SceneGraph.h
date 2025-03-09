@@ -114,6 +114,11 @@ namespace engine
 		ENGINE_API
 		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
 
+
+		template <CValidComponent TComponentType>
+		void UpdateComponents(float deltaTime);
+
+
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
@@ -130,7 +135,7 @@ namespace engine
 		// Group the index and uid bits together in a 64-bit handle
 		EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
 
-		// Internal ReparentEntity overload. Direclty uses an entity's pointer
+		// Internal ReparentEntity overload. Directly uses an entity's pointer
 		void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
 
 		// All transform components in the scene
@@ -148,6 +153,22 @@ namespace engine
 
 
 
+
+	template<CValidComponent TComponentType>
+	inline void SceneGraph::UpdateComponents(float deltaTime)
+	{
+		if constexpr (!UpdateComponent<TComponentType>::m_value)
+			return;
+
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		for (TComponentType& component : array)
+		{
+			if (component.IsValid() && component.IsActive())
+				component.Update(deltaTime);
+		}
+
+	}
 
 	template<>
 	inline ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void)
