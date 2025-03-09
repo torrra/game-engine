@@ -1,4 +1,4 @@
-Script = {entity = nil}
+Script = Component:_new()
 
 local ExistingScriptComponents = {}
 
