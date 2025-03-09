@@ -13,14 +13,22 @@ namespace engine
 	{
 	public:
 
+		// Use parent class constructors
 		using Component::Component;
 		
 		~Script(void) = default;
 
+		// Call Start() in all script objects
 		void Start(void);
-		void Update(float deltaTime);
+
+		// Tick all script objects
+		void Update(float deltaTime) override;
+
+		// Register script component and save a reference in lua
 		void Register(void) override;
 
+		// Add a new lua script object to this component, and register it
+		// in lua
 		void AddScriptObject(const std::string& type);
 
 	private:

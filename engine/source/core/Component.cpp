@@ -7,6 +7,10 @@ namespace engine
 	{
 	}
 
+	void Component::Update(float deltaTime)
+	{
+	}
+
 	bool Component::IsValid(void) const
 	{
 		return !(m_flags & ecs::INVALID_OBJECT);
