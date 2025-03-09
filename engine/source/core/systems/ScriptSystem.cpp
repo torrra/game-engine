@@ -13,7 +13,7 @@ extern "C"
 
 #include "scripting/EntityScriptFunctions.h"
 #include "scripting/ComponentFunctions.h"
-
+#include "scripting/ScriptFunctions.h"
 
 namespace engine
 {
@@ -38,6 +38,7 @@ namespace engine
 
 		RegisterEntityFunctions(m_luaState);
 		RegisterComponentFunctions(m_luaState);
+		RegisterScriptComponentFunctions(m_luaState);
 
 		RunConfigScript("Component.lua");
 		RunConfigScript("Entity.lua");
