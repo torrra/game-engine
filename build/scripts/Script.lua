@@ -55,11 +55,9 @@ end
 
 function Script:_StartComponent()
 
-	print("component starting...")
+	print("[Script component]: component starting...")
 
-	for key, object in pairs(self) do
-
-		print(key..": "..tostring(object))
+	for _, object in pairs(self) do
 
 		if type(object) == "table" and 
 			object._ExecuteStart ~= nil then
