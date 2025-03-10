@@ -267,8 +267,10 @@ ScriptObjectTypes.%s = %s\nreturn %s";
 				continue;
 
 			std::string filename = file.path().string();
+			uint64 filenameLength = filename.size();
 
-			if (filename.find(".lua") == std::string::npos)
+			// look for ".lua" extension ans skip if not found
+			if (filenameLength <= 4 || memcmp(filename.data() + filenameLength - 4, ".lua", 4))
 				continue;
 
 			std::cout << "Running file: " << filename << '\n';
