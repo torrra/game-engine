@@ -119,6 +119,10 @@ namespace engine
 		template <CValidComponent TComponentType>
 		void UpdateComponents(float deltaTime);
 
+		// Re-register all existing components after a lua state reset
+		ENGINE_API
+		void RegisterAllComponents(void);
+
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
@@ -141,6 +145,10 @@ namespace engine
 
 		// Check if components need to be moved after reparenting an entity, and move them if so
 		void MoveReparentedComponents(EntityHandle reparented, EntityHandle newParent);
+
+		// Register all valid components of a type
+		template <CValidComponent TComponentType>
+		void RegisterComponents(void);
 
 
 
@@ -180,6 +188,19 @@ namespace engine
 	inline ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void)
 	{
 		return m_sceneTransforms;
+	}
+
+	template<CValidComponent TComponentType>
+	inline void SceneGraph::RegisterComponents(void)
+	{
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		for (TComponentType& component : array)
+		{
+			if (component.IsValid())
+				component.Register();
+		}
+
 	}
 
 	template<>

@@ -9,6 +9,12 @@ namespace engine
 {
 	SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
 
+	void SceneGraph::RegisterAllComponents(void)
+	{
+		RegisterComponents<Transform>();
+		RegisterComponents<Script>();
+	}
+
 	uint64 SceneGraph::RandomNumber(void)
 	{
 		return m_randomNumGen.Generate();
