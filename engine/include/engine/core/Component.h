@@ -16,6 +16,7 @@ namespace engine
 
 	public:
 
+		ENGINE_API Component(void) = default;
 		ENGINE_API Component(EntityHandle owner);
 		ENGINE_API ~Component(void) = default;
 
@@ -47,7 +48,7 @@ namespace engine
 	protected:
 
 		// which entity in scene graph owns this component
-		EntityHandle	m_owner;
+		EntityHandle	m_owner = static_cast<EntityHandle>(-1);
 
 		// status modifiers that affect behavior (inactive, invalid)
 		uint64			m_flags = 0;
