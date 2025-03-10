@@ -134,6 +134,17 @@ namespace engine
 			LogLuaError();
 	}
 
+	void ScriptSystem::ResetState(SceneGraph* newScene)
+	{
+		Shutdown();
+		Startup();
+
+		if (newScene)
+			m_currentScene = newScene;
+
+		m_currentScene->RegisterAllComponents();
+	}
+
 	void ScriptSystem::RunInterpreter(void)
 	{
 		char buff[256];

@@ -67,6 +67,10 @@ namespace engine
 		ENGINE_API
 		static void UpdateScript(EntityHandle entity, float deltaTime);
 
+		// Fully shutdown and restart lua state, reset all existing lua
+		// objecs and re run all scripts
+		static void ResetState(class SceneGraph* newScene = nullptr);
+
 		// Run a debug lua interpreter
 		// NOTE: there is no way to stop it beside killing the
 		// entire program as of now
