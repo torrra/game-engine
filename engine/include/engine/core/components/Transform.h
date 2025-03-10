@@ -19,7 +19,7 @@ namespace engine
     {
 	private:
 
-		enum E_TransformFlag : uint8
+		enum ETransformFlag : uint8
 		{
 			ABSOLUTE = 1
 		};
