@@ -17,7 +17,9 @@ namespace engine
 
 		// Initialize lua state, register C functions and
 		// run engine scripts. Should be called before any
-		// Script-related function
+
+		// Script-related function other than SetUserScriptLocation().
+		// SetUserScriptLocation should be called before this function on engine startup.
 		ENGINE_API
 		static void Startup(void);
 
@@ -80,6 +82,10 @@ namespace engine
 		ENGINE_API
 		static void CreateUserScript(const char* dirRelativePath, const char* className);
 
+		// Run all .lua files present in the directory specified as
+		// user script locations
+		ENGINE_API
+		static void RunAllUserScripts(void);
 
 		// Run a debug lua interpreter
 		// NOTE: there is no way to stop it beside killing the
@@ -90,6 +96,7 @@ namespace engine
 
 	private:
 
+		static void RunUserScript(const std::string& filename);
 		static void LogLuaError(void);
 
 		// Run an internal lua file

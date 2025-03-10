@@ -17,6 +17,13 @@ extern "C"
 #include "scripting/ComponentFunctions.h"
 #include "scripting/ScriptFunctions.h"
 
+//#include "utility/StringConversion.h"
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <shellapi.h>
+
+
 namespace engine
 {
 	SceneGraph* ScriptSystem::m_currentScene = nullptr;
@@ -24,7 +31,7 @@ namespace engine
 
 	// TODO: get rid of hardcoded path
 	std::string ScriptSystem::m_configScriptsLocation = ScriptSystem::FindConfigScripts();
-	std::string ScriptSystem::m_userScriptsLocation;
+	std::string ScriptSystem::m_userScriptsLocation = "./";
 	
 	void ScriptSystem::Startup(void)
 	{
@@ -48,6 +55,8 @@ namespace engine
 
 		RunConfigScript("ScriptObject.lua");
 		RunConfigScript("Script.lua");
+
+		RunAllUserScripts();
 	}
 
 	void ScriptSystem::Shutdown(void)
@@ -157,7 +166,7 @@ namespace engine
 	{
 		std::string fullPath = m_userScriptsLocation +
 							  ((dirRelativePath) ? dirRelativePath : "") +
-							  ((className) ? className : "") + ".lua";
+							  ((className) ? className : "UserScript") + ".lua";
 
 		if (std::filesystem::exists(fullPath))
 			return;
@@ -183,8 +192,16 @@ ScriptObjectTypes.%s = %s\nreturn %s";
 		sprintf_s(textBuffer, fileData, className, className, className,
 									  formattedName.c_str(), className, className);
 
-
 		newFile << textBuffer;
+		newFile.close();
+		
+		FilePath pathObject(fullPath);
+		
+		// Open new file in text editor
+		ShellExecuteA(NULL, NULL, std::filesystem::absolute(fullPath).string().c_str(), NULL, NULL, SW_SHOW);
+
+		// Run lua file to register existing type
+		RunUserScript(fullPath);
 	}
 
 	void ScriptSystem::RunInterpreter(void)
@@ -232,5 +249,32 @@ ScriptObjectTypes.%s = %s\nreturn %s";
 
 		return formattedName;
 	}
+
+	void ScriptSystem::RunUserScript(const std::string& filename)
+	{
+		if (luaL_dofile(m_luaState, filename.c_str()) != LUA_OK)
+			LogLuaError();
+	}
+
+	void ScriptSystem::RunAllUserScripts(void)
+	{	
+		for (auto& file : std::filesystem::recursive_directory_iterator(m_userScriptsLocation))
+		{
+			if (!file.exists())
+				continue;
+
+			if (!file.is_regular_file())
+				continue;
+
+			std::string filename = file.path().string();
+
+			if (filename.find(".lua") == std::string::npos)
+				continue;
+
+			std::cout << "Running file: " << filename << '\n';
+			RunUserScript(filename);
+		}	
+	}
+
 
 }
