@@ -5,7 +5,7 @@
 std::mutex engine::Input::m_mutex;
 engine::Input* engine::Input::m_instance = nullptr;
 
-void engine::Input::RegisterInput(int key)
+void engine::Input::RegisterInput(int32 key)
 {
 	// Check if key exists
 	if (HasKey(key))
@@ -14,10 +14,12 @@ void engine::Input::RegisterInput(int key)
 		return;
 	}
 
-	GetInstance()->m_keyMap[key] = EInputState::NONE;
+	GetInstance()->m_keyMap[key].m_currentState = EInputState::UP;
+	GetInstance()->m_keyMap[key].m_prevState = EInputState::UP;
+
 }
 
-void engine::Input::UnregisterInput(int key)
+void engine::Input::UnregisterInput(int32 key)
 {
 	// Check if key exists
 	if (!HasKey(key))
@@ -29,46 +31,51 @@ void engine::Input::UnregisterInput(int key)
 	GetInstance()->m_keyMap.erase(key);
 }
 
-bool engine::Input::IsInputPressed(int input)
+bool engine::Input::IsInputPressed(int32 input)
 {
-	// Key not registed
+	// Key not registered 
 	if (!GetInstance()->HasKey(input))
 		return false;
 
-	bool result = GetInstance()->m_keyMap[input] == EInputState::PRESSED;
-	if (result)
-		GetInstance()->m_keyMap[input] = EInputState::HELD;
+	InputData& data = GetInstance()->m_keyMap[input];
 
-	return result;
+	return 
+		data.m_currentState == EInputState::PRESSED &&
+		data.m_prevState == EInputState::UP;
 }
 
-bool engine::Input::IsInputHeld(int input)
+bool engine::Input::IsInputDown(int32 input)
 {
-	// Key not registed
+	// Key not registered
 	if (!GetInstance()->HasKey(input))
 		return false;
 
-	EInputState keyState = GetInstance()->m_keyMap[input];
-
-	return
-		keyState != EInputState::NONE &&
-		keyState != EInputState::RELEASED;
+	return GetInstance()->m_keyMap[input].m_currentState != EInputState::UP;
 }
 
-bool engine::Input::IsInputReleased(int input)
+bool engine::Input::IsInputHeld(int32 input)
 {
-	// Key not registed
+	// Key not registered
 	if (!GetInstance()->HasKey(input))
 		return false;
 
-	bool result = GetInstance()->m_keyMap[input] == EInputState::RELEASED;
-	if (result)
-		GetInstance()->m_keyMap[input] = EInputState::NONE;
-
-	return result;
+	return GetInstance()->m_keyMap[input].m_currentState == EInputState::HELD;
 }
 
-void engine::Input::KeyboardCallback(GLFWwindow* window, int key, int scanCode, int action, int mods)
+bool engine::Input::IsInputReleased(int32 input)
+{
+	// Key not registered
+	if (!GetInstance()->HasKey(input))
+		return false;
+
+	InputData& data = GetInstance()->m_keyMap[input];
+
+	return data.m_currentState == EInputState::UP &&
+		(data.m_prevState == EInputState::PRESSED ||
+		 data.m_prevState == EInputState::HELD);
+}
+
+void engine::Input::KeyboardCallback(GLFWwindow* window, int32 key, int32 scanCode, int32 action, int32 mods)
 {
 	/*
 	*	Keyboard Callback
@@ -87,38 +94,57 @@ void engine::Input::KeyboardCallback(GLFWwindow* window, int key, int scanCode, 
 	(void) mods;
 
 	if (GetInstance()->m_keyMap.contains(key))
-		GetInstance()->m_keyMap[key] = static_cast<EInputState>(action);
+	{
+		InputData& input = GetInstance()->m_keyMap[key];
+
+		input.m_prevState = input.m_currentState;
+		input.m_currentState = static_cast<EInputState>(action);
+		
+		GetInstance()->m_resetKeys = (input.m_currentState == KEY_STATE_RELEASED);
+	}
 }
 
-void engine::Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+void engine::Input::MouseButtonCallback(GLFWwindow* window, int32 button, int32 action, int32 mods)
 {
 	(void) window;
 	(void) mods;
 
 	if (GetInstance()->m_keyMap.contains(button))
-		GetInstance()->m_keyMap[button] = static_cast<EInputState>(action);
+	{
+		InputData& input = GetInstance()->m_keyMap[button];
+		
+		input.m_prevState = input.m_currentState;
+		input.m_currentState = static_cast<EInputState>(action);
+
+		GetInstance()->m_resetKeys = (input.m_currentState == KEY_STATE_RELEASED);
+	}
 }
 
-void engine::Input::MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+void engine::Input::MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset)
 {
 	(void) window;
 
-	GetInstance()->m_scrollDelta = math::Vector2<double>(xOffset, yOffset);
+	GetInstance()->m_scrollDelta = math::Vector2d(xOffset, yOffset);
 }
 
-void engine::Input::CursorPosCallback(GLFWwindow* window, double xPos, double yPos)
+void engine::Input::CursorPosCallback(GLFWwindow* window, f64 xPos, f64 yPos)
 {
 	(void) window;
 
-	GetInstance()->m_cursorPos = math::Vector2<double>(xPos, yPos);
+	GetInstance()->m_cursorPos = math::Vector2d(xPos, yPos);
 }
 
-ENGINE_API void engine::Input::SetInputCallbacks(GLFWwindow* window)
+void engine::Input::SetInputCallbacks(GLFWwindow* window)
 {
 	glfwSetKeyCallback(window, KeyboardCallback);
 	glfwSetMouseButtonCallback(window, MouseButtonCallback);
 	glfwSetScrollCallback(window, MouseScrollCallback);
 	glfwSetCursorPosCallback(window, CursorPosCallback);
+}
+
+engine::Input::Input(void)
+	: m_cursorPos(0.00), m_scrollDelta(0.00), m_resetKeys(false)
+{
 }
 
 void engine::Input::ShutDownInputManager(void)
@@ -131,7 +157,22 @@ void engine::Input::SetCursorMode(ECursorMode cursorMode)
 	glfwSetInputMode(glfwGetCurrentContext(), CURSOR, cursorMode);
 }
 
-bool engine::Input::HasKey(int key) noexcept
+void engine::Input::ResetKeys(void)
+{
+	if (!GetInstance()->m_resetKeys)
+		return;
+	
+	for (auto& key : GetInstance()->m_keyMap)
+	{
+		if (key.second.m_currentState == EInputState::UP &&
+			key.second.m_prevState != EInputState::UP)
+			key.second.m_prevState = EInputState::UP;
+	}
+
+	GetInstance()->m_resetKeys = false;
+}
+
+bool engine::Input::HasKey(int32 key) noexcept
 {
 	return GetInstance()->m_keyMap.contains(key);
 }

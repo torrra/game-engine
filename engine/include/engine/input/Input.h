@@ -1,6 +1,8 @@
 #pragma once
 
 #include "InputData.h"
+#include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 #include <math/MathGeneric.hpp>
 #include <math/Vector2.hpp>
@@ -9,25 +11,12 @@
 #include <string>
 #include <unordered_map>
 
-#include "engine/utility/MemoryCheck.h"
-#include "engine/EngineExport.h"
-
 /*
 *	--------- Keyboard Input ---------
-*	- Keyboard Key pressed		DONE
-*	- Keyboard Key held			DONE
-*	- Keyboard Key release		DONE
-*	- Mouse button press		DONE
-*	- Mouse button held			DONE
-*	- Mouse button release		DONE
-*	- Mouse position			DONE
-*	- Mouse delta position		DONE
-*	- Mouse delta scroll		DONE
-*	- Set mouse mode			DONE
 *	- Handle modifier keys		
-*	- Controller support?		
-*	- Input register			DONE
-*	- Remove singleton
+*	- Controller support		
+*	- Remove singleton			
+*	----------------------------------
 */
 
 struct GLFWwindow;
@@ -38,7 +27,7 @@ namespace engine
 	{
 		PRESSED = KEY_STATE_PRESSED,
 		HELD = KEY_STATE_HELD,
-		RELEASED = KEY_STATE_RELEASED,
+		UP = KEY_STATE_RELEASED,
 		NONE = KEY_STATE_NONE
 	};
 
@@ -50,16 +39,23 @@ namespace engine
 		CAPTURED = CURSOR_MODE_CAPTURED
 	};
 
+	struct InputData
+	{
+		EInputState m_currentState = EInputState::UP;
+		EInputState m_prevState = EInputState::UP;
+	};
+
 	class Input
 	{
 	public:
 								~Input(void) = default;
 
 		// Input manager functions
-		static void ENGINE_API RegisterInput(int key);
-		static void ENGINE_API UnregisterInput(int key);
-		static void ENGINE_API ShutDownInputManager(void);
-		static void ENGINE_API SetCursorMode(ECursorMode cursorMode);
+		ENGINE_API static void RegisterInput(int32 key);
+		ENGINE_API static void UnregisterInput(int32 key);
+		ENGINE_API static void ShutDownInputManager(void);
+		ENGINE_API static void SetCursorMode(ECursorMode cursorMode);
+		ENGINE_API static void ResetKeys(void);
 
 		// Mouse getter functions
 		template <math::CScalarType TValueType>
@@ -72,37 +68,40 @@ namespace engine
 		static math::Vector2<TValueType> GetScrollDelta(void);
 
 		// Input state functions
-		ENGINE_API static bool IsInputPressed(int input);
-		ENGINE_API static bool IsInputHeld(int input);
-		ENGINE_API static bool IsInputReleased(int input);
+		ENGINE_API static bool IsInputPressed(int32 input);
+		ENGINE_API static bool IsInputDown(int32 input);
+		ENGINE_API static bool IsInputHeld(int32 input);
+		ENGINE_API static bool IsInputReleased(int32 input);
 
 		// Callback functions
-		ENGINE_API static void KeyboardCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
-		ENGINE_API static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		ENGINE_API static void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
-		ENGINE_API static void CursorPosCallback(GLFWwindow* window, double xPos, double yPos);
+		ENGINE_API static void KeyboardCallback(GLFWwindow* window, int32 key, int32 scanCode, int32 action, int32 mods);
+		ENGINE_API static void MouseButtonCallback(GLFWwindow* window, int32 button, int32 action, int32 mods);
+		ENGINE_API static void MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset);
+		ENGINE_API static void CursorPosCallback(GLFWwindow* window, f64 xPos, f64 yPos);
 		ENGINE_API static void SetInputCallbacks(GLFWwindow* window);
+	
 	private:
-						Input(void) = default;
+						Input(void);
 						Input(Input const& inputManager) = delete;
 		Input&			operator=(Input const& inputManager) = delete;
-		static bool		HasKey(int keyCode) noexcept;
+		static bool		HasKey(int32 keyCode) noexcept;
 		ENGINE_API static Input*	GetInstance(void);
 
-		std::unordered_map<int, EInputState> m_keyMap;
-
-		math::Vector2<double>					m_cursorPos;
-		math::Vector2<double>					m_scrollDelta;
+		std::unordered_map<int32, InputData> m_keyMap;
+		
+		math::Vector2d					m_cursorPos;
+		math::Vector2d					m_scrollDelta;
 
 		static std::mutex						m_mutex;
 		static Input*							m_instance;
+		bool									m_resetKeys;
 	};
 
 	// Template function definitions
 	template<math::CScalarType TValueType>
 	inline math::Vector2<TValueType> Input::GetCursorPosition(void)
 	{
-		math::Vector2<double> cursorPos = Input::GetInstance()->m_cursorPos;
+		math::Vector2d cursorPos = Input::GetInstance()->m_cursorPos;
 
 		return math::Vector2<TValueType>(
 			static_cast<TValueType>(cursorPos.GetX()),

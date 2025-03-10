@@ -26,10 +26,10 @@ namespace engine
 	class ResourceManager
 	{
 	public:
-		template<typename T>
+		template<typename TResourceType>
 		static void					Load(std::string const& fileName);
-		template<typename T>
-		static T*					GetResource(std::string const& fileName);
+		template<typename TResourceType>
+		static TResourceType*		GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
 		ENGINE_API static void		UnloadAll(void);
 		ENGINE_API static void		CloseResourceManager(void);
@@ -49,7 +49,7 @@ namespace engine
 	};
 
 	// Template function definitions
-	template<typename T>
+	template<typename TResourceType>
 	inline void engine::ResourceManager::Load(std::string const& fileName)
 	{
 		// Check if resource exists
@@ -59,17 +59,17 @@ namespace engine
 			return;
 		}
 
-		GetInstance()->m_resources[fileName] = new T();
+		GetInstance()->m_resources[fileName] = new TResourceType();
 		GetInstance()->m_resources[fileName]->LoadResource(fileName.c_str());
 	}
 
-	template<typename T>
-	inline T* engine::ResourceManager::GetResource(std::string const& fileName)
+	template<typename TResourceType>
+	inline TResourceType* engine::ResourceManager::GetResource(std::string const& fileName)
 	{
 		// Check if resource exists
 		if (!HasResource(fileName))
 			return nullptr;
 
-		return dynamic_cast<T*>(GetInstance()->m_resources[fileName]);
+		return dynamic_cast<TResourceType*>(GetInstance()->m_resources[fileName]);
 	}
 }

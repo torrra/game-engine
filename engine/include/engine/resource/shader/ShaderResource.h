@@ -1,8 +1,7 @@
 #pragma once
 
 #include "engine/resource/Resource.h"
-
-#include <cstdint>
+#include "CoreTypes.h"
 
 namespace engine
 {
@@ -22,12 +21,12 @@ namespace engine
 
 		virtual void LoadResource(const char* fileName) override;
 
-		uint32_t GetShader(void) const noexcept;
+		uint32 GetShader(void) const noexcept;
 		EShaderType GetShaderType(void) const noexcept;
 
 	private:
 		EShaderType ShaderType(const char* fileName) const;
 		EShaderType m_shaderType;
-		uint32_t m_shader;
+		uint32 m_shader;
 	};
 }

@@ -4,12 +4,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "utility/Timer.h"
 #include "utility/MemoryCheck.h"
 
 #define OPENGL_VERSION_MAJOR 4
 #define OPENGL_VERSION_MINOR 5
 
-engine::Window::Window(const char* title, uint32_t width, uint32_t height)
+engine::Window::Window(const char* title, uint32 width, uint32 height)
 	: m_title(title), m_size({width, height}), m_windowPtr(nullptr)
 {
 	static bool isInitialized = false;
@@ -23,7 +24,7 @@ engine::Window::Window(const char* title, uint32_t width, uint32_t height)
 		CreateWindow();
 }
 
-float engine::Window::GetAspectRatio(void) const noexcept
+f32 engine::Window::GetAspectRatio(void) const noexcept
 {
 	return m_aspectRatio;
 }
@@ -53,7 +54,7 @@ void engine::Window::MakeCurrentContext(void)
 	glfwMakeContextCurrent(m_windowPtr);
 }
 
-void engine::Window::ClearWindow(float red, float green, float blue, float alpha)
+void engine::Window::ClearWindow(f32 red, f32 green, f32 blue, f32 alpha)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(red, green, blue, alpha);
@@ -63,6 +64,8 @@ void engine::Window::UpdateBuffers(void)
 {
 	glfwSwapBuffers(m_windowPtr);
 	glfwPollEvents();
+
+	g_engineTime.Update();
 }
 
 void engine::Window::Shutdown(void)
@@ -75,9 +78,9 @@ GLFWwindow* engine::Window::GetCurrentContext(void)
 	return glfwGetCurrentContext();
 }
 
-int engine::Window::Init(void)
+int32 engine::Window::Init(void)
 {
-	int result;
+	int32 result;
 
 	result = InitGLFW();
 	result = CreateWindow();
@@ -86,7 +89,7 @@ int engine::Window::Init(void)
 	return result;
 }
 
-int engine::Window::InitGLFW(void)
+int32 engine::Window::InitGLFW(void)
 {
 	bool result = glfwInit();
 
@@ -103,9 +106,9 @@ int engine::Window::InitGLFW(void)
 	return 0;
 }
 
-int engine::Window::InitGlad(void)
+int32 engine::Window::InitGlad(void)
 {
-	int result = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+	int32 result = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 
 	if (!result)
 	{
@@ -119,11 +122,11 @@ int engine::Window::InitGlad(void)
 	return 0;
 }
 
-int engine::Window::CreateWindow()
+int32 engine::Window::CreateWindow()
 {
 	m_windowPtr = glfwCreateWindow(
 		m_size.GetX(), m_size.GetY(),
-		m_title,
+		m_title.c_str(),
 		NULL, NULL
 	);
 
@@ -145,7 +148,7 @@ int engine::Window::CreateWindow()
 	return 0;
 }
 
-void engine::Window::SetSize(uint32_t width, uint32_t height)
+void engine::Window::SetSize(uint32 width, uint32 height)
 {
 	m_size.X() = width;
 	m_size.Y() = height;
@@ -160,10 +163,10 @@ void engine::Window::SetAspectRatio(void)
 	*	Only update aspect ratio when screen size changes to avoid
 	*	unnecessary divisions
 	*/
-	m_aspectRatio = GetWidth<float>() / GetHeight<float>();
+	m_aspectRatio = GetWidth<f32>() / GetHeight<f32>();
 }
 
-void engine::Window::SizeCallback(GLFWwindow* window, int width, int height)
+void engine::Window::SizeCallback(GLFWwindow* window, int32 width, int32 height)
 {
 	Window* windowPtr = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 

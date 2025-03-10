@@ -1,10 +1,10 @@
 #pragma once
 
 #include "engine/resource/Resource.h"
+#include "engine/EngineExport.h"
 #include "Mesh.h"
 
 #include <vector>
-#include "engine/EngineExport.h"
 
 struct aiNode;
 struct aiScene;
@@ -25,7 +25,7 @@ namespace engine
 		ENGINE_API void			Update(void); // TODO: temporary function remove
 
 	private:
-		void			ProcessNodes(aiNode* node, const aiScene* scene);
+		void					ProcessNodes(aiNode* node, const aiScene* scene);
 		
 		std::vector<Mesh>	m_meshes;
 	};
