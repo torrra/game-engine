@@ -23,6 +23,7 @@ function Entity:RefreshRef()
 	self.ref = EntityRef.GetEntityRef(self.handle)
 end
 
+-- Create new instance of entity reference
 function Entity:_NewNativeEntity(newHandle)
 
 	local newEntity = {handle = newHandle, ref = nil }
@@ -40,11 +41,12 @@ function Entity:Activate(active)
 	end
 end
 
+-- Get an existing entity reference
 function GetEntity(entityName)
 	return ExistingEntities[entityName]
 end
 
-
+-- Register a new unique entity reference
 function _AddEntityHandle(newHandle, entityName)
 
 	ExistingEntities[entityName] = Entity:_NewNativeEntity(newHandle)
