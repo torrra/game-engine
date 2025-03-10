@@ -1,16 +1,16 @@
 #pragma once
 
-#include <stdint.h>
+#include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 #include <math/Vector2.hpp>
 #include <math/Vector3.hpp>
 #include <math/Vector4.hpp>
-
 #include <math/Matrix2.hpp>
 #include <math/Matrix3.hpp>
 #include <math/Matrix4.hpp>
 
-#include "engine/EngineExport.h"
+#include <string>
 
 namespace engine
 {
@@ -26,7 +26,7 @@ namespace engine
 		// Scalar types
 		ENGINE_API void Set(const char* uniformName, bool value);
 		ENGINE_API void Set(const char* uniformName, int value);
-		ENGINE_API void Set(const char* uniformName, uint32_t value);
+		ENGINE_API void Set(const char* uniformName, uint32 value);
 		ENGINE_API void Set(const char* uniformName, float value);
 		ENGINE_API void Set(const char* uniformName, double value);
 
@@ -55,9 +55,9 @@ namespace engine
 	private:
 		void CreateProgram(void);
 
-		const char* m_vertexShader;
-		const char* m_fragShader;
+		std::string m_vertexShader;
+		std::string m_fragShader;
 		
-		uint32_t m_programID;
+		uint32 m_programID;
 	};
 }

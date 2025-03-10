@@ -4,12 +4,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "utility/Timer.h"
 #include "utility/MemoryCheck.h"
 
 #define OPENGL_VERSION_MAJOR 4
 #define OPENGL_VERSION_MINOR 5
 
-engine::Window::Window(const char* title, uint32_t width, uint32_t height)
+engine::Window::Window(const char* title, uint32 width, uint32 height)
 	: m_title(title), m_size({width, height}), m_windowPtr(nullptr)
 {
 	static bool isInitialized = false;
@@ -63,6 +64,8 @@ void engine::Window::UpdateBuffers(void)
 {
 	glfwSwapBuffers(m_windowPtr);
 	glfwPollEvents();
+
+	g_engineTime.Update();
 }
 
 void engine::Window::Shutdown(void)
@@ -123,7 +126,7 @@ int engine::Window::CreateWindow()
 {
 	m_windowPtr = glfwCreateWindow(
 		m_size.GetX(), m_size.GetY(),
-		m_title,
+		m_title.c_str(),
 		NULL, NULL
 	);
 
@@ -145,7 +148,7 @@ int engine::Window::CreateWindow()
 	return 0;
 }
 
-void engine::Window::SetSize(uint32_t width, uint32_t height)
+void engine::Window::SetSize(uint32 width, uint32 height)
 {
 	m_size.X() = width;
 	m_size.Y() = height;
@@ -163,7 +166,7 @@ void engine::Window::SetAspectRatio(void)
 	m_aspectRatio = GetWidth<float>() / GetHeight<float>();
 }
 
-void engine::Window::SizeCallback(GLFWwindow* window, int width, int height)
+void engine::Window::SizeCallback(GLFWwindow* window, int32 width, int32 height)
 {
 	Window* windowPtr = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 

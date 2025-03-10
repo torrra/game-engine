@@ -14,20 +14,10 @@
 
 /*
 *	--------- Keyboard Input ---------
-*	- Keyboard Key pressed		DONE
-*	- Keyboard Key held			DONE
-*	- Keyboard Key release		DONE
-*	- Mouse button press		DONE
-*	- Mouse button held			DONE
-*	- Mouse button release		DONE
-*	- Mouse position			DONE
-*	- Mouse delta position		DONE
-*	- Mouse delta scroll		DONE
-*	- Set mouse mode			DONE
 *	- Handle modifier keys		
-*	- Controller support?		
-*	- Input register			DONE
-*	- Remove singleton
+*	- Controller support		
+*	- Remove singleton			
+*	----------------------------------
 */
 
 struct GLFWwindow;
@@ -38,7 +28,7 @@ namespace engine
 	{
 		PRESSED = KEY_STATE_PRESSED,
 		HELD = KEY_STATE_HELD,
-		RELEASED = KEY_STATE_RELEASED,
+		UP = KEY_STATE_RELEASED,
 		NONE = KEY_STATE_NONE
 	};
 
@@ -50,16 +40,23 @@ namespace engine
 		CAPTURED = CURSOR_MODE_CAPTURED
 	};
 
+	struct InputData
+	{
+		EInputState m_currentState = EInputState::UP;
+		EInputState m_prevState = EInputState::UP;
+	};
+
 	class Input
 	{
 	public:
 								~Input(void) = default;
 
 		// Input manager functions
-		static void ENGINE_API RegisterInput(int key);
-		static void ENGINE_API UnregisterInput(int key);
-		static void ENGINE_API ShutDownInputManager(void);
-		static void ENGINE_API SetCursorMode(ECursorMode cursorMode);
+		ENGINE_API static void RegisterInput(int key);
+		ENGINE_API static void UnregisterInput(int key);
+		ENGINE_API static void ShutDownInputManager(void);
+		ENGINE_API static void SetCursorMode(ECursorMode cursorMode);
+		ENGINE_API static void ResetKeys(void);
 
 		// Mouse getter functions
 		template <math::CScalarType TValueType>
@@ -73,6 +70,7 @@ namespace engine
 
 		// Input state functions
 		ENGINE_API static bool IsInputPressed(int input);
+		ENGINE_API static bool IsInputDown(int input);
 		ENGINE_API static bool IsInputHeld(int input);
 		ENGINE_API static bool IsInputReleased(int input);
 
@@ -82,20 +80,22 @@ namespace engine
 		ENGINE_API static void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 		ENGINE_API static void CursorPosCallback(GLFWwindow* window, double xPos, double yPos);
 		ENGINE_API static void SetInputCallbacks(GLFWwindow* window);
+	
 	private:
-						Input(void) = default;
+						Input(void);
 						Input(Input const& inputManager) = delete;
 		Input&			operator=(Input const& inputManager) = delete;
 		static bool		HasKey(int keyCode) noexcept;
 		ENGINE_API static Input*	GetInstance(void);
 
-		std::unordered_map<int, EInputState> m_keyMap;
+		std::unordered_map<int, InputData> m_keyMap;
 
 		math::Vector2<double>					m_cursorPos;
 		math::Vector2<double>					m_scrollDelta;
 
 		static std::mutex						m_mutex;
 		static Input*							m_instance;
+		bool									m_resetKeys;
 	};
 
 	// Template function definitions

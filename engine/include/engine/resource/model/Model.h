@@ -1,10 +1,10 @@
 #pragma once
 
 #include "engine/resource/Resource.h"
+#include "engine/EngineExport.h"
 #include "Mesh.h"
 
 #include <vector>
-#include "engine/EngineExport.h"
 
 struct aiNode;
 struct aiScene;

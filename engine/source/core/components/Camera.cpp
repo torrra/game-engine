@@ -43,9 +43,9 @@ void engine::Camera::Rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 
 math::Matrix4<float> engine::Camera::ViewProjection(void)
 {
-	m_deltaTime = DeltaTime();
+	m_deltaTime = g_engineTime.GetDeltaTime();
 
-	return m_projectionMatrix * GetViewMatrix();;
+	return m_projectionMatrix * GetViewMatrix();
 }
 
 ENGINE_API math::Vector3<float> engine::Camera::GetPosition(void) const noexcept

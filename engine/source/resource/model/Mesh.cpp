@@ -1,3 +1,4 @@
+
 #include "resource/model/Mesh.h"
 #include "resource/model/Buffer.h"
 
@@ -18,7 +19,7 @@ void engine::Mesh::SetupBuffers(void)
 	Buffer vbo = CreateVBO();
 	Buffer ebo = CreateEBO();
 
-	uint32_t stride = SetAttributes();
+	uint32 stride = SetAttributes();
 
 	glVertexArrayElementBuffer(m_vao, ebo.GetBufferID());
 	glVertexArrayVertexBuffer(m_vao, 0, vbo.GetBufferID(), 0, stride);
@@ -26,32 +27,31 @@ void engine::Mesh::SetupBuffers(void)
 	PostLoad();
 }
 
-uint32_t engine::Mesh::SetAttributes(void)
+uint32 engine::Mesh::SetAttributes(void)
 {
-	uint32_t stride = 0;
+	uint32 stride = 0;
+	uint32 index = 0;
 
 	// Position
-	SetAttribute(3, stride);
+	SetAttribute(index, 3, stride);
 
 	// Normal
-	SetAttribute(3, stride);
+	SetAttribute(index, 3, stride);
 
 	// Tangent
-	SetAttribute(3, stride);
+	SetAttribute(index, 3, stride);
 
 	// BiTangent
-	SetAttribute(3, stride);
+	SetAttribute(index, 3, stride);
 
 	// TexCoord
-	SetAttribute(2, stride);
+	SetAttribute(index, 2, stride);
 
 	return stride;
 }
 
-void engine::Mesh::SetAttribute(int32_t size, uint32_t& stride) const
+void engine::Mesh::SetAttribute(uint32& index, int32 size, uint32& stride) const
 {
-	static uint32_t index = 0;
-
 	glEnableVertexArrayAttrib(m_vao, index);
 	glVertexArrayAttribFormat(m_vao, index, size, GL_FLOAT, GL_FALSE, stride);
 	glVertexArrayAttribBinding(m_vao, index, 0);
@@ -65,7 +65,7 @@ engine::Buffer engine::Mesh::CreateVBO(void)
 	Buffer vbo;
 
 	// Size
-	size_t size = m_vertices.size() * sizeof(Vertex);
+	uint64 size = m_vertices.size() * sizeof(Vertex);
 
 	// Set data
 	vbo.SetData(m_vertices.data(), size);
@@ -78,7 +78,7 @@ engine::Buffer engine::Mesh::CreateEBO(void)
 	Buffer ebo;
 
 	// Size
-	size_t size = m_indices.size() * sizeof(uint32_t);
+	uint64 size = m_indices.size() * sizeof(uint32);
 
 	// Set data
 	ebo.SetData(m_indices.data(), size);
@@ -88,7 +88,7 @@ engine::Buffer engine::Mesh::CreateEBO(void)
 
 void engine::Mesh::PostLoad(void)
 {
-	m_indexCount = static_cast<uint32_t>(m_indices.size());
+	m_indexCount = static_cast<uint32>(m_indices.size());
 
 	m_indices.clear();
 	m_vertices.clear();
@@ -100,7 +100,7 @@ void engine::Mesh::PostLoad(void)
 engine::Mesh& engine::Mesh::operator=(const aiMesh* mesh)
 {
 	// Vertices
-	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
+	for (uint32 i = 0; i < mesh->mNumVertices; ++i)
 	{
 		Vertex vertex{};
 

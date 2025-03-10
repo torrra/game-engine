@@ -26,7 +26,7 @@ ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, int value)
 	glUniform1i(glGetUniformLocation(m_programID, uniformName), value);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, uint32_t value)
+ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, uint32 value)
 {
 	glUniform1ui(glGetUniformLocation(m_programID, uniformName), value);
 }

@@ -14,17 +14,17 @@ engine::Buffer::~Buffer(void)
 	DeleteData();
 }
 
-uint32_t engine::Buffer::GetBufferID(void) const noexcept
+uint32 engine::Buffer::GetBufferID(void) const noexcept
 {
 	return m_buffer;
 }
 
-void engine::Buffer::SetData(Vertex const* vertexData, size_t size) const
+void engine::Buffer::SetData(Vertex const* vertexData, uint64 size) const
 {
 	glNamedBufferData(m_buffer, size, vertexData, GL_STATIC_DRAW);
 }
 
-void engine::Buffer::SetData(int32_t const* indexData, size_t size) const
+void engine::Buffer::SetData(int32 const* indexData, uint64 size) const
 {
 	glNamedBufferData(m_buffer, size, indexData, GL_STATIC_DRAW);
 }

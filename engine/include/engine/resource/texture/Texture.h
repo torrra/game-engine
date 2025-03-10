@@ -2,11 +2,9 @@
 
 #include "engine/resource/Resource.h"
 #include "engine/EngineExport.h"
+#include "engine/CoreTypes.h"
 
 #include <math/Vector2.hpp>
-
-#include <stdint.h>
-
 
 namespace engine
 {
@@ -36,12 +34,11 @@ namespace engine
 			BILINEAR = 0x2601
 		};
 
-
 		void SetWrapping(ETextureWrapping const& wrapMode);
 		void SetFiltering(ETextureFiltering const& filterMode);
 		int SetFormat(int channelCount);
 
 		math::Vector2<int> m_size;
-		uint32_t m_texture;
+		uint32 m_texture;
 	};
 }

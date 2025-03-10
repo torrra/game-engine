@@ -58,7 +58,7 @@ void engine::Shader::LoadResource(const char* fileName)
 	fileData.Clear();
 }
 
-uint32_t engine::Shader::GetShader(void) const noexcept
+uint32 engine::Shader::GetShader(void) const noexcept
 {
 	return m_shader;
 }
@@ -70,7 +70,7 @@ engine::EShaderType engine::Shader::GetShaderType(void) const noexcept
 
 engine::EShaderType engine::Shader::ShaderType(const char* fileName) const
 {
-	size_t pos = std::string(fileName).rfind('.');
+	uint64 pos = std::string(fileName).rfind('.');
 
 	if (pos == std::string::npos)
 	{

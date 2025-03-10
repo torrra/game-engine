@@ -1,7 +1,9 @@
 #pragma once
 
-#include <stdint.h>
+#include "CoreTypes.h"
+
 #include <vector>
+
 
 namespace engine
 {
@@ -13,12 +15,12 @@ namespace engine
 					Buffer(void);
 					~Buffer(void);
 
-		uint32_t	GetBufferID(void) const noexcept;
-		void		SetData(Vertex const* vertexData, size_t size) const;
-		void		SetData(int32_t const* indexData, size_t size) const;
+		uint32		GetBufferID(void) const noexcept;
+		void		SetData(Vertex const* vertexData, uint64 size) const;
+		void		SetData(int32 const* indexData, uint64 size) const;
 		void		DeleteData(void);
 
 	private:
-		uint32_t	m_buffer;
+		uint32		m_buffer;
 	};
 }
