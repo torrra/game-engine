@@ -1,21 +1,25 @@
 ScriptObject = {entity = nil}
 ScriptObjectTypes = {scriptobject = ScriptObject}
 
+-- Create a new instance of a ScriptObject child typ
 -- type: script object derived type
 -- handle: handle of the entity that possesses the new object
 -- owner: owning Script component 
-function ScriptObject._Register(type, handle, owner)
+function ScriptObject._Register(typename, handle, owner)
 
-	local typeTable = ScriptObjectTypes[type]
+	-- Get the script object metatable
+	local typeTable = ScriptObjectTypes[typename]
 	local newObj = {entity = Entity:_NewNativeEntity(handle)}	
 
 	typeTable.__index = typeTable
 	setmetatable(newObj, typeTable)
-	owner[type] = newObj
-	print("\n[ScriptObject script] successfully registered script object owned by "..handle.."\n")
+	owner[typename] = newObj
+	print("\n[ScriptObject script] successfully registered script object of type "..typename.." owned by "..handle.."\n")
 
 end
 
+-- Create a new instance of ScriptObject prototype table
+-- Only used to declare table protptypes inheriting from ScriptObject
 function ScriptObject:_new(object)
 	object = object or {}
 	self.__index = self
@@ -23,12 +27,8 @@ function ScriptObject:_new(object)
 	return object
 end
 
-
-function ScriptObject.typename()
-	return "ScriptObject"
-end
-
-
+-- Execute necessary tasks (refresh references) before running
+-- Start() or Update()
 function ScriptObject:_PreExecute()
 
 	for _, object in pairs(self) do
@@ -41,42 +41,26 @@ function ScriptObject:_PreExecute()
 
 end
 
+
 function ScriptObject:Start()
-	print("\n[Script object]: START CALLED\n")
+
 end
 
 function ScriptObject:Update(deltaTime)
-	print("\n[Script object]: UPDATE CALLED\n")
+
 end
 
-
-local function _PreExecuteScriptObject(handle)
-	local object = ExistingScriptObjects[handle]
-	object:_PreExecute()
-	return object
-end
-
+-- Internal Start() caller
 function ScriptObject:_ExecuteStart()
 
 	self:_PreExecute()
 	self:Start()
 end
 
+-- Internal Update() caller
 function ScriptObject:_ExecuteUpdate(deltaTime)
 	self:_PreExecute()
 	self:Update()
 end	
-
-function _StartScriptObject(handle)
-
-	local object = _PreExecuteScriptObject(handle)
-	object:Start()
-end
-
-function _UpdateScriptObject(handle)
-
-	local object = _PreExecuteScriptObject(handle)
-	object:Update()
-end
 
 return ScriptObject
