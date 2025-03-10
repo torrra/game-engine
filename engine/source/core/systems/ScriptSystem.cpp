@@ -6,6 +6,8 @@ extern "C"
 }
 
 #include <iostream>
+#include <fstream>
+#include <iostream>
 
 #include "core/components/Script.h"
 #include "core/systems/ScriptSystem.h"
@@ -22,6 +24,7 @@ namespace engine
 
 	// TODO: get rid of hardcoded path
 	std::string ScriptSystem::m_configScriptsLocation = ScriptSystem::FindConfigScripts();
+	std::string ScriptSystem::m_userScriptsLocation;
 	
 	void ScriptSystem::Startup(void)
 	{
@@ -145,6 +148,45 @@ namespace engine
 		m_currentScene->RegisterAllComponents();
 	}
 
+	void ScriptSystem::SetUserScriptLocation(const char* path)
+	{
+		m_userScriptsLocation = path;
+	}
+
+	void ScriptSystem::CreateUserScript(const char* dirRelativePath, const char* className)
+	{
+		std::string fullPath = m_userScriptsLocation +
+							  ((dirRelativePath) ? dirRelativePath : "") +
+							  ((className) ? className : "") + ".lua";
+
+		if (std::filesystem::exists(fullPath))
+			return;
+
+		std::string formattedName = FormatLuaClassName(className);
+
+		if (formattedName.empty())
+			return;
+
+		std::ofstream newFile(fullPath,
+							 std::ios::out);
+
+		if (!newFile)
+			return;
+
+		const char fileData[] = "%s = ScriptObject:_new()\n\n-- Define member variables \
+here\n\n-- Is executed once when the object becomes active\nfunction %s:Start()\n\nend\n\n\n\
+-- Is executed every tick\nfunction %s:Update(deltaTime)\n\nend\n\n\n-- Engine definitions\n\
+ScriptObjectTypes.%s = %s\nreturn %s";
+
+		char textBuffer[1024];
+
+		sprintf_s(textBuffer, fileData, className, className, className,
+									  formattedName.c_str(), className, className);
+
+
+		newFile << textBuffer;
+	}
+
 	void ScriptSystem::RunInterpreter(void)
 	{
 		char buff[256];
@@ -168,6 +210,27 @@ namespace engine
 
 		if (luaL_dofile(m_luaState, path.c_str()) != LUA_OK)
 			LogLuaError();
+	}
+
+	std::string ScriptSystem::FormatLuaClassName(const char* name)
+	{
+		constexpr uint64 maxClassNameLength = 64;
+		std::string formattedName = name;
+
+
+		if (formattedName.size() > maxClassNameLength)
+			return std::string();
+
+		for (char& character : formattedName)
+		{
+			if ((!isalnum(character)) && (character != '_'))
+				return std::string();
+
+			if (character >= 'A' && character <= 'Z')
+				character += 32;
+		}
+
+		return formattedName;
 	}
 
 }

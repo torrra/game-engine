@@ -69,7 +69,17 @@ namespace engine
 
 		// Fully shutdown and restart lua state, reset all existing lua
 		// objecs and re run all scripts
+		ENGINE_API
 		static void ResetState(class SceneGraph* newScene = nullptr);
+
+		// Set where the default user-generated scripts are stored for this project
+		ENGINE_API
+		static void SetUserScriptLocation(const char* path);
+
+		// Create a new .lua file inheriting from ScriptObject
+		ENGINE_API
+		static void CreateUserScript(const char* dirRelativePath, const char* className);
+
 
 		// Run a debug lua interpreter
 		// NOTE: there is no way to stop it beside killing the
@@ -85,9 +95,12 @@ namespace engine
 		// Run an internal lua file
 		static void RunConfigScript(const char* script);
 
-		static class	SceneGraph* m_currentScene;
-		static struct	lua_State* m_luaState;
+		static std::string FormatLuaClassName(const char* name);
 
-		static std::string m_configScriptsLocation;
+		static class	SceneGraph* m_currentScene;
+		static struct	lua_State*	m_luaState;
+
+		static std::string			m_configScriptsLocation;
+		static std::string			m_userScriptsLocation;
 	};
 }
