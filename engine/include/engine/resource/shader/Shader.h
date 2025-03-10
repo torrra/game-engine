@@ -25,32 +25,32 @@ namespace engine
 
 		// Scalar types
 		ENGINE_API void Set(const char* uniformName, bool value);
-		ENGINE_API void Set(const char* uniformName, int value);
+		ENGINE_API void Set(const char* uniformName, int32 value);
 		ENGINE_API void Set(const char* uniformName, uint32 value);
-		ENGINE_API void Set(const char* uniformName, float value);
-		ENGINE_API void Set(const char* uniformName, double value);
+		ENGINE_API void Set(const char* uniformName, f32 value);
+		ENGINE_API void Set(const char* uniformName, f64 value);
 
 		// Vectors
-		ENGINE_API void Set(const char* uniformName, math::Vector2<int> const& vec);
-		ENGINE_API void Set(const char* uniformName, math::Vector3<int> const& vec);
-		ENGINE_API void Set(const char* uniformName, math::Vector4<int> const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector2i const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector3i const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector4i const& vec);
 
-		ENGINE_API void Set(const char* uniformName, math::Vector2<float> const& vec);
-		ENGINE_API void Set(const char* uniformName, math::Vector3<float> const& vec);
-		ENGINE_API void Set(const char* uniformName, math::Vector4<float> const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector2f const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector3f const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector4f const& vec);
 
-		ENGINE_API void Set(const char* uniformName, math::Vector2<double> const& vec);
-		ENGINE_API void Set(const char* uniformName, math::Vector3<double> const& vec);
-		ENGINE_API void Set(const char* uniformName, math::Vector4<double> const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector2d const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector3d const& vec);
+		ENGINE_API void Set(const char* uniformName, math::Vector4d const& vec);
 
 		// Matrices
-		ENGINE_API void Set(const char* uniformName, math::Matrix2<float>* matrix);
-		ENGINE_API void Set(const char* uniformName, math::Matrix3<float>* matrix);
-		ENGINE_API void Set(const char* uniformName, math::Matrix4<float>* matrix);
+		ENGINE_API void Set(const char* uniformName, math::Matrix2f* matrix);
+		ENGINE_API void Set(const char* uniformName, math::Matrix3f* matrix);
+		ENGINE_API void Set(const char* uniformName, math::Matrix4f* matrix);
 
-		ENGINE_API void Set(const char* uniformName, math::Matrix2<double>* matrix);
-		ENGINE_API void Set(const char* uniformName, math::Matrix3<double>* matrix);
-		ENGINE_API void Set(const char* uniformName, math::Matrix4<double>* matrix);
+		ENGINE_API void Set(const char* uniformName, math::Matrix2d* matrix);
+		ENGINE_API void Set(const char* uniformName, math::Matrix3d* matrix);
+		ENGINE_API void Set(const char* uniformName, math::Matrix4d* matrix);
 
 	private:
 		void CreateProgram(void);

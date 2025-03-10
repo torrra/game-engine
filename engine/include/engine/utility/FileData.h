@@ -8,7 +8,7 @@ namespace engine
 	struct FileData
 	{
 		FileData(void) = default;
-		FileData(char* fileContent, int size)
+		FileData(char* fileContent, int32 size)
 			: m_fileContent(fileContent), m_size(size)
 		{
 		}
@@ -21,7 +21,7 @@ namespace engine
 			if (file)
 			{
 				fseek(file, 0, SEEK_END);
-				m_size = (int) ftell(file);
+				m_size = (int32) ftell(file);
 
 				m_fileContent = static_cast<char*>(calloc(m_size + 1, sizeof(char)));
 				fseek(file, 0, SEEK_SET);
@@ -43,6 +43,6 @@ namespace engine
 		}
 
 		char*	m_fileContent;
-		int		m_size;
+		int32		m_size;
 	};
 }

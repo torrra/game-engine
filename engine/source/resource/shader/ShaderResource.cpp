@@ -40,12 +40,12 @@ void engine::Shader::LoadResource(const char* fileName)
 	glShaderSource(m_shader, 1, &fileData.m_fileContent, &fileData.m_size);
 	glCompileShader(m_shader);
 
-	int result;
+	int32 result;
 	glGetShaderiv(m_shader, GL_COMPILE_STATUS, &result);
 
 	if (!result)
 	{
-		const int infoLogLength = 2500;
+		const int32 infoLogLength = 2500;
 		char infoLog[infoLogLength];
 
 		glGetShaderInfoLog(m_shader, infoLogLength, nullptr, infoLog);
@@ -77,7 +77,7 @@ engine::EShaderType engine::Shader::ShaderType(const char* fileName) const
 		std::printf("Failed to process shader. Shader file does not have an extension.\n");
 		return EShaderType::INVALID_SHADER;
 	}
-
+	
 	switch (fileName[pos + 1])
 	{
 	case 'v':

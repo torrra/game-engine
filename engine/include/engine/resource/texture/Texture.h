@@ -36,9 +36,9 @@ namespace engine
 
 		void SetWrapping(ETextureWrapping const& wrapMode);
 		void SetFiltering(ETextureFiltering const& filterMode);
-		int SetFormat(int channelCount);
+		int32 SetFormat(int32 channelCount);
 
-		math::Vector2<int> m_size;
+		math::Vector2i m_size;
 		uint32 m_texture;
 	};
 }

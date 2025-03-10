@@ -24,7 +24,7 @@ engine::Window::Window(const char* title, uint32 width, uint32 height)
 		CreateWindow();
 }
 
-float engine::Window::GetAspectRatio(void) const noexcept
+f32 engine::Window::GetAspectRatio(void) const noexcept
 {
 	return m_aspectRatio;
 }
@@ -54,7 +54,7 @@ void engine::Window::MakeCurrentContext(void)
 	glfwMakeContextCurrent(m_windowPtr);
 }
 
-void engine::Window::ClearWindow(float red, float green, float blue, float alpha)
+void engine::Window::ClearWindow(f32 red, f32 green, f32 blue, f32 alpha)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(red, green, blue, alpha);
@@ -78,9 +78,9 @@ GLFWwindow* engine::Window::GetCurrentContext(void)
 	return glfwGetCurrentContext();
 }
 
-int engine::Window::Init(void)
+int32 engine::Window::Init(void)
 {
-	int result;
+	int32 result;
 
 	result = InitGLFW();
 	result = CreateWindow();
@@ -89,7 +89,7 @@ int engine::Window::Init(void)
 	return result;
 }
 
-int engine::Window::InitGLFW(void)
+int32 engine::Window::InitGLFW(void)
 {
 	bool result = glfwInit();
 
@@ -106,9 +106,9 @@ int engine::Window::InitGLFW(void)
 	return 0;
 }
 
-int engine::Window::InitGlad(void)
+int32 engine::Window::InitGlad(void)
 {
-	int result = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+	int32 result = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 
 	if (!result)
 	{
@@ -122,7 +122,7 @@ int engine::Window::InitGlad(void)
 	return 0;
 }
 
-int engine::Window::CreateWindow()
+int32 engine::Window::CreateWindow()
 {
 	m_windowPtr = glfwCreateWindow(
 		m_size.GetX(), m_size.GetY(),
@@ -163,7 +163,7 @@ void engine::Window::SetAspectRatio(void)
 	*	Only update aspect ratio when screen size changes to avoid
 	*	unnecessary divisions
 	*/
-	m_aspectRatio = GetWidth<float>() / GetHeight<float>();
+	m_aspectRatio = GetWidth<f32>() / GetHeight<f32>();
 }
 
 void engine::Window::SizeCallback(GLFWwindow* window, int32 width, int32 height)

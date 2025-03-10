@@ -56,14 +56,14 @@ void engine::Model::ProcessNodes(aiNode* node, const aiScene* scene)
 	m_meshes.reserve(scene->mNumMeshes);
 
 	// Process current node's mesh(es)
-	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+	for (uint32 i = 0; i < node->mNumMeshes; ++i)
 	{
 		Mesh meshData = scene->mMeshes[node->mMeshes[i]];
 		m_meshes.push_back(meshData);
 	}
 
 	// Handle child nodes
-	for (unsigned int i = 0; i < node->mNumChildren; ++i)
+	for (uint32 i = 0; i < node->mNumChildren; ++i)
 	{
 		ProcessNodes(node->mChildren[i], scene);
 	}

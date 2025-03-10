@@ -57,7 +57,7 @@ void engine::Mesh::SetAttribute(uint32& index, int32 size, uint32& stride) const
 	glVertexArrayAttribBinding(m_vao, index, 0);
 
 	++index;
-	stride += size * sizeof(float);
+	stride += size * sizeof(f32);
 }
 
 engine::Buffer engine::Mesh::CreateVBO(void)
@@ -126,11 +126,11 @@ engine::Mesh& engine::Mesh::operator=(const aiMesh* mesh)
 	}
 
 	// Indices
-	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+	for (uint32 i = 0; i < mesh->mNumFaces; ++i)
 	{
 		aiFace face = mesh->mFaces[i];
 
-		for (unsigned int j = 0; j < face.mNumIndices; ++j)
+		for (uint32 j = 0; j < face.mNumIndices; ++j)
 		{
 			m_indices.push_back(face.mIndices[j]);
 		}
@@ -139,15 +139,15 @@ engine::Mesh& engine::Mesh::operator=(const aiMesh* mesh)
 	return *this;
 }
 
-math::Vector2<float> engine::Mesh::ConvertVec2(aiVector3t<float> const& vec3) const noexcept
+math::Vector2f engine::Mesh::ConvertVec2(aiVector3t<f32> const& vec3) const noexcept
 {
-	return math::Vector2<float>(
-		static_cast<float>(vec3.x),
-		static_cast<float>(vec3.y)
+	return math::Vector2f(
+		static_cast<f32>(vec3.x),
+		static_cast<f32>(vec3.y)
 	);
 }
 
-math::Vector3<float> engine::Mesh::ConvertVec3(aiVector3t<float> const& vec3) const noexcept
+math::Vector3f engine::Mesh::ConvertVec3(aiVector3t<f32> const& vec3) const noexcept
 {
-	return math::Vector3<float>(vec3.x, vec3.y, vec3.z);
+	return math::Vector3f(vec3.x, vec3.y, vec3.z);
 }

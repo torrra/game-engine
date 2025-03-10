@@ -11,19 +11,19 @@ engine::Time::Time(void)
 
 void engine::Time::Update()
 {
-	m_totalTime = static_cast<float>(glfwGetTime());
+	m_totalTime = static_cast<f32>(glfwGetTime());
 	
 	m_deltaTime = m_totalTime - m_lastTime;
 	
 	m_lastTime = m_totalTime;
 }
 
-float engine::Time::GetDeltaTime(void)
+f32 engine::Time::GetDeltaTime(void)
 {
 	return m_deltaTime;
 }
 
-float engine::Time::GetTotalTime(void)
+f32 engine::Time::GetTotalTime(void)
 {
 	return m_totalTime;
 }

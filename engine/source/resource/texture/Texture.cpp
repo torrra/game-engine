@@ -19,7 +19,7 @@ ENGINE_API void engine::Texture::LoadResource(const char* fileName)
 
 	glGenTextures(1, &m_texture);
 
-	int channelCount = 0;
+	int32 channelCount = 0;
 	unsigned char* data = stbi_load(relativePath, &m_size[0], &m_size[1], &channelCount, 0);
 
 	// Invalid file type or file not found
@@ -73,7 +73,7 @@ void engine::Texture::SetFiltering(ETextureFiltering const& filterMode)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
 }
 
-int engine::Texture::SetFormat(int channelCount)
+int32 engine::Texture::SetFormat(int32 channelCount)
 {
 	switch (channelCount)
 	{

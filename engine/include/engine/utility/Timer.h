@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 
 namespace engine
@@ -12,13 +13,13 @@ namespace engine
 
 		ENGINE_API void Update();
 
-		ENGINE_API float GetDeltaTime(void);
-		ENGINE_API float GetTotalTime(void);
+		ENGINE_API f32 GetDeltaTime(void);
+		ENGINE_API f32 GetTotalTime(void);
 	
 	private:
-		float m_deltaTime;
-		float m_totalTime;
-		float m_lastTime;
+		f32 m_deltaTime;
+		f32 m_totalTime;
+		f32 m_lastTime;
 	};
 
 	extern Time g_engineTime;

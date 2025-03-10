@@ -31,8 +31,8 @@ namespace engine
 		Buffer		CreateEBO(void);
 		void		PostLoad(void);
 
-		math::Vector2<float>	ConvertVec2(aiVector3t<float> const& vec3) const noexcept;
-		math::Vector3<float>	ConvertVec3(aiVector3t<float> const& vec3) const noexcept;
+		math::Vector2f	ConvertVec2(aiVector3t<f32> const& vec3) const noexcept;
+		math::Vector3f	ConvertVec3(aiVector3t<f32> const& vec3) const noexcept;
 	public:
 		std::vector<Vertex>		m_vertices;
 		std::vector<int32>		m_indices;
