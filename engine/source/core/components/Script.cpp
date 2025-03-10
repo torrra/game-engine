@@ -27,18 +27,7 @@ namespace engine
 
 	void Script::AddScriptObject(const std::string& type)
 	{
-		if (type.find(".lua") == std::string::npos)
-		{
-			std::cout << "[Script component]: " << type << " is not a valid lua script.\n";
-			return;
-		}
-
-		uint64 dotLocation = 0;
-
-		while (type[dotLocation] != '.')
-			++dotLocation;
-
-		std::string formattedType = type.substr(0, dotLocation);
+		std::string formattedType = type;
 
 		for (char& character : formattedType)
 		{
