@@ -123,3 +123,10 @@ void Engine::Transform::SetTransform(const lm::Vector3f& inPosition,
 	m_rotation	= inRotation;
 	m_scale		= inScale;
 }
+
+std::ostream& Engine::Transform::operator<<(std::ostream& os)
+{
+	return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
+			  << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " " << m_rotation.Z() << " "
+			  << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+}
