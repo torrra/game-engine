@@ -26,13 +26,13 @@ engine::Transform engine::Transform::Interpolate(Transform& inStartTransform,
 	Transform result = Transform();
 
 	result.m_position = lm::Vector3f::Lerp(inStartTransform.m_position,
-		inEndTransform.m_position, inTime);
+										   inEndTransform.m_position, inTime);
 
 	result.m_rotation = lm::Quatf::Slerp(inStartTransform.m_rotation,
-		inEndTransform.m_rotation, inTime);
+										 inEndTransform.m_rotation, inTime);
 
 	result.m_scale = lm::Vector3f::Lerp(inStartTransform.m_scale,
-		inEndTransform.m_scale, inTime);
+										inEndTransform.m_scale, inTime);
 
 	return result;
 }
@@ -98,6 +98,7 @@ void engine::Transform::SetTransform(const lm::Vector3f& inPosition,
 std::ostream& engine::Transform::operator<<(std::ostream& os)
 {
 	return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
-		<< m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " " << m_rotation.Z() << " "
-		<< m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+			  << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " " 
+			  << m_rotation.Z() << " "
+			  << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
 }

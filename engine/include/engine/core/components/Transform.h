@@ -28,42 +28,64 @@ namespace engine
 
 		using Component::Component;
 
+		/// Public Constructors
+		// Copy constructor set to default
 		ENGINE_API 						Transform(const Transform& inTransform) = default;
+		// Move constructor set to default
 		ENGINE_API 						Transform(Transform&& inTransform) = default;
 
 		/// Destructors
+		// Destructor set to default
 		ENGINE_API 						~Transform(void) = default;
 
 		/// Transform to matrix
+		// Convert transform to matrix without scale parameters
 		ENGINE_API static lm::Matrix4f	ToMatrixWithoutScale(Transform& inTransform);
+		// Convert transform to matrix with scale parameters
 		ENGINE_API static lm::Matrix4f	ToMatrixWithScale(Transform& inTransform);
+		// Interpolate two transforms
 		ENGINE_API static Transform		Interpolate(Transform& inStartTransform,
 													Transform& inEndTransform,
 													float inTime);
+		
+		// Copy the position from another transform
 		ENGINE_API void					CopyPosition(const Transform& inTransform);
+		// Copy the rotation from another transform
 		ENGINE_API void 				CopyRotation(const Transform& inTransform);
+		// Copy the scale from another transform
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
 		ENGINE_API void					Update(void) {}
 
 		/// Getters
+		// Get the position of the transform
 		ENGINE_API lm::Vector3f			GetPosition(void) const;
+		// Get the rotation of the transform
 		ENGINE_API lm::Quatf			GetRotation(void) const;
+		// Get the scale of the transform
 		ENGINE_API lm::Vector3f			GetScale(void) const;
+		// Get the transform with all parameters
 		ENGINE_API Transform			GetTransform(void) const;
 
 		/// Setters
+		// Set the position of the transform
 		ENGINE_API void					SetPosition(const lm::Vector3f& inPosition);
+		// Set the rotation of the transform
 		ENGINE_API void					SetRotation(const lm::Quatf& inRotation);
+		// Set the scale of the transform
 		ENGINE_API void					SetScale(const lm::Vector3f& inScale);
+		// Set all parameters of the transform
 		ENGINE_API void 				SetTransform(const lm::Vector3f& inPosition,
 													 const lm::Quatf& inRotation,
 													 const lm::Vector3f& inScalein =
 													 lm::Vector3f(1.0f, 1.0f, 1.0f));
 
 		/// Operators
+		// Copy assignement set to default
 		Transform&						operator=(const Transform& inTransform) = default;
+		// Move assignement set to default
 		Transform&						operator=(Transform&& inTransform) = default;
+		// Operator to print a transform
 		std::ostream&					operator<<(std::ostream& os);
 
 	private:
