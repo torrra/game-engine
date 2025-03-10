@@ -24,6 +24,8 @@ function Component:Invalidate()
 	return ComponentRef.Invalidate(self.ref)
 end
 
+-- Create new instance of Component prototype
+-- Used to define tables inheriting from Component
 function Component:_new(object)
 	object = object or {}
 	self.__index = self
