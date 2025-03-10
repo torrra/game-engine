@@ -9,6 +9,7 @@ namespace engine
 {
     class Transform final : public Component
     {
+	public:
 
 		using Component::Component;
 
