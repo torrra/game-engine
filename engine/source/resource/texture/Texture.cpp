@@ -11,7 +11,7 @@ engine::Texture::Texture(void)
 {
 }
 
-ENGINE_API void engine::Texture::LoadResource(const char* fileName)
+void engine::Texture::LoadResource(const char* fileName)
 {
 	// Concatenate file path
 	char relativePath[256] = TEXTURE_RELATIVE_PATH;
@@ -50,12 +50,12 @@ ENGINE_API void engine::Texture::LoadResource(const char* fileName)
 	stbi_image_free(data);
 }
 
-ENGINE_API void engine::Texture::UseTexture(void)
+void engine::Texture::UseTexture(void)
 {
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
-ENGINE_API void engine::Texture::RemoveTexture(void)
+void engine::Texture::RemoveTexture(void)
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

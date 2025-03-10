@@ -48,76 +48,76 @@ math::Matrix4f engine::Camera::ViewProjection(void)
 	return m_projectionMatrix * GetViewMatrix();
 }
 
-ENGINE_API math::Vector3f engine::Camera::GetPosition(void) const noexcept
+math::Vector3f engine::Camera::GetPosition(void) const noexcept
 {
 	return m_position;
 }
 
-ENGINE_API math::Vector3f engine::Camera::GetRotation(void) const noexcept
+math::Vector3f engine::Camera::GetRotation(void) const noexcept
 {
 	return m_rotation;
 }
 
-ENGINE_API f32 engine::Camera::GetSpeed(void) const noexcept
+f32 engine::Camera::GetSpeed(void) const noexcept
 {
 	return m_speed;
 }
 
-ENGINE_API f32 engine::Camera::GetRotationSpeed(void) const noexcept
+f32 engine::Camera::GetRotationSpeed(void) const noexcept
 {
 	return m_angularSpeed;
 }
 
-ENGINE_API f32 engine::Camera::GetFOV(void) const noexcept
+f32 engine::Camera::GetFOV(void) const noexcept
 {
 	return m_frustum.m_fovRad;
 }
 
-ENGINE_API f32 engine::Camera::GetNearPlane(void) const noexcept
+f32 engine::Camera::GetNearPlane(void) const noexcept
 {
 	return m_frustum.m_near;
 }
 
-ENGINE_API f32 engine::Camera::GetFarPlane(void) const noexcept
+f32 engine::Camera::GetFarPlane(void) const noexcept
 {
 	return m_frustum.m_far;
 }
 
-ENGINE_API math::Vector3f& engine::Camera::Position(void)
+math::Vector3f& engine::Camera::Position(void)
 {
 	return m_position;
 }
 
-ENGINE_API math::Vector3f& engine::Camera::Rotation(void)
+math::Vector3f& engine::Camera::Rotation(void)
 {
 	return m_rotation;
 }
 
-ENGINE_API f32& engine::Camera::Speed(void)
+f32& engine::Camera::Speed(void)
 {
 	return m_speed;
 }
 
-ENGINE_API f32& engine::Camera::RotationSpeed(void)
+f32& engine::Camera::RotationSpeed(void)
 {
 	return m_angularSpeed;
 }
 
-ENGINE_API void engine::Camera::SetFOV(f32 fov)
+void engine::Camera::SetFOV(f32 fov)
 {
 	m_frustum.m_fovRad = fov;
 
 	GetProjectionMatrix();
 }
 
-ENGINE_API void engine::Camera::SetNearPlane(f32 nearPlane)
+void engine::Camera::SetNearPlane(f32 nearPlane)
 {
 	m_frustum.m_near = nearPlane;
 
 	GetProjectionMatrix();
 }
 
-ENGINE_API void engine::Camera::SetFarPlane(f32 farPlane)
+void engine::Camera::SetFarPlane(f32 farPlane)
 {
 	m_frustum.m_far = farPlane;
 

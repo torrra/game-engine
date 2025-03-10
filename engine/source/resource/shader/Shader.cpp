@@ -10,101 +10,101 @@ engine::ShaderProgram::ShaderProgram(const char* vertexShader, const char* fragS
 	CreateProgram();
 }
 
-ENGINE_API void engine::ShaderProgram::Use(void) const
+void engine::ShaderProgram::Use(void) const
 {
 	return glUseProgram(m_programID);
 }
 
 // Scalar types
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, bool value)
+void engine::ShaderProgram::Set(const char* uniformName, bool value)
 {
 	glUniform1i(glGetUniformLocation(m_programID, uniformName), value);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, int32 value)
+void engine::ShaderProgram::Set(const char* uniformName, int32 value)
 {
 	glUniform1i(glGetUniformLocation(m_programID, uniformName), value);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, uint32 value)
+void engine::ShaderProgram::Set(const char* uniformName, uint32 value)
 {
 	glUniform1ui(glGetUniformLocation(m_programID, uniformName), value);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, f32 value)
+void engine::ShaderProgram::Set(const char* uniformName, f32 value)
 {
 	glUniform1f(glGetUniformLocation(m_programID, uniformName), value);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, f64 value)
+void engine::ShaderProgram::Set(const char* uniformName, f64 value)
 {
 	glUniform1d(glGetUniformLocation(m_programID, uniformName), value);
 }
 
 // Vector ints
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector2i const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector2i const& vec)
 {
 	glUniform2i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1]);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector3i const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector3i const& vec)
 {
 	glUniform3i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2]);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector4i const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector4i const& vec)
 {
 	glUniform4i(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2], vec[3]);
 }
 
 // Vector floats
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector2f const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector2f const& vec)
 {
 	glUniform2f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1]);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector3f const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector3f const& vec)
 {
 	glUniform3f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2]);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector4f const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector4f const& vec)
 {
 	glUniform4f(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2], vec[3]);
 }
 
 // Vector double
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector2d const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector2d const& vec)
 {
 	glUniform2d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1]);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector3d const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector3d const& vec)
 {
 	glUniform3d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2]);
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Vector4d const& vec)
+void engine::ShaderProgram::Set(const char* uniformName, math::Vector4d const& vec)
 {
 	glUniform4d(glGetUniformLocation(m_programID, uniformName), vec[0], vec[1], vec[2], vec[3]);
 }
 
 // Matrix float
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2f* matrix)
+void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2f* matrix)
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
 	glUniformMatrix2fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3f* matrix)
+void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3f* matrix)
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
 	glUniformMatrix3fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4f* matrix)
+void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4f* matrix)
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
@@ -112,21 +112,21 @@ ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix
 }
 
 // Matrix double
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2d* matrix)
+void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2d* matrix)
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
 	glUniformMatrix2dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3d* matrix)
+void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3d* matrix)
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
 	glUniformMatrix3dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
 }
 
-ENGINE_API void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4d* matrix)
+void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4d* matrix)
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
