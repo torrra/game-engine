@@ -2,6 +2,7 @@ Script = Component:_new()
 
 local ExistingScriptComponents = {}
 
+-- Register new instance of ScriptComponent
 function Script:_RegisterScriptComponent(handle)
 
 	local newComponent = {entity = handle}
@@ -11,6 +12,7 @@ function Script:_RegisterScriptComponent(handle)
 	print("\n[Script component] successfully registered component owned by "..handle.."\n")
 end
 
+-- Add a new script object instance to this comopnent
 function Script:_RegisterScriptObject(type)
 	ScriptObject._Register(type, self.entity, self)
 end
@@ -21,7 +23,7 @@ function Script:RefreshRef()
 	self.ref = ScriptRef.GetScriptRef(self.entity)
 end
 
-
+-- Run updates on all applicable members
 function Script:_UpdateComponent(deltaTime)
 
 	for _, object in pairs(self) do
@@ -34,6 +36,7 @@ function Script:_UpdateComponent(deltaTime)
 	end
 end
 
+-- Start all script objects in this component
 function Script:_StartComponent()
 
 	print("[Script component]: component starting...")
@@ -49,23 +52,24 @@ function Script:_StartComponent()
 end
 
 
-
+-- Get an existing script component
 function GetScriptComponent(ownerHandle)
 
 	return ExistingScriptComponents[ownerHandle]
 end
 
-
+-- Create a new script component instance from C++
 function _NewScriptComponent(handle)
 	Script:_RegisterScriptComponent(handle)
 end
 
-function _NewScriptObject(type, handle)
+-- Add a new script o
+function _NewScriptObject(typename, handle)
 	local ownerComponent = ExistingScriptComponents[handle]
-	ScriptObject._Register(type, handle, ownerComponent)	
+	ScriptObject._Register(typename, handle, ownerComponent)	
 end
 
-
+-- Update script objects inside a script
 function _UpdateScript(handle, deltaTime)
 
 	print("\n[Script component] updating script component owned by "..handle.."\n")
@@ -73,6 +77,7 @@ function _UpdateScript(handle, deltaTime)
 	component:_UpdateComponent(deltaTime)
 end
 
+-- Call Start() on all script objects
 function _StartScript(handle)
 
 	print("\n[Script component] starting script component owned by "..handle.."\n")
