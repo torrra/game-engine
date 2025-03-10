@@ -46,7 +46,7 @@ namespace engine
 		// Interpolate two transforms
 		ENGINE_API static Transform		Interpolate(Transform& inStartTransform,
 													Transform& inEndTransform,
-													float inTime);
+													f32 inTime);
 		
 		// Copy the position from another transform
 		ENGINE_API void					CopyPosition(const Transform& inTransform);

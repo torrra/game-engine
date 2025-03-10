@@ -21,7 +21,7 @@ lm::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
 }
 
 engine::Transform engine::Transform::Interpolate(Transform& inStartTransform,
-												 Transform& inEndTransform, float inTime)
+												 Transform& inEndTransform, f32 inTime)
 {
 	Transform result = Transform();
 
