@@ -51,5 +51,8 @@ namespace engine
 
 		Frustum m_frustum;
 		math::Matrix4f m_projectionMatrix;
+
+		// TODO: placeholder value representing texture output
+		void* m_output = nullptr;
 	};
 }
