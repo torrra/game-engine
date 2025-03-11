@@ -136,7 +136,7 @@ namespace engine
 			LogLuaError();
 	}
 
-	void ScriptSystem::UpdateScript(EntityHandle entity, float deltaTime)
+	void ScriptSystem::UpdateScript(EntityHandle entity, f32 deltaTime)
 	{
 		lua_getglobal(m_luaState, "_UpdateScript");
 		lua_pushinteger(m_luaState, entity);

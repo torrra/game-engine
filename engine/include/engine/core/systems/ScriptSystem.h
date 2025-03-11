@@ -67,7 +67,7 @@ namespace engine
 
 		// Call all Update() functions in a given entity's script component
 		ENGINE_API
-		static void UpdateScript(EntityHandle entity, float deltaTime);
+		static void UpdateScript(EntityHandle entity, f32 deltaTime);
 
 		// Fully shutdown and restart lua state, reset all existing lua
 		// objecs and re run all scripts
