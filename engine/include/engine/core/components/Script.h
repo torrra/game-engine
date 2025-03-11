@@ -22,7 +22,7 @@ namespace engine
 		void Start(void);
 
 		// Tick all script objects
-		void Update(f32 deltaTime) override;
+		void Update(f32 deltaTime);
 
 		// Register script component and save a reference in lua
 		void Register(void) override;
