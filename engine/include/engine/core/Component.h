@@ -17,7 +17,7 @@ namespace engine
 	public:
 
 		ENGINE_API Component(void) = default;
-		ENGINE_API Component(EntityHandle owner);
+		ENGINE_API Component(EntityHandle owner, class SceneGraph* scene);
 		ENGINE_API ~Component(void) = default;
 
 		virtual void Register(void) = 0;

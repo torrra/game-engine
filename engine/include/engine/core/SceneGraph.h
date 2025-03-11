@@ -237,7 +237,7 @@ namespace engine
 		// set owner flag to tell that it owns a component of this type
 		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
 
-		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_parent);
+		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_parent, this);
 
 		newComponent->Register();
 		return newComponent;
