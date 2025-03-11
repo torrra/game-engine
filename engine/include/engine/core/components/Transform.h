@@ -59,11 +59,15 @@ namespace engine
 		// Copy the scale from another transform
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
-		ENGINE_API void					Update(void) {}
-		ENGINE_API void					Register(void) {}
+		ENGINE_API void					Register(void) {};
 
+		// Add translation to local position
 		ENGINE_API void					Move(math::Vector3f translation);
+
+		// Add rotation in degrees to local rotation
 		ENGINE_API void					Rotate(f32 angleX, f32 angleY, f32 angleZ);
+
+		// Add quaternion rotation to local rotation
 		ENGINE_API void					Rotate(const math::Quatf& rotation);
 
 		/// Getters
@@ -87,6 +91,8 @@ namespace engine
 		ENGINE_API void					SetPosition(const math::Vector3f& inPosition);
 		// Set the rotation of the transform
 		ENGINE_API void					SetRotation(const math::Quatf& inRotation);
+		// Set rotation of the transform in degrees
+		ENGINE_API void					SetRotation(f32 angleX, f32 angleY, f32 angleZ);
 		// Set the scale of the transform
 		ENGINE_API void					SetScale(const math::Vector3f& inScale);
 		// Set all parameters of the transform
@@ -94,6 +100,9 @@ namespace engine
 													 const math::Quatf& inRotation,
 													 const math::Vector3f& inScalein =
 													 math::Vector3f(1.0f, 1.0f, 1.0f));
+
+		// Get absolute transform ready to be recalculated
+		ENGINE_API void					Update(void);
 
 		/// Operators
 		// Copy assignement set to default
@@ -104,6 +113,8 @@ namespace engine
 		std::ostream&					operator<<(std::ostream& os);
 
 	private:
+
+
 
 		void UpdateAxes(void);
 		void CacheParentTransform(void);
@@ -120,8 +131,14 @@ namespace engine
 
     }; // !Class Transform
 
-	template <>
+	/*template <>
 	struct UpdateAfterParent<Transform>
+	{
+		static constexpr bool m_value = true;
+	};*/
+
+	template <>
+	struct UpdateComponent<Transform>
 	{
 		static constexpr bool m_value = true;
 	};

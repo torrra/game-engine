@@ -1,22 +1,22 @@
 #include "core/components/Transform.h"
 #include "core/SceneGraph.h"
 
-lm::Matrix4f engine::Transform::ToMatrixWithoutScale(Transform& inTransform)
+math::Matrix4f engine::Transform::ToMatrixWithoutScale(Transform& inTransform)
 {
-	lm::Matrix4f transformMatrix = lm::TransformMatrix(inTransform.m_rotation, inTransform.m_position);
+	math::Matrix4f transformMatrix = math::TransformMatrix(inTransform.m_rotation, inTransform.m_position);
 
 	return transformMatrix;
 }
 
-lm::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
+math::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
 {
-	lm::Matrix4f positionMatrix = lm::Matrix4f::PositionMatrix(inTransform.m_position);
+	math::Matrix4f positionMatrix = math::Matrix4f::PositionMatrix(inTransform.m_position);
 
-	lm::Matrix4f rotationMatrix = inTransform.m_rotation.RotationMatrix();
+	math::Matrix4f rotationMatrix = inTransform.m_rotation.RotationMatrix();
 
-	lm::Matrix4f scaleMatrix = lm::Matrix4f::ScaleMatrix(inTransform.m_scale);
+	math::Matrix4f scaleMatrix = math::Matrix4f::ScaleMatrix(inTransform.m_scale);
 
-	lm::Matrix4f transformMatrix = (scaleMatrix * rotationMatrix) * positionMatrix;
+	math::Matrix4f transformMatrix = (scaleMatrix * rotationMatrix) * positionMatrix;
 
 	return transformMatrix;
 }
@@ -26,13 +26,13 @@ engine::Transform engine::Transform::Interpolate(Transform& inStartTransform,
 {
 	Transform result = Transform();
 
-	result.m_position = lm::Vector3f::Lerp(inStartTransform.m_position,
+	result.m_position = math::Vector3f::Lerp(inStartTransform.m_position,
 										   inEndTransform.m_position, inTime);
 
-	result.m_rotation = lm::Quatf::Slerp(inStartTransform.m_rotation,
+	result.m_rotation = math::Quatf::Slerp(inStartTransform.m_rotation,
 										 inEndTransform.m_rotation, inTime);
 
-	result.m_scale = lm::Vector3f::Lerp(inStartTransform.m_scale,
+	result.m_scale = math::Vector3f::Lerp(inStartTransform.m_scale,
 										inEndTransform.m_scale, inTime);
 
 	return result;
@@ -53,6 +53,11 @@ void engine::Transform::CopyScale(const Transform& inTransform)
 	m_scale = inTransform.m_scale;
 }
 
+void engine::Transform::Update(void)
+{
+	m_parentCache.m_cached = false;
+}
+
 void engine::Transform::Move(math::Vector3f translation)
 {
 	m_position += m_forward * translation;
@@ -60,9 +65,10 @@ void engine::Transform::Move(math::Vector3f translation)
 
 void engine::Transform::Rotate(f32 angleX, f32 angleY, f32 angleZ)
 {
-	Rotate(math::Quatf(math::Radian(angleX),
-					   math::Radian(angleY), 
-					   math::Radian(angleZ)));
+
+	Rotate(math::Quatf(math::Radian(angleX * DEG2RAD),
+					   math::Radian(angleY * DEG2RAD), 
+					   math::Radian(angleZ * DEG2RAD)));
 
 }
 
@@ -72,17 +78,17 @@ void engine::Transform::Rotate(const math::Quatf& rotation)
 	UpdateAxes();
 }
 
-lm::Vector3f engine::Transform::GetPosition(void) const
+math::Vector3f engine::Transform::GetPosition(void) const
 {
 	return m_position;
 }
 
-lm::Quatf engine::Transform::GetRotation(void) const
+math::Quatf engine::Transform::GetRotation(void) const
 {
 	return m_rotation;
 }
 
-lm::Vector3f engine::Transform::GetScale(void) const
+math::Vector3f engine::Transform::GetScale(void) const
 {
 	return m_scale;
 }
@@ -116,23 +122,32 @@ math::Quatf engine::Transform::GetAbsoluteRotation(void)
 	return m_parentCache.m_rotation * m_rotation;
 }
 
-void engine::Transform::SetPosition(const lm::Vector3f& inPosition)
+void engine::Transform::SetPosition(const math::Vector3f& inPosition)
 {
 	m_position = inPosition;
 }
 
-void engine::Transform::SetRotation(const lm::Quatf& inRotation)
+void engine::Transform::SetRotation(const math::Quatf& inRotation)
 {
 	m_rotation = inRotation;
+	UpdateAxes();
 }
 
-void engine::Transform::SetScale(const lm::Vector3f& inScale)
+void engine::Transform::SetRotation(f32 angleX, f32 angleY, f32 angleZ)
+{
+	SetRotation(math::Quatf(math::Radian(angleX * DEG2RAD),
+							math::Radian(angleY * DEG2RAD),
+							math::Radian(angleZ * DEG2RAD)));
+
+}
+
+void engine::Transform::SetScale(const math::Vector3f& inScale)
 {
 	m_scale = inScale;
 }
 
-void engine::Transform::SetTransform(const lm::Vector3f& inPosition,
-	const lm::Quatf& inRotation, const lm::Vector3f& inScale)
+void engine::Transform::SetTransform(const math::Vector3f& inPosition,
+	const math::Quatf& inRotation, const math::Vector3f& inScale)
 {
 	m_position = inPosition;
 	m_rotation = inRotation;
@@ -149,7 +164,7 @@ std::ostream& engine::Transform::operator<<(std::ostream& os)
 
 void engine::Transform::UpdateAxes(void)
 {
-	m_forward = m_rotation.Rotate(math::Vector3f::Front());
+	m_forward = GetAbsoluteRotation().Rotate(math::Vector3f::Front());
 	m_forward.Normalize();
 
 	m_right = math::Cross(m_forward, math::Vector3f::Up());
