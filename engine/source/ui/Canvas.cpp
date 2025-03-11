@@ -20,11 +20,10 @@ ENGINE_API void engine::Canvas::Render(void)
 	ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoDecoration |
 		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoBackground |
+		/*ImGuiWindowFlags_NoBackground |*/ // TODO: re-add later
 		ImGuiWindowFlags_NoScrollWithMouse |
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoFocusOnAppearing |
-		/*ImGuiWindowFlags_NoInputs |*/
 		ImGuiWindowFlags_NoDocking;
 
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -32,7 +31,7 @@ ENGINE_API void engine::Canvas::Render(void)
 	ImGui::SetNextWindowViewport(viewport->ID);
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
-	//ImGui::PushStyleColor(ImGuiCol_WindowBg, uiUtils::Convert(m_color)); // TODO: imgui config
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, m_color);
 	ImGui::Begin("Canvas", nullptr, flags);
 
 	for (UIElement* element : m_elements)
