@@ -12,7 +12,7 @@ namespace engine
 		ScriptSystem::StartScript(m_owner);
 	}
 
-	void Script::Update(float deltaTime)
+	void Script::Update(f32 deltaTime)
 	{
 		ScriptSystem::UpdateScript(m_owner, deltaTime);
 	}
