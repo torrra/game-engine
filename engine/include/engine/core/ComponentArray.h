@@ -47,7 +47,7 @@ namespace engine
 
 		// Create a component without checking if the object's parent is
 		// before its new memory location
-		TComponentType* ForceCreateComponent(EntityHandle owner);
+		TComponentType* ForceCreateComponent(EntityHandle owner, class SceneGraph* scene);
 
 		std::unordered_map<EntityHandle, uint64>	m_entityIndexMap;
 		std::vector<TComponentType>					m_components;
@@ -129,7 +129,7 @@ namespace engine
 		// Creates new component with no regard for ordering if new component does not
 		// need to be updated after parent
 		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
-			return ForceCreateComponent(owner);
+			return ForceCreateComponent(owner, scene);
 
 		// parentIndex is 0 by default so that it is always considered 'before'
 		// the new component when the latter has no actual parent, makes it so it
@@ -189,7 +189,8 @@ namespace engine
 	}
 
 	template<CValidComponent TComponentType> inline
-	TComponentType* ComponentArray<TComponentType>::ForceCreateComponent(EntityHandle owner)
+	TComponentType* ComponentArray<TComponentType>::ForceCreateComponent(EntityHandle owner,
+																	class SceneGraph* scene)
 	{
 		// write over invalid component if possible
 		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
@@ -201,7 +202,7 @@ namespace engine
 
 			printf("[Component array]: filling invalid slot\n");
 
-			currentComponent = TComponentType(owner);
+			currentComponent = TComponentType(owner, scene);
 			m_entityIndexMap[owner] = newIndex;
 			return &currentComponent;
 		}
@@ -209,7 +210,7 @@ namespace engine
 		printf("[Component array]: creating new slot\n");
 
 		// create new component if no invalid component was found
-		m_entityIndexMap[m_components.size()] = owner;
-		return &m_components.emplace_back(owner);
+		m_entityIndexMap[owner] = m_components.size();
+		return &m_components.emplace_back(owner, scene);
 	}
 }
