@@ -2,6 +2,7 @@
 
 #include "engine/ui/UIElement.h"
 #include "engine/ui/elements/Label.h"
+#include "engine/ui/elements/Image.h"
 #include "engine/EngineExport.h"
 
 #include <math/Vector2.hpp>
@@ -22,6 +23,7 @@ namespace engine
 		ENGINE_API void Clear(void);
 
 		ENGINE_API Label* AddLabel(const char* text);
+		ENGINE_API Image* AddImage(const char* fileName);
 
 	private:
 		std::vector<UIElement*> m_elements;

@@ -7,7 +7,7 @@
 #define TEXTURE_RELATIVE_PATH "..\\assets\\"
 
 engine::Texture::Texture(void)
-	: m_texture(0), m_size(0, 0)
+	: m_texture(0), m_size(0, 0), m_aspectRatio(1.0f)
 {
 }
 
@@ -41,6 +41,9 @@ void engine::Texture::LoadResource(const char* fileName)
 	glTexImage2D(GL_TEXTURE_2D, 0, format, m_size[0], m_size[1], 0, format, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+	if (m_size[1] != 0)
+		m_aspectRatio = (f32) m_size[0] / (f32) m_size[1];
+
 	// Set wrapping parameter
 	SetWrapping(ETextureWrapping::REPEAT);
 
@@ -58,6 +61,21 @@ void engine::Texture::UseTexture(void)
 void engine::Texture::RemoveTexture(void)
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+uint32 engine::Texture::GetTexture(void) const noexcept
+{
+	return m_texture;
+}
+
+f32 engine::Texture::GetAspectRatio(void) const noexcept
+{
+	return m_aspectRatio;
+}
+
+math::Vector2i engine::Texture::GetSize(void) const noexcept
+{
+	return m_size;
 }
 
 void engine::Texture::SetWrapping(ETextureWrapping const& wrapMode)

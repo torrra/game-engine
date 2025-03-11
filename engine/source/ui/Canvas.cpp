@@ -53,9 +53,16 @@ ENGINE_API void engine::Canvas::Clear(void)
 	m_elements.shrink_to_fit();
 }
 
-ENGINE_API engine::Label* engine::Canvas::AddLabel(const char* text)
+engine::Label* engine::Canvas::AddLabel(const char* text)
 {
 	m_elements.push_back(new Label(text));
 
 	return dynamic_cast<Label*>(m_elements[(int) m_elements.size() - 1]);
+}
+
+engine::Image* engine::Canvas::AddImage(const char* fileName)
+{
+	m_elements.push_back(new Image(fileName));
+
+	return dynamic_cast<Image*>(m_elements[(int) m_elements.size() - 1]);
 }
