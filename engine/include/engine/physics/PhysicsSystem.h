@@ -10,22 +10,17 @@ namespace engine
 		// Empty constructor to initialize the physics system
 		// PxFoundation, PxPvd, PxPhysics
 							PhysicsSystem(void);
+							PhysicsSystem(const PhysicsSystem& other) = delete;
 
 		/// Destructor
-		// Destroy all the physics system resources
+		// Destroy all the physics system resources and the physics handler
 							~PhysicsSystem(void);
-
-		/// Getter
-		class PxPhysics*	getPhysics(void) const;
 
 	private :
 
 		/// Private members
 		// Forward declaration to do encapsulation
-		// PxFoundation, PxPvd, PxPhysics
-		class physx::PxFoundation*	m_Foundation	= nullptr;
-		class physx::PxPhysics*		m_Physics		= nullptr;
-		class physx::PxPvd*			m_Pvd			= nullptr;
+		struct PhysicsSystemHandle* m_PhysicHandle;
 
 	}; // !Class PhysicsSystem
 } // !Namespace engine
