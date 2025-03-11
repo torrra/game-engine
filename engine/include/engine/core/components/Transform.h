@@ -131,11 +131,11 @@ namespace engine
 
     }; // !Class Transform
 
-	/*template <>
+	template <>
 	struct UpdateAfterParent<Transform>
 	{
 		static constexpr bool m_value = true;
-	};*/
+	};
 
 	template <>
 	struct UpdateComponent<Transform>
