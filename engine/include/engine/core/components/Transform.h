@@ -59,6 +59,7 @@ namespace engine
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
 		ENGINE_API void					Update(void) {}
+		ENGINE_API void					Register(void) {}
 
 		ENGINE_API void					Move(math::Vector3f translation);
 		ENGINE_API void					Rotate(f32 angleX, f32 angleY, f32 angleZ);

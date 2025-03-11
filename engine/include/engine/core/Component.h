@@ -20,7 +20,10 @@ namespace engine
 		ENGINE_API Component(EntityHandle owner);
 		ENGINE_API ~Component(void) = default;
 
-		virtual void Update(void) = 0;
+		virtual void Register(void) = 0;
+
+		// Tick component
+		virtual void Update(float deltaTime);
 
 		// Is this component a valid object?
 		// true: this object is a valid component instance
@@ -54,9 +57,17 @@ namespace engine
 
 	// Defines whether a type has objects that NEED to be updated after their parents
 	// e.g. a transform component should be updated after its owner's transform.
-	// False by default, must be manually instanciated and defined as true if needed
+	// False by default, must be manually instantiated and defined as true if needed
 	template <CValidComponent TComponentType>
 	struct UpdateAfterParent
+	{
+		static constexpr bool m_value = false;
+	};
+
+	// Defines if a component type should be updated each tick in the main loop
+	// False by default, must be manually instantiated and defined as true if needed
+	template <CValidComponent TComponentType>
+	struct UpdateComponent
 	{
 		static constexpr bool m_value = false;
 	};
