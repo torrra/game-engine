@@ -126,9 +126,9 @@ namespace engine
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
-		// Output a uint64 between 0 and ULONG_MAX
+		// Output a int64 between 0 and ULONG_MAX
 		ENGINE_API
-		static uint64 RandomNumber(void);
+		static int64 RandomNumber(void);
 
 	private:
 

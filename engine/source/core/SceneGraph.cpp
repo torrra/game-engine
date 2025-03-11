@@ -15,7 +15,7 @@ namespace engine
 		RegisterComponents<Script>();
 	}
 
-	uint64 SceneGraph::RandomNumber(void)
+	int64 SceneGraph::RandomNumber(void)
 	{
 		return m_randomNumGen.Generate();
 	}
