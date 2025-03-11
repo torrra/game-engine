@@ -56,6 +56,7 @@ namespace engine
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
 		ENGINE_API void					Update(void) {}
+		ENGINE_API void					Register(void) {}
 
 		/// Getters
 		// Get the position of the transform
