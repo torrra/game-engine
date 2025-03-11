@@ -50,11 +50,14 @@ target_include_directories(${TARGET_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/physx
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/assimp
-	
+	PUBLIC ${MATHLIB_INCLUDE_DIR}
 )
 
 # Link against necessary libraries
-target_link_libraries(${TARGET_NAME} PRIVATE ${TARGET_STATIC_LIBS})
+target_link_libraries(${TARGET_NAME} 
+	PRIVATE ${TARGET_STATIC_LIBS}
+	PRIVATE ${MATHLIB_LIB}
+)
 
 # Set name as exposed variable to build other   projects
 set(DEPENDENCIES_LIBRARY ${TARGET_NAME} PARENT_SCOPE)
