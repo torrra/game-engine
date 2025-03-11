@@ -12,6 +12,7 @@
 
 #include "components/Script.h"
 #include "components/Transform.h"
+#include "components/Camera.h"
 
 namespace engine
 {
@@ -159,6 +160,9 @@ namespace engine
 		// All script components in the scene
 		ComponentArray<Script>				m_sceneScripts;
 
+		// All cameras components in the scene
+		ComponentArray<Camera>				m_sceneCameras;
+
 		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
 
@@ -190,6 +194,14 @@ namespace engine
 	{
 		return m_sceneTransforms;
 	}
+
+
+	template<>
+	inline ComponentArray<Camera>& SceneGraph::GetComponentArray<Camera>(void)
+	{
+		return m_sceneCameras;
+	}
+
 
 	template<CValidComponent TComponentType>
 	inline void SceneGraph::RegisterComponents(void)
