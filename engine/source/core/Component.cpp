@@ -7,10 +7,6 @@ namespace engine
 	{
 	}
 
-	void Component::Update(float)
-	{
-	}
-
 	bool Component::IsValid(void) const
 	{
 		return !(m_flags & ecs::INVALID_OBJECT);
