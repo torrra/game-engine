@@ -8,10 +8,6 @@
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
 
-engine::Camera::Camera(EntityHandle)
-{
-}
-
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
 	return m_projectionMatrix * GetViewMatrix();
