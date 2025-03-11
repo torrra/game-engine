@@ -47,6 +47,9 @@ namespace engine
 		// which entity in scene graph owns this component
 		EntityHandle	m_owner = static_cast<EntityHandle>(-1);
 
+		// Scene graph in which ths component exists
+		class SceneGraph* m_currentScene = nullptr;
+
 		// status modifiers that affect behavior (inactive, invalid)
 		uint64			m_flags = 0;
 	};

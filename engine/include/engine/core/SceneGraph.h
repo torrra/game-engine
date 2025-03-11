@@ -114,6 +114,9 @@ namespace engine
 		ENGINE_API
 		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
 
+		ENGINE_API
+		std::vector<EntityHandle> GetAllParents(EntityHandle entity);
+
 		// Tick all components of a given type, provided that this typed
 		// has its UpdateComponent trait set to true
 		template <CValidComponent TComponentType>

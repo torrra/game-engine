@@ -20,11 +20,12 @@ namespace engine
     {
 	private:
 
-		enum ETransformFlag : uint8
+		struct AbsoluteCache
 		{
-			ABSOLUTE_POSITION = 1,
-			ABSOLUTE_ROTATION = (uint8) (1 << 1),
-			ABSOLUTE_SCALE = (uint8) (1 << 2)
+			math::Quatf		m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);
+			math::Vector3f	m_position = math::Vector3f::Zero();
+			math::Vector3f	m_scale = math::Vector3f::One();
+			bool			m_cached = false;
 		};
 
 	public:
@@ -75,6 +76,12 @@ namespace engine
 		// Get the transform with all parameters
 		ENGINE_API Transform			GetTransform(void) const;
 
+		ENGINE_API math::Vector3f		GetAbsolutePosition(void);
+
+		ENGINE_API math::Vector3f		GetAbsoluteScale(void);
+
+		ENGINE_API math::Quatf			GetAbsoluteRotation(void);
+
 		/// Setters
 		// Set the position of the transform
 		ENGINE_API void					SetPosition(const math::Vector3f& inPosition);
@@ -99,6 +106,7 @@ namespace engine
 	private:
 
 		void UpdateAxes(void);
+		void CacheParentTransform(void);
 
 		/// Private members
 		math::Quatf		m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);
@@ -107,7 +115,8 @@ namespace engine
 		math::Vector3f  m_forward = math::Vector3f::Front();
 		math::Vector3f  m_right = math::Vector3f::Right();
 		math::Vector3f  m_up = math::Vector3f::Up();
-		uint8			m_transformFlags = 0;
+
+		AbsoluteCache   m_parentCache;
 
     }; // !Class Transform
 

@@ -1,4 +1,5 @@
 #include "core/components/Transform.h"
+#include "core/SceneGraph.h"
 
 lm::Matrix4f engine::Transform::ToMatrixWithoutScale(Transform& inTransform)
 {
@@ -91,6 +92,30 @@ engine::Transform engine::Transform::GetTransform(void) const
 	return *this;
 }
 
+math::Vector3f engine::Transform::GetAbsolutePosition(void)
+{
+	if (!m_parentCache.m_cached)
+		CacheParentTransform();
+
+	return m_parentCache.m_position + m_position;
+}
+
+math::Vector3f engine::Transform::GetAbsoluteScale(void)
+{
+	if (!m_parentCache.m_cached)
+		CacheParentTransform();
+
+	return m_parentCache.m_scale * m_scale;
+}
+
+math::Quatf engine::Transform::GetAbsoluteRotation(void)
+{
+	if (!m_parentCache.m_cached)
+		CacheParentTransform();
+
+	return m_parentCache.m_rotation * m_rotation;
+}
+
 void engine::Transform::SetPosition(const lm::Vector3f& inPosition)
 {
 	m_position = inPosition;
@@ -133,4 +158,26 @@ void engine::Transform::UpdateAxes(void)
 	m_up = math::Cross(m_right, m_forward);
 	m_up.Normalize();
 
+}
+
+void engine::Transform::CacheParentTransform(void)
+{
+	std::vector<EntityHandle> parents = m_currentScene->GetAllParents(m_owner);
+
+	m_parentCache.m_position = math::Vector3f::Zero();
+	m_parentCache.m_scale = math::Vector3f::Zero();
+	m_parentCache.m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);
+
+	// Iterate backwards to get parent closest to root first
+	for (auto parentIt = parents.rbegin(); parentIt != parents.rend(); ++parentIt)
+	{
+		if (Transform* transform = m_currentScene->GetComponent<Transform>(*parentIt))
+		{
+			m_parentCache.m_position += transform->GetAbsolutePosition();
+			m_parentCache.m_scale *= transform->GetAbsoluteScale();
+			m_parentCache.m_rotation *= transform->GetAbsoluteRotation();
+		}
+	}
+
+	m_parentCache.m_cached = true;
 }

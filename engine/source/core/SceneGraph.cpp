@@ -210,6 +210,21 @@ namespace engine
 		return children;
 	}
 
+	std::vector<EntityHandle> SceneGraph::GetAllParents(EntityHandle entity)
+	{
+		std::vector<EntityHandle> parents;
+
+		Entity* entityPtr = GetEntity(entity);
+
+		while (entityPtr && (entityPtr->m_parent != Entity::INVALID_HANDLE))
+		{
+			parents.push_back(entityPtr->m_parent);
+			entityPtr = GetEntity(entityPtr->m_parent);
+		}
+
+		return parents;
+	}
+
 	EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
 	{
 		// if either half is over 32 bits, the handle is invalid

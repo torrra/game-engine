@@ -25,6 +25,11 @@ namespace engine
 		m_statusFlags |= ecs::INVALID_OBJECT;
 	}
 
+	bool Entity::HasParent(void) const
+	{
+		return m_parent != INVALID_HANDLE;
+	}
+
 	EntityHandle Entity::GetHandle(void) const
 	{
 		return m_handle;

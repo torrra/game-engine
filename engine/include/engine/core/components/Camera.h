@@ -46,10 +46,8 @@ namespace engine
 
 		math::Matrix4f GetViewMatrix(void);
 		void CalcProjectionMatrix(void);
-		f32 RotateAxis(f32 angle, f32 delta);
 
 		Frustum m_frustum;
 		math::Matrix4f m_projectionMatrix;
-		class SceneGraph* m_currentScene = nullptr;
 	};
 }
