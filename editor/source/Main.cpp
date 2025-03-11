@@ -35,6 +35,7 @@ int main(void)
 
 	engine::ResourceManager::Load<engine::Model>("padoru.obj");
 	engine::ResourceManager::Load<engine::Texture>("padoru.png");
+	engine::ResourceManager::Load<engine::Texture>("full-moon-png-6.png");
 	engine::ResourceManager::Load<engine::Font>("SourceSans3-Regular.ttf");
 	engine::ResourceManager::Load<engine::Font>("Pacifico-Regular.ttf");
 
@@ -54,6 +55,10 @@ int main(void)
 	label->SetTextColor(0.98f, 0.6f, 0.7, 1.0f);
 	label->SetFont("Pacifico-Regular.ttf", 18.0f);
 	label->WrapText(500.0f);
+
+	engine::Image* image = canvas.AddImage("full-moon-png-6.png");
+	image->SetPosition({200.0f, 200.0f});
+	image->SetScale({500.0f, 100.0f});
 
 	engine::Frustum frustum(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
 	engine::Camera camera(frustum, {0.0f, 0.0f, -2.5f}, 1.f, 80.0f);
