@@ -4,7 +4,7 @@
 #include <math/Matrix4.hpp>
 #include <math/Quaternion.hpp>
 
-#include "core/Component.h"
+#include "engine/core/Component.h"
 
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
@@ -28,9 +28,11 @@ namespace engine
 	{
 	public:
 		
-		ENGINE_API Camera(EntityHandle);
+		using Component::Component;
 
 		ENGINE_API ~Camera(void) = default;
+
+		ENGINE_API void Register(void) {};
 
 		ENGINE_API math::Matrix4f ViewProjection(void);
 
