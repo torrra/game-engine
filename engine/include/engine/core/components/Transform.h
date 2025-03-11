@@ -2,7 +2,7 @@
 
 #pragma region core
 
-#include "core/Component.h"
+#include "engine/core/Component.h"
 
 #pragma endregion
 

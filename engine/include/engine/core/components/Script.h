@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "core/Component.h"
-#include "core/Entity.h"
+#include "engine/core/Component.h"
+#include "engine/core/Entity.h"
 
-#include "scripting/ScriptObject.h"
+#include "engine/scripting/ScriptObject.h"
 
 namespace engine
 {
@@ -16,19 +16,25 @@ namespace engine
 		// Use parent class constructors
 		using Component::Component;
 		
+		ENGINE_API
 		~Script(void) = default;
 
 		// Call Start() in all script objects
+
+		ENGINE_API
 		void Start(void);
 
 		// Tick all script objects
+		ENGINE_API
 		void Update(f32 deltaTime);
 
 		// Register script component and save a reference in lua
+		ENGINE_API
 		void Register(void) override;
 
 		// Add a new lua script object to this component, and register it
 		// in lua
+		ENGINE_API
 		void AddScriptObject(const std::string& type);
 
 	private:
