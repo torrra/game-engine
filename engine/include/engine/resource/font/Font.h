@@ -12,7 +12,7 @@ namespace engine
 	{
 	public:
 		ENGINE_API Font(void);
-		ENGINE_API virtual ~Font(void) = default;
+		ENGINE_API virtual ~Font(void) override;
 
 		ENGINE_API virtual void LoadResource(const char* fileName) override;
 
