@@ -22,9 +22,6 @@ namespace engine
 
 		virtual void Register(void) = 0;
 
-		// Tick component
-		virtual void Update(float deltaTime);
-
 		// Is this component a valid object?
 		// true: this object is a valid component instance
 		// false: this object is 'dead' and subject to overwrite
