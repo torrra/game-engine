@@ -5,15 +5,9 @@
 #include "engine/ui/UIElement.h"
 #include "engine/resource/texture/Texture.h"
 
-#include <string>
+#include <math/Vector4.hpp>
 
-/*
-*	-------- TODO: image --------
-*	- Position
-*	- Size
-*	- Aspect Ratio
-*	-----------------------------
-*/
+#include <string>
 
 namespace engine
 {
@@ -26,11 +20,15 @@ namespace engine
 
 		ENGINE_API virtual void Render(void) override;
 
-		ENGINE_API void KeepAspectRatio(bool value);
+		ENGINE_API void ConstantAspectRatio(bool value);
+		ENGINE_API void SetBorderColor(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
+		ENGINE_API void SetImageTint(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
 
 	private:
 		std::string m_fileName;
-		Texture* m_imageData;
+		math::Vector4f m_borderColor;
+		math::Vector4f m_tint;
+		Texture* m_data;
 		bool m_keepAspectRatio;
 	};
 }

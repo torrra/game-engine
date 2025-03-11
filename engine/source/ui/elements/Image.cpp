@@ -12,9 +12,9 @@
 
 
 engine::Image::Image(const char* fileName)
-	: m_fileName(fileName), m_keepAspectRatio(false)
+	: m_fileName(fileName), m_keepAspectRatio(false), m_tint(1.0f), m_borderColor(0.0f)
 {
-	m_imageData = ResourceManager::GetResource<Texture>(m_fileName.c_str());
+	m_data = ResourceManager::GetResource<Texture>(m_fileName.c_str());
 }
 
 engine::Image::~Image(void)
@@ -22,9 +22,9 @@ engine::Image::~Image(void)
 	m_fileName.clear();
 }
 
-ENGINE_API void engine::Image::Render(void)
+void engine::Image::Render(void)
 {
-	if (!m_imageData)
+	if (!m_data)
 		return;
 
 	math::Vector2f size(m_transform.m_scale);
@@ -33,15 +33,25 @@ ENGINE_API void engine::Image::Render(void)
 	{
 		size = math::Vector2f(
 			m_transform.m_scale.GetX(),
-			m_transform.m_scale.GetX() * m_imageData->GetAspectRatio()
+			m_transform.m_scale.GetX() * m_data->GetAspectRatio()
 		);
 	}
 
 	ImGui::SetCursorPos(m_transform.m_position);
-	ImGui::Image(m_imageData->GetTexture(), size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	ImGui::Image(m_data->GetTexture(), size, ImVec2(0, 0), ImVec2(1, 1), m_tint, m_borderColor);
 }
 
-ENGINE_API void engine::Image::KeepAspectRatio(bool value)
+void engine::Image::ConstantAspectRatio(bool value)
 {
 	m_keepAspectRatio = value;
+}
+
+void engine::Image::SetBorderColor(f32 red, f32 green, f32 blue, f32 alpha)
+{
+	m_borderColor = {red, green, blue, alpha};
+}
+
+void engine::Image::SetImageTint(f32 red, f32 green, f32 blue, f32 alpha)
+{
+	m_tint = {red, green, blue, alpha};
 }
