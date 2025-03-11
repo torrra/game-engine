@@ -20,12 +20,12 @@
 
 namespace engine
 {
-	struct Transform
+	struct UITransform
 	{
 		math::Vector2f m_position;
 		math::Vector2f m_scale;
 
-		Transform(void)
+		UITransform(void)
 			: m_position(0.0f), m_scale(1.0f)
 		{
 		}
@@ -46,6 +46,6 @@ namespace engine
 		ENGINE_API virtual void Render(void) = 0;
 
 	protected:
-		Transform m_transform;
+		UITransform m_transform;
 	};
 }
