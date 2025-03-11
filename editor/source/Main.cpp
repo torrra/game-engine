@@ -5,6 +5,7 @@
 #include <engine/resource/shader/Shader.h>
 #include <engine/resource/model/Model.h>
 #include <engine/resource/texture/Texture.h>
+#include <engine/resource/font/Font.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/input/Input.h>
 #include <engine/core/components/Camera.h>
@@ -27,6 +28,7 @@ int main(void)
 
 	engine::ResourceManager::Load<engine::Model>("padoru.obj");
 	engine::ResourceManager::Load<engine::Texture>("padoru.png");
+	engine::ResourceManager::Load<engine::Font>("SourceSans3-Regular.ttf");
 
 	engine::Input::RegisterInput(KEY_W);
 	engine::Input::RegisterInput(KEY_A);
@@ -40,7 +42,6 @@ int main(void)
 
 	engine::Frustum frustum(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
 	engine::Camera camera(frustum, {0.0f, 0.0f, -2.5f}, 2.5f, 80.0f);
-
 	math::Matrix4f cameraVal;
 	cameraVal.Identity();
 
@@ -60,8 +61,6 @@ int main(void)
 
 		math::Vector2<float> deltaPos = cursorPos - lastCursorPos;
 
-		static float pitch = 0.0f;
-
 		// Rotate camera, pass the amount to rotate camera
 		camera.Rotate(
 			deltaPos.GetY(),
@@ -70,8 +69,6 @@ int main(void)
 		);
 		lastCursorPos = cursorPos;
 
-
-		pitch += 0.1f;
 		auto viewProjection = camera.ViewProjection();
 
 		if (engine::Input::IsInputPressed(KEY_ESCAPE))
@@ -92,6 +89,7 @@ int main(void)
 		engine::ResourceManager::GetResource<engine::Model>("padoru.obj")->Update();
 
 		uiManager.UpdateUI();
+		engine::Input::ResetKeys();
 		window.UpdateBuffers();
 	}
 
