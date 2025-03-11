@@ -1,5 +1,11 @@
 #pragma once
 
+#pragma region core
+
+#include "core/Component.h"
+
+#pragma endregion
+
 #pragma region math
 
 #include <math/Vector3.hpp>
@@ -7,11 +13,6 @@
 
 #pragma endregion
 
-#pragma region core
-
-#include "core/Component.h"
-
-#pragma endregion
 
 namespace engine
 {
@@ -21,7 +22,9 @@ namespace engine
 
 		enum ETransformFlag : uint8
 		{
-			ABSOLUTE = 1
+			ABSOLUTE_POSITION = 1,
+			ABSOLUTE_ROTATION = (uint8) (1 << 1),
+			ABSOLUTE_SCALE = (uint8) (1 << 2)
 		};
 
 	public:
@@ -57,6 +60,10 @@ namespace engine
 
 		ENGINE_API void					Update(void) {}
 
+		ENGINE_API void					Move(math::Vector3f translation);
+		ENGINE_API void					Rotate(f32 angleX, f32 angleY, f32 angleZ);
+		ENGINE_API void					Rotate(const math::Quatf& rotation);
+
 		/// Getters
 		// Get the position of the transform
 		ENGINE_API math::Vector3f		GetPosition(void) const;
@@ -89,6 +96,8 @@ namespace engine
 		std::ostream&					operator<<(std::ostream& os);
 
 	private:
+
+		void UpdateAxes(void);
 
 		/// Private members
 		math::Quatf		m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);

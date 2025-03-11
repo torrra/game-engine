@@ -52,6 +52,25 @@ void engine::Transform::CopyScale(const Transform& inTransform)
 	m_scale = inTransform.m_scale;
 }
 
+void engine::Transform::Move(math::Vector3f translation)
+{
+	m_position += m_forward * translation;
+}
+
+void engine::Transform::Rotate(f32 angleX, f32 angleY, f32 angleZ)
+{
+	Rotate(math::Quatf(math::Radian(angleX),
+					   math::Radian(angleY), 
+					   math::Radian(angleZ)));
+
+}
+
+void engine::Transform::Rotate(const math::Quatf& rotation)
+{
+	m_rotation *= rotation;
+	UpdateAxes();
+}
+
 lm::Vector3f engine::Transform::GetPosition(void) const
 {
 	return m_position;
@@ -101,4 +120,17 @@ std::ostream& engine::Transform::operator<<(std::ostream& os)
 			  << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " " 
 			  << m_rotation.Z() << " "
 			  << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+}
+
+void engine::Transform::UpdateAxes(void)
+{
+	m_forward = m_rotation.Rotate(math::Vector3f::Front());
+	m_forward.Normalize();
+
+	m_right = math::Cross(m_forward, math::Vector3f::Up());
+	m_right.Normalize();
+
+	m_up = math::Cross(m_right, m_forward);
+	m_up.Normalize();
+
 }
