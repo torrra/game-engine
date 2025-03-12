@@ -9,6 +9,7 @@
 #include "utility/MemoryCheck.h"
 
 #include <iostream>
+#include <functional>
 
 engine::Canvas::Canvas(math::Vector4<float> color)
 	: m_color(color)
@@ -65,4 +66,18 @@ engine::Image* engine::Canvas::AddImage(const char* fileName)
 	m_elements.push_back(new Image(fileName));
 
 	return dynamic_cast<Image*>(m_elements[(int) m_elements.size() - 1]);
+}
+
+engine::Button* engine::Canvas::AddButton(const char* text, std::function<void(void)> function)
+{
+	m_elements.push_back(new Button(text, function));
+
+	return dynamic_cast<Button*>(m_elements[(int) m_elements.size() - 1]);
+}
+
+engine::ProgressBar* engine::Canvas::AddProgressBar(void)
+{
+	m_elements.push_back(new ProgressBar());
+
+	return dynamic_cast<ProgressBar*>(m_elements[(int) m_elements.size() - 1]);
 }
