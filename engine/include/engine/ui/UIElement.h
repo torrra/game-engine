@@ -2,13 +2,13 @@
 
 /*
 *	----- UI Elements -----
-*	- Canvas
-*	- Text label
-*	- Image
-*	- progress bar
-*	- Button
-*	- Dropdown
-*	- combo box
+*	- Canvas			
+*	- Text label		DONE
+*	- Image				DONE
+*	- progress bar		
+*	- Button			
+*	- Dropdown			
+*	- combo box			
 *	----------------------
 */
 

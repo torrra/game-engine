@@ -32,7 +32,7 @@ void engine::Label::Render(void)
 		ImGui::PushFont(m_font);
 		m_font->Scale = m_fontScale;
 	}
-	
+
 	ImGui::PushTextWrapPos(m_transform.m_position.GetX() + m_textBoxWidth);
 	ImGui::TextColored(m_textColor, m_text.c_str());
 	ImGui::PopTextWrapPos();

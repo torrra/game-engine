@@ -20,7 +20,7 @@ ENGINE_API void engine::UIManager::NewFrame(void)
 	ImGui::NewFrame();
 
 	// Enable docking for UI windows
-	ImGui::DockSpaceOverViewport();
+	//ImGui::DockSpaceOverViewport();
 	ImGui::ShowMetricsWindow();
 }
 
