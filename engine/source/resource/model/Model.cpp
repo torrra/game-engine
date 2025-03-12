@@ -51,6 +51,11 @@ void engine::Model::Update(void)
 	}
 }
 
+const std::vector<engine::Mesh>& engine::Model::GetMeshes(void) const
+{
+	return m_meshes;
+}
+
 void engine::Model::ProcessNodes(aiNode* node, const aiScene* scene)
 {
 	m_meshes.reserve(scene->mNumMeshes);
