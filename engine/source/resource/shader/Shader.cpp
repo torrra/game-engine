@@ -18,6 +18,11 @@ engine::ShaderProgram::~ShaderProgram(void)
 
 }
 
+void engine::ShaderProgram::LoadResource(const char* filePath)
+{
+	(void) filePath;
+}
+
 void engine::ShaderProgram::Use(void) const
 {
 	return glUseProgram(m_programID);
