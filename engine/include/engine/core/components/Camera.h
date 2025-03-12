@@ -50,7 +50,7 @@ namespace engine
 		void CalcProjectionMatrix(void);
 
 		Frustum m_frustum;
-		math::Matrix4f m_projectionMatrix;
+		math::Matrix4f m_projectionMatrix{1.f};
 
 		// TODO: placeholder value representing texture output
 		void* m_output = nullptr;
