@@ -33,7 +33,7 @@ namespace engine
 
 			if (!currentEntity.IsValid())
 			{
-				printf("[Scene graph]: filling invalid slot\n");
+				//printf("[Scene graph]: filling invalid slot\n");
 				EntityHandle newHandle = MakeHandle(newIndex, newUID);
 
 				// write over dead entity to avoid reallocation
@@ -43,7 +43,7 @@ namespace engine
 			}
 		}
 
-		printf("[Scene graph]: creating new slot\n");
+		//printf("[Scene graph]: creating new slot\n");
 
 		// create entity in new slot in array
 		EntityHandle newHandle = MakeHandle(newIndex, newUID);
@@ -55,8 +55,8 @@ namespace engine
 		}
 
 		// TODO: log error?
-		else
-			printf("[Scene graph]: no entity created\n");
+		//else
+			//printf("[Scene graph]: no entity created\n");
 
 		return newHandle;
 	}
@@ -84,7 +84,7 @@ namespace engine
 		if (!entity.IsValid())
 			return nullptr;
 
-		printf("[Scene graph]: found entity with matching handle\n");
+		//printf("[Scene graph]: found entity with matching handle\n");
 		return &entity;
 	}
 
@@ -210,6 +210,29 @@ namespace engine
 		return children;
 	}
 
+
+	void SceneGraph::RenderScene(void)
+	{
+		for (Camera& camera : m_sceneCameras)
+		{
+			if (!camera.IsValid() || !camera.IsActive())
+				continue;
+
+			//math::Matrix4f view = camera.GetViewMatrix();
+			//math::Matrix4f projection = camera.GetProjectionMatrix();
+			math::Matrix4f viewProjection = camera.ViewProjection();
+
+			for (Renderer& renderer : m_sceneRenderers)
+			{
+				if (!renderer.IsValid() || !renderer.IsActive())
+					continue;
+
+				renderer.Render(viewProjection);
+			}
+		}
+	}
+
+
 	EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
 	{
 		// if either half is over 32 bits, the handle is invalid
@@ -236,12 +259,12 @@ namespace engine
 
 		if (toReparentIndex < parentIndex)
 		{
-			printf("[Scene graph]: moving child to back of array\n");
+			//printf("[Scene graph]: moving child to back of array\n");
 			MoveReparentedComponents(toReparent->m_handle, newParent);			
 		}
 
-		else
-			printf("[Scene graph]: reparent complete with no layout changes\n");
+		//else
+			//printf("[Scene graph]: reparent complete with no layout changes\n");
 
 	}
 
