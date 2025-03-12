@@ -60,21 +60,20 @@ void engine::Transform::Update(void)
 
 void engine::Transform::Move(math::Vector3f translation)
 {
-	m_position += m_forward * translation;
+	m_position += m_rotation.Rotate(translation);
 }
 
 void engine::Transform::Rotate(f32 angleX, f32 angleY, f32 angleZ)
 {
-
-	Rotate(math::Quatf(math::Radian(angleX * DEG2RAD),
-					   math::Radian(angleY * DEG2RAD), 
-					   math::Radian(angleZ * DEG2RAD)));
+	Rotate(math::Quatf(math::Radian(-angleX * DEG2RAD),
+					   math::Radian(-angleY * DEG2RAD), 
+					   math::Radian(-angleZ * DEG2RAD)));
 
 }
 
 void engine::Transform::Rotate(const math::Quatf& rotation)
 {
-	m_rotation *= rotation;
+	m_rotation *= rotation.Normalized();
 	UpdateAxes();
 }
 
@@ -164,14 +163,20 @@ std::ostream& engine::Transform::operator<<(std::ostream& os)
 
 void engine::Transform::UpdateAxes(void)
 {
-	m_forward = GetAbsoluteRotation().Rotate(math::Vector3f::Front());
-	m_forward.Normalize();
+	m_forward = m_rotation.Rotate(math::Vector3f::Front());
+
+	if (m_forward.Magnitude() != 0.f)
+		m_forward.Normalize();
 
 	m_right = math::Cross(m_forward, math::Vector3f::Up());
-	m_right.Normalize();
+
+	if (m_right.Magnitude() != 0.f)
+		m_right.Normalize();
 
 	m_up = math::Cross(m_right, m_forward);
-	m_up.Normalize();
+
+	if (m_up.Magnitude() != 0.f)
+		m_up.Normalize();
 
 }
 
