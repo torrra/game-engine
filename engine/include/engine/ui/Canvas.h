@@ -3,6 +3,8 @@
 #include "engine/ui/UIElement.h"
 #include "engine/ui/elements/Label.h"
 #include "engine/ui/elements/Image.h"
+#include "engine/ui/elements/ProgressBar.h"
+#include "engine/ui/elements/Button.h"
 #include "engine/EngineExport.h"
 
 #include <math/Vector2.hpp>
@@ -24,6 +26,8 @@ namespace engine
 
 		ENGINE_API Label* AddLabel(const char* text);
 		ENGINE_API Image* AddImage(const char* fileName);
+		ENGINE_API Button* AddButton(const char* text, std::function<void(void)> function);
+		ENGINE_API ProgressBar* AddProgressBar(void);
 
 	private:
 		std::vector<UIElement*> m_elements;
