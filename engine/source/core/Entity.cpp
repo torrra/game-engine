@@ -50,6 +50,11 @@ namespace engine
 		return !(m_statusFlags & ecs::INVALID_OBJECT);
 	}
 
+	bool Entity::IsActive(void) const
+	{
+		return !(m_statusFlags & ecs::INACTIVE_OBJECT);
+	}
+
 	void Entity::Activate(bool activeState)
 	{
 		// Reset inactive bit

@@ -122,5 +122,6 @@ int main(void)
 	if (!_CrtDumpMemoryLeaks())
 		std::printf("No memory leaks detected\n");
 
+
 	return 0;
 }

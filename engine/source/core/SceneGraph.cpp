@@ -1,13 +1,21 @@
 #include "core/SceneGraph.h"
 #include "core/Entity.h"
 
+#include "core/systems/ScriptSystem.h"
+
 #include <iostream>
 
 namespace engine
 {
 	SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
 
-	uint64 SceneGraph::RandomNumber(void)
+	void SceneGraph::RegisterAllComponents(void)
+	{
+		RegisterComponents<Transform>();
+		RegisterComponents<Script>();
+	}
+
+	int64 SceneGraph::RandomNumber(void)
 	{
 		return m_randomNumGen.Generate();
 	}
@@ -17,16 +25,20 @@ namespace engine
 		EntityHandle newIndex = 0;
 		EntityHandle newUID = RandomNumber();
 
-		for (; newIndex < m_sceneEntities.size(); ++newIndex)
+		EntityHandle entityCount = static_cast<EntityHandle>(m_sceneEntities.size());
+
+		for (; newIndex < entityCount; ++newIndex)
 		{
 			Entity& currentEntity = m_sceneEntities[newIndex];
 
 			if (!currentEntity.IsValid())
 			{
 				printf("[Scene graph]: filling invalid slot\n");
+				EntityHandle newHandle = MakeHandle(newIndex, newUID);
 
 				// write over dead entity to avoid reallocation
-				currentEntity = Entity(name, MakeHandle(newIndex, newUID), parent);
+				currentEntity = Entity(name, newHandle, parent);
+				ScriptSystem::RegisterNewEntity(newHandle, GetFullEntityName(newHandle));
 				return currentEntity.m_handle;
 			}
 		}
@@ -37,7 +49,10 @@ namespace engine
 		EntityHandle newHandle = MakeHandle(newIndex, newUID);
 
 		if (newHandle != Entity::INVALID_HANDLE)
+		{
 			m_sceneEntities.emplace_back(name, newHandle, parent);
+			ScriptSystem::RegisterNewEntity(newHandle, GetFullEntityName(newHandle));
+		}
 
 		// TODO: log error?
 		else
@@ -55,7 +70,7 @@ namespace engine
 		EntityHandle index = (handle & Entity::INDEX_MASK);
 
 		// out of bounds
-		if (index >= m_sceneEntities.size())
+		if (index >= static_cast<EntityHandle>(m_sceneEntities.size()))
 			return nullptr;
 
 		Entity& entity = m_sceneEntities[index];
@@ -83,6 +98,50 @@ namespace engine
 		}
 
 		return nullptr;
+	}
+
+	std::string SceneGraph::GetFullEntityName(EntityHandle entity)
+	{
+		std::string name;
+		Entity* entityPtr = GetEntity(entity);
+
+		if (!entityPtr)
+			return name;
+
+		std::vector<EntityHandle> allParents = GetAllParents(entity);
+
+		// iterate backwards to start from parent closest to root
+		for (auto parentIt = allParents.rbegin(); parentIt != allParents.rend(); ++parentIt)
+		{
+			if (Entity* parent = GetEntity(*parentIt))
+				name += parent->GetName() + '.';
+		}
+
+		return name + entityPtr->GetName();
+	}
+
+	std::vector<EntityHandle> SceneGraph::GetAllParents(EntityHandle entity)
+	{
+		std::vector<EntityHandle>	parents;
+
+		if (Entity* entityPtr = GetEntity(entity))
+		{
+			EntityHandle currentParent = entityPtr->m_parent;
+
+			while (currentParent != Entity::INVALID_HANDLE)
+			{
+				parents.push_back(currentParent);
+				entityPtr = GetEntity(currentParent);
+
+				// No need to keep iterating if parent is invalid
+				if (!entityPtr)
+					break;
+				else
+					currentParent = entityPtr->m_parent;
+			}
+		}
+
+		return parents;
 	}
 
 	void SceneGraph::DestroyEntity(EntityHandle entity)
@@ -178,17 +237,7 @@ namespace engine
 		if (toReparentIndex < parentIndex)
 		{
 			printf("[Scene graph]: moving child to back of array\n");
-
-			// no need to move the reparented component's children if it hasn't moved itself
-			bool transformMoved = m_sceneTransforms.MoveReparentedComponent(toReparent->m_handle, newParent);
-
-			std::vector<EntityHandle> allChildren = GetChildrenAllLevels(toReparent->m_handle);
-
-			for (EntityHandle child : allChildren)
-			{
-				if (transformMoved)
-					m_sceneTransforms.MoveReparentedComponent(child);
-			}
+			MoveReparentedComponents(toReparent->m_handle, newParent);			
 		}
 
 		else
@@ -196,13 +245,31 @@ namespace engine
 
 	}
 
+	void SceneGraph::MoveReparentedComponents(EntityHandle reparented, EntityHandle newParent)
+	{
+		// no need to move the reparented component's children if it hasn't moved itself
+		bool transformMoved = m_sceneTransforms.MoveReparentedComponent(reparented, newParent);
+		bool scriptMoved = m_sceneScripts.MoveReparentedComponent(reparented, newParent);
+
+		std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
+
+		for (EntityHandle child : allChildren)
+		{
+			if (transformMoved)
+				m_sceneTransforms.MoveReparentedComponent(child);
+
+			if (scriptMoved)
+				m_sceneScripts.MoveReparentedComponent(child);
+		}
+	}
+
 	SceneGraph::Random::Random(std::random_device randomDevice)
-		: m_generator(randomDevice()), m_distribution(0, ULONG_MAX)
+		: m_generator(randomDevice()), m_distribution(LONG_MIN, LONG_MAX)
 	{
 
 	}
 
-	uint64 SceneGraph::Random::Generate()
+	int64 SceneGraph::Random::Generate()
 	{
 		return m_distribution(m_generator);
 	}
