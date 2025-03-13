@@ -1,18 +1,55 @@
-#include "engine/core/components/Camera.h"
-#include "engine/core/components/Transform.h"
-#include "engine/utility/Timer.h"
-
-#include "engine/core/Entity.h"
-#include "engine/core/SceneGraph.h"
+#include "core/components/Camera.h"
+#include "utility/Timer.h"
 
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
+
+
+
+engine::Camera::Camera(EntityHandle, SceneGraph*)
+{
+	GetProjectionMatrix();
+}
+
+void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
+{
+	math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
+	m_position += camSpaceDir.Normalized() * speed * deltaTime;
+}
+
+void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
+{
+	m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch, rotationSpeed);	// Pitch
+	m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw, rotationSpeed);		// Yaw
+	m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll, rotationSpeed);	// Roll
+
+	// Clamp pitch // TODO: fix pitch
+	if (m_rotation[0] > 90.0f)
+		m_rotation[0] = 90.0f;
+	else if (m_rotation[0] < -90.0f)
+		m_rotation[0] = -90.0f;
+
+	m_rotQuat = math::Quaternion<f32>(
+		math::Radian(m_rotation[0] * DEG2RAD),
+		math::Radian(m_rotation[1] * DEG2RAD),
+		math::Radian(m_rotation[2] * DEG2RAD)
+	);
+}
 
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
 	return m_projectionMatrix * GetViewMatrix();
 }
 
+math::Vector3f engine::Camera::GetPosition(void) const noexcept
+{
+	return m_position;
+}
+
+math::Vector3f engine::Camera::GetRotation(void) const noexcept
+{
+	return m_rotation;
+}
 
 f32 engine::Camera::GetFOV(void) const noexcept
 {
@@ -29,45 +66,50 @@ f32 engine::Camera::GetFarPlane(void) const noexcept
 	return m_frustum.m_far;
 }
 
+math::Vector3f& engine::Camera::Position(void)
+{
+	return m_position;
+}
+
+math::Vector3f& engine::Camera::Rotation(void)
+{
+	return m_rotation;
+}
+
 
 void engine::Camera::SetFOV(f32 fov)
 {
 	m_frustum.m_fovRad = fov;
 
-	CalcProjectionMatrix();
+	GetProjectionMatrix();
 }
 
 void engine::Camera::SetNearPlane(f32 nearPlane)
 {
 	m_frustum.m_near = nearPlane;
 
-	CalcProjectionMatrix();
+	GetProjectionMatrix();
 }
 
 void engine::Camera::SetFarPlane(f32 farPlane)
 {
 	m_frustum.m_far = farPlane;
 
-	CalcProjectionMatrix();
+	GetProjectionMatrix();
 }
 
 math::Matrix4f engine::Camera::GetViewMatrix(void)
 {
-	if(Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
-	{
-		math::Matrix4f matrix(1.0f);
+	math::Matrix4f matrix(1.0f);
 
-		matrix[3][0] = -transform->GetPosition().X();
-		matrix[3][1] = -transform->GetPosition().Y();
-		matrix[3][2] = -transform->GetPosition().Z();
+	matrix[3][0] = -m_position.X();
+	matrix[3][1] = -m_position.Y();
+	matrix[3][2] = -m_position.Z();
 
-		return transform->GetRotation().RotationMatrix() * matrix;
-	}
-	
-	return math::Matrix4f(1.f);
+	return m_rotQuat.RotationMatrix() * matrix;
 }
 
-void engine::Camera::CalcProjectionMatrix(void)
+void engine::Camera::GetProjectionMatrix(void)
 {
 	const f32 tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
 	const f32 farMinusNearDenom = 1.0f / (m_frustum.m_far - m_frustum.m_near);
@@ -91,4 +133,20 @@ void engine::Camera::CalcProjectionMatrix(void)
 	m_projectionMatrix[1][3] = 0.0f;
 	m_projectionMatrix[2][3] = -1.0f;
 	m_projectionMatrix[3][3] = 0.0f;
+}
+
+f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed)
+{
+	f32 maxDelta = 5.0f;
+
+	// Limits
+	if (deltaAngle < -maxDelta)
+		deltaAngle = -maxDelta;
+	else if (deltaAngle > maxDelta)
+		deltaAngle = maxDelta;
+
+	existingAngle += deltaAngle * rotationSpeed;
+
+	// Wrap angle
+	return existingAngle;
 }
