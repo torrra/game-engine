@@ -1,8 +1,8 @@
 #pragma once
 
-#include "InputData.h"
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
+#include "InputData.h"
 
 #include <math/MathGeneric.hpp>
 #include <math/Vector2.hpp>

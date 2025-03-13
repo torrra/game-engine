@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/resource/Resource.h"
-#include "CoreTypes.h"
+#include "resource/Resource.h"
+#include "engine/CoreTypes.h"
 
 namespace engine
 {
