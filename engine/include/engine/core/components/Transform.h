@@ -1,11 +1,5 @@
 #pragma once
 
-#pragma region core
-
-#include "engine/core/Component.h"
-
-#pragma endregion
-
 #pragma region math
 
 #include <math/Vector3.hpp>
@@ -13,21 +7,16 @@
 
 #pragma endregion
 
+#pragma region core
+
+#include "engine/core/Component.h"
+
+#pragma endregion
 
 namespace engine
 {
-    class Transform final : public Component
-    {
-	private:
-
-		struct AbsoluteCache
-		{
-			math::Quatf		m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);
-			math::Vector3f	m_position = math::Vector3f::Zero();
-			math::Vector3f	m_scale = math::Vector3f::One();
-			bool			m_cached = false;
-		};
-
+	class Transform final : public Component
+	{
 	public:
 
 		using Component::Component;
@@ -35,7 +24,7 @@ namespace engine
 		/// Public Constructors
 		// Copy constructor set to default
 		ENGINE_API 						Transform(const Transform& inTransform) = default;
-		// Move constructor set to default
+		// AddTranslation constructor set to default
 		ENGINE_API 						Transform(Transform&& inTransform) = default;
 
 		/// Destructors
@@ -44,14 +33,18 @@ namespace engine
 
 		/// Transform to matrix
 		// Convert transform to matrix without scale parameters
-		ENGINE_API static math::Matrix4f	ToMatrixWithoutScale(Transform& inTransform);
+		ENGINE_API static math::Matrix4f	ToMatrixWithoutScale(const Transform& inTransform);
 		// Convert transform to matrix with scale parameters
 		ENGINE_API static math::Matrix4f	ToMatrixWithScale(Transform& inTransform);
 		// Interpolate two transforms
-		ENGINE_API static Transform			Interpolate(Transform& inStartTransform,
-														Transform& inEndTransform,
-														f32 inTime);
-		
+		ENGINE_API static Transform		Interpolate(const Transform& inStartTransform,
+			const Transform& inEndTransform,
+			f32 inTime);
+
+
+		ENGINE_API static math::Matrix4f ToWorldMatrix(Transform& inTransform);
+
+
 		// Copy the position from another transform
 		ENGINE_API void					CopyPosition(const Transform& inTransform);
 		// Copy the rotation from another transform
@@ -59,40 +52,24 @@ namespace engine
 		// Copy the scale from another transform
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
-		ENGINE_API void					Register(void) {};
-
-		// Add translation to local position
-		ENGINE_API void					Move(math::Vector3f translation);
-
-		// Add rotation in degrees to local rotation
-		ENGINE_API void					Rotate(f32 angleX, f32 angleY, f32 angleZ);
-
-		// Add quaternion rotation to local rotation
-		ENGINE_API void					Rotate(const math::Quatf& rotation);
+		ENGINE_API void					Update(void) {}
+		ENGINE_API void					Register(void) {}
 
 		/// Getters
 		// Get the position of the transform
-		ENGINE_API math::Vector3f		GetPosition(void) const;
+		ENGINE_API math::Vector3f			GetPosition(void) const;
 		// Get the rotation of the transform
 		ENGINE_API math::Quatf			GetRotation(void) const;
 		// Get the scale of the transform
-		ENGINE_API math::Vector3f		GetScale(void) const;
+		ENGINE_API math::Vector3f			GetScale(void) const;
 		// Get the transform with all parameters
 		ENGINE_API Transform			GetTransform(void) const;
-
-		ENGINE_API math::Vector3f		GetAbsolutePosition(void);
-
-		ENGINE_API math::Vector3f		GetAbsoluteScale(void);
-
-		ENGINE_API math::Quatf			GetAbsoluteRotation(void);
 
 		/// Setters
 		// Set the position of the transform
 		ENGINE_API void					SetPosition(const math::Vector3f& inPosition);
 		// Set the rotation of the transform
 		ENGINE_API void					SetRotation(const math::Quatf& inRotation);
-		// Set rotation of the transform in degrees
-		ENGINE_API void					SetRotation(f32 angleX, f32 angleY, f32 angleZ);
 		// Set the scale of the transform
 		ENGINE_API void					SetScale(const math::Vector3f& inScale);
 		// Set all parameters of the transform
@@ -101,44 +78,39 @@ namespace engine
 													 const math::Vector3f& inScalein =
 													 math::Vector3f(1.0f, 1.0f, 1.0f));
 
-		// Get absolute transform ready to be recalculated
-		ENGINE_API void					Update(void);
+
+		ENGINE_API void					AddTranslation(const math::Vector3f& inTranslation);
+		ENGINE_API void					AddRotation(f32 angleX, f32 angleY, f32 angleZ);
+		ENGINE_API void					AddRotation(const math::Quatf& inRotation);
+		ENGINE_API void					AddScale(const math::Vector3f& inScale);
 
 		/// Operators
 		// Copy assignement set to default
-		Transform&						operator=(const Transform& inTransform) = default;
-		// Move assignement set to default
-		Transform&						operator=(Transform&& inTransform) = default;
+		Transform& operator=(const Transform& inTransform) = default;
+		// AddTranslation assignement set to default
+		Transform& operator=(Transform&& inTransform) = default;
 		// Operator to print a transform
-		std::ostream&					operator<<(std::ostream& os);
+		std::ostream& operator<<(std::ostream& os);
 
 	private:
 
+		void UpdateLocalMatrix(void);
 
-
-		void UpdateAxes(void);
-		void CacheParentTransform(void);
 
 		/// Private members
+
+		math::Matrix4f  m_localMat{ 1.f };
+
 		math::Quatf		m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);
 		math::Vector3f	m_position = math::Vector3f::Zero();
 		math::Vector3f	m_scale = math::Vector3f::One();
-		math::Vector3f  m_forward = math::Vector3f::Front();
-		math::Vector3f  m_right = math::Vector3f::Right();
-		math::Vector3f  m_up = math::Vector3f::Up();
 
-		AbsoluteCache   m_parentCache;
+		bool			m_dirty = false;
 
-    }; // !Class Transform
+	}; // !Class Transform
 
 	template <>
 	struct UpdateAfterParent<Transform>
-	{
-		static constexpr bool m_value = true;
-	};
-
-	template <>
-	struct UpdateComponent<Transform>
 	{
 		static constexpr bool m_value = true;
 	};

@@ -35,7 +35,7 @@ namespace engine
 
 		if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
 		{
-			math::Matrix4f transformMat = Transform::ToMatrixWithScale(*transform);
+			math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
 			math::Matrix4f mvp = viewProjection * transformMat;
 
 			math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
