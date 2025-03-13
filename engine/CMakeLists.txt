@@ -38,7 +38,7 @@ add_library(${TARGET_NAME} SHARED)
 
 target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES})
 
-target_include_directories(${TARGET_NAME} SYSTEM
+target_include_directories(${TARGET_NAME}
 	PUBLIC ${MATHLIB_INCLUDE_DIR} 
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine
