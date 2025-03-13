@@ -9,6 +9,8 @@
 #include "Component.h"
 #include "Entity.h"
 #include "ComponentArray.h"
+
+#include "components/Script.h"
 #include "components/Transform.h"
 
 namespace engine
@@ -27,11 +29,11 @@ namespace engine
 			Random(Random&&) = delete;
 			Random(std::random_device randomDevice);
 
-			uint64 Generate();
+			int64 Generate();
 
 		private:
 			std::mt19937_64							m_generator;
-			std::uniform_int_distribution<uint64>	m_distribution;
+			std::uniform_int_distribution<int64>	m_distribution;
 		};
 
 	public:
@@ -84,6 +86,18 @@ namespace engine
 		ENGINE_API
 		Entity* GetEntity(const std::string& name);
 
+		// Get the entity's name with its parents names in front of it,
+		// separated with a dot.
+		ENGINE_API
+		std::string GetFullEntityName(EntityHandle entity);
+
+		// Get the handles of every entity that is a parent/grandparent/etc of
+		// an entity.The first element in the returned array is the entity's direct
+		// parent, and the last one is the one on top of the hierarchy
+		ENGINE_API
+		std::vector<EntityHandle> GetAllParents(EntityHandle entity);
+
+
 		// Permanently set an entity for destruction/overwrite.
 		ENGINE_API
 		void	DestroyEntity(EntityHandle entity);
@@ -100,12 +114,21 @@ namespace engine
 		ENGINE_API
 		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
 
+		// Tick all components of a given type, provided that this typed
+		// has its UpdateComponent trait set to true
+		template <CValidComponent TComponentType>
+		void UpdateComponents(float deltaTime);
+
+		// Re-register all existing components after a lua state reset
+		ENGINE_API
+		void RegisterAllComponents(void);
+
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
-		// Output a uint64 between 0 and ULONG_MAX
+		// Output a int64 between 0 and ULONG_MAX
 		ENGINE_API
-		static uint64 RandomNumber(void);
+		static int64 RandomNumber(void);
 
 	private:
 
@@ -116,11 +139,24 @@ namespace engine
 		// Group the index and uid bits together in a 64-bit handle
 		EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
 
-		// Internal ReparentEntity overload. Direclty uses an entity's pointer
+		// Internal ReparentEntity overload. Directly uses an entity's pointer
 		void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
+
+
+		// Check if components need to be moved after reparenting an entity, and move them if so
+		void MoveReparentedComponents(EntityHandle reparented, EntityHandle newParent);
+
+		// Register all valid components of a type
+		template <CValidComponent TComponentType>
+		void RegisterComponents(void);
+
+
 
 		// All transform components in the scene
 		ComponentArray<Transform>			m_sceneTransforms;
+
+		// All script components in the scene
+		ComponentArray<Script>				m_sceneScripts;
 
 		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
@@ -132,10 +168,45 @@ namespace engine
 
 
 
+	template<CValidComponent TComponentType>
+	inline void SceneGraph::UpdateComponents(float deltaTime)
+	{
+		if constexpr (!UpdateComponent<TComponentType>::m_value)
+			return;
+
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		for (TComponentType& component : array)
+		{
+			if (component.IsValid() && component.IsActive())
+				component.Update(deltaTime);
+		}
+
+	}
+
 	template<>
 	inline ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void)
 	{
 		return m_sceneTransforms;
+	}
+
+	template<CValidComponent TComponentType>
+	inline void SceneGraph::RegisterComponents(void)
+	{
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		for (TComponentType& component : array)
+		{
+			if (component.IsValid())
+				component.Register();
+		}
+
+	}
+
+	template<>
+	inline ComponentArray<Script>& SceneGraph::GetComponentArray<Script>(void)
+	{
+		return m_sceneScripts;
 	}
 
 
@@ -164,7 +235,11 @@ namespace engine
 
 		// set owner flag to tell that it owns a component of this type
 		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
-		return array.CreateComponent(ownerEntity, ownerPtr->m_parent);
+
+		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_parent);
+
+		newComponent->Register();
+		return newComponent;
 	}
 
 }
