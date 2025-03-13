@@ -5,8 +5,6 @@
 
 #include "utility/MemoryCheck.h"
 
-#define SHADER_RELATIVE_PATH "..\\shaders\\"
-
 engine::Shader::Shader(void)
 	: m_shader(0), m_shaderType(EShaderType::INVALID_SHADER)
 {
@@ -20,12 +18,8 @@ void engine::Shader::LoadResource(const char* fileName)
 	if (m_shaderType == EShaderType::INVALID_SHADER)
 		return;
 
-	// Concatenate file path
-	char relativePath[256] = SHADER_RELATIVE_PATH;
-	strcat_s(relativePath, fileName);
-
 	// Load shader file to memory
-	FileData fileData = fileData.ReadFile(relativePath);
+	FileData fileData = fileData.ReadFile(fileName);
 
 	if (!fileData.m_size)
 	{

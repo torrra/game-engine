@@ -11,17 +11,11 @@
 
 #include <iostream>
 
-#define MODEL_RELATIVE_PATH "..\\assets\\"
-
 void engine::Model::LoadResource(const char* fileName)
 {
-	// Concatenate file path
-	char filePath[256] = MODEL_RELATIVE_PATH;
-	strcat_s(filePath, fileName);
-
 	// Read file
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath,
+	const aiScene* scene = importer.ReadFile(fileName,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
 		aiProcess_FlipUVs | aiProcess_CalcTangentSpace
 	);
