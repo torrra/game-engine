@@ -16,10 +16,11 @@ namespace engine
 
 	public:
 
+		ENGINE_API Component(void) = default;
 		ENGINE_API Component(EntityHandle owner);
 		ENGINE_API ~Component(void) = default;
 
-		virtual void Update(void) = 0;
+		virtual void Register(void) = 0;
 
 		// Is this component a valid object?
 		// true: this object is a valid component instance
@@ -44,7 +45,7 @@ namespace engine
 	protected:
 
 		// which entity in scene graph owns this component
-		EntityHandle	m_owner;
+		EntityHandle	m_owner = static_cast<EntityHandle>(-1);
 
 		// status modifiers that affect behavior (inactive, invalid)
 		uint64			m_flags = 0;
@@ -53,9 +54,17 @@ namespace engine
 
 	// Defines whether a type has objects that NEED to be updated after their parents
 	// e.g. a transform component should be updated after its owner's transform.
-	// False by default, must be manually instanciated and defined as true if needed
+	// False by default, must be manually instantiated and defined as true if needed
 	template <CValidComponent TComponentType>
 	struct UpdateAfterParent
+	{
+		static constexpr bool m_value = false;
+	};
+
+	// Defines if a component type should be updated each tick in the main loop
+	// False by default, must be manually instantiated and defined as true if needed
+	template <CValidComponent TComponentType>
+	struct UpdateComponent
 	{
 		static constexpr bool m_value = false;
 	};

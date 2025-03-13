@@ -1,0 +1,178 @@
+#include "core/components/Camera.h"
+#include "utility/Timer.h"
+
+#include <math/Arithmetic.hpp>
+#include <math/Vector4.hpp>
+
+engine::Camera::Camera(Frustum const& frustum, math::Vector3f const& position, f32 speed, f32 angularSpeed)
+	: m_frustum(frustum), m_position(position), m_speed(speed), m_angularSpeed(angularSpeed)
+{
+	m_forward = math::Vector3f::Front();
+	m_right = math::Vector3f::Right();
+	m_up = math::Vector3f::Up();
+	m_projectionMatrix.Identity();
+	m_rotation = math::Vector3f::Zero();
+
+	GetProjectionMatrix();
+}
+
+void engine::Camera::Move(f32 x, f32 y, f32 z)
+{
+	math::Vector3f camSpaceDir = m_rotQuat.Rotate({x, y, z});
+	m_position += camSpaceDir.Normalized() * m_speed * m_deltaTime;
+}
+
+void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
+{
+	m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
+	m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);		// Yaw
+	m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);		// Roll
+
+	// Clamp pitch // TODO: fix pitch
+	if (m_rotation[0] > 90.0f)
+		m_rotation[0] = 90.0f;
+	else if (m_rotation[0] < -90.0f)
+		m_rotation[0] = -90.0f;
+
+	m_rotQuat = math::Quaternion<f32>(
+		math::Radian(m_rotation[0] * DEG2RAD),
+		math::Radian(m_rotation[1] * DEG2RAD),
+		math::Radian(m_rotation[2] * DEG2RAD)
+	);
+}
+
+math::Matrix4f engine::Camera::ViewProjection(void)
+{
+	m_deltaTime = g_engineTime.GetDeltaTime();
+
+	return m_projectionMatrix * GetViewMatrix();
+}
+
+math::Vector3f engine::Camera::GetPosition(void) const noexcept
+{
+	return m_position;
+}
+
+math::Vector3f engine::Camera::GetRotation(void) const noexcept
+{
+	return m_rotation;
+}
+
+f32 engine::Camera::GetSpeed(void) const noexcept
+{
+	return m_speed;
+}
+
+f32 engine::Camera::GetRotationSpeed(void) const noexcept
+{
+	return m_angularSpeed;
+}
+
+f32 engine::Camera::GetFOV(void) const noexcept
+{
+	return m_frustum.m_fovRad;
+}
+
+f32 engine::Camera::GetNearPlane(void) const noexcept
+{
+	return m_frustum.m_near;
+}
+
+f32 engine::Camera::GetFarPlane(void) const noexcept
+{
+	return m_frustum.m_far;
+}
+
+math::Vector3f& engine::Camera::Position(void)
+{
+	return m_position;
+}
+
+math::Vector3f& engine::Camera::Rotation(void)
+{
+	return m_rotation;
+}
+
+f32& engine::Camera::Speed(void)
+{
+	return m_speed;
+}
+
+f32& engine::Camera::RotationSpeed(void)
+{
+	return m_angularSpeed;
+}
+
+void engine::Camera::SetFOV(f32 fov)
+{
+	m_frustum.m_fovRad = fov;
+
+	GetProjectionMatrix();
+}
+
+void engine::Camera::SetNearPlane(f32 nearPlane)
+{
+	m_frustum.m_near = nearPlane;
+
+	GetProjectionMatrix();
+}
+
+void engine::Camera::SetFarPlane(f32 farPlane)
+{
+	m_frustum.m_far = farPlane;
+
+	GetProjectionMatrix();
+}
+
+math::Matrix4f engine::Camera::GetViewMatrix(void)
+{
+	math::Matrix4f matrix(1.0f);
+
+	matrix[3][0] = -m_position.X();
+	matrix[3][1] = -m_position.Y();
+	matrix[3][2] = -m_position.Z();
+	
+	return m_rotQuat.RotationMatrix() * matrix;
+}
+
+void engine::Camera::GetProjectionMatrix(void)
+{
+	const f32 tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
+	const f32 farMinusNearDenom = 1.0f / (m_frustum.m_far - m_frustum.m_near);
+
+	m_projectionMatrix[0][0] = 1.0f / (m_frustum.m_ratio * tanAngle);
+	m_projectionMatrix[1][0] = 0.0f;
+	m_projectionMatrix[2][0] = 0.0f;
+	m_projectionMatrix[3][0] = 0.0f;
+
+	m_projectionMatrix[0][1] = 0.0f;
+	m_projectionMatrix[1][1] = 1.0f / tanAngle;
+	m_projectionMatrix[2][1] = 0.0f;
+	m_projectionMatrix[3][1] = 0.0f;
+
+	m_projectionMatrix[0][2] = 0.0f;
+	m_projectionMatrix[1][2] = 0.0f;
+	m_projectionMatrix[2][2] = -(m_frustum.m_far + m_frustum.m_near) * farMinusNearDenom;
+	m_projectionMatrix[3][2] = -((2.0f * m_frustum.m_far * m_frustum.m_near) * farMinusNearDenom);
+
+	m_projectionMatrix[0][3] = 0.0f;
+	m_projectionMatrix[1][3] = 0.0f;
+	m_projectionMatrix[2][3] = -1.0f;
+	m_projectionMatrix[3][3] = 0.0f;
+}
+
+f32 engine::Camera::RotateAxis(f32 angle, f32 delta)
+{
+	f32 maxDelta = 5.0f;
+
+	// Limits
+	if (delta < -maxDelta)
+		delta = -maxDelta;
+	else if (delta > maxDelta)
+		delta = maxDelta;
+
+	angle += delta * m_angularSpeed * m_deltaTime;
+
+	// Wrap angle
+	return angle;
+}
