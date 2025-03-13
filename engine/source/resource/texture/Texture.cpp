@@ -4,8 +4,6 @@
 #include <glad/glad.h>
 #include <stb/stb_image.h>
 
-#define TEXTURE_RELATIVE_PATH "..\\assets\\"
-
 engine::Texture::Texture(void)
 	: m_texture(0), m_size(0, 0)
 {
@@ -13,14 +11,10 @@ engine::Texture::Texture(void)
 
 void engine::Texture::LoadResource(const char* fileName)
 {
-	// Concatenate file path
-	char relativePath[256] = TEXTURE_RELATIVE_PATH;
-	strcat_s(relativePath, fileName);
-
 	glGenTextures(1, &m_texture);
 
 	int32 channelCount = 0;
-	unsigned char* data = stbi_load(relativePath, &m_size[0], &m_size[1], &channelCount, 0);
+	unsigned char* data = stbi_load(fileName, &m_size[0], &m_size[1], &channelCount, 0);
 
 	// Invalid file type or file not found
 	if (!data)
