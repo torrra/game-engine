@@ -27,13 +27,13 @@ void engine::Image::Render(void)
 	if (!m_data)
 		return;
 
-	math::Vector2f size(m_transform.m_scale);
+	math::Vector2f size(m_transform.m_sizePx);
 	
 	if (m_keepAspectRatio)
 	{
 		size = math::Vector2f(
-			m_transform.m_scale.GetX(),
-			m_transform.m_scale.GetX() * m_data->GetAspectRatio()
+			m_transform.m_sizePx.GetX(),
+			m_transform.m_sizePx.GetX() * m_data->GetAspectRatio()
 		);
 	}
 

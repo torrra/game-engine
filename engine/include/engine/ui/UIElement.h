@@ -23,10 +23,10 @@ namespace engine
 	struct UITransform
 	{
 		math::Vector2f m_position;
-		math::Vector2f m_scale;
+		math::Vector2f m_sizePx;
 
 		UITransform(void)
-			: m_position(0.0f), m_scale(1.0f)
+			: m_position(0.0f), m_sizePx(0.0f)
 		{
 		}
 	};

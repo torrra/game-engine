@@ -13,7 +13,7 @@ lm::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
 
 	lm::Matrix4f rotationMatrix = inTransform.m_rotation.RotationMatrix();
 
-	lm::Matrix4f scaleMatrix = lm::Matrix4f::ScaleMatrix(inTransform.m_scale);
+	lm::Matrix4f scaleMatrix = lm::Matrix4f::ScaleMatrix(inTransform.m_sizePx);
 
 	lm::Matrix4f transformMatrix = (scaleMatrix * rotationMatrix) * positionMatrix;
 
@@ -31,8 +31,8 @@ engine::Transform engine::Transform::Interpolate(Transform& inStartTransform,
 	result.m_rotation = lm::Quatf::Slerp(inStartTransform.m_rotation,
 										 inEndTransform.m_rotation, inTime);
 
-	result.m_scale = lm::Vector3f::Lerp(inStartTransform.m_scale,
-										inEndTransform.m_scale, inTime);
+	result.m_sizePx = lm::Vector3f::Lerp(inStartTransform.m_sizePx,
+										inEndTransform.m_sizePx, inTime);
 
 	return result;
 }
@@ -49,7 +49,7 @@ void engine::Transform::CopyRotation(const Transform& inTransform)
 
 void engine::Transform::CopyScale(const Transform& inTransform)
 {
-	m_scale = inTransform.m_scale;
+	m_sizePx = inTransform.m_sizePx;
 }
 
 lm::Vector3f engine::Transform::GetPosition(void) const
@@ -64,7 +64,7 @@ lm::Quatf engine::Transform::GetRotation(void) const
 
 lm::Vector3f engine::Transform::GetScale(void) const
 {
-	return m_scale;
+	return m_sizePx;
 }
 
 engine::Transform engine::Transform::GetTransform(void) const
@@ -84,7 +84,7 @@ void engine::Transform::SetRotation(const lm::Quatf& inRotation)
 
 void engine::Transform::SetScale(const lm::Vector3f& inScale)
 {
-	m_scale = inScale;
+	m_sizePx = inScale;
 }
 
 void engine::Transform::SetTransform(const lm::Vector3f& inPosition,
@@ -92,7 +92,7 @@ void engine::Transform::SetTransform(const lm::Vector3f& inPosition,
 {
 	m_position = inPosition;
 	m_rotation = inRotation;
-	m_scale = inScale;
+	m_sizePx = inScale;
 }
 
 std::ostream& engine::Transform::operator<<(std::ostream& os)
@@ -100,5 +100,5 @@ std::ostream& engine::Transform::operator<<(std::ostream& os)
 	return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
 			  << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " " 
 			  << m_rotation.Z() << " "
-			  << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+			  << m_sizePx.X() << " " << m_sizePx.Y() << " " << m_sizePx.Z();
 }
