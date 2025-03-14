@@ -1,4 +1,5 @@
 #include "core/components/Camera.h"
+#include "core/systems/ScriptSystem.h"
 #include "utility/Timer.h"
 
 #include <math/Arithmetic.hpp>
@@ -6,8 +7,10 @@
 
 
 
-engine::Camera::Camera(EntityHandle, SceneGraph*)
+engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
 {
+	m_owner = owner;
+	m_currentScene = scene;
 	GetProjectionMatrix();
 }
 
@@ -39,6 +42,11 @@ void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rot
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
 	return m_projectionMatrix * GetViewMatrix();
+}
+
+void engine::Camera::Register(void)
+{
+	engine::ScriptSystem::RegisterNewComponent("_NewCameraComponent", m_owner);
 }
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
