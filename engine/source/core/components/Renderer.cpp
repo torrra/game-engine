@@ -26,7 +26,6 @@ namespace engine
 		if (m_texture)
 		{
 			m_texture->UseTexture();
-			m_shader->Set("texture1", 0);
 		}
 		else
 			Texture::RemoveTexture();
