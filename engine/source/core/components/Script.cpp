@@ -19,7 +19,7 @@ namespace engine
 
 	void Script::Register(void)
 	{
-		ScriptSystem::RegisterNewScriptComponent(m_owner);
+		ScriptSystem::RegisterNewComponent("_NewScriptComponent", m_owner);
 
 		for (const ScriptObject& object : m_scriptObjects)
 			object.Register();
