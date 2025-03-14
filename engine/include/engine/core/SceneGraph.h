@@ -126,6 +126,7 @@ namespace engine
 		ENGINE_API
 		void RegisterAllComponents(void);
 
+		// Render all active renderers with all active cameras
 		ENGINE_API
 		void RenderScene(void);
 
@@ -263,7 +264,7 @@ namespace engine
 		// set owner flag to tell that it owns a component of this type
 		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
 
-		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_parent, this);
+		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_handle, this);
 
 		newComponent->Register();
 		return newComponent;
