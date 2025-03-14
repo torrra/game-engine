@@ -13,6 +13,7 @@ namespace engine
 	{
 		RegisterComponents<Transform>();
 		RegisterComponents<Script>();
+		RegisterComponents<Camera>();
 	}
 
 	int64 SceneGraph::RandomNumber(void)
