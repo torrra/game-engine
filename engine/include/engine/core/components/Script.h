@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "core/Component.h"
-#include "core/Entity.h"
+#include "engine/core/Component.h"
+#include "engine/core/Entity.h"
 
-#include "scripting/ScriptObject.h"
+#include "engine/scripting/ScriptObject.h"
 
 namespace engine
 {
