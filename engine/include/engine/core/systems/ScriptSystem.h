@@ -48,6 +48,12 @@ namespace engine
 		ENGINE_API
 		static const std::string&	GetConfigScriptsLocation(void);
 
+		// Register a component of a given type
+		// function: lua global function that creates a table for an existing component
+		// owner: owning entity 
+		ENGINE_API
+		static void RegisterNewComponent(const char* function, EntityHandle owner);
+
 
 		// Add an entity to the scripting system's lua entity table
 		ENGINE_API
