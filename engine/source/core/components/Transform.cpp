@@ -1,4 +1,5 @@
 #include "core/components/Transform.h"
+#include "core/systems/ScriptSystem.h"
 #include "core/SceneGraph.h"
 
 math::Matrix4f engine::Transform::ToMatrixWithoutScale(const Transform& inTransform)
@@ -70,6 +71,11 @@ void engine::Transform::CopyScale(const Transform& inTransform)
 {
 	m_scale = inTransform.m_scale;
 	m_dirty = true;
+}
+
+void engine::Transform::Register(void)
+{
+	engine::ScriptSystem::RegisterNewComponent("_NewTransformComponent", m_owner);
 }
 
 math::Vector3f engine::Transform::GetPosition(void) const
