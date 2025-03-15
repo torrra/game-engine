@@ -57,13 +57,10 @@ namespace engine
 
 		f32 RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed);
 
-		Frustum m_frustum;
-		math::Quaternion<f32> m_rotQuat = math::Quatf(1.f, 0.f, 0.f, 0.f);
+		Frustum		   m_frustum;
+		math::Quatf    m_rotQuat = math::Quatf(1.f, 0.f, 0.f, 0.f);
 		math::Matrix4f m_projectionMatrix{1.f};
 		math::Vector3f m_position{ 0.f };
 		math::Vector3f m_rotation{ 0.f };
-		/*math::Vector3f m_forward;
-		math::Vector3f m_up;
-		math::Vector3f m_right;*/
 	};
 }
