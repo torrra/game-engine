@@ -29,32 +29,28 @@ extern "C"
 
 namespace engine
 {
-	SceneGraph* ScriptSystem::m_currentScene = nullptr;
-	lua_State*  ScriptSystem::m_luaState = nullptr;
-
-	// TODO: get rid of hardcoded path
-	std::string ScriptSystem::m_configScriptsLocation = ScriptSystem::FindConfigScripts();
-	std::string ScriptSystem::m_userScriptsLocation = "./";
+	ScriptSystem* ScriptSystem::m_instance = nullptr;
+	std::mutex  ScriptSystem::m_mutex;
 	
 	void ScriptSystem::Startup(void)
 	{
-		m_luaState = luaL_newstate();
+		GetInstance()->m_luaState = luaL_newstate();
 
-		if (!m_luaState)
+		if (!GetInstance()->m_luaState)
 		{
 			// TODO: log error?
 			std::cout << "Unable to create Lua state\n";
 			exit(EXIT_FAILURE);			
 		}
 
-		luaL_openlibs(m_luaState);
+		luaL_openlibs(GetInstance()->m_luaState);
 
-		RegisterEntityFunctions(m_luaState);
-		RegisterComponentFunctions(m_luaState);
-		RegisterScriptComponentFunctions(m_luaState);
-		RegisterCameraFunctions(m_luaState);
-		RegisterTransformFunctions(m_luaState);
-		RegisterInputFunctions(m_luaState);
+		RegisterEntityFunctions(GetInstance()->m_luaState);
+		RegisterComponentFunctions(GetInstance()->m_luaState);
+		RegisterScriptComponentFunctions(GetInstance()->m_luaState);
+		RegisterCameraFunctions(GetInstance()->m_luaState);
+		RegisterTransformFunctions(GetInstance()->m_luaState);
+		RegisterInputFunctions(GetInstance()->m_luaState);
 
 		RunConfigScript("Component.lua");
 		RunConfigScript("Entity.lua");
@@ -72,30 +68,32 @@ namespace engine
 
 	void ScriptSystem::Shutdown(void)
 	{
-		lua_close(m_luaState);
+		lua_close(GetInstance()->m_luaState);
+		delete m_instance;
+		m_instance = nullptr;
 	}
 
 	void ScriptSystem::SetCurrentScene(SceneGraph* graph)
 	{
-		m_currentScene = graph;
+		GetInstance()->m_currentScene = graph;
 	}
 
 	SceneGraph* ScriptSystem::GetCurrentScene(void)
 	{
-		return m_currentScene;
+		return GetInstance()->m_currentScene;
 	}
 
 	const std::string& ScriptSystem::GetConfigScriptsLocation(void)
 	{
-		return m_configScriptsLocation;
+		return GetInstance()->m_configScriptsLocation;
 	}
 
 	void ScriptSystem::RegisterNewComponent(const char* function, EntityHandle owner)
 	{
-		lua_getglobal(m_luaState, function);
-		lua_pushinteger(m_luaState, owner);
+		lua_getglobal(GetInstance()->m_luaState, function);
+		lua_pushinteger(GetInstance()->m_luaState, owner);
 
-		if (lua_pcall(m_luaState, 1, 0, 0) != LUA_OK)
+		if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
 
@@ -104,30 +102,30 @@ namespace engine
 		if (name.empty())
 			return;
 
-		lua_getglobal(m_luaState, "_AddEntityHandle");
-		lua_pushinteger(m_luaState, newEntity);
-		lua_pushstring(m_luaState, name.c_str());
+		lua_getglobal(GetInstance()->m_luaState, "_AddEntityHandle");
+		lua_pushinteger(GetInstance()->m_luaState, newEntity);
+		lua_pushstring(GetInstance()->m_luaState, name.c_str());
 
-		if (lua_pcall(m_luaState, 2, 0, 0) != LUA_OK)
+		if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
 
 	void ScriptSystem::RegisterNewScriptComponent(EntityHandle owner)
 	{
-		lua_getglobal(m_luaState, "_NewScriptComponent");
-		lua_pushinteger(m_luaState, owner);
+		lua_getglobal(GetInstance()->m_luaState, "_NewScriptComponent");
+		lua_pushinteger(GetInstance()->m_luaState, owner);
 		  
-		if (lua_pcall(m_luaState, 1, 0, 0) != LUA_OK)
+		if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
 
 	void ScriptSystem::RegisterNewScriptObject(const std::string& type, EntityHandle owner)
 	{
-		lua_getglobal(m_luaState, "_NewScriptObject");
-		lua_pushstring(m_luaState, type.c_str());
-		lua_pushinteger(m_luaState, owner);
+		lua_getglobal(GetInstance()->m_luaState, "_NewScriptObject");
+		lua_pushstring(GetInstance()->m_luaState, type.c_str());
+		lua_pushinteger(GetInstance()->m_luaState, owner);
 
-		if (lua_pcall(m_luaState, 2, 0, 0) != LUA_OK)
+		if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
 
@@ -149,42 +147,46 @@ namespace engine
 
 	void ScriptSystem::StartScript(EntityHandle entity)
 	{
-		lua_getglobal(m_luaState, "_StartScript");
-		lua_pushinteger(m_luaState, entity);
+		lua_getglobal(GetInstance()->m_luaState, "_StartScript");
+		lua_pushinteger(GetInstance()->m_luaState, entity);
 
-		if (lua_pcall(m_luaState, 1, 0, 0) != LUA_OK)
+		if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
 
 	void ScriptSystem::UpdateScript(EntityHandle entity, f32 deltaTime)
 	{
-		lua_getglobal(m_luaState, "_UpdateScript");
-		lua_pushinteger(m_luaState, entity);
-		lua_pushnumber(m_luaState, deltaTime);
+		lua_getglobal(GetInstance()->m_luaState, "_UpdateScript");
+		lua_pushinteger(GetInstance()->m_luaState, entity);
+		lua_pushnumber(GetInstance()->m_luaState, deltaTime);
 
-		if (lua_pcall(m_luaState, 2, 0, 0) != LUA_OK)
+		if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
 			LogLuaError();
 	}
 
 	void ScriptSystem::ResetState(SceneGraph* newScene)
 	{
+		SceneGraph* oldScenePtr = GetInstance()->m_currentScene;
+
 		Shutdown();
 		Startup();
 
 		if (newScene)
-			m_currentScene = newScene;
+			GetInstance()->m_currentScene = newScene;
+		else
+			GetInstance()->m_currentScene = oldScenePtr;
 
-		m_currentScene->RegisterAllComponents();
+		GetInstance()->m_currentScene->RegisterAllComponents();
 	}
 
 	void ScriptSystem::SetUserScriptLocation(const char* path)
 	{
-		m_userScriptsLocation = path;
+		GetInstance()->m_userScriptsLocation = path;
 	}
 
 	void ScriptSystem::CreateUserScript(const char* dirRelativePath, const char* className)
 	{
-		std::string fullPath = m_userScriptsLocation +
+		std::string fullPath = GetInstance()->m_userScriptsLocation +
 							  ((dirRelativePath) ? dirRelativePath : "") +
 							  ((className) ? className : "UserScript") + ".lua";
 
@@ -230,22 +232,22 @@ ScriptObjectTypes.%s = %s\nreturn %s";
 
 		while (fgets(buff, sizeof(buff), stdin) != NULL)
 		{		
-			if (luaL_dostring(m_luaState, buff) != LUA_OK)
+			if (luaL_dostring(GetInstance()->m_luaState, buff) != LUA_OK)
 				LogLuaError();
 		}
 	}
 
 	void ScriptSystem::LogLuaError(void)
 	{
-		std::cout << lua_tostring(m_luaState, -1) << '\n';
-		lua_pop(m_luaState, 1);
+		std::cout << lua_tostring(GetInstance()->m_luaState, -1) << '\n';
+		lua_pop(GetInstance()->m_luaState, 1);
 	}
 
 	void ScriptSystem::RunConfigScript(const char* script)
 	{
 		std::string path = ScriptSystem::GetConfigScriptsLocation() + script;
 
-		if (luaL_dofile(m_luaState, path.c_str()) != LUA_OK)
+		if (luaL_dofile(GetInstance()->m_luaState, path.c_str()) != LUA_OK)
 			LogLuaError();
 	}
 
@@ -270,15 +272,32 @@ ScriptObjectTypes.%s = %s\nreturn %s";
 		return formattedName;
 	}
 
+	ScriptSystem* ScriptSystem::GetInstance(void)
+	{
+		if (!m_instance)
+		{
+			std::unique_lock lock(m_mutex);
+
+			if (!m_instance)
+				m_instance = new ScriptSystem();
+
+		}
+
+		return m_instance;
+	}
+
 	void ScriptSystem::RunUserScript(const std::string& filename)
 	{
-		if (luaL_dofile(m_luaState, filename.c_str()) != LUA_OK)
+		if (luaL_dofile(GetInstance()->m_luaState, filename.c_str()) != LUA_OK)
 			LogLuaError();
 	}
 
 	void ScriptSystem::RunAllUserScripts(void)
 	{	
-		for (auto& file : std::filesystem::recursive_directory_iterator(m_userScriptsLocation))
+		if (!std::filesystem::exists(GetInstance()->m_userScriptsLocation))
+			return;
+
+		for (auto& file : std::filesystem::recursive_directory_iterator(GetInstance()->m_userScriptsLocation))
 		{
 			if (!file.exists())
 				continue;
