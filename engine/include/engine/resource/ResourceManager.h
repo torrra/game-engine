@@ -59,7 +59,7 @@ namespace engine
 		// Check if resource exists
 		if (HasResource(fileName))
 		{
-			std::printf("Resource already loaded\n");
+			std::printf("Resource '%s' already loaded\n", fileName.c_str());
 			return;
 		}
 

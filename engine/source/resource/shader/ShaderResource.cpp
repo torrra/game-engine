@@ -23,7 +23,7 @@ void engine::Shader::LoadResource(const char* fileName)
 
 	if (!fileData.m_size)
 	{
-		std::printf("Failed to process shader. Shader file contains no content.\n");
+		std::printf("Failed to process shader '%s'. Shader file contains no content.\n", fileName);
 		m_shaderType = EShaderType::INVALID_SHADER;
 		return;
 	}
