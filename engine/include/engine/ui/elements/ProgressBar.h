@@ -12,7 +12,7 @@ namespace engine
 	{
 	public:
 		ENGINE_API ProgressBar(void);
-		ENGINE_API virtual ~ProgressBar(void) override;
+		ENGINE_API virtual ~ProgressBar(void) override = default;
 
 		ENGINE_API virtual void Render(void) override;
 	private:

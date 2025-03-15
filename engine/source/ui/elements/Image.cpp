@@ -17,11 +17,6 @@ engine::Image::Image(const char* fileName)
 	m_data = ResourceManager::GetResource<Texture>(m_fileName.c_str());
 }
 
-engine::Image::~Image(void)
-{
-	m_fileName.clear();
-}
-
 void engine::Image::Render(void)
 {
 	if (!m_data)

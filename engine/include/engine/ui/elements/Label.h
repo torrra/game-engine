@@ -22,7 +22,7 @@ namespace engine
 	public:
 		ENGINE_API Label(void) = delete;
 		ENGINE_API Label(const char* text);
-		ENGINE_API virtual ~Label(void) override;
+		ENGINE_API virtual ~Label(void) override = default;
 
 		ENGINE_API virtual void Render(void) override;
 		

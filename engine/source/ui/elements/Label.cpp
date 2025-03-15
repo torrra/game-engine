@@ -18,11 +18,6 @@ engine::Label::Label(const char* text)
 	m_textColor = {1.0f, 1.0f, 1.0f, 1.0f};
 }
 
-engine::Label::~Label(void)
-{
-	m_text.clear();
-}
-
 void engine::Label::Render(void)
 {
 	ImGui::SetCursorPos(m_transform.m_position);

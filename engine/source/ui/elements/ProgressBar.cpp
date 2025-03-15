@@ -13,10 +13,6 @@ engine::ProgressBar::ProgressBar(void)
 {
 }
 
-engine::ProgressBar::~ProgressBar(void)
-{
-}
-
 
 void engine::ProgressBar::Render(void)
 {

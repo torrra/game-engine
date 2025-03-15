@@ -5,6 +5,7 @@
 #include "engine/ui/elements/Image.h"
 #include "engine/ui/elements/ProgressBar.h"
 #include "engine/ui/elements/Button.h"
+#include "engine/ui/elements/Rect.h"
 #include "engine/EngineExport.h"
 
 #include <math/Vector2.hpp>
@@ -28,9 +29,11 @@ namespace engine
 		ENGINE_API Image* AddImage(const char* fileName);
 		ENGINE_API Button* AddButton(const char* text, std::function<void(void)> function);
 		ENGINE_API ProgressBar* AddProgressBar(void);
+		ENGINE_API Rectangle* AddRectangle(math::Vector2f const& pos, math::Vector2f const& sizePx);
 
 	private:
 		std::vector<UIElement*> m_elements;
 		math::Vector4<float> m_color;
+		int32 m_uid;
 	};
 }

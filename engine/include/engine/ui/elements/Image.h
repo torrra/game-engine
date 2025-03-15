@@ -16,7 +16,7 @@ namespace engine
 	public:
 		ENGINE_API Image(void) = delete;
 		ENGINE_API Image(const char* fileName);
-		ENGINE_API virtual ~Image(void) override;
+		ENGINE_API virtual ~Image(void) override = default;
 
 		ENGINE_API virtual void Render(void) override;
 

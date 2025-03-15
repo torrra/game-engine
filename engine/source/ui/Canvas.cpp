@@ -12,7 +12,7 @@
 #include <functional>
 
 engine::Canvas::Canvas(math::Vector4<float> color)
-	: m_color(color)
+	: m_color(color), m_uid(0)
 {
 }
 
@@ -58,26 +58,48 @@ engine::Label* engine::Canvas::AddLabel(const char* text)
 {
 	m_elements.push_back(new Label(text));
 
-	return dynamic_cast<Label*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<Label*>(element);
 }
 
 engine::Image* engine::Canvas::AddImage(const char* fileName)
 {
 	m_elements.push_back(new Image(fileName));
 
-	return dynamic_cast<Image*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<Image*>(element);
 }
 
 engine::Button* engine::Canvas::AddButton(const char* text, std::function<void(void)> function)
 {
 	m_elements.push_back(new Button(text, function));
 
-	return dynamic_cast<Button*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+	
+	return dynamic_cast<Button*>(element);
 }
 
 engine::ProgressBar* engine::Canvas::AddProgressBar(void)
 {
 	m_elements.push_back(new ProgressBar());
 
-	return dynamic_cast<ProgressBar*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<ProgressBar*>(element);
+}
+
+engine::Rectangle* engine::Canvas::AddRectangle(math::Vector2f const& pos, math::Vector2f const& sizePx)
+{
+	m_elements.push_back(new Rectangle(pos, sizePx));
+	
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<Rectangle*>(element);
 }

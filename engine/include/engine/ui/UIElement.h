@@ -42,10 +42,20 @@ namespace engine
 
 		ENGINE_API virtual void SetPosition(math::Vector2f const& position);
 		ENGINE_API virtual void SetScale(math::Vector2f const& scale);
-
+		ENGINE_API virtual void SetAutoScale(bool autoResize);
+		
 		ENGINE_API virtual void Render(void) = 0;
+	
+	private:
+		void SetUID(int32 const& uid);
 
+		friend class Canvas;
+	
 	protected:
+		void AutoScale(void);
+
 		UITransform m_transform;
+		int32 m_uid;
+		bool m_autoScale;
 	};
 }
