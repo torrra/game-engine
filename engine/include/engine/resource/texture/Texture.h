@@ -18,6 +18,10 @@ namespace engine
 		ENGINE_API virtual void LoadResource(const char* fileName) override;
 		ENGINE_API void UseTexture(void);
 		ENGINE_API static void RemoveTexture(void);
+
+		uint32 GetTexture(void) const noexcept;
+		f32 GetAspectRatio(void) const noexcept;
+		math::Vector2i GetSize(void) const noexcept;
 	
 	private:
 		enum ETextureWrapping
@@ -39,6 +43,7 @@ namespace engine
 		int32 SetFormat(int32 channelCount);
 
 		math::Vector2i m_size;
+		f32 m_aspectRatio;
 		uint32 m_texture;
 	};
 }

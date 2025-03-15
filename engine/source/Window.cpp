@@ -70,6 +70,7 @@ void engine::Window::UpdateBuffers(void)
 
 void engine::Window::Shutdown(void)
 {
+	m_title.clear();
 	glfwTerminate();
 }
 

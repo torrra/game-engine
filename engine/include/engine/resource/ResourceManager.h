@@ -28,6 +28,10 @@ namespace engine
 	public:
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName);
+		ENGINE_API static void		LoadShader(
+										const char* shaderUID, 
+										const char* vertShader, 
+										const char* fragShader);
 		template<typename TResourceType>
 		static TResourceType*		GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
