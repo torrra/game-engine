@@ -72,7 +72,7 @@ end
 -- Update script objects inside a script
 function _UpdateScript(handle, deltaTime)
 
-	print("\n[Script component] updating script component owned by "..handle.."\n")
+	-- print("\n[Script component] updating script component owned by "..handle.."\n")
 	local component = ExistingScriptComponents[handle]
 	component:_UpdateComponent(deltaTime)
 end

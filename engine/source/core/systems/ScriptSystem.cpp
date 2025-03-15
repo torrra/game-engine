@@ -16,6 +16,9 @@ extern "C"
 #include "scripting/EntityScriptFunctions.h"
 #include "scripting/ComponentFunctions.h"
 #include "scripting/ScriptFunctions.h"
+#include "scripting/CameraFunctions.h"
+#include "scripting/TransformFunctions.h"
+#include "scripting/InputFunctions.h"
 
 //#include "utility/StringConversion.h"
 
@@ -49,12 +52,20 @@ namespace engine
 		RegisterEntityFunctions(m_luaState);
 		RegisterComponentFunctions(m_luaState);
 		RegisterScriptComponentFunctions(m_luaState);
+		RegisterCameraFunctions(m_luaState);
+		RegisterTransformFunctions(m_luaState);
+		RegisterInputFunctions(m_luaState);
 
 		RunConfigScript("Component.lua");
 		RunConfigScript("Entity.lua");
 
 		RunConfigScript("ScriptObject.lua");
 		RunConfigScript("Script.lua");
+
+		RunConfigScript("Camera.lua");
+		RunConfigScript("Transform.lua");
+
+		RunConfigScript("Input.lua");
 
 		RunAllUserScripts();
 	}
@@ -77,6 +88,15 @@ namespace engine
 	const std::string& ScriptSystem::GetConfigScriptsLocation(void)
 	{
 		return m_configScriptsLocation;
+	}
+
+	void ScriptSystem::RegisterNewComponent(const char* function, EntityHandle owner)
+	{
+		lua_getglobal(m_luaState, function);
+		lua_pushinteger(m_luaState, owner);
+
+		if (lua_pcall(m_luaState, 1, 0, 0) != LUA_OK)
+			LogLuaError();
 	}
 
 	void ScriptSystem::RegisterNewEntity(EntityHandle newEntity, const std::string& name)

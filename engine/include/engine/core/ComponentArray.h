@@ -26,7 +26,9 @@ namespace engine
 		void			InvalidateComponent(EntityHandle owner);
 
 		// Create a new component
-		TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent);
+		TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent,
+										class SceneGraph* scene);
+
 		TComponentType* GetComponent(EntityHandle owner);
 
 		// Check if an entity owns a component in this array
@@ -45,7 +47,7 @@ namespace engine
 
 		// Create a component without checking if the object's parent is
 		// before its new memory location
-		TComponentType* CreateComponentUnordered(EntityHandle owner);
+		TComponentType* ForceCreateComponent(EntityHandle owner, class SceneGraph* scene);
 
 		std::unordered_map<EntityHandle, uint64>	m_entityIndexMap;
 		std::vector<TComponentType>					m_components;
@@ -53,7 +55,8 @@ namespace engine
 
 
 	template<CValidComponent TComponentType>
-	inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner, EntityHandle parent)
+	inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner,
+																		EntityHandle parent)
 	{
 		// do not do anything if the contained type is not sensitive to
 		// the memory layout (if parents don't need to be updated before children)
@@ -118,13 +121,15 @@ namespace engine
 		m_entityIndexMap.erase(owner);
 	}
 
-	template<CValidComponent TComponentType>
-	inline TComponentType* ComponentArray<TComponentType>::CreateComponent(EntityHandle owner, EntityHandle parent)
+	template<CValidComponent TComponentType> inline 
+	TComponentType* ComponentArray<TComponentType>::CreateComponent(EntityHandle owner,
+															        EntityHandle parent,
+																	class SceneGraph* scene)
 	{	
 		// Creates new component with no regard for ordering if new component does not
 		// need to be updated after parent
 		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
-			return CreateComponentUnordered(owner);
+			return ForceCreateComponent(owner, scene);
 
 		// parentIndex is 0 by default so that it is always considered 'before'
 		// the new component when the latter has no actual parent, makes it so it
@@ -134,7 +139,9 @@ namespace engine
 		if (m_entityIndexMap.contains(parent))
 			parentIndex = m_entityIndexMap[parent];
 
-		for (EntityHandle newIndex = 0; newIndex < static_cast<EntityHandle>(m_components.size()); ++newIndex)
+		EntityHandle size = static_cast<EntityHandle>(m_components.size());
+
+		for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
 		{
 			TComponentType& currentComponent = m_components[newIndex];
 
@@ -144,14 +151,14 @@ namespace engine
 
 			printf("[Component array]: filling invalid slot\n");
 
-			currentComponent = TComponentType(owner);
+			currentComponent = TComponentType(owner, scene);
 			m_entityIndexMap[owner] = newIndex;		
 			return &currentComponent;
 		}
 
 		printf("[Component array]: creating new slot\n");
-		m_entityIndexMap[m_components.size()] = owner;
-		return &m_components.emplace_back(owner);
+		m_entityIndexMap[owner] = m_components.size();
+		return &m_components.emplace_back(owner, scene);
 	}
 
 	template<CValidComponent TComponentType>
@@ -181,8 +188,9 @@ namespace engine
 		return m_components.end();
 	}
 
-	template<CValidComponent TComponentType>
-	inline TComponentType* ComponentArray<TComponentType>::CreateComponentUnordered(EntityHandle owner)
+	template<CValidComponent TComponentType> inline
+	TComponentType* ComponentArray<TComponentType>::ForceCreateComponent(EntityHandle owner,
+																	class SceneGraph* scene)
 	{
 		// write over invalid component if possible
 		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
@@ -194,7 +202,7 @@ namespace engine
 
 			printf("[Component array]: filling invalid slot\n");
 
-			currentComponent = TComponentType(owner);
+			currentComponent = TComponentType(owner, scene);
 			m_entityIndexMap[owner] = newIndex;
 			return &currentComponent;
 		}
@@ -202,7 +210,7 @@ namespace engine
 		printf("[Component array]: creating new slot\n");
 
 		// create new component if no invalid component was found
-		m_entityIndexMap[m_components.size()] = owner;
-		return &m_components.emplace_back(owner);
+		m_entityIndexMap[owner] = m_components.size();
+		return &m_components.emplace_back(owner, scene);
 	}
 }

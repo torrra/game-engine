@@ -64,6 +64,9 @@ namespace engine
 		bool HasComponent(void) const;
 
 		ENGINE_API
+		bool HasParent(void) const;
+
+		ENGINE_API
 		EntityHandle GetHandle(void) const;
 
 		ENGINE_API
