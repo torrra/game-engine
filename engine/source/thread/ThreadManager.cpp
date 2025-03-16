@@ -1,6 +1,20 @@
 #include "engine/thread/ThreadManager.h"
 
 
+void engine::ThreadManager::Startup(uint32 numThreads)
+{
+	// Don't create more threads if there are already existing threads
+	if (!m_workers.empty())
+		return;
+
+	// Reset bool in case thread manager was previously shut down
+	m_stopThreads = false;
+
+	// Launch threads
+	for (uint32 thread = 0; thread < numThreads; ++thread)
+		m_workers.emplace_back(&ThreadManager::TreadLoop, this);
+}
+
 void engine::ThreadManager::Shutdown(void)
 {
 	// lock mutex here, we want
@@ -16,6 +30,7 @@ void engine::ThreadManager::Shutdown(void)
 	for (std::thread& thread : m_workers)
 		thread.join();
 
+	m_workers.clear();
 }
 
 void engine::ThreadManager::TreadLoop(void)

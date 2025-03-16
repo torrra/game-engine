@@ -10,11 +10,22 @@
 #include <utility>
 #include <vector>
 
+#include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
+
 namespace engine
 {
 	class ThreadManager
 	{
 	public:
+
+		ENGINE_API
+		ThreadManager(void) = default;
+		
+		ENGINE_API
+		~ThreadManager(void) = default;
+
+		ThreadManager(ThreadManager&&) = delete;
 
 		// Add a function to the task list, without getting a future for its return value
 		template <typename TFunctionType, typename... TVariadicArgs>
@@ -27,7 +38,12 @@ namespace engine
 		template <typename TFunctionType, typename... TVariadicArgs> [[nodiscard]]
 		auto AddTaskWithResult(TFunctionType&& function, TVariadicArgs&&... args);
 
+		// Create threads
+		ENGINE_API
+		void Startup(uint32 numThreads = std::thread::hardware_concurrency() - 2);
+
 		// Finish existing tasks and join all threads
+		ENGINE_API
 		void Shutdown(void);
 
 	private:
