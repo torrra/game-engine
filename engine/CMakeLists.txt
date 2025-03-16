@@ -74,7 +74,13 @@ target_link_libraries(${TARGET_NAME}
 
 if (MSVC)
 	# Disable linker warning for glfw3's missing debug info
-	target_link_options(${TARGET_NAME} PRIVATE /IGNORE:4099)
+	# and ignore non multithread runtime libs
+	target_link_options(${TARGET_NAME} PRIVATE
+	/IGNORE:4099
+	/NODEFAULTLIB:libcmt.lib
+	/NODEFAULTLIB:libcmtd.lib
+)
+
 	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 endif()
 
