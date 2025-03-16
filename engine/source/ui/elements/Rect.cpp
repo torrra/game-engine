@@ -18,12 +18,9 @@ engine::Rectangle::Rectangle(math::Vector2f const& pos, math::Vector2f const& si
 
 void engine::Rectangle::Render(void)
 {
-	if (m_autoScale)
-		AutoScale();
-
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	const ImGuiID& id = window->GetID((int32) m_uid); // TODO: check, this may cause later issues
-	printf("%f, %f\n", ImGui::GetContentRegionAvail()[0], ImGui::GetContentRegionAvail()[1]);
+
 	ImRect box(
 		window->Pos + m_transform.m_position,
 		window->Pos + m_transform.m_position + m_transform.m_sizePx

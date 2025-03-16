@@ -52,7 +52,7 @@ namespace engine
 		friend class Canvas;
 	
 	protected:
-		void AutoScale(void);
+		void AutoScale(f32 regionRatio);
 
 		UITransform m_transform;
 		int32 m_uid;

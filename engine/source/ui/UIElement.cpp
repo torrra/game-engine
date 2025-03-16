@@ -10,6 +10,7 @@
 engine::UIElement::UIElement(void)
 	: m_transform(), m_uid(-1), m_autoScale(true)
 {
+	// TODO: remove printf
 	printf("UIElement constructor\n");
 }
 
@@ -43,19 +44,9 @@ void engine::UIElement::SetUID(int32 const& uid)
 	m_uid = uid;
 }
 
-void engine::UIElement::AutoScale(void)
+void engine::UIElement::AutoScale(f32 regionRatio)
 {
-	// TODO: use callback to prevent excess function calls
-	static math::Vector2f prevContentRegion = ImGui::GetContentRegionAvail();
-	math::Vector2f contentRegion = ImGui::GetContentRegionAvail();
-
-	if (prevContentRegion != contentRegion)
-	{
-		f32 regionRatio = contentRegion.GetX() / prevContentRegion.GetX();
-
-		m_transform.m_position *= regionRatio;
-		m_transform.m_sizePx *= regionRatio;
-		
-		prevContentRegion = contentRegion;
-	}
+	m_transform.m_position *= regionRatio;
+	m_transform.m_sizePx *= regionRatio;
 }
+

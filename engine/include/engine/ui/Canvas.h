@@ -19,7 +19,7 @@ namespace engine
 	class Canvas
 	{
 	public:
-		ENGINE_API Canvas(math::Vector4<float> color);
+		ENGINE_API Canvas(math::Vector2f const& windowSize, math::Vector4f const& color);
 		ENGINE_API ~Canvas(void) = default;
 
 		ENGINE_API void Render(void);
@@ -32,6 +32,10 @@ namespace engine
 		ENGINE_API Rectangle* AddRectangle(math::Vector2f const& pos, math::Vector2f const& sizePx);
 
 	private:
+		void RescaleCanvas(void);
+
+		math::Vector2f m_size;
+		math::Vector2f m_prevSize;
 		std::vector<UIElement*> m_elements;
 		math::Vector4<float> m_color;
 		int32 m_uid;

@@ -11,8 +11,8 @@
 #include <iostream>
 #include <functional>
 
-engine::Canvas::Canvas(math::Vector4<float> color)
-	: m_color(color), m_uid(0)
+engine::Canvas::Canvas(math::Vector2f const& windowSize, math::Vector4f const& color)
+	: m_size(windowSize), m_prevSize(windowSize), m_color(color), m_uid(0)
 {
 }
 
@@ -34,6 +34,8 @@ ENGINE_API void engine::Canvas::Render(void)
 	ImGui::SetNextWindowSize(viewport->Size);
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, m_color);
 	ImGui::Begin("Canvas", nullptr, flags);
+
+	RescaleCanvas();
 
 	for (UIElement* element : m_elements)
 	{
@@ -102,4 +104,23 @@ engine::Rectangle* engine::Canvas::AddRectangle(math::Vector2f const& pos, math:
 	element->SetUID(++m_uid);
 
 	return dynamic_cast<Rectangle*>(element);
+}
+
+void engine::Canvas::RescaleCanvas(void)
+{
+	m_size = ImGui::GetContentRegionAvail();
+
+	if (m_size != m_prevSize)
+	{
+		const f32 regionRatio = m_size.GetX() / m_prevSize.GetX();
+
+		for (UIElement* element : m_elements)
+		{
+
+			if (element->m_autoScale)
+				element->AutoScale(regionRatio);
+		}
+
+		m_prevSize = m_size;
+	}
 }
