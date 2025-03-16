@@ -45,25 +45,17 @@ void engine::UIElement::SetUID(int32 const& uid)
 
 void engine::UIElement::AutoScale(void)
 {
-	// TODO: use callback to prevent useless function calls
+	// TODO: use callback to prevent excess function calls
 	static math::Vector2f prevContentRegion = ImGui::GetContentRegionAvail();
 	math::Vector2f contentRegion = ImGui::GetContentRegionAvail();
 
 	if (prevContentRegion != contentRegion)
 	{
-		math::Vector2f regionRatio = contentRegion / prevContentRegion;
-		f32 aspectRatio = m_transform.m_sizePx.GetX() / m_transform.m_sizePx.GetY();
+		f32 regionRatio = contentRegion.GetX() / prevContentRegion.GetX();
 
-		// Scale
-		m_transform.m_sizePx = 
-		{
-			m_transform.m_sizePx.GetY() * regionRatio.GetY(),
-			(m_transform.m_sizePx.GetY() * regionRatio.GetY()) * aspectRatio
-		};
-
-		// Position
 		m_transform.m_position *= regionRatio;
-
+		m_transform.m_sizePx *= regionRatio;
+		
 		prevContentRegion = contentRegion;
 	}
 }
