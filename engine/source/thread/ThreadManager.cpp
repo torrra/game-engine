@@ -1,18 +1,17 @@
 #include "engine/thread/ThreadManager.h"
 
+engine::ThreadManager* engine::ThreadManager::m_instance = nullptr;
+std::once_flag	engine::ThreadManager::m_instanceCreatedFlag;
 
 void engine::ThreadManager::Startup(uint32 numThreads)
 {
 	// Don't create more threads if there are already existing threads
-	if (!m_workers.empty())
+	if (!GetInstance()->m_workers.empty())
 		return;
-
-	// Reset bool in case thread manager was previously shut down
-	m_stopThreads = false;
 
 	// Launch threads
 	for (uint32 thread = 0; thread < numThreads; ++thread)
-		m_workers.emplace_back(&ThreadManager::TreadLoop, this);
+		GetInstance()->m_workers.emplace_back(&ThreadManager::TreadLoop, GetInstance());
 }
 
 void engine::ThreadManager::Shutdown(void)
@@ -21,16 +20,18 @@ void engine::ThreadManager::Shutdown(void)
 	// the bool to be assigned BEFORE
 	// notify_all is called, or else threads
 	// will be unable to join
-	m_poolMutex.lock();
-	m_stopThreads = true;
-	m_poolMutex.unlock();
+	GetInstance()->m_poolMutex.lock();
+	GetInstance()->m_stopThreads = true;
+	GetInstance()->m_poolMutex.unlock();
 
-	m_conditionVariable.notify_all();
+	GetInstance()->m_conditionVariable.notify_all();
 
-	for (std::thread& thread : m_workers)
+	for (std::thread& thread : GetInstance()->m_workers)
 		thread.join();
 
-	m_workers.clear();
+	GetInstance()->m_workers.clear();
+
+	delete m_instance;
 }
 
 void engine::ThreadManager::TreadLoop(void)
@@ -45,7 +46,9 @@ void engine::ThreadManager::TreadLoop(void)
 		{
 			// lock for condition variable
 			std::unique_lock lock(m_poolMutex);
-			m_conditionVariable.wait(lock, [this]() {return m_stopThreads || !m_tasks.empty(); });
+
+			m_conditionVariable.wait(lock,
+			[this]() -> bool {return m_stopThreads || !m_tasks.empty(); });
 
 			// Only break when Shutdown was called AND all tasks are
 			// completed. Otherwise the packaged_task pointers won't be be deleted and leak
@@ -65,4 +68,13 @@ void engine::ThreadManager::TreadLoop(void)
 		// and the delete statement
 		task();
 	}
+}
+
+engine::ThreadManager* engine::ThreadManager::GetInstance(void)
+{
+	// Only create instance once. call_once should be a blocking call, saving the need for double checking
+	if (!m_instance)
+		std::call_once(m_instanceCreatedFlag, []() {m_instance = new ThreadManager(); });
+
+	return m_instance;
 }

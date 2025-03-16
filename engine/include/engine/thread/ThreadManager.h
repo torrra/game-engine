@@ -29,34 +29,41 @@ namespace engine
 
 		// Add a function to the task list, without getting a future for its return value
 		template <typename TFunctionType, typename... TVariadicArgs>
-		void AddTask(TFunctionType&& function, TVariadicArgs&&... args);
+		static void AddTask(TFunctionType&& function, TVariadicArgs&&... args);
 
 		// Add a function to the task list, and get a future for its return value
 		// Returns a std::future that contains the return type of the function
 		// passed as 1st argument, which will be deduced at compile time:
 		// std::future<std::invoke_result_t<TFunctionType, TVariadicArgs...>>
 		template <typename TFunctionType, typename... TVariadicArgs> [[nodiscard]]
-		auto AddTaskWithResult(TFunctionType&& function, TVariadicArgs&&... args);
+		static auto AddTaskWithResult(TFunctionType&& function, TVariadicArgs&&... args);
 
 		// Create threads
 		ENGINE_API
-		void Startup(uint32 numThreads = std::thread::hardware_concurrency() - 2);
+		static void Startup(uint32 numThreads = std::thread::hardware_concurrency() - 2);
 
 		// Finish existing tasks and join all threads
 		ENGINE_API
-		void Shutdown(void);
+		static void Shutdown(void);
 
 	private:
 
 		// Loop executed wby worker threads to sleep until
 		// work is available and execute tasks
 		void TreadLoop(void);
+
+		// Export this function as it will be called from inline functions
+		ENGINE_API
+		static ThreadManager* GetInstance(void);
 		
 		std::mutex							m_poolMutex;
 		std::condition_variable				m_conditionVariable;
 		std::vector<std::thread>			m_workers;
 		std::queue<std::function<void()>>	m_tasks;
 		bool								m_stopThreads = false;
+
+		static std::once_flag				m_instanceCreatedFlag;
+		static ThreadManager*				m_instance;
 		  
 	};
 
@@ -73,10 +80,10 @@ namespace engine
 													   std::forward<TVariadicArgs>(args)...);
 
 		// We don't want another thread to touch the queue while we add a task
-		m_poolMutex.lock();
-		m_tasks.push(packagedFunc);
-		m_poolMutex.unlock();
-		m_conditionVariable.notify_one();
+		GetInstance()->m_poolMutex.lock();
+		GetInstance()->m_tasks.push(packagedFunc);
+		GetInstance()->m_poolMutex.unlock();
+		GetInstance()->m_conditionVariable.notify_one();
 	}
 
 
@@ -106,12 +113,12 @@ namespace engine
 		std::future<TReturnType> future = task->get_future();
 
 		// lock to ensure that only this thread can write into the queue
-		m_poolMutex.lock();
+		GetInstance()->m_poolMutex.lock();
 
 		// use lambda so that the task is stored as a void() function
-		m_tasks.push([task]() -> void {(*task)(); delete task; });
-		m_poolMutex.unlock();
-		m_conditionVariable.notify_one();
+		GetInstance()->m_tasks.push([task]() -> void {(*task)(); delete task; });
+		GetInstance()->m_poolMutex.unlock();
+		GetInstance()->m_conditionVariable.notify_one();
 
 		return future;
 	}
