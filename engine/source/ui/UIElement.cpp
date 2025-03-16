@@ -49,13 +49,20 @@ void engine::UIElement::AutoScale(void)
 	static math::Vector2f prevContentRegion = ImGui::GetContentRegionAvail();
 	math::Vector2f contentRegion = ImGui::GetContentRegionAvail();
 
-
 	if (prevContentRegion != contentRegion)
 	{
 		math::Vector2f regionRatio = contentRegion / prevContentRegion;
+		f32 aspectRatio = m_transform.m_sizePx.GetX() / m_transform.m_sizePx.GetY();
 
+		// Scale
+		m_transform.m_sizePx = 
+		{
+			m_transform.m_sizePx.GetY() * regionRatio.GetY(),
+			(m_transform.m_sizePx.GetY() * regionRatio.GetY()) * aspectRatio
+		};
+
+		// Position
 		m_transform.m_position *= regionRatio;
-		m_transform.m_sizePx *= regionRatio;
 
 		prevContentRegion = contentRegion;
 	}
