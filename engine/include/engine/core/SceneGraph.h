@@ -129,7 +129,7 @@ namespace engine
 		// Tick all components of a given type, provided that this typed
 		// has its UpdateComponent trait set to true
 		template <CValidComponent TComponentType, typename... TVariadicArgs>
-		void UpdateComponents(TVariadicArgs... args);
+		void UpdateComponents(TVariadicArgs&&... args);
 
 		// Re-register all existing components after a lua state reset
 		ENGINE_API
@@ -201,7 +201,7 @@ namespace engine
 
 
 	template <CValidComponent TComponentType, typename... TVariadicArgs>
-	inline void SceneGraph::UpdateComponents(TVariadicArgs... args)
+	inline void SceneGraph::UpdateComponents(TVariadicArgs&&... args)
 	{
 		if constexpr (!UpdateComponent<TComponentType>::m_value)
 			return;
@@ -211,7 +211,7 @@ namespace engine
 		for (TComponentType& component : array)
 		{
 			if (component.IsValid() && component.IsActive())
-				component.Update(args...);
+				component.Update(std::forward<TVariadicArgs>(args)...);
 		}
 
 	}
