@@ -4,22 +4,22 @@
 #undef new
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_internal.h>
 
-engine::Rectangle::Rectangle(math::Vector2f const& pos, math::Vector2f const& sizePx)
+engine::Rectangle::Rectangle(math::Vector2f const& position, math::Vector2f const& size)
+	: m_rounding(0.0f)
 {
-	m_transform.m_position = pos;
-	m_transform.m_sizePx = sizePx;
-	m_color = ImGui::ColorConvertFloat4ToU32({GREEN, 1.0f});
-	m_rounding = 0.0f;
+	// Set transform
+	SetPosition(position);
+	SetScale(size);
+	
+	SetColor(WHITE, 1.0f);
 }
 
 void engine::Rectangle::Render(void)
 {
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
-	const ImGuiID& id = window->GetID((int32) m_uid); // TODO: check, this may cause later issues
+	const ImGuiID& id = window->GetID(m_uid); // TODO: check, this may cause later issues
 
 	ImRect box(
 		window->Pos + m_transform.m_position,
