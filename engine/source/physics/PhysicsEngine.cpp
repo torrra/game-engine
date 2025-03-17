@@ -62,7 +62,6 @@ void engine::PhysicsEngine::Init(void)
 {
 	PhysicsEngineImpl& impl = *m_impl;
 
-	/// TODO : Delete debug cout
 	/*
 		Founction to create the base of physX, everything of physx is based on foundation
 		Foundation manage the initialization of the memory management, prepare error
@@ -73,10 +72,8 @@ void engine::PhysicsEngine::Init(void)
 		<param> errorCallback : Let us to not use printf/cout directly
 		Can overload those classes to have our own allocator or error log
 	*/
-	(impl.m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-		gDefaultErrorCallback)) != NULL ?
-		std::cout << "Foundation created" << std::endl :
-		std::cout << "Failed to create foundation" << std::endl;
+	impl.m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
+										   gDefaultErrorCallback);
 
 	/*
 		Create an instance of physx visual debugger which is the interface of communication
@@ -84,9 +81,10 @@ void engine::PhysicsEngine::Init(void)
 			- Send to pvd in real time
 		<param> Foundation : The base of physX
 	*/
-	(impl.m_pvd = physx::PxCreatePvd(*impl.m_foundation)) != NULL ?
-		std::cout << "Pvd created" << std::endl :
-		std::cout << "Failed to create pvd" << std::endl;
+	if (impl.m_foundation != nullptr)
+	{
+		impl.m_pvd = physx::PxCreatePvd(*impl.m_foundation);
+	}
 
 	/*
 		Allows to send to the pvd in real time to be able to understand errors
@@ -99,9 +97,7 @@ void engine::PhysicsEngine::Init(void)
 		<param> Timeout in milliseconds : Timeout of the connection
 	*/
 	physx::PxPvdTransport* transport;
-	(transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10)) != NULL ?
-		std::cout << "Transport created" << std::endl :
-		std::cout << "Failed to create transport" << std::endl;
+	transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
 
 	/*
 		Activate the connection to the pvd, determine what type of data to send and check
@@ -109,9 +105,10 @@ void engine::PhysicsEngine::Init(void)
 		<param> Transport : The transport to connect previously created
 		<param> Flags : What type of data to send (eALL to send everything)
 	*/
-	(impl.m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL)) ?
-		std::cout << "Pvd connected" << std::endl :
-		std::cout << "Failed to connect pvd" << std::endl;
+	if (transport != nullptr)
+	{
+		impl.m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
+	}
 
 	/*
 		Will manage every physics scene, every physics object(rigid bodies, collision shapes, 
@@ -122,51 +119,53 @@ void engine::PhysicsEngine::Init(void)
 		<param> Track out standing allocation (optional) : Follow memory allocation
 		<param> Pvd (optional) : Let to connect pvd for debug.
 	*/
-	(impl.m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *impl.m_foundation, 
-									  physx::PxTolerancesScale(), true, impl.m_pvd)) != NULL ?
-		std::cout << "Physics created" << std::endl :
-		std::cout << "Failed to create physics" << std::endl;
+	impl.m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *impl.m_foundation,
+									 physx::PxTolerancesScale(), true, impl.m_pvd);
 
-	/*
-		values for the tolerances in the scene, these must be the same values passed into
-		PxCreatePhysics(). The affected tolerances are bounceThresholdVelocity and 
-		frictionOffsetThreshold
-		<param> Scale : Define physic tolerance (size, speed, mass, etc.)
-	*/
-	physx::PxSceneDesc sceneDesc(impl.m_physics->getTolerancesScale());
-	// Set the value of the gravity by default to -9.81f
-	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+	if (impl.m_physics != nullptr)
+	{
+		/*
+			values for the tolerances in the scene, these must be the same values passed into
+			PxCreatePhysics(). The affected tolerances are bounceThresholdVelocity and
+			frictionOffsetThreshold
+			<param> Scale : Define physic tolerance (size, speed, mass, etc.)
+		*/
+		physx::PxSceneDesc sceneDesc(impl.m_physics->getTolerancesScale());
+		// Set the value of the gravity by default to -9.81f
+		sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
-	/// TODO : Check how many threads to use in regard to our own thread pool
-	/*
-		Create an administrator to manage the cpu threads to execute physics simulation
-		on multiple threads. Allows to distribute tasks on multiple threads
-		<param> Nb threads : Number of threads
-	*/
-	impl.m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher = impl.m_dispatcher;
-	/*
-		Decide how to manage the interaction between physics objects as 
-			- how the will collides
-			- Have they to generate contact events
-			- Have they to generate trigger events
-		We use it to personalize the collision logic between objects
-		<param> Attributes : Attributes of the objects (dynamic, static, etc.)
-		<param> Filter : Personalized data
-		<param> Flags : To determine what we want to do between the two objects 
-				(trigger, collide, etc.)
-		<param> Data : Constant data (mostly unused)
-	*/
-	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+		/// TODO : Check how many threads to use in regard to our own thread pool
+		/*
+			Create an administrator to manage the cpu threads to execute physics simulation
+			on multiple threads. Allows to distribute tasks on multiple threads
+			<param> Nb threads : Number of threads
+		*/
+		impl.m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+		sceneDesc.cpuDispatcher = impl.m_dispatcher;
+		/*
+			Decide how to manage the interaction between physics objects as
+				- how the will collides
+				- Have they to generate contact events
+				- Have they to generate trigger events
+			We use it to personalize the collision logic between objects
+			<param> Attributes : Attributes of the objects (dynamic, static, etc.)
+			<param> Filter : Personalized data
+			<param> Flags : To determine what we want to do between the two objects
+					(trigger, collide, etc.)
+			<param> Data : Constant data (mostly unused)
+		*/
+		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
 
-	/*
-		Create an instance of a physic scene where all the simulation run. It's the
-		simulation space.
-		Every physic object will be created in this scene.
-		Every interaction between objects will be calculate in this scene.
-		<param> SceneDesc : The description of the scene
-	*/
-	impl.m_scene = impl.m_physics->createScene(sceneDesc);
+		/*
+			Create an instance of a physic scene where all the simulation run. It's the
+			simulation space.
+			Every physic object will be created in this scene.
+			Every interaction between objects will be calculate in this scene.
+			<param> SceneDesc : The description of the scene
+		*/
+		impl.m_scene = impl.m_physics->createScene(sceneDesc);
+	}
+	
 	/*
 		Allow to create a physic material to personalize the physic behavior of the objects.
 		Determine wich type of objects will collide, what is the friction, what is the restitution
@@ -182,21 +181,15 @@ void engine::PhysicsEngine::CleanUp(void)
 	// Release all physX elements in the good order
 	PhysicsEngineImpl& impl = *m_impl;
 	PX_RELEASE(impl.m_material);
-	std::cout << "Material released" << std::endl;
 	PX_RELEASE(impl.m_scene);
-	std::cout << "Scene released" << std::endl;
 	PX_RELEASE(impl.m_dispatcher);
-	std::cout << "Dispatcher released" << std::endl;
 	PX_RELEASE(impl.m_physics);
-	std::cout << "Physics released" << std::endl;
 	// Disconnect transport and pvd before realeasing them
 	impl.m_pvd->getTransport()->disconnect();
 	impl.m_pvd->disconnect();
 	impl.m_pvd->getTransport()->release();
 	PX_RELEASE(impl.m_pvd);
-	std::cout << "Pvd released" << std::endl;
 	PX_RELEASE(impl.m_foundation);
-	std::cout << "Foundation released" << std::endl;
 
 	// Delete the instance
 	delete m_instance;
