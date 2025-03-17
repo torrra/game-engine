@@ -13,6 +13,8 @@
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 
+#define DEFAULT_NUM_THREADS ((std::thread::hardware_concurrency() / 4) * 3)
+
 namespace engine
 {
 	class ThreadManager
@@ -39,12 +41,33 @@ namespace engine
 		static auto AddTaskWithResult(TFunctionType&& function, TVariadicArgs&&... args);
 
 		// Create threads
+		// NOTE: Lua also uses its own thread, and the physics engine also uses threads,
+
 		ENGINE_API
-		static void Startup(uint32 numThreads = std::thread::hardware_concurrency() - 2);
+		static void Startup(uint32 numThreads = DEFAULT_NUM_THREADS);
 
 		// Finish existing tasks and join all threads
 		ENGINE_API
 		static void Shutdown(void);
+
+		// Update game-related components on another thread
+		// As of now, only scripts are directly updated, though scripts can
+		// affect transform and camera components. 
+		// Call SynchronizeGameThread() before this function to be able to 
+		// parallelize rendering
+		ENGINE_API
+		static void UpdateGameLogic(class SceneGraph* scene, f32 deltaTime);
+		
+		// Wait until tick update is finished and copy components necessary for
+		// rendering into a separate cache
+		ENGINE_API
+		static void SynchronizeGameThread(class SceneGraph* scene = nullptr);
+		
+		// Render active scene using its previously cached values.
+		// Should be optimally called after SynchronizeGameThread() and
+		// UpdateGameLogic() as this function will begin rendering on this thread
+		ENGINE_API
+		static void RenderScene(class SceneGraph* scene);
 
 	private:
 
@@ -58,8 +81,9 @@ namespace engine
 		
 		std::mutex							m_poolMutex;
 		std::condition_variable				m_conditionVariable;
-		std::vector<std::thread>			m_workers;
 		std::queue<std::function<void()>>	m_tasks;
+		std::vector<std::thread>			m_workers;
+		std::future<void>					m_gameUpdateFinished;
 		bool								m_stopThreads = false;
 
 		static std::once_flag				m_instanceCreatedFlag;

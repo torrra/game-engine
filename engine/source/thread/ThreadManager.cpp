@@ -1,7 +1,8 @@
 #include "engine/thread/ThreadManager.h"
+#include "engine/core/SceneGraph.h"
 
-engine::ThreadManager* engine::ThreadManager::m_instance = nullptr;
-std::once_flag	engine::ThreadManager::m_instanceCreatedFlag;
+engine::ThreadManager*  engine::ThreadManager::m_instance = nullptr;
+std::once_flag			engine::ThreadManager::m_instanceCreatedFlag;
 
 void engine::ThreadManager::Startup(uint32 numThreads)
 {
@@ -16,6 +17,8 @@ void engine::ThreadManager::Startup(uint32 numThreads)
 
 void engine::ThreadManager::Shutdown(void)
 {
+	SynchronizeGameThread(nullptr);
+
 	// lock mutex here, we want
 	// the bool to be assigned BEFORE
 	// notify_all is called, or else threads
@@ -32,6 +35,35 @@ void engine::ThreadManager::Shutdown(void)
 	GetInstance()->m_workers.clear();
 
 	delete m_instance;
+}
+
+void engine::ThreadManager::UpdateGameLogic(SceneGraph* scene, f32 deltaTime)
+{
+	if (!scene)
+		return;
+
+	// Store a future so that we can wait for the worker thread to finish updating
+	GetInstance()->m_gameUpdateFinished = AddTaskWithResult([scene, deltaTime]()
+		{
+			scene->UpdateComponents<Script>(deltaTime);
+		});
+}
+
+void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
+{
+	// Wait until the logic update is finished (unless no update was sent to a thread)
+	if (GetInstance()->m_gameUpdateFinished.valid())
+		GetInstance()->m_gameUpdateFinished.wait();
+
+	// Copy updated transforms into separate array for rendering
+	if (scene)
+		scene->CacheComponents();
+}
+
+void engine::ThreadManager::RenderScene(SceneGraph* scene)
+{
+	if (scene)
+		scene->RenderFromCache();
 }
 
 void engine::ThreadManager::TreadLoop(void)
