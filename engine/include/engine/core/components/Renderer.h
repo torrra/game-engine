@@ -56,4 +56,12 @@ namespace engine
 		class Texture* m_texture = nullptr;
 
 	};
+
+
+	template<>
+	inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Renderer>()
+	{
+		return RENDERER;
+	}
+
 }
