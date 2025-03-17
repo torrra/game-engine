@@ -2,6 +2,8 @@
 
 #include "engine/EngineExport.h"
 #include "engine/core/Component.h"
+#include "engine/core/ComponentArray.h"
+#include "engine/core/components/Transform.h"
 
 namespace engine
 {
@@ -15,7 +17,8 @@ namespace engine
 		void Register(void) override;
 
 		ENGINE_API
-		void Render(const math::Matrix4f& viewProjection);
+		void Render(const math::Matrix4f& viewProjection,
+				    ComponentArray<Transform>& transforms);
 
 		ENGINE_API
 		const class Model* GetModel(void);

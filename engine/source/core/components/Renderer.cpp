@@ -18,7 +18,8 @@ namespace engine
 	{
 	}
 
-	void Renderer::Render(const math::Matrix4f& viewProjection)
+	void Renderer::Render(const math::Matrix4f& viewProjection,
+						  ComponentArray<class Transform>& transforms)
 	{
 		if (!m_model || !m_shader)
 			return;
@@ -32,7 +33,7 @@ namespace engine
 
 		m_shader->Use();
 
-		if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+		if (Transform* transform = transforms.GetComponent(m_owner))
 		{
 			math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
 			math::Matrix4f mvp = viewProjection * transformMat;
