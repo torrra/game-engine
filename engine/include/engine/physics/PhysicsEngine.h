@@ -24,9 +24,9 @@ namespace engine
 		~PhysicsEngine(void);
 
 		/// Members
-		struct PhysicsEngineImpl* m_impl;
+		struct PhysicsEngineImpl*	m_impl;
 
-		static PhysicsEngine* m_instance;
+		static PhysicsEngine*		m_instance;
 
 	}; // !Class PhysicsEngine
 } // !Namespace engine

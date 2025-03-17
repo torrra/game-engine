@@ -6,7 +6,7 @@
 
 #pragma endregion
 
-struct PhysicsEngineImpl 
+struct engine::PhysicsEngineImpl 
 {
 	physx::PxFoundation*			m_foundation	= nullptr;
 	physx::PxPhysics*				m_physics		= nullptr;
@@ -20,4 +20,9 @@ struct PhysicsEngineImpl
 engine::PhysicsEngine::PhysicsEngine() 
 {
 	m_impl = new PhysicsEngineImpl();
+}
+
+engine::PhysicsEngine::~PhysicsEngine(void)
+{
+	delete m_impl;
 }
