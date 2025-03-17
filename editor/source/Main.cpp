@@ -13,6 +13,9 @@
 #include <engine/ui/Canvas.h>
 #include <engine/ui/elements/Label.h>
 #include <engine/ui/elements/Image.h>
+#include <engine/ui/elements/Rect.h>
+#include <engine/ui/elements/ProgressBar.h>
+
 
 #include <engine/utility/Timer.h>
 
@@ -95,11 +98,12 @@ int main(void)
 		engine::Input::RegisterInput(KEY_D);
 		engine::Input::RegisterInput(KEY_E);
 		engine::Input::RegisterInput(KEY_Q);
+		engine::Input::RegisterInput(KEY_T);
 		engine::Input::RegisterInput(KEY_ESCAPE);
 
 		//engine::Input::SetCursorMode(engine::ECursorMode::DISABLED);
 
-		engine::Canvas canvas({0.0f, 0.0f, 0.0f, 0.0f});
+		engine::Canvas canvas({window.GetWidth<float>(), window.GetHeight<float>()}, { 0.0f, 0.0f, 0.0f, 0.0f });
 		engine::Image* image = canvas.AddImage("..\\assets\\full-moon-png-6.png");
 		image->SetPosition({800.0f, 100.0f});
 		image->SetScale({100.0f, 100.0f});
@@ -109,9 +113,24 @@ int main(void)
 		label->SetFont("..\\fonts\\SourceSans3-Regular.ttf", 18.0f);
 		label->WrapText(500.0f);
 		engine::Button* button = canvas.AddButton("Button test text eee", &func);
-		button->SetPosition({100.0f, 100.0f});
+		button->SetPosition({200.0f, 200.0f});
+		button->SetPadding({0, 0});
 		button->SetRounding(1.0f);
-		
+
+		f32 val = 1.0f;
+		engine::ProgressBar* bar = canvas.AddProgressBar({10.0f, 0.0f}, {940.0f, 15.0f}, {0.0f, 100.0f});
+		bar->SetBgColor(RED, 1.0f);
+		bar->SetFillColor(GREEN, 1.0f);
+		bar->SetValue(val);
+
+		math::Vector2f scale(450.0f, 300.0f);
+		math::Vector2f center(
+			(window.GetWidth() * 0.5f) - (scale[0] * 0.5f),
+			(window.GetHeight() * 0.5f) - (scale[1] * 0.5f)
+		);
+
+		engine::Rectangle* rect = canvas.AddRectangle(center, scale);
+		rect->SetColor(1.0f, 0.0f, 0.0f, 0.5f);
 
 		engine::Frustum frustum(0.01f, 250.0f, 60.0f, window.GetAspectRatio());
 		engine::Camera camera(frustum, {0.0f, 0.0f, -0.5f}, 1.f, 80.0f);
@@ -128,6 +147,12 @@ int main(void)
 				camera.Move(-1.0f, 0.0f, 0.0f);
 			else if (engine::Input::IsInputDown(KEY_D))
 				camera.Move(1.0f, 0.0f, 0.0f);
+
+			if (engine::Input::IsInputReleased(KEY_T))
+			{
+				val = (val > 0.0f) ?  val - 0.1f : 0.0f;
+				bar->SetValue(val);
+			}
 		
 			math::Vector2<float> cursorPos = engine::Input::GetCursorPosition<float>();
 			static math::Vector2<float> lastCursorPos(cursorPos);
