@@ -21,7 +21,6 @@ ENGINE_API void engine::Canvas::Render(void)
 	ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoDecoration |
 		ImGuiWindowFlags_NoMove |
-		/*ImGuiWindowFlags_NoBackground |*/ // TODO: re-add later
 		ImGuiWindowFlags_NoScrollWithMouse |
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoFocusOnAppearing |
@@ -86,9 +85,9 @@ engine::Button* engine::Canvas::AddButton(const char* text, std::function<void(v
 	return dynamic_cast<Button*>(element);
 }
 
-engine::ProgressBar* engine::Canvas::AddProgressBar(void)
+engine::ProgressBar* engine::Canvas::AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range)
 {
-	m_elements.push_back(new ProgressBar());
+	m_elements.push_back(new ProgressBar(position, size, range));
 
 	UIElement* element = m_elements[(int32) m_elements.size() - 1];
 	element->SetUID(++m_uid);

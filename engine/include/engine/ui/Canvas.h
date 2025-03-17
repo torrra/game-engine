@@ -28,7 +28,7 @@ namespace engine
 		ENGINE_API Label* AddLabel(const char* text);
 		ENGINE_API Image* AddImage(const char* fileName);
 		ENGINE_API Button* AddButton(const char* text, std::function<void(void)> function);
-		ENGINE_API ProgressBar* AddProgressBar(void);
+		ENGINE_API ProgressBar* AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range);
 		ENGINE_API Rectangle* AddRectangle(math::Vector2f const& pos, math::Vector2f const& sizePx);
 
 	private:
