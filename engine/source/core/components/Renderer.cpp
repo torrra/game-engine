@@ -56,55 +56,55 @@ namespace engine
 		DrawModel();
 	}
 
-	const Model* Renderer::GetModel(void)
+	const Model* Renderer::GetModel(void) const
 	{
 		return m_model;
 	}
 
-	const ShaderProgram* Renderer::GetShader(void)
+	const ShaderProgram* Renderer::GetShader(void) const
 	{
 		return m_shader;
 	}
 
-	const Texture* Renderer::GetTexture(void)
+	const Texture* Renderer::GetTexture(void) const
 	{
 		return m_texture;
 	}
 
-	void Renderer::SetModel(Model* model)
+	void Renderer::SetModel(const Model* model)
 	{
 		m_model = model;
 	}
 
 	void Renderer::SetModel(const char* key)
 	{
-		if (Model* model = ResourceManager::GetResource<Model>(key))
+		if (const Model* model = ResourceManager::GetResource<Model>(key))
 			m_model = model;
 	}
 
-	void Renderer::SetShader(ShaderProgram* shader)
+	void Renderer::SetShader(const ShaderProgram* shader)
 	{
 		m_shader = shader;
 	}
 
 	void Renderer::SetShader(const char* key)
 	{
-		if (ShaderProgram* shader = ResourceManager::GetResource<ShaderProgram>(key))
+		if (const ShaderProgram* shader = ResourceManager::GetResource<ShaderProgram>(key))
 			m_shader = shader;
 	}
 
-	void Renderer::SetTexture(Texture* texture)
+	void Renderer::SetTexture(const Texture* texture)
 	{
 		m_texture = texture;
 	}
 
 	void Renderer::SetTexture(const char* key)
 	{
-		if (Texture* texture = ResourceManager::GetResource<Texture>(key))
+		if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
 			m_texture = texture;
 	}
 
-	void Renderer::DrawModel(void)
+	void Renderer::DrawModel(void) const
 	{
 		for (const Mesh& mesh : m_model->GetMeshes())
 		{

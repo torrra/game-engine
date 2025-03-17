@@ -21,39 +21,39 @@ namespace engine
 				    ComponentArray<Transform>& transforms);
 
 		ENGINE_API
-		const class Model* GetModel(void);
+		const class Model* GetModel(void) const;
 
 		ENGINE_API
-		const class ShaderProgram* GetShader(void);
+		const class ShaderProgram* GetShader(void) const;
 
 		ENGINE_API
-		const class Texture* GetTexture(void);
+		const class Texture* GetTexture(void) const;
 
 		ENGINE_API
-		void SetModel(Model* model);
+		void SetModel(const class Model* model);
 
 		ENGINE_API
 		void SetModel(const char* key);
 
 		ENGINE_API
-		void SetShader(class ShaderProgram* shader);
+		void SetShader(const class ShaderProgram* shader);
 
 		ENGINE_API
 		void SetShader(const char* key);
 
 		ENGINE_API
-		void SetTexture(class Texture* texture);
+		void SetTexture(const class Texture* texture);
 
 		ENGINE_API
 		void SetTexture(const char* key);
 
 	private:
 
-		void DrawModel(void);
+		void DrawModel(void) const;
 
-		class Model* m_model = nullptr;
-		class ShaderProgram* m_shader = nullptr;
-		class Texture* m_texture = nullptr;
+		const class Model* m_model = nullptr;
+		const class ShaderProgram* m_shader = nullptr;
+		const class Texture* m_texture = nullptr;
 
 	};
 
