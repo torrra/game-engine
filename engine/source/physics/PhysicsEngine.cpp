@@ -17,7 +17,7 @@ struct engine::PhysicsEngineImpl
 
 }; // !Struct PhysicsEngineImpl
 
-engine::PhysicsEngine::PhysicsEngine() 
+engine::PhysicsEngine::PhysicsEngine()
 {
 	m_impl = new PhysicsEngineImpl();
 }
@@ -25,4 +25,14 @@ engine::PhysicsEngine::PhysicsEngine()
 engine::PhysicsEngine::~PhysicsEngine(void)
 {
 	delete m_impl;
+}
+
+ENGINE_API engine::PhysicsEngine& engine::PhysicsEngine::Get(void)
+{
+	if (m_instance == nullptr)
+	{
+		m_instance = new engine::PhysicsEngine();
+	}
+
+	return *m_instance;
 }

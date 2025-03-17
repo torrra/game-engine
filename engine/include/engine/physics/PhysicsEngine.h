@@ -12,6 +12,9 @@ namespace engine
 	{
 	public :
 
+		/// Getter
+		ENGINE_API static PhysicsEngine& Get(void);
+
 	private :
 
 		/// Constructor
