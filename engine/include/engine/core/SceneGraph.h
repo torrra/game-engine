@@ -126,10 +126,17 @@ namespace engine
 		ENGINE_API
 		void RegisterAllComponents(void);
 
-		// Render all active renderers with all active cameras
+		// Render all active renderers with all active cameras.
+		// This function will use the array poulated with CacheTransforms(),
+		// and not the active transform array
 		ENGINE_API
-		void RenderScene(void);
+		void RenderFromCachedTransforms(void);
 
+		// Copy all data from transform component array to a separate cache
+		// This function is used after the game logic update, allowing to start the next
+		// gameplay tick before rendering on the main thread
+		ENGINE_API
+		void CacheTransforms(void);
 
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
@@ -174,6 +181,9 @@ namespace engine
 
 		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
+
+
+		ComponentArray<Transform>			m_transformRenderCache;
 
 		// Random uint64 generator. We only need a unique instance
 		static Random						m_randomNumGen;
