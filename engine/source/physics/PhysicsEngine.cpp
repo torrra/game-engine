@@ -76,6 +76,8 @@ void engine::PhysicsEngine::Init(void)
 		std::cout << "Pvd connected" << std::endl :
 		std::cout << "Failed to connect pvd" << std::endl;
 
+	transport->release();
+
 	physx::PxSceneDesc sceneDesc(impl.m_physics->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
