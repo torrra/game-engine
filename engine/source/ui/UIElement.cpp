@@ -7,11 +7,11 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_internal.h>
 
+#define INVALID_UNIQUE_ID -1
+
 engine::UIElement::UIElement(void)
-	: m_transform(), m_uid(-1), m_autoScale(true)
+	: m_transform(), m_uid(INVALID_UNIQUE_ID), m_autoScale(true)
 {
-	// TODO: remove printf
-	printf("UIElement constructor\n");
 }
 
 math::Vector2f engine::UIElement::GetPosition(void) const noexcept
@@ -46,6 +46,7 @@ void engine::UIElement::SetUID(int32 const& uid)
 
 void engine::UIElement::AutoScale(f32 regionRatio)
 {
+	// Resize via change in screen width
 	m_transform.m_position *= regionRatio;
 	m_transform.m_sizePx *= regionRatio;
 }
