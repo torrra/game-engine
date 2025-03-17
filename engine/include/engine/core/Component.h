@@ -17,7 +17,7 @@ namespace engine
 	public:
 
 		ENGINE_API Component(void) = default;
-		ENGINE_API Component(EntityHandle owner);
+		ENGINE_API Component(EntityHandle owner, class SceneGraph* scene);
 		ENGINE_API ~Component(void) = default;
 
 		virtual void Register(void) = 0;
@@ -46,6 +46,9 @@ namespace engine
 
 		// which entity in scene graph owns this component
 		EntityHandle	m_owner = static_cast<EntityHandle>(-1);
+
+		// Scene graph in which ths component exists
+		class SceneGraph* m_currentScene = nullptr;
 
 		// status modifiers that affect behavior (inactive, invalid)
 		uint64			m_flags = 0;

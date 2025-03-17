@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <mutex>
 
 #include "engine/EngineExport.h"
 #include "engine/core/TypesECS.h"
@@ -47,6 +48,12 @@ namespace engine
 		// Get the engine's scripts location as a string
 		ENGINE_API
 		static const std::string&	GetConfigScriptsLocation(void);
+
+		// Register a component of a given type
+		// function: lua global function that creates a table for an existing component
+		// owner: owning entity 
+		ENGINE_API
+		static void RegisterNewComponent(const char* function, EntityHandle owner);
 
 
 		// Add an entity to the scripting system's lua entity table
@@ -104,10 +111,16 @@ namespace engine
 
 		static std::string FormatLuaClassName(const char* name);
 
-		static class	SceneGraph* m_currentScene;
-		static struct	lua_State*	m_luaState;
+		static ScriptSystem* GetInstance(void);
 
-		static std::string			m_configScriptsLocation;
-		static std::string			m_userScriptsLocation;
+
+		class	SceneGraph* m_currentScene = nullptr;
+		struct	lua_State*	m_luaState = nullptr;
+
+		std::string			m_configScriptsLocation = ScriptSystem::FindConfigScripts();
+		std::string			m_userScriptsLocation;
+
+		static std::mutex	 m_mutex;
+		static ScriptSystem* m_instance;
 	};
 }

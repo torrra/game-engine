@@ -1,68 +1,94 @@
 #include "core/components/Transform.h"
+#include "core/systems/ScriptSystem.h"
+#include "core/SceneGraph.h"
 
-lm::Matrix4f engine::Transform::ToMatrixWithoutScale(Transform& inTransform)
+math::Matrix4f engine::Transform::ToMatrixWithoutScale(const Transform& inTransform)
 {
-	lm::Matrix4f transformMatrix = lm::TransformMatrix(inTransform.m_rotation, inTransform.m_position);
+	math::Matrix4f transformMatrix = math::TransformMatrix(inTransform.m_rotation, inTransform.m_position);
 
 	return transformMatrix;
 }
 
-lm::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
+math::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
 {
-	lm::Matrix4f positionMatrix = lm::Matrix4f::PositionMatrix(inTransform.m_position);
+	if (inTransform.m_dirty)
+		inTransform.UpdateLocalMatrix();
 
-	lm::Matrix4f rotationMatrix = inTransform.m_rotation.RotationMatrix();
-
-	lm::Matrix4f scaleMatrix = lm::Matrix4f::ScaleMatrix(inTransform.m_scale);
-
-	lm::Matrix4f transformMatrix = (scaleMatrix * rotationMatrix) * positionMatrix;
-
-	return transformMatrix;
+	return inTransform.m_localMat;
 }
 
-engine::Transform engine::Transform::Interpolate(Transform& inStartTransform,
-												 Transform& inEndTransform, f32 inTime)
+engine::Transform engine::Transform::Interpolate(const Transform& inStartTransform,
+	const Transform& inEndTransform, f32 inTime)
 {
 	Transform result = Transform();
 
-	result.m_position = lm::Vector3f::Lerp(inStartTransform.m_position,
-										   inEndTransform.m_position, inTime);
+	result.m_position = math::Vector3f::Lerp(inStartTransform.m_position,
+		inEndTransform.m_position, inTime);
 
-	result.m_rotation = lm::Quatf::Slerp(inStartTransform.m_rotation,
-										 inEndTransform.m_rotation, inTime);
+	result.m_rotation = math::Quatf::Slerp(inStartTransform.m_rotation,
+		inEndTransform.m_rotation, inTime);
 
-	result.m_scale = lm::Vector3f::Lerp(inStartTransform.m_scale,
-										inEndTransform.m_scale, inTime);
+	result.m_scale = math::Vector3f::Lerp(inStartTransform.m_scale,
+		inEndTransform.m_scale, inTime);
+
+	result.m_dirty = true;
 
 	return result;
 }
 
+
+math::Matrix4f engine::Transform::ToWorldMatrix(Transform& inTransform)
+{
+	math::Matrix4f world{ 1.f };
+
+	std::vector<EntityHandle> parents = 
+	inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
+
+	// Iterate backwards to get parent closest to root first
+	for (auto parentIt = parents.rbegin(); parentIt != parents.rend(); ++parentIt)
+	{
+		if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
+			world *= ToMatrixWithScale(*transform);
+	}
+
+	return world * ToMatrixWithScale(inTransform);
+}
+
+
 void engine::Transform::CopyPosition(const Transform& inTransform)
 {
 	m_position = inTransform.m_position;
+	m_dirty = true;
 }
 
 void engine::Transform::CopyRotation(const Transform& inTransform)
 {
 	m_rotation = inTransform.m_rotation;
+	m_dirty = true;
 }
 
 void engine::Transform::CopyScale(const Transform& inTransform)
 {
 	m_scale = inTransform.m_scale;
+	m_dirty = true;
 }
 
-lm::Vector3f engine::Transform::GetPosition(void) const
+void engine::Transform::Register(void)
+{
+	engine::ScriptSystem::RegisterNewComponent("_NewTransformComponent", m_owner);
+}
+
+math::Vector3f engine::Transform::GetPosition(void) const
 {
 	return m_position;
 }
 
-lm::Quatf engine::Transform::GetRotation(void) const
+math::Quatf engine::Transform::GetRotation(void) const
 {
 	return m_rotation;
 }
 
-lm::Vector3f engine::Transform::GetScale(void) const
+math::Vector3f engine::Transform::GetScale(void) const
 {
 	return m_scale;
 }
@@ -72,33 +98,73 @@ engine::Transform engine::Transform::GetTransform(void) const
 	return *this;
 }
 
-void engine::Transform::SetPosition(const lm::Vector3f& inPosition)
+void engine::Transform::SetPosition(const math::Vector3f& inPosition)
 {
 	m_position = inPosition;
+	m_dirty = true;
 }
 
-void engine::Transform::SetRotation(const lm::Quatf& inRotation)
+void engine::Transform::SetRotation(const math::Quatf& inRotation)
 {
 	m_rotation = inRotation;
+	m_dirty = true;
 }
 
-void engine::Transform::SetScale(const lm::Vector3f& inScale)
+void engine::Transform::SetScale(const math::Vector3f& inScale)
 {
 	m_scale = inScale;
+	m_dirty = true;
 }
 
-void engine::Transform::SetTransform(const lm::Vector3f& inPosition,
-	const lm::Quatf& inRotation, const lm::Vector3f& inScale)
+void engine::Transform::SetTransform(const math::Vector3f& inPosition,
+	const math::Quatf& inRotation, const math::Vector3f& inScale)
 {
 	m_position = inPosition;
 	m_rotation = inRotation;
 	m_scale = inScale;
+	m_dirty = true;
+}
+
+
+void engine::Transform::AddTranslation(const math::Vector3f& translation)
+{
+	m_position += translation;
+	m_dirty = true;
+}
+
+
+void engine::Transform::AddRotation(f32 angleX, f32 angleY, f32 angleZ)
+{
+	math::Quatf quatRotation
+	{
+		math::Radian(angleX * DEG2RAD), math::Radian(angleY * DEG2RAD), math::Radian(angleZ * DEG2RAD)
+	};
+
+	AddRotation(quatRotation);
+}
+
+void engine::Transform::AddRotation(const math::Quatf& rotation)
+{
+	m_rotation *= rotation;
+	m_dirty = true;
+}
+
+void engine::Transform::AddScale(const math::Vector3f& scale)
+{
+	m_scale *= scale;
+	m_dirty = true;
 }
 
 std::ostream& engine::Transform::operator<<(std::ostream& os)
 {
 	return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
-			  << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " " 
-			  << m_rotation.Z() << " "
-			  << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+		<< m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " "
+		<< m_rotation.Z() << " "
+		<< m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+}
+
+void engine::Transform::UpdateLocalMatrix(void)
+{
+	m_localMat = math::TransformMatrix(m_rotation, m_position, m_scale);
+	m_dirty = false;
 }

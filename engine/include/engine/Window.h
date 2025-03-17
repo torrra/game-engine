@@ -1,7 +1,7 @@
 #pragma once
 
-#include "EngineExport.h"
-#include "CoreTypes.h"
+#include "engine/EngineExport.h"
+#include "engine/CoreTypes.h"
 
 #include <math/MathGeneric.hpp>
 #include <math/Vector2.hpp>

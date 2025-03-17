@@ -1,32 +1,30 @@
 #include "core/components/Camera.h"
+#include "core/systems/ScriptSystem.h"
 #include "utility/Timer.h"
 
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
 
-engine::Camera::Camera(Frustum const& frustum, math::Vector3f const& position, f32 speed, f32 angularSpeed)
-	: m_frustum(frustum), m_position(position), m_speed(speed), m_angularSpeed(angularSpeed)
-{
-	m_forward = math::Vector3f::Front();
-	m_right = math::Vector3f::Right();
-	m_up = math::Vector3f::Up();
-	m_projectionMatrix.Identity();
-	m_rotation = math::Vector3f::Zero();
 
+
+engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
+{
+	m_owner = owner;
+	m_currentScene = scene;
 	GetProjectionMatrix();
 }
 
-void engine::Camera::Move(f32 x, f32 y, f32 z)
+void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
-	math::Vector3f camSpaceDir = m_rotQuat.Rotate({x, y, z});
-	m_position += camSpaceDir.Normalized() * m_speed * m_deltaTime;
+	math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
+	m_position += camSpaceDir.Normalized() * speed * deltaTime;
 }
 
-void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
+void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
 {
-	m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
-	m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);		// Yaw
-	m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);		// Roll
+	m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch, rotationSpeed);	// Pitch
+	m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw, rotationSpeed);		// Yaw
+	m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll, rotationSpeed);	// Roll
 
 	// Clamp pitch // TODO: fix pitch
 	if (m_rotation[0] > 90.0f)
@@ -43,9 +41,12 @@ void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
 
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
-	m_deltaTime = g_engineTime.GetDeltaTime();
-
 	return m_projectionMatrix * GetViewMatrix();
+}
+
+void engine::Camera::Register(void)
+{
+	engine::ScriptSystem::RegisterNewComponent("_NewCameraComponent", m_owner);
 }
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
@@ -56,16 +57,6 @@ math::Vector3f engine::Camera::GetPosition(void) const noexcept
 math::Vector3f engine::Camera::GetRotation(void) const noexcept
 {
 	return m_rotation;
-}
-
-f32 engine::Camera::GetSpeed(void) const noexcept
-{
-	return m_speed;
-}
-
-f32 engine::Camera::GetRotationSpeed(void) const noexcept
-{
-	return m_angularSpeed;
 }
 
 f32 engine::Camera::GetFOV(void) const noexcept
@@ -93,15 +84,6 @@ math::Vector3f& engine::Camera::Rotation(void)
 	return m_rotation;
 }
 
-f32& engine::Camera::Speed(void)
-{
-	return m_speed;
-}
-
-f32& engine::Camera::RotationSpeed(void)
-{
-	return m_angularSpeed;
-}
 
 void engine::Camera::SetFOV(f32 fov)
 {
@@ -131,7 +113,7 @@ math::Matrix4f engine::Camera::GetViewMatrix(void)
 	matrix[3][0] = -m_position.X();
 	matrix[3][1] = -m_position.Y();
 	matrix[3][2] = -m_position.Z();
-	
+
 	return m_rotQuat.RotationMatrix() * matrix;
 }
 
@@ -161,18 +143,18 @@ void engine::Camera::GetProjectionMatrix(void)
 	m_projectionMatrix[3][3] = 0.0f;
 }
 
-f32 engine::Camera::RotateAxis(f32 angle, f32 delta)
+f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed)
 {
 	f32 maxDelta = 5.0f;
 
 	// Limits
-	if (delta < -maxDelta)
-		delta = -maxDelta;
-	else if (delta > maxDelta)
-		delta = maxDelta;
+	if (deltaAngle < -maxDelta)
+		deltaAngle = -maxDelta;
+	else if (deltaAngle > maxDelta)
+		deltaAngle = maxDelta;
 
-	angle += delta * m_angularSpeed * m_deltaTime;
+	existingAngle += deltaAngle * rotationSpeed;
 
 	// Wrap angle
-	return angle;
+	return existingAngle;
 }

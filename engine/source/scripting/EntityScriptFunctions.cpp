@@ -19,11 +19,8 @@ int script_IsEntityValid(lua_State* luaState)
 	if (argumentCount != 1)
 		luaL_error(luaState, "Expected 1 argument (self)");
 
-	else
-	{
-		if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
-			result = entity->IsValid();
-	}
+	else if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
+		result = entity->IsValid();
 
 	lua_pushboolean(luaState, result);
 	return 1;

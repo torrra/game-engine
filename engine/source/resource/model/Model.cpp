@@ -11,17 +11,11 @@
 
 #include <iostream>
 
-#define MODEL_RELATIVE_PATH "..\\assets\\"
-
 void engine::Model::LoadResource(const char* fileName)
 {
-	// Concatenate file path
-	char filePath[256] = MODEL_RELATIVE_PATH;
-	strcat_s(filePath, fileName);
-
 	// Read file
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath,
+	const aiScene* scene = importer.ReadFile(fileName,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
 		aiProcess_FlipUVs | aiProcess_CalcTangentSpace
 	);
@@ -49,6 +43,11 @@ void engine::Model::Update(void)
 		glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
+}
+
+const std::vector<engine::Mesh>& engine::Model::GetMeshes(void) const
+{
+	return m_meshes;
 }
 
 void engine::Model::ProcessNodes(aiNode* node, const aiScene* scene)

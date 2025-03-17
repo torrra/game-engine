@@ -1,9 +1,10 @@
 #include "core/Component.h"
+#include "core/SceneGraph.h"
 
 namespace engine
 {
-	Component::Component(EntityHandle owner)
-		: m_owner(owner)
+	Component::Component(EntityHandle owner, SceneGraph* scene)
+		: m_owner(owner), m_currentScene(scene)
 	{
 	}
 

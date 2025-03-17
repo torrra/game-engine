@@ -9,21 +9,14 @@
 
 #pragma region core
 
-#include "core/Component.h"
+#include "engine/core/Component.h"
 
 #pragma endregion
 
 namespace engine
 {
-    class Transform final : public Component
-    {
-	private:
-
-		enum ETransformFlag : uint8
-		{
-			ABSOLUTE = 1
-		};
-
+	class Transform final : public Component
+	{
 	public:
 
 		using Component::Component;
@@ -31,7 +24,7 @@ namespace engine
 		/// Public Constructors
 		// Copy constructor set to default
 		ENGINE_API 						Transform(const Transform& inTransform) = default;
-		// Move constructor set to default
+		// AddTranslation constructor set to default
 		ENGINE_API 						Transform(Transform&& inTransform) = default;
 
 		/// Destructors
@@ -40,14 +33,18 @@ namespace engine
 
 		/// Transform to matrix
 		// Convert transform to matrix without scale parameters
-		ENGINE_API static lm::Matrix4f	ToMatrixWithoutScale(Transform& inTransform);
+		ENGINE_API static math::Matrix4f	ToMatrixWithoutScale(const Transform& inTransform);
 		// Convert transform to matrix with scale parameters
-		ENGINE_API static lm::Matrix4f	ToMatrixWithScale(Transform& inTransform);
+		ENGINE_API static math::Matrix4f	ToMatrixWithScale(Transform& inTransform);
 		// Interpolate two transforms
-		ENGINE_API static Transform		Interpolate(Transform& inStartTransform,
-													Transform& inEndTransform,
-													f32 inTime);
-		
+		ENGINE_API static Transform		Interpolate(const Transform& inStartTransform,
+			const Transform& inEndTransform,
+			f32 inTime);
+
+
+		ENGINE_API static math::Matrix4f ToWorldMatrix(Transform& inTransform);
+
+
 		// Copy the position from another transform
 		ENGINE_API void					CopyPosition(const Transform& inTransform);
 		// Copy the rotation from another transform
@@ -56,48 +53,61 @@ namespace engine
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
 		ENGINE_API void					Update(void) {}
-		ENGINE_API void					Register(void) {}
+		ENGINE_API void					Register(void);
 
 		/// Getters
 		// Get the position of the transform
-		ENGINE_API lm::Vector3f			GetPosition(void) const;
+		ENGINE_API math::Vector3f			GetPosition(void) const;
 		// Get the rotation of the transform
-		ENGINE_API lm::Quatf			GetRotation(void) const;
+		ENGINE_API math::Quatf			GetRotation(void) const;
 		// Get the scale of the transform
-		ENGINE_API lm::Vector3f			GetScale(void) const;
+		ENGINE_API math::Vector3f			GetScale(void) const;
 		// Get the transform with all parameters
 		ENGINE_API Transform			GetTransform(void) const;
 
 		/// Setters
 		// Set the position of the transform
-		ENGINE_API void					SetPosition(const lm::Vector3f& inPosition);
+		ENGINE_API void					SetPosition(const math::Vector3f& inPosition);
 		// Set the rotation of the transform
-		ENGINE_API void					SetRotation(const lm::Quatf& inRotation);
+		ENGINE_API void					SetRotation(const math::Quatf& inRotation);
 		// Set the scale of the transform
-		ENGINE_API void					SetScale(const lm::Vector3f& inScale);
+		ENGINE_API void					SetScale(const math::Vector3f& inScale);
 		// Set all parameters of the transform
-		ENGINE_API void 				SetTransform(const lm::Vector3f& inPosition,
-													 const lm::Quatf& inRotation,
-													 const lm::Vector3f& inScalein =
-													 lm::Vector3f(1.0f, 1.0f, 1.0f));
+		ENGINE_API void 				SetTransform(const math::Vector3f& inPosition,
+													 const math::Quatf& inRotation,
+													 const math::Vector3f& inScalein =
+													 math::Vector3f(1.0f, 1.0f, 1.0f));
+
+
+		ENGINE_API void					AddTranslation(const math::Vector3f& inTranslation);
+		ENGINE_API void					AddRotation(f32 angleX, f32 angleY, f32 angleZ);
+		ENGINE_API void					AddRotation(const math::Quatf& inRotation);
+		ENGINE_API void					AddScale(const math::Vector3f& inScale);
 
 		/// Operators
 		// Copy assignement set to default
-		Transform&						operator=(const Transform& inTransform) = default;
-		// Move assignement set to default
-		Transform&						operator=(Transform&& inTransform) = default;
+		Transform& operator=(const Transform& inTransform) = default;
+		// AddTranslation assignement set to default
+		Transform& operator=(Transform&& inTransform) = default;
 		// Operator to print a transform
-		std::ostream&					operator<<(std::ostream& os);
+		std::ostream& operator<<(std::ostream& os);
 
 	private:
 
-		/// Private members
-		lm::Vector3f	m_position = lm::Vector3f(0.f, 0.f, 0.f);
-		lm::Quatf		m_rotation = lm::Quatf(1.f, 0.f, 0.f, 0.f);
-		lm::Vector3f	m_scale = lm::Vector3f(1.f, 1.f, 1.f);
-		uint8			m_transformFlags = 0;
+		void UpdateLocalMatrix(void);
 
-    }; // !Class Transform
+
+		/// Private members
+
+		math::Matrix4f  m_localMat{ 1.f };
+
+		math::Quatf		m_rotation = math::Quatf(1.f, 0.f, 0.f, 0.f);
+		math::Vector3f	m_position = math::Vector3f::Zero();
+		math::Vector3f	m_scale = math::Vector3f::One();
+
+		bool			m_dirty = false;
+
+	}; // !Class Transform
 
 	template <>
 	struct UpdateAfterParent<Transform>

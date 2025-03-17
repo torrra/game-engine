@@ -12,6 +12,8 @@
 
 #include "components/Script.h"
 #include "components/Transform.h"
+#include "components/Camera.h"
+#include "components/Renderer.h"
 
 namespace engine
 {
@@ -114,14 +116,20 @@ namespace engine
 		ENGINE_API
 		std::vector<EntityHandle> GetChildrenAllLevels(EntityHandle parent);
 
+
 		// Tick all components of a given type, provided that this typed
 		// has its UpdateComponent trait set to true
-		template <CValidComponent TComponentType>
-		void UpdateComponents(float deltaTime);
+		template <CValidComponent TComponentType, typename... TVariadicArgs>
+		void UpdateComponents(TVariadicArgs... args);
 
 		// Re-register all existing components after a lua state reset
 		ENGINE_API
 		void RegisterAllComponents(void);
+
+		// Render all active renderers with all active cameras
+		ENGINE_API
+		void RenderScene(void);
+
 
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
@@ -158,6 +166,12 @@ namespace engine
 		// All script components in the scene
 		ComponentArray<Script>				m_sceneScripts;
 
+		// All cameras components in the scene
+		ComponentArray<Camera>				m_sceneCameras;
+
+		// All renderer components in the scene
+		ComponentArray<Renderer>			m_sceneRenderers;
+
 		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
 
@@ -168,8 +182,8 @@ namespace engine
 
 
 
-	template<CValidComponent TComponentType>
-	inline void SceneGraph::UpdateComponents(float deltaTime)
+	template <CValidComponent TComponentType, typename... TVariadicArgs>
+	inline void SceneGraph::UpdateComponents(TVariadicArgs... args)
 	{
 		if constexpr (!UpdateComponent<TComponentType>::m_value)
 			return;
@@ -179,7 +193,7 @@ namespace engine
 		for (TComponentType& component : array)
 		{
 			if (component.IsValid() && component.IsActive())
-				component.Update(deltaTime);
+				component.Update(args...);
 		}
 
 	}
@@ -189,6 +203,20 @@ namespace engine
 	{
 		return m_sceneTransforms;
 	}
+
+
+	template<>
+	inline ComponentArray<Camera>& SceneGraph::GetComponentArray<Camera>(void)
+	{
+		return m_sceneCameras;
+	}
+
+	template<>
+	inline ComponentArray<Renderer>& SceneGraph::GetComponentArray<Renderer>(void)
+	{
+		return m_sceneRenderers;
+	}
+
 
 	template<CValidComponent TComponentType>
 	inline void SceneGraph::RegisterComponents(void)
@@ -236,7 +264,7 @@ namespace engine
 		// set owner flag to tell that it owns a component of this type
 		ownerPtr->m_components |= Entity::GetComponentFlag<TComponentType>();
 
-		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_parent);
+		TComponentType* newComponent = array.CreateComponent(ownerEntity, ownerPtr->m_handle, this);
 
 		newComponent->Register();
 		return newComponent;
