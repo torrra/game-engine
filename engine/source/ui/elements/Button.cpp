@@ -9,18 +9,19 @@
 #undef new
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_internal.h>
 
-engine::Button::Button(const char* text, std::function<void(void)> function)
-	: m_text(text), m_edgeRounding(0.0f), m_padding(0), m_action(function)
+engine::Button::Button(const char* text, math::Vector2f const& position, math::Vector2f const& size)
+	: m_text(text), m_rounding(0.0f), m_padding(0)
 {
-	m_regularColor = ImGui::GetColorU32({RED, 1.0f});
-	m_hoveredColor = ImGui::GetColorU32({GREEN, 1.0f});
-	m_pressedColor = ImGui::GetColorU32({BLUE, 1.0f});
-
-
+	// Transform
+	SetPosition(position);
+	SetScale(size);
+	
+	// Default colors
+	SetColor(DARK_GRAY, 1.0f );
+	SetHoveredColor(GRAY, 1.0f);
+	SetPressedColor(LIGHT_GRAY, 1.0f);
 }
 
 void engine::Button::Render(void)
@@ -41,21 +42,31 @@ void engine::Button::Render(void)
 		return;
 	
 	// Button state
-	bool hovered, held = false;
-	if (ImGui::ButtonBehavior(box, id, &hovered, &held))
-		m_action();
+	bool pressed, hovered, held = false;
 	
-	// Color
+	pressed = ImGui::ButtonBehavior(box, id, &hovered, &held);
+
 	uint32 color = m_regularColor;
-	if (held && hovered)
+	if (pressed)
+	{
+		m_state = EButtonState::BUTTON_PRESSED;
 		color = m_pressedColor;
+	}
 	else if (hovered)
+	{
+		m_state = EButtonState::BUTTON_HOVERED;
 		color = m_hoveredColor;
+	}
+	else
+	{
+		m_state = EButtonState::BUTTON_UP;
+		color = m_regularColor;
+	}
 	
-	window->DrawList->AddRectFilled(box.Min, box.Max, color, m_edgeRounding);
+	window->DrawList->AddRectFilled(box.Min, box.Max, color, m_rounding);
 	
 	ImGui::RenderNavCursor(box, id);
-	ImGui::RenderFrame(box.Min, box.Max, color, true, m_edgeRounding);
+	ImGui::RenderFrame(box.Min, box.Max, color, true, m_rounding);
 	ImGui::RenderTextClipped(
 		box.Min + math::Vector2f((float) m_padding.GetX(), (float) m_padding.GetY()),
 		box.Max - math::Vector2f((float) m_padding.GetX(), (float) m_padding.GetY()),
@@ -73,27 +84,37 @@ void engine::Button::SetText(const char* text)
 
 void engine::Button::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
-	m_regularColor = ImGui::GetColorU32({red, green, blue, alpha});
+	m_regularColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Button::SetHoveredColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
-	m_hoveredColor = ImGui::GetColorU32({red, green, blue, alpha});
+	m_hoveredColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Button::SetPressedColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
-	m_pressedColor = ImGui::GetColorU32({red, green, blue, alpha});
+	m_pressedColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Button::SetRounding(f32 rounding)
 {
-	m_edgeRounding = rounding;
+	m_rounding = rounding;
 }
 
 void engine::Button::SetPadding(math::Vector2<uint16> paddingPx)
 {
 	m_padding = paddingPx;
+}
+
+engine::EButtonState engine::Button::GetState(void) const noexcept
+{
+	return m_state;
+}
+
+bool engine::Button::IsPressed(void) const noexcept
+{
+	return m_state == EButtonState::BUTTON_PRESSED;
 }
 
 void engine::Button::CalcSize(void)
@@ -104,19 +125,7 @@ void engine::Button::CalcSize(void)
 	
 	m_transform.m_sizePx = 
 	{
-		textSize.GetX() + (float) (2 * m_padding.GetX()),
-		textSize.GetY() + (float) (2 * m_padding.GetY())
+		textSize.GetX() + static_cast<f32>(2 * m_padding.GetX()),
+		textSize.GetY() + static_cast<f32>(2 * m_padding.GetY())
 	};
 }
-
-//math::Vector2f engine::Button::CalcTextSize(uint16 fontSize)
-//{
-//	ImFont* font = nullptr;
-//	ImGui::GetDefaultFont()->
-//	if (fontName[0] != '\0')
-//		font = engine::ResourceManager::GetResource<Font>(fontName)->GetFont();
-//	else
-//		font = ImGui::GetIO().Fonts[0].Fonts[0];
-//
-//	return font->CalcTextSizeA(fontSize, FLT_MAX, -1.0f, text);
-//}
