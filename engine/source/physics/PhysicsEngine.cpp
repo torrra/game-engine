@@ -20,8 +20,10 @@
 physx::PxDefaultAllocator		gDefaultAllocatorCallback;
 physx::PxDefaultErrorCallback	gDefaultErrorCallback;
 
+// Set the instance to nullptr
 engine::PhysicsEngine* engine::PhysicsEngine::m_instance = nullptr;
 
+// Create a structure of physX elements to store them
 struct engine::PhysicsEngineImpl 
 {
 	physx::PxFoundation*			m_foundation	= nullptr;
@@ -35,11 +37,13 @@ struct engine::PhysicsEngineImpl
 
 engine::PhysicsEngine::PhysicsEngine()
 {
+	// Create a pointer to the structure of physX elements
 	m_impl = new PhysicsEngineImpl();
 }
 
 engine::PhysicsEngine::~PhysicsEngine(void)
 {
+	// Delete the pointer to the structure of physX elements
 	delete m_impl;
 }
 
@@ -47,6 +51,7 @@ engine::PhysicsEngine& engine::PhysicsEngine::Get(void)
 {
 	if (m_instance == nullptr)
 	{
+		// Create the instance if was not created
 		m_instance = new engine::PhysicsEngine();
 	}
 
@@ -174,6 +179,7 @@ void engine::PhysicsEngine::Init(void)
 
 void engine::PhysicsEngine::CleanUp(void)
 {
+	// Release all physX elements in the good order
 	PhysicsEngineImpl& impl = *m_impl;
 	PX_RELEASE(impl.m_material);
 	std::cout << "Material released" << std::endl;
@@ -183,6 +189,7 @@ void engine::PhysicsEngine::CleanUp(void)
 	std::cout << "Dispatcher released" << std::endl;
 	PX_RELEASE(impl.m_physics);
 	std::cout << "Physics released" << std::endl;
+	// Disconnect transport and pvd before realeasing them
 	impl.m_pvd->getTransport()->disconnect();
 	impl.m_pvd->disconnect();
 	impl.m_pvd->getTransport()->release();
@@ -191,6 +198,7 @@ void engine::PhysicsEngine::CleanUp(void)
 	PX_RELEASE(impl.m_foundation);
 	std::cout << "Foundation released" << std::endl;
 
+	// Delete the instance
 	delete m_instance;
 	m_instance = nullptr;
 }

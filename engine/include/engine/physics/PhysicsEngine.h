@@ -17,27 +17,37 @@ namespace engine
 		ENGINE_API static	PhysicsEngine& Get(void);
 
 		/// Functions
-		// Initialize the physics engine
+		/*
+			Initialize the physics engine by intializing
+				- Foundation
+				- Pvd
+				- Transport
+				- Physics
+				- Scene
+				- Material
+		*/
 		ENGINE_API void		Init(void);
 		// Update the physics engine
 		ENGINE_API void		StepSimulation(void);
-		// Release resources
+		// Release all physx resources
 		ENGINE_API void		CleanUp(void);
 
 	private :
 
 		/// Constructor
-		// Empty private constructor
+		// Empty private constructor to initialize the PhysicsEngineImpl structure
 							PhysicsEngine(void);
 		// Copy constructor deleted to make a singleton
 							PhysicsEngine(const PhysicsEngine&) = delete;
 
 		/// Destructor
+		// Delete the PhyscsEngineImpl pointer
 							~PhysicsEngine(void);
 
 		/// Members
+		// Pointer to the implementation of the physx structure
 		struct PhysicsEngineImpl*	m_impl;
-
+		// Instance of the physics engine
 		static PhysicsEngine*		m_instance;
 
 	}; // !Class PhysicsEngine
