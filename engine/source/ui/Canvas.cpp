@@ -46,8 +46,31 @@ void engine::Canvas::Render(void)
 	ImGui::PopStyleColor();
 }
 
+void engine::Canvas::RemoveElement(UIElement* element)
+{
+	// Check if an element is null
+	if (!element)
+		return;
+
+	// Check element is in array
+	for (int elementIndex = 0; elementIndex < m_elements.size(); ++elementIndex)
+	{
+		if (m_elements[elementIndex]->m_uid == element->m_uid)
+		{
+			// Delete element
+			delete element;
+			m_elements.erase(m_elements.begin() + elementIndex);
+
+			return;
+		}
+	}
+
+	std::printf("Warning: failed to delete UI element\n");
+}
+
 void engine::Canvas::Clear(void)
 {
+	// Remove all elements
 	for (UIElement* element : m_elements)
 	{
 		delete element;
@@ -66,19 +89,34 @@ engine::Label* engine::Canvas::AddLabel(const char* text)
 	return dynamic_cast<Label*>(element);
 }
 
-engine::Image* engine::Canvas::AddImage(const char* fileName)
+engine::Image* engine::Canvas::AddImage(
+	const char* fileName, 
+	math::Vector2f position)
 {
-	m_elements.push_back(new Image(fileName));
+	m_elements.push_back(new Image(fileName, position));
 
 	UIElement* element = m_elements[(int32) m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
 
-	return dynamic_cast<Image*>(element);
+	Image* image = dynamic_cast<Image*>(element);
+	
+	// Error handling
+	if (!image->IsDataValid())
+	{
+		// TODO: add logging
+		std::printf("Failed to create & add image to UI. Error: image '%s' could not be found.\n", fileName);
+		RemoveElement(image);
+	}
+
+	return image;
 }
 
-engine::Button* engine::Canvas::AddButton(const char* text, std::function<void(void)> function)
+engine::Button* engine::Canvas::AddButton(
+	const char* text, 
+	math::Vector2f const& position, 
+	math::Vector2f const& size)
 {
-	m_elements.push_back(new Button(text, function));
+	m_elements.push_back(new Button(text, position, size));
 
 	UIElement* element = m_elements[(int32) m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
@@ -86,7 +124,10 @@ engine::Button* engine::Canvas::AddButton(const char* text, std::function<void(v
 	return dynamic_cast<Button*>(element);
 }
 
-engine::ProgressBar* engine::Canvas::AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range)
+engine::ProgressBar* engine::Canvas::AddProgressBar(
+	math::Vector2f const& position, 
+	math::Vector2f const& size, 
+	math::Vector2f const& range)
 {
 	m_elements.push_back(new ProgressBar(position, size, range));
 
@@ -96,7 +137,9 @@ engine::ProgressBar* engine::Canvas::AddProgressBar(math::Vector2f const& positi
 	return dynamic_cast<ProgressBar*>(element);
 }
 
-engine::Rectangle* engine::Canvas::AddRectangle(math::Vector2f const& position, math::Vector2f const& size)
+engine::Rectangle* engine::Canvas::AddRectangle(
+	math::Vector2f const& position, 
+	math::Vector2f const& size)
 {
 	m_elements.push_back(new Rectangle(position, size));
 	
@@ -114,7 +157,6 @@ void engine::Canvas::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
 
 void engine::Canvas::RescaleCanvas(void)
 {
-	
 	m_size = ImGui::GetContentRegionAvail();
 
 	// Screen size has not changed

@@ -36,14 +36,16 @@ namespace engine
 		// Render function used to display UI to screen. It should be placed at the end of the update loop.
 		ENGINE_API void			Render(void);
 
+		ENGINE_API void			RemoveElement(UIElement* element);
+
 		// Clear function used to destroy a canvas & clear all associated UI elements.
 		ENGINE_API void			Clear(void);
 
 		// Add UI elements
 		ENGINE_API Label*		AddLabel(const char* text); 
-		ENGINE_API Image*		AddImage(const char* fileName);
-		ENGINE_API Button*		AddButton(const char* text, std::function<void(void)> function);
-		ENGINE_API ProgressBar* AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range);
+		ENGINE_API Image*		AddImage(const char* fileName, math::Vector2f position);
+		ENGINE_API Button*		AddButton(const char* text, math::Vector2f const& position, math::Vector2f const& size);
+		ENGINE_API ProgressBar*	AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range);
 		ENGINE_API Rectangle*	AddRectangle(math::Vector2f const& position, math::Vector2f const& size);
 
 		// Change canvas's background color. All values between 0 - 1.
