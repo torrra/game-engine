@@ -76,7 +76,7 @@ void engine::PhysicsEngine::Init(void)
 		std::cout << "Pvd connected" << std::endl :
 		std::cout << "Failed to connect pvd" << std::endl;
 
-	transport->release();
+	//transport->release();
 
 	physx::PxSceneDesc sceneDesc(impl.m_physics->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
@@ -98,6 +98,9 @@ void engine::PhysicsEngine::CleanUp(void)
 	std::cout << "Scene released" << std::endl;
 	PX_RELEASE(impl.m_dispatcher);
 	std::cout << "Dispatcher released" << std::endl;
+	impl.m_pvd->getTransport()->disconnect();
+	impl.m_pvd->disconnect();
+	impl.m_pvd->getTransport()->release();
 	PX_RELEASE(impl.m_pvd);
 	std::cout << "Pvd released" << std::endl;
 	PX_RELEASE(impl.m_physics);
