@@ -38,6 +38,15 @@ namespace engine
 			std::uniform_int_distribution<int64>	m_distribution;
 		};
 
+		// Component arrays to be copied to render in parallel with a
+		// game logic tick
+		struct ComponentCache
+		{
+			ComponentArray<Transform>			m_transformRenderCache;
+			ComponentArray<Camera>				m_cameraRenderCache;
+		};
+		
+
 	public:
 
 		ENGINE_API SceneGraph(void) = default;
@@ -127,21 +136,21 @@ namespace engine
 		void RegisterAllComponents(void);
 
 		// Render all active renderers with all active cameras.
-		// This function will use the array poulated with CacheTransforms(),
+		// This function will use the arrays populated with CacheComponents(),
 		// and not the active transform array
 		ENGINE_API
-		void RenderFromCachedTransforms(void);
+		void RenderFromCache(void);
 
 		// Copy all data from transform component array to a separate cache
 		// This function is used after the game logic update, allowing to start the next
 		// gameplay tick before rendering on the main thread
 		ENGINE_API
-		void CacheTransforms(void);
+		void CacheComponents(void);
 
 		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
-		// Output a int64 between 0 and ULONG_MAX
+		// Output a int64 between LONG_MIN and LONG_MAX
 		ENGINE_API
 		static int64 RandomNumber(void);
 
@@ -182,8 +191,7 @@ namespace engine
 		// All entities in tge scene
 		std::vector<Entity>					m_sceneEntities;
 
-
-		ComponentArray<Transform>			m_transformRenderCache;
+		ComponentCache						m_renderCache;
 
 		// Random uint64 generator. We only need a unique instance
 		static Random						m_randomNumGen;

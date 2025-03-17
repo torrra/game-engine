@@ -214,9 +214,9 @@ namespace engine
 	}
 
 
-	void SceneGraph::RenderFromCachedTransforms(void)
+	void SceneGraph::RenderFromCache(void)
 	{
-		for (Camera& camera : m_sceneCameras)
+		for (Camera& camera : m_renderCache.m_cameraRenderCache)
 		{
 			if (!camera.IsValid() || !camera.IsActive())
 				continue;
@@ -228,14 +228,15 @@ namespace engine
 				if (!renderer.IsValid() || !renderer.IsActive())
 					continue;
 
-				renderer.Render(viewProjection, m_transformRenderCache);
+				renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
 			}
 		}
 	}
 
-	void SceneGraph::CacheTransforms(void)
+	void SceneGraph::CacheComponents(void)
 	{
-		m_transformRenderCache = m_sceneTransforms;
+		m_renderCache.m_cameraRenderCache = m_sceneCameras;
+		m_renderCache.m_transformRenderCache = m_sceneTransforms;
 	}
 
 	EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
