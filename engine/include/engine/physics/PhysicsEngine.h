@@ -13,18 +13,23 @@ namespace engine
 	public :
 
 		/// Getter
-		ENGINE_API static PhysicsEngine& Get(void);
+		// Get the instance of PhysicsEngine
+		ENGINE_API static	PhysicsEngine& Get(void);
+
+		/// Functions
+		// Initialize the physics engine
+		ENGINE_API void		Init(void);
 
 	private :
 
 		/// Constructor
 		// Empty private constructor
-		PhysicsEngine(void);
+							PhysicsEngine(void);
 		// Copy constructor deleted to make a singleton
-		PhysicsEngine(const PhysicsEngine&) = delete;
+							PhysicsEngine(const PhysicsEngine&) = delete;
 
 		/// Destructor
-		~PhysicsEngine(void);
+							~PhysicsEngine(void);
 
 		/// Members
 		struct PhysicsEngineImpl*	m_impl;
