@@ -11,8 +11,8 @@
 #include <iostream>
 #include <functional>
 
-engine::Canvas::Canvas(math::Vector4<float> color)
-	: m_color(color)
+engine::Canvas::Canvas(math::Vector2f const& windowSize, math::Vector4f const& color)
+	: m_size(windowSize), m_prevSize(windowSize), m_color(color), m_uid(0)
 {
 }
 
@@ -21,7 +21,6 @@ ENGINE_API void engine::Canvas::Render(void)
 	ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoDecoration |
 		ImGuiWindowFlags_NoMove |
-		/*ImGuiWindowFlags_NoBackground |*/ // TODO: re-add later
 		ImGuiWindowFlags_NoScrollWithMouse |
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoFocusOnAppearing |
@@ -34,6 +33,8 @@ ENGINE_API void engine::Canvas::Render(void)
 	ImGui::SetNextWindowSize(viewport->Size);
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, m_color);
 	ImGui::Begin("Canvas", nullptr, flags);
+
+	RescaleCanvas();
 
 	for (UIElement* element : m_elements)
 	{
@@ -58,26 +59,67 @@ engine::Label* engine::Canvas::AddLabel(const char* text)
 {
 	m_elements.push_back(new Label(text));
 
-	return dynamic_cast<Label*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<Label*>(element);
 }
 
 engine::Image* engine::Canvas::AddImage(const char* fileName)
 {
 	m_elements.push_back(new Image(fileName));
 
-	return dynamic_cast<Image*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<Image*>(element);
 }
 
 engine::Button* engine::Canvas::AddButton(const char* text, std::function<void(void)> function)
 {
 	m_elements.push_back(new Button(text, function));
 
-	return dynamic_cast<Button*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+	
+	return dynamic_cast<Button*>(element);
 }
 
-engine::ProgressBar* engine::Canvas::AddProgressBar(void)
+engine::ProgressBar* engine::Canvas::AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range)
 {
-	m_elements.push_back(new ProgressBar());
+	m_elements.push_back(new ProgressBar(position, size, range));
 
-	return dynamic_cast<ProgressBar*>(m_elements[(int) m_elements.size() - 1]);
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<ProgressBar*>(element);
+}
+
+engine::Rectangle* engine::Canvas::AddRectangle(math::Vector2f const& pos, math::Vector2f const& sizePx)
+{
+	m_elements.push_back(new Rectangle(pos, sizePx));
+	
+	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	element->SetUID(++m_uid);
+
+	return dynamic_cast<Rectangle*>(element);
+}
+
+void engine::Canvas::RescaleCanvas(void)
+{
+	m_size = ImGui::GetContentRegionAvail();
+
+	if (m_size != m_prevSize)
+	{
+		const f32 regionRatio = m_size.GetX() / m_prevSize.GetX();
+
+		for (UIElement* element : m_elements)
+		{
+
+			if (element->m_autoScale)
+				element->AutoScale(regionRatio);
+		}
+
+		m_prevSize = m_size;
+	}
 }

@@ -28,10 +28,7 @@ void engine::Button::Render(void)
 	// Condition to avoid negative or null button size
 	if (m_transform.m_sizePx.GetX() + m_transform.m_sizePx.GetY() <= 0.0f)
 		CalcSize();
-
-	//m_transform.m_sizePx = {200, 200};
-	m_transform.m_position = {960/2, 540/2};
-	m_edgeRounding = 25.0f;
+	
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	const ImGuiID& id = window->GetID(m_text.c_str());
 	
@@ -39,29 +36,24 @@ void engine::Button::Render(void)
 		window->Pos + m_transform.m_position,
 		window->Pos + m_transform.m_position + m_transform.m_sizePx
 	);
-
+	
 	if (window->SkipItems || !ImGui::ItemAdd(box, id))
 		return;
-
+	
 	// Button state
 	bool hovered, held = false;
 	if (ImGui::ButtonBehavior(box, id, &hovered, &held))
 		m_action();
-
+	
 	// Color
 	uint32 color = m_regularColor;
 	if (held && hovered)
 		color = m_pressedColor;
 	else if (hovered)
 		color = m_hoveredColor;
-
-	window->DrawList->AddRectFilled(
-		box.Min,
-		box.Max,
-		color,
-		m_edgeRounding
-	);
-
+	
+	window->DrawList->AddRectFilled(box.Min, box.Max, color, m_edgeRounding);
+	
 	ImGui::RenderNavCursor(box, id);
 	ImGui::RenderFrame(box.Min, box.Max, color, true, m_edgeRounding);
 	ImGui::RenderTextClipped(
@@ -71,15 +63,6 @@ void engine::Button::Render(void)
 		&box
 	);
 }
-
-//ImGui::PushStyleColor(ImGuiCol_Button, m_regularColor);
-//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, m_hoveredColor);
-//ImGui::PushStyleColor(ImGuiCol_ButtonActive, m_pressedColor);
-//ImStyle
-//if (ImGui::Button(m_text.c_str()))
-//	m_action();
-//
-//ImGui::PopStyleColor(3);
 
 void engine::Button::SetText(const char* text)
 {
@@ -118,7 +101,7 @@ void engine::Button::CalcSize(void)
 	ImGui::PushFont(ImGui::GetFont());
 	math::Vector2f textSize = ImGui::CalcTextSize(m_text.c_str());
 	ImGui::PopFont();
-
+	
 	m_transform.m_sizePx = 
 	{
 		textSize.GetX() + (float) (2 * m_padding.GetX()),

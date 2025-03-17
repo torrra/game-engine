@@ -18,15 +18,10 @@ engine::Label::Label(const char* text)
 	m_textColor = {1.0f, 1.0f, 1.0f, 1.0f};
 }
 
-engine::Label::~Label(void)
-{
-	m_text.clear();
-}
-
 void engine::Label::Render(void)
 {
 	ImGui::SetCursorPos(m_transform.m_position);
-	
+
 	if (m_font)
 	{
 		ImGui::PushFont(m_font);
@@ -60,7 +55,7 @@ void engine::Label::SetFont(const char* fontName, f32 fontSize)
 		printf("'SetFont()' failed, font '%s' could not be found. Make sure the font file is loaded first.\n", fontName);
 }
 
-ENGINE_API void engine::Label::WrapText(f32 maxWidthPx)
+void engine::Label::WrapText(f32 maxWidthPx)
 {
 	m_textBoxWidth = maxWidthPx;
 }
