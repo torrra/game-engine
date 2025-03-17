@@ -79,9 +79,9 @@ void engine::Canvas::Clear(void)
 	m_elements.shrink_to_fit();
 }
 
-engine::Label* engine::Canvas::AddLabel(const char* text)
+engine::Label* engine::Canvas::AddLabel(const char* text, math::Vector2f const& position)
 {
-	m_elements.push_back(new Label(text));
+	m_elements.push_back(new Label(text, position));
 
 	UIElement* element = m_elements[(int32) m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
