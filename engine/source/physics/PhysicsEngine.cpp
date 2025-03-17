@@ -86,3 +86,23 @@ void engine::PhysicsEngine::Init(void)
 	impl.m_scene = impl.m_physics->createScene(sceneDesc);
 	impl.m_material = impl.m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
+
+void engine::PhysicsEngine::CleanUp(void)
+{
+	PhysicsEngineImpl& impl = *m_impl;
+	PX_RELEASE(impl.m_material);
+	std::cout << "Material released" << std::endl;
+	PX_RELEASE(impl.m_scene);
+	std::cout << "Scene released" << std::endl;
+	PX_RELEASE(impl.m_dispatcher);
+	std::cout << "Dispatcher released" << std::endl;
+	PX_RELEASE(impl.m_pvd);
+	std::cout << "Pvd released" << std::endl;
+	PX_RELEASE(impl.m_physics);
+	std::cout << "Physics released" << std::endl;
+	PX_RELEASE(impl.m_foundation);
+	std::cout << "Foundation released" << std::endl;
+
+	delete m_instance;
+	m_instance = nullptr;
+}

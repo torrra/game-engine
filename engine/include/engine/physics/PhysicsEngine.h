@@ -19,6 +19,10 @@ namespace engine
 		/// Functions
 		// Initialize the physics engine
 		ENGINE_API void		Init(void);
+		// Update the physics engine
+		ENGINE_API void		StepSimulation(void);
+		// Release resources
+		ENGINE_API void		CleanUp(void);
 
 	private :
 
