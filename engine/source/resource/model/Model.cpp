@@ -2,6 +2,8 @@
 #include "resource/model/Buffer.h"
 #include "resource/model/Vertex.h"
 
+#include "engine/thread/ThreadManager.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -10,29 +12,30 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <string>
 
 void engine::Model::LoadResource(const char* fileName)
 {
-	// Read file
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(fileName,
-		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-		aiProcess_FlipUVs | aiProcess_CalcTangentSpace
-	);
+	ThreadManager::AddTask([this, fileName = std::string(fileName)]
+		{
+			// Read file
+			Assimp::Importer importer;
+			const aiScene * scene = importer.ReadFile(fileName,
+				aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+				aiProcess_FlipUVs | aiProcess_CalcTangentSpace
+			);
 
-	// Error management
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		std::printf("Failed to load model '%s'. Error: %s\n", fileName, importer.GetErrorString());
-		return;
-	}
-	
-	ProcessNodes(scene->mRootNode, scene);
-	
-	for (Mesh& mesh : m_meshes)
-	{
-		mesh.SetupBuffers();
-	}
+			// Error management
+			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+			{
+				std::printf("Failed to load model '%s'. Error: %s\n", fileName.c_str(), importer.GetErrorString());
+				return;
+			}
+
+			ProcessNodes(scene->mRootNode, scene);
+			m_loadStatus |= LOADED;
+		}
+	);
 }
 
 void engine::Model::Update(void)
@@ -47,6 +50,19 @@ void engine::Model::Update(void)
 
 const std::vector<engine::Mesh>& engine::Model::GetMeshes(void) const
 {
+	// If model has finished loading from another thread but has not yet
+	// called the OpenGL functions to setup its buffers, do it now before
+	// passing meshes over to caller
+	if ((m_loadStatus & LOADED) && !(m_loadStatus & GRAPHICS_CALLS_COMPLETE))
+	{
+		for (Mesh& mesh : m_meshes)
+		{
+			mesh.SetupBuffers();
+		}
+
+		m_loadStatus |= GRAPHICS_CALLS_COMPLETE;
+	}
+
 	return m_meshes;
 }
 

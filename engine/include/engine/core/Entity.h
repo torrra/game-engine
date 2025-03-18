@@ -29,7 +29,8 @@ namespace engine
 		{
 			NO_COMPONENTS = 0,
 			TRANSFORM = 1,
-			SCRIPT = 2
+			SCRIPT = (uint64) (1 << 1),
+			RENDERER = (uint64) (1 << 2)
 		};
 
 		friend class SceneGraph;
