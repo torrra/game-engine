@@ -69,7 +69,7 @@ namespace engine
 
 		// Loop executed wby worker threads to sleep until
 		// work is available and execute tasks
-		void TreadLoop(void);
+		void ThreadLoop(void);
 
 
 		// Export this function as it will be called from inline functions

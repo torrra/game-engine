@@ -12,7 +12,7 @@ void engine::ThreadManager::Startup(uint32 numThreads)
 
 	// Launch threads
 	for (uint32 thread = 0; thread < numThreads; ++thread)
-		GetInstance()->m_workers.emplace_back(&ThreadManager::TreadLoop, GetInstance());
+		GetInstance()->m_workers.emplace_back(&ThreadManager::ThreadLoop, GetInstance());
 }
 
 void engine::ThreadManager::Shutdown(void)
@@ -66,7 +66,7 @@ void engine::ThreadManager::RenderScene(SceneGraph* scene)
 		scene->RenderFromCache();
 }
 
-void engine::ThreadManager::TreadLoop(void)
+void engine::ThreadManager::ThreadLoop(void)
 {
 	while (true)
 	{
