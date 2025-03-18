@@ -5,7 +5,7 @@
 #include <iostream>
 #include "utility/MemoryCheck.h"
 
-#define RELATIVE_FONT_PATH "..\\fonts\\"
+#define DEFAULT_FONT_SIZE 24.0f
 
 engine::Font::Font(void)
 	: m_font(nullptr)
@@ -18,27 +18,22 @@ engine::Font::~Font(void)
 }
 
 void engine::Font::LoadResource(const char* fileName)
-{
-	// Concatenate file path
-	char filePath[256] = RELATIVE_FONT_PATH;
-	strcat_s(filePath, fileName);
-	
+{	
 	ImGuiIO& io = ImGui::GetIO();
-	ImFontConfig config;
-	config.RasterizerDensity = 1.0f;
-	m_font = io.Fonts->AddFontFromFileTTF(filePath, 36.0f, &config);
+
+	// TODO: scale via DPI?
+	m_font = io.Fonts->AddFontFromFileTTF(fileName, DEFAULT_FONT_SIZE);
+
+	// Build to font atlas
 	io.Fonts->Build();
 }
 
-ENGINE_API ImFont* engine::Font::GetFont(void) const noexcept
+ImFont* engine::Font::GetFont(void) const noexcept
 {
-	if (!this)
-		return nullptr;
-
 	return m_font;
 }
 
-ENGINE_API f32 engine::Font::GetFontSize(void) const noexcept
+f32 engine::Font::GetFontSize(void) const noexcept
 {
 	return m_font->FontSize;
 }
