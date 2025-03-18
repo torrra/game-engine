@@ -21,14 +21,6 @@ namespace engine
 	{
 	public:
 
-		ENGINE_API
-		ThreadManager(void) = default;
-		
-		ENGINE_API
-		~ThreadManager(void) = default;
-
-		ThreadManager(ThreadManager&&) = delete;
-
 		// Add a function to the task list, without getting a future for its return value
 		template <typename TFunctionType, typename... TVariadicArgs>
 		static void AddTask(TFunctionType&& function, TVariadicArgs&&... args);
@@ -71,9 +63,14 @@ namespace engine
 
 	private:
 
+		ThreadManager(void) = default;
+		ThreadManager(ThreadManager&&) = delete;
+		~ThreadManager(void) = default;
+
 		// Loop executed wby worker threads to sleep until
 		// work is available and execute tasks
 		void TreadLoop(void);
+
 
 		// Export this function as it will be called from inline functions
 		ENGINE_API
