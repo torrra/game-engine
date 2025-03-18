@@ -29,6 +29,11 @@ namespace engine
 
 				fclose(file);
 			}
+			else
+			{
+				m_fileContent = nullptr;
+				m_size = 0;
+			}
 
 			return *this;
 		}

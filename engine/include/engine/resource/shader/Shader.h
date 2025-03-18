@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/resource/Resource.h"
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 
@@ -14,12 +15,14 @@
 
 namespace engine
 {
-	class ShaderProgram
+	class ShaderProgram : public IResource
 	{
 	public:
 		ENGINE_API ShaderProgram(void) = delete;
 		ENGINE_API ShaderProgram(const char* vertexShader, const char* fragShader);
-		ENGINE_API ~ShaderProgram(void) = default;
+		ENGINE_API virtual ~ShaderProgram(void) override;
+
+		virtual void LoadResource(const char* filePath) override;
 
 		ENGINE_API void Use(void) const;
 
