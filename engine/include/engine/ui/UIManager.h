@@ -10,14 +10,21 @@ namespace engine
 	class UIManager
 	{
 	public:
-		UIManager(void) = delete;
-		ENGINE_API UIManager(GLFWwindow* window);
-		~UIManager(void) = default;
+		// Initialize UI, must be called after creating GLFW window
+		ENGINE_API		UIManager(GLFWwindow* window);
+		ENGINE_API		UIManager(void) = delete;
+		ENGINE_API		~UIManager(void) = default;
 
-		ENGINE_API void NewFrame(void);
-		ENGINE_API void UpdateUI(void);
-		ENGINE_API void ShutDown(void);
+		// Update function, call at start of update loop after reset window color
+		ENGINE_API void	NewFrame(void);
+
+		// Update function, call at the end of the update loop before updating window buffers
+		ENGINE_API void	UpdateUI(void);
+
+		// Clear memory call at end of program
+		ENGINE_API void	ShutDown(void);
+	
 	private:
-		void InitUI(GLFWwindow* window);
+		void			InitUI(GLFWwindow* window);
 	};
 }
