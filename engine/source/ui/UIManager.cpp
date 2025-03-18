@@ -1,30 +1,33 @@
 #include "ui/UIManager.h"
+#include "Window.h"
 
-#include <glfw/glfw3.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_impl_glfw.h>
 
+#include <glfw/glfw3.h>
+
 #include "utility/MemoryCheck.h"
 
+#define ENABLE_UI_DEBUG 0
 
 engine::UIManager::UIManager(GLFWwindow* window)
 {
 	InitUI(window);
 }
 
-ENGINE_API void engine::UIManager::NewFrame(void)
+void engine::UIManager::NewFrame(void)
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	// Enable docking for UI windows
-	//ImGui::DockSpaceOverViewport();
+#if ENABLE_UI_DEBUG == 1
 	ImGui::ShowMetricsWindow();
+#endif
 }
 
-ENGINE_API void engine::UIManager::UpdateUI(void)
+void engine::UIManager::UpdateUI(void)
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -38,7 +41,7 @@ ENGINE_API void engine::UIManager::UpdateUI(void)
 	}
 }
 
-ENGINE_API void engine::UIManager::ShutDown(void)
+void engine::UIManager::ShutDown(void)
 {
 	ImGui_ImplGlfw_Shutdown();
 	ImGui_ImplOpenGL3_Shutdown();
@@ -52,12 +55,13 @@ void engine::UIManager::InitUI(GLFWwindow* window)
 
 	// Set flags
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-	// Set editor theme
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	
+	// Set UI theme
 	ImGui::StyleColorsDark();
 
+	// Init
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 450");
 }

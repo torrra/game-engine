@@ -172,4 +172,6 @@ void engine::Window::SizeCallback(GLFWwindow* window, int32 width, int32 height)
 	Window* windowPtr = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 
 	windowPtr->SetSize(width, height);
+
+	glViewport(0, 0, width, height);
 }

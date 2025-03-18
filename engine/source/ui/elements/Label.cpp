@@ -1,4 +1,5 @@
 #include "ui/elements/Label.h"
+
 #include "resource/ResourceManager.h"
 #include "resource/font/Font.h"
 
@@ -7,47 +8,40 @@
 
 #undef new
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
 
-#include <cstdarg>
-
-engine::Label::Label(const char* text)
+engine::Label::Label(const char* text, math::Vector2f const& position)
 	: m_text(text), m_fontScale(1.0f), m_font(nullptr), m_textBoxWidth(FLT_MAX)
 {
-	m_textColor = {1.0f, 1.0f, 1.0f, 1.0f};
-}
-
-engine::Label::~Label(void)
-{
-	m_text.clear();
+	SetPosition(position);
+	SetTextColor(WHITE, 1.0f);
 }
 
 void engine::Label::Render(void)
 {
 	ImGui::SetCursorPos(m_transform.m_position);
-	
+
 	if (m_font)
 	{
 		ImGui::PushFont(m_font);
 		m_font->Scale = m_fontScale;
 	}
 
+	ImGui::PushStyleColor(ImGuiCol_Text, m_textColor);
 	ImGui::PushTextWrapPos(m_transform.m_position.GetX() + m_textBoxWidth);
-	ImGui::TextColored(m_textColor, m_text.c_str());
+	ImGui::Text(m_text.c_str());
 	ImGui::PopTextWrapPos();
+	ImGui::PopStyleColor();
 
 	if (m_font)
 	{
 		ImGui::PopFont();
 		m_font->Scale = 1.0f;
 	}
-
 }
 
 void engine::Label::SetTextColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
-	m_textColor = {red, green, blue, alpha};
+	m_textColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Label::SetFont(const char* fontName, f32 fontSize)
@@ -57,10 +51,11 @@ void engine::Label::SetFont(const char* fontName, f32 fontSize)
 	if (m_font)
 		m_fontScale = fontSize / m_font->FontSize;
 	else
-		printf("'SetFont()' failed, font '%s' could not be found. Make sure the font file is loaded first.\n", fontName);
+		// TODO: potentially add logging
+		std::printf("'SetFont()' failed, font '%s' could not be found. Make sure the font file is loaded first.\n", fontName);
 }
 
-ENGINE_API void engine::Label::WrapText(f32 maxWidthPx)
+void engine::Label::WrapText(f32 maxWidthPx)
 {
 	m_textBoxWidth = maxWidthPx;
 }

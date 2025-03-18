@@ -8,17 +8,19 @@ struct ImFont;
 
 namespace engine
 {
+	// Font resource supports all .ttf font files
 	class Font : public IResource
 	{
 	public:
-		ENGINE_API Font(void);
-		ENGINE_API virtual ~Font(void) override;
+		ENGINE_API			Font(void);
+		ENGINE_API virtual	~Font(void) override;
 
-		ENGINE_API virtual void LoadResource(const char* fileName) override;
+		virtual void		LoadResource(const char* fileName) override;
 
-		ENGINE_API ImFont* GetFont(void) const noexcept;
-		ENGINE_API f32 GetFontSize(void) const noexcept;
+		ENGINE_API ImFont*	GetFont(void) const noexcept;
+		ENGINE_API f32		GetFontSize(void) const noexcept;
+	
 	private:
-		ImFont* m_font;
+		ImFont*		m_font;
 	};
 }

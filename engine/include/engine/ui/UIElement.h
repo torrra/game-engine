@@ -2,11 +2,6 @@
 
 /*
 *	----- UI Elements -----
-*	- Canvas			
-*	- Text label		DONE
-*	- Image				DONE
-*	- progress bar		
-*	- Button			
 *	- Dropdown			
 *	- combo box			
 *	----------------------
@@ -20,13 +15,19 @@
 
 namespace engine
 {
+	/*
+		2D transform for UI elements.
+
+		All members are measured in pixels although type is
+		float for ImGui compatibility.
+	*/
 	struct UITransform
 	{
 		math::Vector2f m_position;
-		math::Vector2f m_scale;
+		math::Vector2f m_sizePx;
 
 		UITransform(void)
-			: m_position(0.0f), m_scale(1.0f)
+			: m_position(0.0f), m_sizePx(0.0f)
 		{
 		}
 	};
@@ -34,18 +35,29 @@ namespace engine
 	class UIElement
 	{
 	public:
-		ENGINE_API UIElement(void);
-		ENGINE_API virtual ~UIElement(void) = default;
+		ENGINE_API							UIElement(void);
+		ENGINE_API virtual					~UIElement(void) = default;
 
-		ENGINE_API virtual math::Vector2f GetPosition(void) const noexcept;
-		ENGINE_API virtual math::Vector2f GetScale(void) const noexcept;
+		ENGINE_API virtual math::Vector2f	GetPosition(void) const noexcept;
+		ENGINE_API virtual math::Vector2f	GetScale(void) const noexcept;
 
-		ENGINE_API virtual void SetPosition(math::Vector2f const& position);
-		ENGINE_API virtual void SetScale(math::Vector2f const& scale);
+		ENGINE_API virtual void				SetPosition(math::Vector2f const& position);
+		ENGINE_API virtual void				SetScale(math::Vector2f const& scale);
+		ENGINE_API virtual void				SetAutoScale(bool autoResize);
+		
+		ENGINE_API virtual void				Render(void) = 0;
+	
+	protected:
+		void	AutoScale(f32 regionRatio);
 
-		ENGINE_API virtual void Render(void) = 0;
+	private:
+		void	SetUID(int32 const& uid);
 
 	protected:
-		UITransform m_transform;
+		UITransform	m_transform;
+		int32		m_uid;
+		bool		m_autoScale;
+		
+		friend class Canvas;
 	};
 }
