@@ -3,6 +3,8 @@
 std::mutex engine::ResourceManager::m_mutex;
 engine::ResourceManager* engine::ResourceManager::m_instance = nullptr;
 
+
+
 void engine::ResourceManager::Unload(std::string const& fileName)
 {
 	// Check resource exists
@@ -26,6 +28,17 @@ void engine::ResourceManager::CloseResourceManager(void)
 		GetInstance()->UnloadAll();
 
 	delete m_instance;
+}
+
+const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resource)
+{
+	for (auto const& data : GetInstance()->m_resources)
+	{
+		if (resource == data.second)
+			return &data.first;
+	}
+
+	return nullptr;
 }
 
 engine::ResourceManager* engine::ResourceManager::GetInstance(void)

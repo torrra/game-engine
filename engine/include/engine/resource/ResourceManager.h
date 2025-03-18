@@ -34,6 +34,8 @@ namespace engine
 		ENGINE_API static void		UnloadAll(void);
 		ENGINE_API static void		CloseResourceManager(void);
 
+		ENGINE_API static const std::string* FindKeyByVal(const IResource* resource);
+
 	private:
 									ResourceManager(void) = default;
 									ResourceManager(ResourceManager const& rManager) = delete;
