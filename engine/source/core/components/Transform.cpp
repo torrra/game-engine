@@ -2,6 +2,8 @@
 #include "core/systems/ScriptSystem.h"
 #include "core/SceneGraph.h"
 
+#include "serialization/TextSerializer.h"
+
 math::Matrix4f engine::Transform::ToMatrixWithoutScale(const Transform& inTransform)
 {
 	math::Matrix4f transformMatrix = math::TransformMatrix(inTransform.m_rotation, inTransform.m_position);
@@ -153,6 +155,17 @@ void engine::Transform::AddScale(const math::Vector3f& scale)
 {
 	m_scale *= scale;
 	m_dirty = true;
+}
+
+void engine::Transform::SerializeText(std::ofstream& output)
+{
+	output << "[Transform]\n    ";
+	text::Serialize(output, "rotation", m_rotation);
+	output << "\n    ";
+	text::Serialize(output, "position", m_position);
+	output << "\n    ";
+	text::Serialize(output, "scale", m_scale);
+	output << '\n';
 }
 
 std::ostream& engine::Transform::operator<<(std::ostream& os)

@@ -78,11 +78,20 @@ namespace engine
 													 const math::Vector3f& inScalein =
 													 math::Vector3f(1.0f, 1.0f, 1.0f));
 
-
+		// Add translation to the current translation value
 		ENGINE_API void					AddTranslation(const math::Vector3f& inTranslation);
+
+		// Add rotation in euler degrees to the current rotation
 		ENGINE_API void					AddRotation(f32 angleX, f32 angleY, f32 angleZ);
+
+		// Add quaternion rotation to current rotation
 		ENGINE_API void					AddRotation(const math::Quatf& inRotation);
+
+		// Multiply current scale by new scale
 		ENGINE_API void					AddScale(const math::Vector3f& inScale);
+
+		// Serialize rotation, position and scale in plain text
+		ENGINE_API void					SerializeText(std::ofstream& output);
 
 		/// Operators
 		// Copy assignement set to default
