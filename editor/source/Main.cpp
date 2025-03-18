@@ -2,7 +2,6 @@
 
 #include <engine/utility/MemoryCheck.h>
 
-#include "engine/physics/PhysicsEngine.h"
 
 extern "C" {
 	_declspec(dllexport) unsigned int NvOptimusEnablement = 1;
@@ -15,9 +14,7 @@ int main(void)
 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	{
-		engine::PhysicsEngine::Get().Init(); 
-
-		engine::PhysicsEngine::Get().CleanUp();
+		
 	}
 
 	// Memory leak check
