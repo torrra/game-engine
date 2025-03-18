@@ -27,7 +27,7 @@ namespace engine
 	{
 	public:
 		
-		ENGINE_API Camera(EntityHandle, class SceneGraph*);
+		ENGINE_API Camera(EntityHandle owner, class SceneGraph* scene);
 
 		ENGINE_API ~Camera(void) = default;
 
@@ -50,6 +50,9 @@ namespace engine
 		ENGINE_API void SetFOV(f32 fov);
 		ENGINE_API void SetNearPlane(f32 nearPlane);
 		ENGINE_API void SetFarPlane(f32 farPlane);
+
+		ENGINE_API void SerializeText(std::ofstream& output);
+
 
 	private:
 		math::Matrix4f GetViewMatrix(void);

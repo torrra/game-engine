@@ -5,7 +5,8 @@
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
 
-
+#include <fstream>
+#include "serialization/TextSerializer.h"
 
 engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
 {
@@ -104,6 +105,22 @@ void engine::Camera::SetFarPlane(f32 farPlane)
 	m_frustum.m_far = farPlane;
 
 	GetProjectionMatrix();
+}
+
+void engine::Camera::SerializeText(std::ofstream& output)
+{
+	output << "[Camera]\n    ";
+	text::Serialize(output, "near", m_frustum.m_near);
+	output << "\n    ";
+	text::Serialize(output, "far", m_frustum.m_far);
+	output << "\n    ";
+	text::Serialize(output, "fov", m_frustum.m_fovRad);
+	output << "\n    ";
+	text::Serialize(output, "aspectRatio", m_frustum.m_ratio);
+	output << "\n    ";
+	text::Serialize(output, "rotationEuler", m_rotation);
+	output << "\n    ";
+	text::Serialize(output, "position", m_position);
 }
 
 math::Matrix4f engine::Camera::GetViewMatrix(void)
