@@ -121,6 +121,9 @@ void engine::Camera::SerializeText(std::ofstream& output)
 	text::Serialize(output, "rotationEuler", m_rotation);
 	output << "\n    ";
 	text::Serialize(output, "position", m_position);
+	output << "\n    ";
+	text::Serialize(output, "flags", m_flags);
+	output << '\n';
 }
 
 math::Matrix4f engine::Camera::GetViewMatrix(void)

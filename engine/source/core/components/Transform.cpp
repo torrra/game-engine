@@ -165,6 +165,8 @@ void engine::Transform::SerializeText(std::ofstream& output)
 	text::Serialize(output, "position", m_position);
 	output << "\n    ";
 	text::Serialize(output, "scale", m_scale);
+	output << "\n    ";
+	text::Serialize(output, "flags", m_flags);
 	output << '\n';
 }
 
