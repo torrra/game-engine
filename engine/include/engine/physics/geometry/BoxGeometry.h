@@ -1,8 +1,14 @@
 #pragma once
 
+#pragma region Engine
+
+#include "engine/EngineExport.h"
+
+#pragma endregion
+
 #pragma region Geometry
 
-#include "physics/geometry/Geometry.h"
+#include "engine/physics/geometry/Geometry.h"
 
 #pragma endregion
 
@@ -14,23 +20,21 @@ namespace engine
 
 		/// Constructor
 		// Default constructor set to 1x1x1
-				BoxGeometry() = default;
+		ENGINE_API			BoxGeometry(void);
 		// Constructor with width, height and depth
-				BoxGeometry(float inWidth, float inHeight, float inDepth);
+		ENGINE_API			BoxGeometry(float inWidth, float inHeight, float inDepth);
 
 		/// Destructor
-				~BoxGeometry() override = default;
+		ENGINE_API			~BoxGeometry(void) override;
 
 		/// Getters
-		void*	GetNativeGeometry() override;
+		ENGINE_API void*	GetNativeGeometry(void) const override;
 
-		float	GetVolume() override;
+		ENGINE_API float	GetVolume(void) const override;
 
 	private :
 
-		float m_width	= 1.f;
-		float m_height	= 1.f;
-		float m_depth	= 1.f;
+		struct GeometryImpl*	m_geometryImpl	= nullptr;
 
 	}; // !Class BoxGeometry
 } // !Namespace engine
