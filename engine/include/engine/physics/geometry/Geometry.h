@@ -1,16 +1,28 @@
 #pragma once
 
+#pragma region Engine
+
+#include "engine/EngineExport.h"
+
+#pragma endregion
+
+#include "BoxGeometry.h"
+
 namespace engine
 {
 	class Geometry
 	{
 	public :
 
-		virtual ~Geometry(void) = default;
+		/// Destructor
+		// Default virtual destructor
+		ENGINE_API virtual			~Geometry(void) = default;
 
-		virtual void* GetNativeGeometry(void) const = 0;
-
-		virtual float GetVolume(void) const = 0;
+		/// Getter
+		// Virtual getter for the native geometry
+		ENGINE_API virtual void*	GetNativeGeometry(void) const = 0;
+		// Virtual getter for the volume
+		ENGINE_API virtual float	GetVolume(void) const = 0;
 
 	}; // !Class Geometry
 } // !Namespace engine
