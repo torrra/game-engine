@@ -3,6 +3,7 @@
 #include <fstream>
 #include <type_traits>
 #include <iostream>
+#include <utility>
 
 #include "engine/CoreTypes.h"
 
@@ -23,7 +24,10 @@ namespace engine::text
 	} && !std::is_pointer_v<TEvaluatedType>;
 
 	template <CSerializableType TValueType>
-	void Serialize(std::ofstream&, const char* name, TValueType);
+	void Serialize(std::ofstream& file, const char* name, const TValueType& val);
+
+	void Serialize(std::ofstream& file, const char* name, const std::string& val);
+	void Serialize(std::ofstream& file, const char* name, const char* val, uint64 length);
 }
 
 namespace engine::text::types
@@ -35,11 +39,26 @@ namespace engine::text::types
 namespace engine::text
 {
 	template<CSerializableType TValueType> inline
-	void Serialize(std::ofstream& file, const char* name, TValueType val)
+	void Serialize(std::ofstream& file, const char* name, const TValueType& val)
+	{
+		using TNameType = std::remove_reference_t<std::remove_const_t<TValueType>>;
+
+		const char* valName((name) ? name : "unnamed val");
+		file << "@" <<  types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
+	}	
+	
+	inline void Serialize(std::ofstream& file, const char* name, const std::string& val)
 	{
 		const char* valName((name) ? name : "unnamed val");
-		file << "@" <<  types::GetTypeName<TValueType>() << " | " << valName << '=' << val;
-	}	
+		file << "@" << "string " << val.size() << " | " << valName << '=' << val;
+	}
+
+	inline void Serialize(std::ofstream& file, const char* name, const char* val, uint64 length)
+	{
+		const char* valName((name) ? name : "unnamed val");
+		file << "@" << "string " << length << " | " << valName << '=' << val;
+	}
+
 }
 
 
@@ -50,6 +69,8 @@ namespace engine::text::types
 	{
 		return "unrecognized type";
 	}
+
+// fundamental types
 
 	template<> inline
 	std::string GetTypeName<int32>(void)
@@ -110,7 +131,6 @@ namespace engine::text::types
 	{
 		return "f64";
 	}
-
 
 // Vector3
 
