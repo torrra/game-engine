@@ -10,6 +10,8 @@
 
 #include "core/SceneGraph.h"
 
+#include "serialization/TextSerializer.h"
+
 #include "glad/glad.h"
 
 namespace engine
@@ -102,6 +104,33 @@ namespace engine
 	{
 		if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
 			m_texture = texture;
+	}
+
+	void Renderer::SerializeText(std::ofstream& output)
+	{
+		// TODO: uncomment shader serialization when UI branch is merged
+
+		const std::string* model = ResourceManager::FindKeyByVal(m_model);
+		const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
+		//const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
+
+		if ((!model) /*|| (!shader)*/)
+			return;
+
+		output << "[Renderer]\n    ";
+		text::Serialize(output, "model", *model);
+		/*output << "\n    ";
+		text::Serialize(output, "shader", *shader);*/
+		output << "\n    ";
+
+		if (texture)
+		{
+			text::Serialize(output, "texture", *texture);
+			output << "\n    ";
+		}
+
+		text::Serialize(output, "flags", m_flags);
+		output << '\n';
 	}
 
 	void Renderer::DrawModel(void) const

@@ -5,6 +5,8 @@
 #include "engine/core/ComponentArray.h"
 #include "engine/core/components/Transform.h"
 
+#include <fstream>
+
 namespace engine
 {
 	class Renderer final : public Component
@@ -46,6 +48,9 @@ namespace engine
 
 		ENGINE_API
 		void SetTexture(const char* key);
+
+		ENGINE_API
+		void SerializeText(std::ofstream& output);
 
 	private:
 
