@@ -12,6 +12,12 @@
 
 #pragma endregion
 
+#pragma region Internal
+
+#include "physics/InternalPhysXStruct.hpp"
+
+#pragma endregion
+
 /*
 	PxDefaultAllocator : memory allocation management
 	PxDefaultErrorCallback : Error/internal log management of physx
@@ -22,18 +28,6 @@ physx::PxDefaultErrorCallback	gDefaultErrorCallback;
 
 // Set the instance to nullptr
 engine::PhysicsEngine* engine::PhysicsEngine::m_instance = nullptr;
-
-// Create a structure of physX elements to store them
-struct engine::PhysicsEngineImpl 
-{
-	physx::PxFoundation*			m_foundation	= nullptr;
-	physx::PxPhysics*				m_physics		= nullptr;
-	physx::PxScene*					m_scene			= nullptr;
-	physx::PxDefaultCpuDispatcher*	m_dispatcher	= nullptr;
-	physx::PxMaterial*				m_material		= nullptr;
-	physx::PxPvd*					m_pvd			= nullptr;
-
-}; // !Struct PhysicsEngineImpl
 
 engine::PhysicsEngine::PhysicsEngine()
 {
