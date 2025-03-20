@@ -52,6 +52,11 @@ engine::PhysicsEngine& engine::PhysicsEngine::Get(void)
 	return *m_instance;
 }
 
+engine::PhysicsEngineImpl& engine::PhysicsEngine::GetImpl(void) const
+{
+	return *m_impl;
+}
+
 void engine::PhysicsEngine::Init(void)
 {
 	/*

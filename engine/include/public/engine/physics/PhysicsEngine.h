@@ -17,6 +17,8 @@ namespace engine
 		// Get the instance of PhysicsEngine
 		ENGINE_API static	PhysicsEngine& Get(void);
 
+		ENGINE_API PhysicsEngineImpl& GetImpl(void) const;
+
 		/// Functions
 		/*
 			Initialize the physics engine by intializing

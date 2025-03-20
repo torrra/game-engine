@@ -4,6 +4,9 @@
 
 #include <physx/PxPhysicsAPI.h>
 
+#include "physics/InternalPhysXStruct.hpp"
+#include "physics/PhysicsEngine.h"
+
 static physx::PxDefaultAllocator		gDefaultAllocatorCallback;
 static physx::PxDefaultErrorCallback	gDefaultErrorCallback;
 
