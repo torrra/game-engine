@@ -20,9 +20,9 @@ namespace engine
 
 	}; // !Struct PhysicsEngineImpl
 
-	struct RigidBodyImpl
+	struct RigidBodyDynamicImpl
 	{
 		physx::PxRigidDynamic*			m_rigidBodyDynamic	= nullptr;
-		physx::PxRigidStatic*			m_rigidBodyStatic	= nullptr;
-	};
+
+	}; // !Struct RigidBodyImpl
 } // !Namespace engine
