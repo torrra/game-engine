@@ -75,8 +75,8 @@ void engine::Canvas::Clear(void)
 	{
 		delete element;
 	}
-
-	m_elements.shrink_to_fit();
+	
+	m_elements.clear();
 }
 
 engine::Label* engine::Canvas::AddLabel(const char* text, math::Vector2f const& position)

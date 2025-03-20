@@ -76,8 +76,8 @@ namespace engine
 	{
 		return 
 		{
-			static_cast<TValueType>(m_size.GetX(),
-			static_cast<TValueType>(m_size.GetY()
+			static_cast<TValueType>(m_size.GetX()),
+			static_cast<TValueType>(m_size.GetY())
 		};
 	}
 }
