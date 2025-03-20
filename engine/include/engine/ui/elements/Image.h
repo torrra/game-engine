@@ -23,13 +23,13 @@ namespace engine
 		ENGINE_API void		SetImageTint(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
 
 		// Function to check if image data is loaded
-		bool IsDataValid(void);
+		bool				IsDataValid(void);
 
 	private:
-		std::string m_fileName;
-		Texture*	m_data;
-		uint32		m_borderColor;
-		uint32		m_tint;
-		bool		m_keepAspectRatio;
+		std::string			m_fileName;
+		const Texture*		m_data;
+		uint32				m_borderColor;
+		uint32				m_tint;
+		bool				m_keepAspectRatio;
 	};
 }
