@@ -2,8 +2,9 @@
 
 #include <engine/utility/MemoryCheck.h>
 
-#include "engine/physics/geometry/GeometryTest.h"
+//#include "engine/physics/geometry/GeometryTest.h"
 #include "engine/physics/PhysicsEngine.h"
+#include "engine/physics/rigidbody/RigidBodyDynamic.h"
 
 #include <math/VectorGeneric.hpp>
 #include <math/Vector3.hpp>
@@ -31,16 +32,21 @@ int main(void)
 		//{
 		//	physics.StepSimulation(1.f / 60.f);
 		//}
-
+		
 		/// PhysicsEngine use
 		engine::PhysicsEngine* physics;
 		physics->Get().Init();
+
+		engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic();
+		rigidBody->CreateDynamicRigidBody(physics->Get());
 
 		for (int i = 0; i < 300; ++i)
 		{
 			physics->Get().StepSimulation(1.f / 60.f);
 		}
 
+		//rigidBody->RigidBodyDynamicCleanUp();
+		delete rigidBody;
 		physics->Get().CleanUp();
 	}
 
