@@ -83,7 +83,7 @@ engine::Label* engine::Canvas::AddLabel(const char* text, math::Vector2f const& 
 {
 	m_elements.push_back(new Label(text, position));
 
-	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	UIElement* element = m_elements[m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
 
 	return dynamic_cast<Label*>(element);
@@ -95,7 +95,7 @@ engine::Image* engine::Canvas::AddImage(
 {
 	m_elements.push_back(new Image(fileName, position));
 
-	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	UIElement* element = m_elements[m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
 
 	Image* image = dynamic_cast<Image*>(element);
@@ -118,7 +118,7 @@ engine::Button* engine::Canvas::AddButton(
 {
 	m_elements.push_back(new Button(text, position, size));
 
-	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	UIElement* element = m_elements[m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
 	
 	return dynamic_cast<Button*>(element);
@@ -131,7 +131,7 @@ engine::ProgressBar* engine::Canvas::AddProgressBar(
 {
 	m_elements.push_back(new ProgressBar(position, size, range));
 
-	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	UIElement* element = m_elements[m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
 
 	return dynamic_cast<ProgressBar*>(element);
@@ -143,7 +143,7 @@ engine::Rectangle* engine::Canvas::AddRectangle(
 {
 	m_elements.push_back(new Rectangle(position, size));
 	
-	UIElement* element = m_elements[(int32) m_elements.size() - 1];
+	UIElement* element = m_elements[m_elements.size() - 1];
 	element->SetUID(++m_uidCounter);
 
 	return dynamic_cast<Rectangle*>(element);
