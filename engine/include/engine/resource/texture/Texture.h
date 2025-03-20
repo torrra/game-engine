@@ -16,7 +16,7 @@ namespace engine
 		ENGINE_API ~Texture(void) = default;
 		
 		ENGINE_API virtual void LoadResource(const char* fileName) override;
-		ENGINE_API void UseTexture(void);
+		ENGINE_API void UseTexture(void) const;
 		ENGINE_API static void RemoveTexture(void);
 
 		uint32 GetTexture(void) const noexcept;

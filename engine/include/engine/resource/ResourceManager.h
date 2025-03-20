@@ -33,7 +33,7 @@ namespace engine
 										const char* vertShader, 
 										const char* fragShader);
 		template<typename TResourceType>
-		static TResourceType*		GetResource(std::string const& fileName);
+		static const TResourceType*		GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
 		ENGINE_API static void		UnloadAll(void);
 		ENGINE_API static void		CloseResourceManager(void);
@@ -68,7 +68,7 @@ namespace engine
 	}
 
 	template<typename TResourceType>
-	inline TResourceType* engine::ResourceManager::GetResource(std::string const& fileName)
+	inline const TResourceType* engine::ResourceManager::GetResource(std::string const& fileName)
 	{
 		// Check if resource exists
 		if (!HasResource(fileName))

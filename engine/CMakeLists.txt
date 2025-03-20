@@ -58,7 +58,7 @@ source_group("Engine scripts" FILES ${TARGET_SCRIPT_FILES})
 
 add_library(${TARGET_NAME} SHARED)
 
-target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES} ${TARGET_ENGINE_SHADER_FILES})
+target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES} ${TARGET_EXTRA_FILES} ${TARGET_ENGINE_SHADER_FILES} ${TARGET_SCRIPT_FILES})
 
 target_include_directories(${TARGET_NAME}
 	PUBLIC ${MATHLIB_INCLUDE_DIR} 
@@ -74,7 +74,13 @@ target_link_libraries(${TARGET_NAME}
 
 if (MSVC)
 	# Disable linker warning for glfw3's missing debug info
-	target_link_options(${TARGET_NAME} PRIVATE /IGNORE:4099)
+	# and ignore non multithread runtime libs
+	target_link_options(${TARGET_NAME} PRIVATE
+	/IGNORE:4099
+	/NODEFAULTLIB:libcmt.lib
+	/NODEFAULTLIB:libcmtd.lib
+)
+
 	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 endif()
 

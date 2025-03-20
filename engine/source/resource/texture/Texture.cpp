@@ -47,7 +47,7 @@ void engine::Texture::LoadResource(const char* fileName)
 	stbi_image_free(data);
 }
 
-void engine::Texture::UseTexture(void)
+void engine::Texture::UseTexture(void) const
 {
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 }
