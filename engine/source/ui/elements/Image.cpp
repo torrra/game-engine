@@ -9,6 +9,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
+#define ALPHA_BITMASK 0xFF0000
 
 engine::Image::Image(const char* fileName, math::Vector2f const& position)
 	: m_fileName(fileName), m_keepAspectRatio(true)
@@ -40,7 +41,7 @@ void engine::Image::Render(void)
 	if (window->SkipItems)
 		return;
 	
-	const float borderSize = (m_borderColor & 0xFF000000) ? 1.0f : 0.0f;
+	const float borderSize = (m_borderColor & ALPHA_BITMASK) ? 1.0f : 0.0f;
 	const math::Vector2f padding(borderSize, borderSize);
 
 	math::Vector2f size;
