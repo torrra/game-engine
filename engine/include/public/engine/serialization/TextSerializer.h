@@ -129,6 +129,13 @@ namespace engine::text::types
 	ESerializedType GetUnsigned2DVectorTypeFromName(const std::string& typeName);
 	ESerializedType GetSigned2DVectorTypeFromName(const std::string& typeName);
 
+	ESerializedType Get3DVectorTypeFromName(const std::string& typeName);
+	ESerializedType GetUnsigned3DVectorTypeFromName(const std::string& typeName);
+	ESerializedType GetSigned3DVectorTypeFromName(const std::string& typeName);
+
+	ESerializedType Get4DVectorTypeFromName(const std::string& typeName);
+	ESerializedType GetUnsigned4DVectorTypeFromName(const std::string& typeName);
+	ESerializedType GetSigned4DVectorTypeFromName(const std::string& typeName);
 }
 
 namespace engine::text

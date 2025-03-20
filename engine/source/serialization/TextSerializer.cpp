@@ -18,6 +18,32 @@ namespace engine::text
 
 namespace engine::text::types
 {
+	ESerializedType GetTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[1])
+		{
+			// unsigned integer type
+		case 'u':
+			return GetUnsignedIntegerTypeFromName(typeName);
+
+			// signed integer type
+		case 'i':
+			return GetSignedIntegerTypeFromName(typeName);
+
+			// vector type
+		case 'v':
+			return GetVectorTypeFromName(typeName);
+
+			// string
+		case 's':
+			return ESerializedType::STRING;
+
+		default:
+			return ESerializedType::UNKNOWN_TYPE;
+		}
+	}
+
+
 	ESerializedType GetUnsignedIntegerTypeFromName(const std::string& typeName)
 	{
 		switch (typeName[5])
@@ -70,6 +96,48 @@ namespace engine::text::types
 		}
 	}
 
+	ESerializedType GetVectorTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[4])
+		{
+		case '2':
+			return Get2DVectorTypeFromName(typeName);
+
+		case '3':
+			return Get3DVectorTypeFromName(typeName);
+
+		case '4':
+			return Get4DVectorTypeFromName(typeName);
+
+		default:
+			return ESerializedType::UNKNOWN_TYPE;
+		}
+	}
+
+	ESerializedType Get2DVectorTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[5])
+		{
+		case 'u':
+			return GetUnsigned2DVectorTypeFromName(typeName);
+
+		case 'i':
+			return GetSigned2DVectorTypeFromName(typeName);
+
+		case 'f':
+
+			if (typeName[6] == '3')
+				return ESerializedType::VEC2_F32;
+			else if (typeName[6] == '6')
+				return ESerializedType::VEC2_F64;
+
+			else return ESerializedType::UNKNOWN_TYPE;
+
+		default:
+			return ESerializedType::UNKNOWN_TYPE;
+		}
+	}
+
 	ESerializedType GetUnsigned2DVectorTypeFromName(const std::string& typeName)
 	{
 		switch (typeName[7])
@@ -115,62 +183,145 @@ namespace engine::text::types
 	}
 
 
-	ESerializedType Get2DVectorTypeFromName(const std::string& typeName)
+
+
+	ESerializedType Get3DVectorTypeFromName(const std::string& typeName)
 	{
 		switch (typeName[5])
 		{
 		case 'u':
-			return GetUnsigned2DVectorTypeFromName(typeName);
+			return GetUnsigned3DVectorTypeFromName(typeName);
 
 		case 'i':
-			return GetSigned2DVectorTypeFromName(typeName);
+			return GetSigned3DVectorTypeFromName(typeName);
 
 		case 'f':
 
 			if (typeName[6] == '3')
-				return ESerializedType::VEC2_F32;
-			else
-				return ESerializedType::VEC2_F64;
+				return ESerializedType::VEC3_F32;
+			else if (typeName[6] == '6')
+				return ESerializedType::VEC3_F64;
+
+			else return ESerializedType::UNKNOWN_TYPE;
 
 		default:
 			return ESerializedType::UNKNOWN_TYPE;
 		}
 	}
 
-
-	ESerializedType GetVectorTypeFromName(const std::string& typeName)
+	ESerializedType GetUnsigned3DVectorTypeFromName(const std::string& typeName)
 	{
-		switch (typeName[4])
+		switch (typeName[7])
 		{
-		case '2':
-			return Get2DVectorTypeFromName(typeName);
+		case '8':
+			return ESerializedType::VEC3_UINT8;
+
+		case '1':
+			return ESerializedType::VEC3_UINT16;
+
+		case '3':
+			return ESerializedType::VEC3_UINT32;
+
+		case '6':
+			return ESerializedType::VEC3_UINT64;
+
+		default:
+			return ESerializedType::UNKNOWN_TYPE;
+		}
+
+	}
+
+	ESerializedType GetSigned3DVectorTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[6])
+		{
+		case '8':
+			return ESerializedType::VEC3_INT8;
+
+		case '1':
+			return ESerializedType::VEC3_INT16;
+
+		case '3':
+			return ESerializedType::VEC3_INT32;
+
+		case '6':
+			return ESerializedType::VEC3_INT64;
+
+		default:
+			return ESerializedType::UNKNOWN_TYPE;
+		}
+
+	}
+
+
+
+
+
+	ESerializedType Get4DVectorTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[5])
+		{
+		case 'u':
+			return GetUnsigned4DVectorTypeFromName(typeName);
+
+		case 'i':
+			return GetSigned4DVectorTypeFromName(typeName);
+
+		case 'f':
+
+			if (typeName[6] == '3')
+				return ESerializedType::VEC4_F32;
+			else if (typeName[6] == '6')
+				return ESerializedType::VEC4_F64;
+
+			else return ESerializedType::UNKNOWN_TYPE;
+
 		default:
 			return ESerializedType::UNKNOWN_TYPE;
 		}
 	}
 
-    ESerializedType GetTypeFromName(const std::string& typeName)
-    {
-		switch (typeName[1])
+	ESerializedType GetUnsigned4DVectorTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[7])
 		{
-		// unsigned integer type
-		case 'u':
-			return GetUnsignedIntegerTypeFromName(typeName);
+		case '8':
+			return ESerializedType::VEC4_UINT8;
 
-		// signed integer type
-		case 'i':
-			return GetSignedIntegerTypeFromName(typeName);
+		case '1':
+			return ESerializedType::VEC4_UINT16;
 
-		// vector type
-		case 'v':
-			return GetVectorTypeFromName(typeName);
+		case '3':
+			return ESerializedType::VEC4_UINT32;
 
-		// string
-		case 's':
-			return ESerializedType::STRING;
+		case '6':
+			return ESerializedType::VEC4_UINT64;
 
 		default:
 			return ESerializedType::UNKNOWN_TYPE;
 		}
-    }
+
+	}
+
+	ESerializedType GetSigned4DVectorTypeFromName(const std::string& typeName)
+	{
+		switch (typeName[6])
+		{
+		case '8':
+			return ESerializedType::VEC4_INT8;
+
+		case '1':
+			return ESerializedType::VEC4_INT16;
+
+		case '3':
+			return ESerializedType::VEC4_INT32;
+
+		case '6':
+			return ESerializedType::VEC4_INT64;
+
+		default:
+			return ESerializedType::UNKNOWN_TYPE;
+		}
+
+	}
 }
