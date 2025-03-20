@@ -12,7 +12,7 @@ namespace engine
 	class Image : public UIElement
 	{
 	public:
-		ENGINE_API			Image(const char* fileName, math::Vector2f position);
+		ENGINE_API			Image(const char* fileName, math::Vector2f const& position);
 		ENGINE_API			Image(void) = delete;
 		ENGINE_API virtual	~Image(void) override = default;
 

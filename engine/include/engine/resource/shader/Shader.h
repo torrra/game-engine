@@ -20,7 +20,7 @@ namespace engine
 	public:
 		ENGINE_API ShaderProgram(void) = delete;
 		ENGINE_API ShaderProgram(const char* vertexShader, const char* fragShader);
-		ENGINE_API virtual ~ShaderProgram(void) override;
+		ENGINE_API virtual ~ShaderProgram(void) override = default;
 
 		virtual void LoadResource(const char* filePath) override;
 

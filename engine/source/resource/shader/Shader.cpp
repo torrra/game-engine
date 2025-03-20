@@ -11,13 +11,6 @@ engine::ShaderProgram::ShaderProgram(const char* vertexShader, const char* fragS
 	CreateProgram();
 }
 
-engine::ShaderProgram::~ShaderProgram(void)
-{
-	m_vertexShader.clear();
-	m_fragShader.clear();
-
-}
-
 void engine::ShaderProgram::LoadResource(const char* filePath)
 {
 	(void) filePath;

@@ -91,7 +91,7 @@ engine::Label* engine::Canvas::AddLabel(const char* text, math::Vector2f const& 
 
 engine::Image* engine::Canvas::AddImage(
 	const char* fileName, 
-	math::Vector2f position)
+	math::Vector2f const& position)
 {
 	m_elements.push_back(new Image(fileName, position));
 
