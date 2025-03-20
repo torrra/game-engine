@@ -34,7 +34,7 @@ target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES})
 # -- Set public include directory for this and other projects -- #
 target_include_directories(${TARGET_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
-	PRIVATE ${ENGINE_INCLUDE_DIR}
+	# PRIVATE ${ENGINE_INCLUDE_DIR}
 )
 
 target_link_libraries(${TARGET_NAME}
