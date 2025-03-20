@@ -28,6 +28,10 @@ namespace engine
 	public:
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName);
+		ENGINE_API static void		LoadShader(
+										const char* shaderProgramName, 
+										const char* vertShader, 
+										const char* fragShader);
 		template<typename TResourceType>
 		static const TResourceType*		GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
@@ -55,7 +59,7 @@ namespace engine
 		// Check if resource exists
 		if (HasResource(fileName))
 		{
-			std::printf("Resource already loaded\n");
+			std::printf("Resource '%s' already loaded\n", fileName.c_str());
 			return;
 		}
 

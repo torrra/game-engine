@@ -1,6 +1,7 @@
 #include "resource/shader/Shader.h"
 #include "resource/shader/ShaderResource.h"
 #include "resource/ResourceManager.h"
+#include "utility/MemoryCheck.h"
 
 #include <glad/glad.h>
 
@@ -8,6 +9,11 @@ engine::ShaderProgram::ShaderProgram(const char* vertexShader, const char* fragS
 	: m_vertexShader(vertexShader), m_fragShader(fragShader), m_programID(0)
 {
 	CreateProgram();
+}
+
+void engine::ShaderProgram::LoadResource(const char* filePath)
+{
+	(void) filePath;
 }
 
 void engine::ShaderProgram::Use(void) const

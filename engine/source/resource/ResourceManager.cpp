@@ -1,7 +1,24 @@
 #include "resource/ResourceManager.h"
+#include "resource/shader/Shader.h"
 
 std::mutex engine::ResourceManager::m_mutex;
 engine::ResourceManager* engine::ResourceManager::m_instance = nullptr;
+
+void engine::ResourceManager::LoadShader(
+		const char* shaderProgramName,
+		const char* vertShader, 
+		const char* fragShader)
+{
+	if (HasResource(shaderProgramName))
+	{
+		std::printf("Shader UID already exists. Failed to create new shader program '%s'\n", 
+			shaderProgramName);
+		
+		return;
+	}
+
+	GetInstance()->m_resources[shaderProgramName] = new ShaderProgram(vertShader, fragShader);
+}
 
 void engine::ResourceManager::Unload(std::string const& fileName)
 {

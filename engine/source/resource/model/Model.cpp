@@ -38,16 +38,6 @@ void engine::Model::LoadResource(const char* fileName)
 	);
 }
 
-void engine::Model::Update(void)
-{
-	for (Mesh& mesh : m_meshes)
-	{
-		glBindVertexArray(mesh.m_vao);
-		glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-	}
-}
-
 const std::vector<engine::Mesh>& engine::Model::GetMeshes(void) const
 {
 	// If model has finished loading from another thread but has not yet

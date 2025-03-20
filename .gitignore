@@ -11,6 +11,7 @@ nppBackup/
 !*[Bb]uild/assets
 !*[Bb]uild/engineShader
 !*[Bb]uild*/scripts
+!*[Bb]uild/fonts
 
 # vim files
 *.swp
