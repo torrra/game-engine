@@ -10,8 +10,10 @@
 
 #define USER_SCRIPT_PATH "\\assets\\scripts\\"
 
-#define ERROR -1
-#define SUCCESS 0
+#define SUCCESS		0
+#define ERROR		1
+
+#define DEFAULT_NAME "Editor";
 
 #define FIX_UPDATE_PER_SECOND 20
 #define TO_MILLISECONDS 0.001f
@@ -23,17 +25,18 @@ engine::Engine::Engine(void)
 
 int16 engine::Engine::Startup(const char* projectName, const char* projectDir, uint32 threadCount)
 {
-	int16 result = SUCCESS;
+	if (!projectDir)
+		std::printf("No project opened\n");
 
 	ThreadManager::Startup(threadCount);
 	
 	m_graph = new SceneGraph();
 
-	if (InitScriptSystem(projectDir)) 
-		return result;
+	if (InitScriptSystem(projectDir))
+		return ERROR;
 
 	if (InitWindow(projectName))
-		return result;
+		return ERROR;
 
 	// TODO: init UI manager
 
@@ -42,9 +45,10 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
 	m_time = Time();
 
 	// Load default resources
-	LoadEngineResources();
+	if (LoadEngineResources())
+		return ERROR;
 
-	return result;
+	return SUCCESS;
 }
 
 void engine::Engine::ShutDown(void)
@@ -112,23 +116,36 @@ engine::Window* engine::Engine::GetWindow(void) const noexcept
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 {
 	char scriptPath[256];
-	memcpy(scriptPath, projectDir, strlen(projectDir) + strlen(USER_SCRIPT_PATH));
-	strcat_s(scriptPath, USER_SCRIPT_PATH);
 
-	ScriptSystem::SetUserScriptLocation(scriptPath);
-	ScriptSystem::Startup(); // TODO: Check for successful init
+	if (projectDir)
+	{
+		// Concatenate file path
+		memcpy(scriptPath, projectDir, strlen(projectDir) + strlen(USER_SCRIPT_PATH));
+		strcat_s(scriptPath, USER_SCRIPT_PATH);
+
+		ScriptSystem::SetUserScriptLocation(scriptPath);
+	}
+
+	ScriptSystem::Startup();
 
 	return SUCCESS;
 }
 
 inline int16 engine::Engine::InitWindow(const char* projectName)
 {
+	std::string windowTitle(projectName);
+
+	if (!projectName)
+	{
+		windowTitle = DEFAULT_NAME;
+	}
+
 	if (Window::InitGLFW())
 		return ERROR;
 
 	// By default open the editor full screen on primary monitor
 	math::Vector2i monitorSize = Monitor::GetPrimaryMonitorSize();
-	m_window = new Window(projectName, monitorSize.GetX(), monitorSize.GetY(), true);
+	m_window = new Window(windowTitle.c_str(), monitorSize.GetX(), monitorSize.GetY(), true);
 
 	return (m_window->GetWindowPtr()) ? SUCCESS : ERROR;
 }
