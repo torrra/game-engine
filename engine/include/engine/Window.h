@@ -25,6 +25,9 @@ namespace engine
 		template<math::CScalarType TValueType = uint32>
 		TValueType					GetHeight(void) const noexcept;
 
+		template<math::CScalarType TValueType = uint32>
+		math::Vector2<TValueType>	GetSize(void) const noexcept;
+
 		ENGINE_API f32				GetAspectRatio(void) const noexcept;
 		ENGINE_API GLFWwindow*		GetWindowPtr(void) const noexcept;
 		ENGINE_API bool				IsIconified(void) const noexcept;
@@ -68,4 +71,13 @@ namespace engine
 		return static_cast<TValueType>(m_size.GetY());
 	}
 
+	template<math::CScalarType TValueType>
+	math::Vector2<TValueType> engine::Window::GetSize(void) const noexcept
+	{
+		return 
+		{
+			static_cast<TValueType>(m_size.GetX(),
+			static_cast<TValueType>(m_size.GetY()
+		};
+	}
 }
