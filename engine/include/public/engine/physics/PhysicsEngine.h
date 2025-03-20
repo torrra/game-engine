@@ -9,6 +9,8 @@
 
 namespace engine
 {
+	struct PhysicsEngineImpl;
+
 	class PhysicsEngine
 	{
 	public :
@@ -58,9 +60,9 @@ namespace engine
 
 		/// Members
 		// Pointer to the implementation of the physx structure
-		struct PhysicsEngineImpl*	m_impl;
+		PhysicsEngineImpl*		m_impl;
 		// Instance of the physics engine
-		static PhysicsEngine*		m_instance;
+		static PhysicsEngine*	m_instance;
 
 	}; // !Class PhysicsEngine
 } // !Namespace engine
