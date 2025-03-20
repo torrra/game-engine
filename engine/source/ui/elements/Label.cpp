@@ -48,11 +48,12 @@ void engine::Label::SetFont(const char* fontName, f32 fontSize)
 {
 	m_font = ResourceManager::GetResource<Font>(fontName)->GetFont();
 
-	if (m_font)
+	if (m_font &&
+		m_font->FontSize >= 1.0f)
 		m_fontScale = fontSize / m_font->FontSize;
 	else
 		// TODO: potentially add logging
-		std::printf("'SetFont()' failed, font '%s' could not be found. Make sure the font file is loaded first.\n", fontName);
+		std::printf("'SetFont()' failed, font '%s' could not be found or invalid font size. Make sure the font file is loaded first.\n", fontName);
 }
 
 void engine::Label::WrapText(f32 maxWidthPx)
