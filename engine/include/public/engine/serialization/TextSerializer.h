@@ -13,6 +13,86 @@
 #include <math/Vector4.hpp>
 #include <math/Quaternion.hpp>
 
+
+namespace engine
+{
+	enum class ESerializedType
+	{
+		UNKNOWN_TYPE,
+
+		// Fundamental types
+
+		UINT8,
+		UINT16,
+		UINT32,
+		UINT64,
+
+		INT8,
+		INT16,
+		INT32,
+		INT64,
+
+		F32,
+		F64,
+
+		STRING,
+
+		// Vector2
+
+		VEC2_UINT8,
+		VEC2_UINT16,
+		VEC2_UINT32,
+		VEC2_UINT64,
+
+		VEC2_INT8,
+		VEC2_INT16,
+		VEC2_INT32,
+		VEC2_INT64,
+
+		VEC2_F32,
+		VEC2_F64,
+
+		// Vector3
+
+		VEC3_UINT8,
+		VEC3_UINT16,
+		VEC3_UINT32,
+		VEC3_UINT64,
+
+		VEC3_INT8,
+		VEC3_INT16,
+		VEC3_INT32,
+		VEC3_INT64,
+
+		VEC3_F32,
+		VEC3_F64,
+
+		// Vector4
+
+		VEC4_UINT8,
+		VEC4_UINT16,
+		VEC4_UINT32,
+		VEC4_UINT64,
+
+		VEC4_INT8,
+		VEC4_INT16,
+		VEC4_INT32,
+		VEC4_INT64,
+
+		VEC4_F32,
+		VEC4_F64,
+
+		// Angle
+
+		DEG_F32,
+		DEG_F64,
+
+		RAD_F32,
+		RAD_F64
+	};
+}
+
+
 namespace engine::text
 {
 	// Basic type is a non-pointer type that has a formatted I/O operator implementation
@@ -28,12 +108,27 @@ namespace engine::text
 
 	void Serialize(std::ofstream& file, const char* name, const std::string& val);
 	void Serialize(std::ofstream& file, const char* name, const char* val, uint64 length);
+
+	template <CSerializableType TValueType>
+	void Deserialize(std::ifstream& file, TValueType& val);	
 }
 
 namespace engine::text::types
 {
 	template <CSerializableType TValueType>
 	std::string GetTypeName(void);
+
+	ESerializedType GetTypeFromName(const std::string& typeName);
+
+	ESerializedType GetUnsignedIntegerTypeFromName(const std::string& typeName);
+	ESerializedType GetSignedIntegerTypeFromName(const std::string& typeName);
+
+	ESerializedType GetVectorTypeFromName(const std::string& typeName);
+
+	ESerializedType Get2DVectorTypeFromName(const std::string& typeName);
+	ESerializedType GetUnsigned2DVectorTypeFromName(const std::string& typeName);
+	ESerializedType GetSigned2DVectorTypeFromName(const std::string& typeName);
+
 }
 
 namespace engine::text
@@ -45,20 +140,13 @@ namespace engine::text
 
 		const char* valName((name) ? name : "unnamed val");
 		file << "@" <<  types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
-	}	
-	
-	inline void Serialize(std::ofstream& file, const char* name, const std::string& val)
-	{
-		const char* valName((name) ? name : "unnamed val");
-		file << "@" << "string " << val.size() << " | " << valName << '=' << val;
 	}
 
-	inline void Serialize(std::ofstream& file, const char* name, const char* val, uint64 length)
+	template<CSerializableType TValueType>
+	void Deserialize(std::ifstream& file, TValueType& val)
 	{
-		const char* valName((name) ? name : "unnamed val");
-		file << "@" << "string " << length << " | " << valName << '=' << val;
+		file >> val;
 	}
-
 }
 
 
