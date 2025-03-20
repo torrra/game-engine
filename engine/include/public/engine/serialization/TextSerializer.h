@@ -88,7 +88,12 @@ namespace engine
 		DEG_F64,
 
 		RAD_F32,
-		RAD_F64
+		RAD_F64,
+
+		// Quaternion
+
+		QUAT_F32,
+		QUAT_F64
 	};
 }
 

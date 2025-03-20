@@ -23,23 +23,39 @@ namespace engine::text::types
 		switch (typeName[1])
 		{
 			// unsigned integer type
-		case 'u':
-			return GetUnsignedIntegerTypeFromName(typeName);
+		case 'u': return GetUnsignedIntegerTypeFromName(typeName);
 
 			// signed integer type
-		case 'i':
-			return GetSignedIntegerTypeFromName(typeName);
+		case 'i': return GetSignedIntegerTypeFromName(typeName);
 
 			// vector type
-		case 'v':
-			return GetVectorTypeFromName(typeName);
+		case 'v': return GetVectorTypeFromName(typeName);
 
 			// string
-		case 's':
-			return ESerializedType::STRING;
+		case 's': return ESerializedType::STRING;
 
-		default:
-			return ESerializedType::UNKNOWN_TYPE;
+			// quaternion
+		case 'q':
+
+			if (typeName[5] == '3')return ESerializedType::QUAT_F32;
+
+			else return ESerializedType::QUAT_F64;
+
+			// radian
+		case 'r':
+
+			if (typeName[4] == '3') return ESerializedType::RAD_F32;
+
+			else return ESerializedType::RAD_F64;
+
+			// degree
+		case 'd':
+
+			if (typeName[4] == '3') return ESerializedType::DEG_F32;
+
+			else return ESerializedType::DEG_F64;
+
+		default: return ESerializedType::UNKNOWN_TYPE;
 		}
 	}
 
@@ -128,10 +144,8 @@ namespace engine::text::types
 
 			if (typeName[6] == '3')
 				return ESerializedType::VEC2_F32;
-			else if (typeName[6] == '6')
+			else
 				return ESerializedType::VEC2_F64;
-
-			else return ESerializedType::UNKNOWN_TYPE;
 
 		default:
 			return ESerializedType::UNKNOWN_TYPE;
