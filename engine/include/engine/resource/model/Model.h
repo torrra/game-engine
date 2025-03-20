@@ -17,6 +17,7 @@ namespace engine
 
 	class Model final : public IResource
 	{
+
 	public:
 		ENGINE_API				Model(void) = default;
 		ENGINE_API virtual		~Model(void) = default;
@@ -24,12 +25,18 @@ namespace engine
 		ENGINE_API virtual void	LoadResource(const char* fileName) override;
 		ENGINE_API void			Update(void); // TODO: temporary function remove
 
-		ENGINE_API
-		const std::vector<Mesh>& GetMeshes(void) const;
 
 	private:
 		void					ProcessNodes(aiNode* node, const aiScene* scene);
 		
-		std::vector<Mesh>	m_meshes;
+		// This function is meant to be used by renderer components, and ONLY from the
+		// render thread.
+		ENGINE_API
+		const std::vector<Mesh>& GetMeshes(void) const;
+
+		mutable std::vector<Mesh>			m_meshes;
+		mutable uint8						m_loadStatus = 0;
+
+		friend class Renderer;
 	};
 }

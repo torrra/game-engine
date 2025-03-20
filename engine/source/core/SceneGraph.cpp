@@ -3,6 +3,8 @@
 
 #include "core/systems/ScriptSystem.h"
 
+#include "thread/ThreadManager.h"
+
 #include <iostream>
 
 namespace engine
@@ -212,15 +214,13 @@ namespace engine
 	}
 
 
-	void SceneGraph::RenderScene(void)
+	void SceneGraph::RenderFromCache(void)
 	{
-		for (Camera& camera : m_sceneCameras)
+		for (Camera& camera : m_renderCache.m_cameraRenderCache)
 		{
 			if (!camera.IsValid() || !camera.IsActive())
 				continue;
 
-			//math::Matrix4f view = camera.GetViewMatrix();
-			//math::Matrix4f projection = camera.GetProjectionMatrix();
 			math::Matrix4f viewProjection = camera.ViewProjection();
 
 			for (Renderer& renderer : m_sceneRenderers)
@@ -228,11 +228,16 @@ namespace engine
 				if (!renderer.IsValid() || !renderer.IsActive())
 					continue;
 
-				renderer.Render(viewProjection);
+				renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
 			}
 		}
 	}
 
+	void SceneGraph::CacheComponents(void)
+	{
+		m_renderCache.m_cameraRenderCache = m_sceneCameras;
+		m_renderCache.m_transformRenderCache = m_sceneTransforms;
+	}
 
 	EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
 	{

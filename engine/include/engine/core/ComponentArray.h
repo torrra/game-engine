@@ -9,6 +9,11 @@ namespace engine
 	{
 	public:
 
+
+		ComponentArray(void) = default;
+		ComponentArray(const ComponentArray&) = default;
+		~ComponentArray(void) = default;
+
 		// Check if a component should be moved to the back of the array. The component will
 		// only be moved if the component type requires children to be updated after parents,
 		// and if the child is found before the parent.
@@ -42,6 +47,8 @@ namespace engine
 
 		auto begin(void);
 		auto end(void);
+
+		ComponentArray& operator=(const ComponentArray&) = default;
 
 	private:
 
