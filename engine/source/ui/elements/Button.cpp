@@ -68,8 +68,8 @@ void engine::Button::Render(void)
 	ImGui::RenderNavCursor(box, id);
 	ImGui::RenderFrame(box.Min, box.Max, color, true, m_rounding);
 	ImGui::RenderTextClipped(
-		box.Min + math::Vector2f((float) m_padding.GetX(), (float) m_padding.GetY()),
-		box.Max - math::Vector2f((float) m_padding.GetX(), (float) m_padding.GetY()),
+		box.Min + math::Vector2f(m_padding.GetX(), m_padding.GetY()),
+		box.Max - math::Vector2f(m_padding.GetX(), m_padding.GetY()),
 		m_text.c_str(), 0, nullptr, ImGui::GetCurrentContext()->Style.ButtonTextAlign,
 		&box
 	);
@@ -102,7 +102,7 @@ void engine::Button::SetRounding(f32 rounding)
 	m_rounding = rounding;
 }
 
-void engine::Button::SetPadding(math::Vector2<uint16> paddingPx)
+void engine::Button::SetPadding(math::Vector2<f32> paddingPx)
 {
 	m_padding = paddingPx;
 }
@@ -125,7 +125,7 @@ void engine::Button::CalcSize(void)
 	
 	m_transform.m_sizePx = 
 	{
-		textSize.GetX() + static_cast<f32>(2 * m_padding.GetX()),
-		textSize.GetY() + static_cast<f32>(2 * m_padding.GetY())
+		textSize.GetX() + (2 * m_padding.GetX()),
+		textSize.GetY() + (2 * m_padding.GetY())
 	};
 }
