@@ -10,18 +10,18 @@
 #define OPENGL_VERSION_MAJOR 4
 #define OPENGL_VERSION_MINOR 5
 
-engine::Window::Window(const char* title, uint32 width, uint32 height)
+engine::Window::Window(const char* title, uint32 width, uint32 height, bool fullScreen)
 	: m_title(title), m_size({width, height}), m_windowPtr(nullptr)
 {
 	static bool isInitialized = false;
+	
+	CreateWindow(fullScreen);
 
 	if (!isInitialized)
 	{
-		Init();
+		InitGlad();
 		isInitialized = true;
 	}
-	else
-		CreateWindow();
 }
 
 f32 engine::Window::GetAspectRatio(void) const noexcept
@@ -64,8 +64,6 @@ void engine::Window::UpdateBuffers(void)
 {
 	glfwSwapBuffers(m_windowPtr);
 	glfwPollEvents();
-
-	g_engineTime.Update();
 }
 
 void engine::Window::Shutdown(void)
@@ -78,18 +76,7 @@ GLFWwindow* engine::Window::GetCurrentContext(void)
 	return glfwGetCurrentContext();
 }
 
-int32 engine::Window::Init(void)
-{
-	int32 result;
-
-	result = InitGLFW();
-	result = CreateWindow();
-	result = InitGlad();
-
-	return result;
-}
-
-int32 engine::Window::InitGLFW(void)
+int16 engine::Window::InitGLFW(void)
 {
 	bool result = glfwInit();
 
@@ -122,8 +109,10 @@ int32 engine::Window::InitGlad(void)
 	return 0;
 }
 
-int32 engine::Window::CreateWindow()
+int32 engine::Window::CreateWindow(bool fullScreen)
 {
+	glfwWindowHint(GLFW_MAXIMIZED, fullScreen);
+
 	m_windowPtr = glfwCreateWindow(
 		m_size.GetX(), m_size.GetY(),
 		m_title.c_str(),
@@ -171,6 +160,4 @@ void engine::Window::SizeCallback(GLFWwindow* window, int32 width, int32 height)
 	Window* windowPtr = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 
 	windowPtr->SetSize(width, height);
-
-	glViewport(0, 0, width, height);
 }
