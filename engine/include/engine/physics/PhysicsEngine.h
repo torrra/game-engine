@@ -9,8 +9,6 @@
 
 namespace engine
 {
-	struct PhysicsEngineImpl;
-
 	class PhysicsEngine
 	{
 	public :
@@ -35,8 +33,6 @@ namespace engine
 		// Release all physx resources
 		ENGINE_API void		CleanUp(void);
 
-		ENGINE_API PhysicsEngineImpl* GetImpl(void) const { return m_impl; }
-
 	private :
 
 		/// Constructor
@@ -60,7 +56,7 @@ namespace engine
 
 		/// Members
 		// Pointer to the implementation of the physx structure
-		PhysicsEngineImpl*	m_impl;
+		struct PhysicsEngineImpl*	m_impl;
 		// Instance of the physics engine
 		static PhysicsEngine*		m_instance;
 
