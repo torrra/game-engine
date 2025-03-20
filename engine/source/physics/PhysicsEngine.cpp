@@ -60,7 +60,7 @@ engine::PhysicsEngine& engine::PhysicsEngine::Get(void)
 
 void engine::PhysicsEngine::Init(void)
 {
-	PhysicsEngineImpl& impl = *m_impl;
+	//PhysicsEngineImpl& impl = *m_impl;
 
 	/*
 		Founction to create the base of physX, everything of physx is based on foundation
@@ -72,7 +72,7 @@ void engine::PhysicsEngine::Init(void)
 		<param> errorCallback : Let us to not use printf/cout directly
 		Can overload those classes to have our own allocator or error log
 	*/
-	impl.m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
+	m_impl->m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
 										   gDefaultErrorCallback);
 
 	/*
@@ -81,9 +81,9 @@ void engine::PhysicsEngine::Init(void)
 			- Send to pvd in real time
 		<param> Foundation : The base of physX
 	*/
-	if (impl.m_foundation != nullptr)
+	if (m_impl->m_foundation != nullptr)
 	{
-		impl.m_pvd = physx::PxCreatePvd(*impl.m_foundation);
+		m_impl->m_pvd = physx::PxCreatePvd(*m_impl->m_foundation);
 	}
 
 	/*
@@ -107,7 +107,7 @@ void engine::PhysicsEngine::Init(void)
 	*/
 	if (transport != nullptr)
 	{
-		impl.m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
+		m_impl->m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
 	}
 
 	/*
@@ -119,10 +119,13 @@ void engine::PhysicsEngine::Init(void)
 		<param> Track out standing allocation (optional) : Follow memory allocation
 		<param> Pvd (optional) : Let to connect pvd for debug.
 	*/
-	impl.m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *impl.m_foundation,
-									 physx::PxTolerancesScale(), true, impl.m_pvd);
+	if (m_impl->m_foundation != nullptr)
+	{
+		m_impl->m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_impl->m_foundation,
+			physx::PxTolerancesScale(), true, m_impl->m_pvd);
+	}
 
-	if (impl.m_physics != nullptr)
+	if (m_impl->m_physics != nullptr)
 	{
 		/*
 			values for the tolerances in the scene, these must be the same values passed into
@@ -130,7 +133,7 @@ void engine::PhysicsEngine::Init(void)
 			frictionOffsetThreshold
 			<param> Scale : Define physic tolerance (size, speed, mass, etc.)
 		*/
-		physx::PxSceneDesc sceneDesc(impl.m_physics->getTolerancesScale());
+		physx::PxSceneDesc sceneDesc(m_impl->m_physics->getTolerancesScale());
 		// Set the value of the gravity by default to -9.81f
 		sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
@@ -140,8 +143,8 @@ void engine::PhysicsEngine::Init(void)
 			on multiple threads. Allows to distribute tasks on multiple threads
 			<param> Nb threads : Number of threads
 		*/
-		impl.m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-		sceneDesc.cpuDispatcher = impl.m_dispatcher;
+		m_impl->m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+		sceneDesc.cpuDispatcher = m_impl->m_dispatcher;
 		/*
 			Decide how to manage the interaction between physics objects as
 				- how the will collides
@@ -163,7 +166,7 @@ void engine::PhysicsEngine::Init(void)
 			Every interaction between objects will be calculate in this scene.
 			<param> SceneDesc : The description of the scene
 		*/
-		impl.m_scene = impl.m_physics->createScene(sceneDesc);
+		m_impl->m_scene = m_impl->m_physics->createScene(sceneDesc);
 	}
 	
 	/*
@@ -173,30 +176,30 @@ void engine::PhysicsEngine::Init(void)
 		<param> Static friction : Resistance during the movement
 		<param> Restitution : Bounce capacity (elasticity)
 	*/
-	impl.m_material = impl.m_physics->createMaterial(0.5f, 0.5f, 0.6f);
+	m_impl->m_material = m_impl->m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
 void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
 {
-	PhysicsEngineImpl& impl = *m_impl;
-	impl.m_scene->simulate(inDeltaTime);
-	impl.m_scene->fetchResults(true);
+	//PhysicsEngineImpl& impl = *m_impl;
+	m_impl->m_scene->simulate(inDeltaTime);
+	m_impl->m_scene->fetchResults(true);
 }
 
 void engine::PhysicsEngine::CleanUp(void)
 {
 	// Release all physX elements in the good order
-	PhysicsEngineImpl& impl = *m_impl;
-	PX_RELEASE(impl.m_material);
-	PX_RELEASE(impl.m_scene);
-	PX_RELEASE(impl.m_dispatcher);
-	PX_RELEASE(impl.m_physics);
+	//PhysicsEngineImpl& impl = *m_impl;
+	PX_RELEASE(m_impl->m_material);
+	PX_RELEASE(m_impl->m_scene);
+	PX_RELEASE(m_impl->m_dispatcher);
+	PX_RELEASE(m_impl->m_physics);
 	// Disconnect transport and pvd before realeasing them
-	impl.m_pvd->getTransport()->disconnect();
-	impl.m_pvd->disconnect();
-	impl.m_pvd->getTransport()->release();
-	PX_RELEASE(impl.m_pvd);
-	PX_RELEASE(impl.m_foundation);
+	m_impl->m_pvd->getTransport()->disconnect();
+	m_impl->m_pvd->disconnect();
+	m_impl->m_pvd->getTransport()->release();
+	PX_RELEASE(m_impl->m_pvd);
+	PX_RELEASE(m_impl->m_foundation);
 
 	// Delete the instance
 	delete m_instance;

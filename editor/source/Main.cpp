@@ -3,6 +3,7 @@
 #include <engine/utility/MemoryCheck.h>
 
 #include "engine/physics/geometry/GeometryTest.h"
+#include "engine/physics/PhysicsEngine.h"
 
 #include <math/VectorGeneric.hpp>
 #include <math/Vector3.hpp>
@@ -18,16 +19,29 @@ int main(void)
 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	{
-		engine::Physics physics;
+		/// Geometry Test
+		/// TODO : Delete while rigid body are implemented
+		//engine::Physics physics;
 
-		engine::RigidBody box(physics.GetPhysics(), physics.GetScene(), physics.GetMaterial(), math::Vector3f(-10.f, 2.f, 0.f));
+		//engine::RigidBody box(physics.GetPhysics(), physics.GetScene(), physics.GetMaterial(), math::Vector3f(-10.f, 2.f, 0.f));
 	
-		box.SetVelocity(math::Vector3f(10.f, 0.f, 0.f));
+		//box.SetVelocity(math::Vector3f(10.f, 0.f, 0.f));
+
+		//for (int i = 0; i < 300; ++i)
+		//{
+		//	physics.StepSimulation(1.f / 60.f);
+		//}
+
+		/// PhysicsEngine use
+		engine::PhysicsEngine* physics;
+		physics->Get().Init();
 
 		for (int i = 0; i < 300; ++i)
 		{
-			physics.StepSimulation(1.f / 60.f);
+			physics->Get().StepSimulation(1.f / 60.f);
 		}
+
+		physics->Get().CleanUp();
 	}
 
 	// Memory leak check
