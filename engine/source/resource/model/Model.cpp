@@ -35,16 +35,6 @@ void engine::Model::LoadResource(const char* fileName)
 	}
 }
 
-void engine::Model::Update(void)
-{
-	for (Mesh& mesh : m_meshes)
-	{
-		glBindVertexArray(mesh.m_vao);
-		glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-	}
-}
-
 void engine::Model::ProcessNodes(aiNode* node, const aiScene* scene)
 {
 	m_meshes.reserve(scene->mNumMeshes);
