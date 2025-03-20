@@ -60,8 +60,6 @@ engine::PhysicsEngine& engine::PhysicsEngine::Get(void)
 
 void engine::PhysicsEngine::Init(void)
 {
-	//PhysicsEngineImpl& impl = *m_impl;
-
 	/*
 		Founction to create the base of physX, everything of physx is based on foundation
 		Foundation manage the initialization of the memory management, prepare error
@@ -73,45 +71,69 @@ void engine::PhysicsEngine::Init(void)
 		Can overload those classes to have our own allocator or error log
 	*/
 	m_impl->m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-										   gDefaultErrorCallback);
+						   gDefaultErrorCallback);
 
-	/*
-		Create an instance of physx visual debugger which is the interface of communication
-			- Recover internal data of physx engine
-			- Send to pvd in real time
-		<param> Foundation : The base of physX
-	*/
+	bool isPvdInitialized = InitPvd();
+
+	InitPhysics(isPvdInitialized);
+
+	InitScene();
+
+	std::cout << "Physics engine initialized" << std::endl;
+}
+
+bool engine::PhysicsEngine::InitPvd(void)
+{
+	bool isConnected = false;
+
 	if (m_impl->m_foundation != nullptr)
 	{
+		/*
+			Create an instance of physx visual debugger which is the interface of communication
+				- Recover internal data of physx engine
+				- Send to pvd in real time
+			<param> Foundation : The base of physX
+		*/
 		m_impl->m_pvd = physx::PxCreatePvd(*m_impl->m_foundation);
+
+		/*
+			Allows to send to the pvd in real time to be able to understand errors
+				- Rigid bodies position
+				- Collision shapes
+				- Constraints applied
+				- etc
+			<param> Host : Address IP (most of the time 127.0.0.1)
+			<param> Port : Port number (most of the time 5425)
+			<param> Timeout in milliseconds : Timeout of the connection
+		*/
+		physx::PxPvdTransport* transport;
+		transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+
+		/*
+			Activate the connection to the pvd, determine what type of data to send and check
+			if the connection is successful
+			<param> Transport : The transport to connect previously created
+			<param> Flags : What type of data to send (eALL to send everything)
+		*/
+		if (transport != nullptr)
+		{
+			isConnected = m_impl->m_pvd->connect(*transport,
+				physx::PxPvdInstrumentationFlag::eALL);
+		}
 	}
 
-	/*
-		Allows to send to the pvd in real time to be able to understand errors
-			- Rigid bodies position
-			- Collision shapes
-			- Constraints applied
-			- etc
-		<param> Host : Address IP (most of the time 127.0.0.1)
-		<param> Port : Port number (most of the time 5425)
-		<param> Timeout in milliseconds : Timeout of the connection
-	*/
-	physx::PxPvdTransport* transport;
-	transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-
-	/*
-		Activate the connection to the pvd, determine what type of data to send and check
-		if the connection is successful
-		<param> Transport : The transport to connect previously created
-		<param> Flags : What type of data to send (eALL to send everything)
-	*/
-	if (transport != nullptr)
+	if (!isConnected)
 	{
-		m_impl->m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
+		return false;
 	}
 
+	return true;
+}
+
+void engine::PhysicsEngine::InitPhysics(bool inIsPvdConnected)
+{
 	/*
-		Will manage every physics scene, every physics object(rigid bodies, collision shapes, 
+		Will manage every physics scene, every physics object(rigid bodies, collision shapes,
 		etc.), manage materials, manage constraints, etc.
 		<param> Version : PhysX SDK version
 		<param> Foundation : The base of physX
@@ -121,10 +143,21 @@ void engine::PhysicsEngine::Init(void)
 	*/
 	if (m_impl->m_foundation != nullptr)
 	{
-		m_impl->m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_impl->m_foundation,
-			physx::PxTolerancesScale(), true, m_impl->m_pvd);
+		if (inIsPvdConnected)
+		{
+			m_impl->m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_impl->m_foundation,
+				physx::PxTolerancesScale(), true, m_impl->m_pvd);
+		}
+		else
+		{
+			m_impl->m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_impl->m_foundation,
+				physx::PxTolerancesScale(), true);
+		}
 	}
+}
 
+void engine::PhysicsEngine::InitScene(void)
+{
 	if (m_impl->m_physics != nullptr)
 	{
 		/*
@@ -167,21 +200,20 @@ void engine::PhysicsEngine::Init(void)
 			<param> SceneDesc : The description of the scene
 		*/
 		m_impl->m_scene = m_impl->m_physics->createScene(sceneDesc);
+
+		/*
+			Allow to create a physic material to personalize the physic behavior of the objects.
+			Determine wich type of objects will collide, what is the friction, what is the restitution
+			<param> Dynamic friction : Resistance to start a movement
+			<param> Static friction : Resistance during the movement
+			<param> Restitution : Bounce capacity (elasticity)
+		*/
+		m_impl->m_material = m_impl->m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 	}
-	
-	/*
-		Allow to create a physic material to personalize the physic behavior of the objects.
-		Determine wich type of objects will collide, what is the friction, what is the restitution
-		<param> Dynamic friction : Resistance to start a movement
-		<param> Static friction : Resistance during the movement
-		<param> Restitution : Bounce capacity (elasticity)
-	*/
-	m_impl->m_material = m_impl->m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
 void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
 {
-	//PhysicsEngineImpl& impl = *m_impl;
 	m_impl->m_scene->simulate(inDeltaTime);
 	m_impl->m_scene->fetchResults(true);
 }
@@ -189,7 +221,6 @@ void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
 void engine::PhysicsEngine::CleanUp(void)
 {
 	// Release all physX elements in the good order
-	//PhysicsEngineImpl& impl = *m_impl;
 	PX_RELEASE(m_impl->m_material);
 	PX_RELEASE(m_impl->m_scene);
 	PX_RELEASE(m_impl->m_dispatcher);
@@ -204,4 +235,6 @@ void engine::PhysicsEngine::CleanUp(void)
 	// Delete the instance
 	delete m_instance;
 	m_instance = nullptr;
+
+	std::cout << "Physics engine cleaned up" << std::endl;
 }

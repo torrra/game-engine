@@ -45,6 +45,15 @@ namespace engine
 		// Delete the PhyscsEngineImpl pointer
 							~PhysicsEngine(void);
 
+		/// Functions
+		// Initialize PVD/transport
+		bool				InitPvd(void);
+		// Initialize physics
+		void 				InitPhysics(bool inIsPvdConnected);
+		// Initialize the scene/material/dispatcher
+		void				InitScene(void);
+
+
 		/// Members
 		// Pointer to the implementation of the physx structure
 		struct PhysicsEngineImpl*	m_impl;
