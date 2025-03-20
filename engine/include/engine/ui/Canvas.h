@@ -43,7 +43,7 @@ namespace engine
 
 		// Add UI elements
 		ENGINE_API Label*		AddLabel(const char* text, math::Vector2f const& position);
-		ENGINE_API Image*		AddImage(const char* fileName, math::Vector2f position);
+		ENGINE_API Image*		AddImage(const char* fileName, math::Vector2f const& position);
 		ENGINE_API Button*		AddButton(const char* text, math::Vector2f const& position, math::Vector2f const& size);
 		ENGINE_API ProgressBar*	AddProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range);
 		ENGINE_API Rectangle*	AddRectangle(math::Vector2f const& position, math::Vector2f const& size);
