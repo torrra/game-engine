@@ -176,6 +176,13 @@ void engine::PhysicsEngine::Init(void)
 	impl.m_material = impl.m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
+void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
+{
+	PhysicsEngineImpl& impl = *m_impl;
+	impl.m_scene->simulate(inDeltaTime);
+	impl.m_scene->fetchResults(true);
+}
+
 void engine::PhysicsEngine::CleanUp(void)
 {
 	// Release all physX elements in the good order

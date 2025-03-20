@@ -3,6 +3,7 @@
 #pragma region Engine
 
 #include "engine/EngineExport.h"
+#include "engine/CoreTypes.h"
 
 #pragma endregion
 
@@ -27,8 +28,8 @@ namespace engine
 				- Material
 		*/
 		ENGINE_API void		Init(void);
-		// Update the physics engine
-		ENGINE_API void		StepSimulation(void);
+		// 
+		ENGINE_API void		StepSimulation(f32 inDeltaTime);
 		// Release all physx resources
 		ENGINE_API void		CleanUp(void);
 
