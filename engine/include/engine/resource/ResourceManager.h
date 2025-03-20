@@ -29,7 +29,7 @@ namespace engine
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName);
 		ENGINE_API static void		LoadShader(
-										const char* shaderUID, 
+										const char* shaderProgramName, 
 										const char* vertShader, 
 										const char* fragShader);
 		template<typename TResourceType>
