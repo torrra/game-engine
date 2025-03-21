@@ -42,6 +42,9 @@ namespace engine
 		ENGINE_API
 		void Invalidate(void);
 
+		ENGINE_API
+		EntityHandle GetOwner(void) const;
+
 	protected:
 
 		// which entity in scene graph owns this component

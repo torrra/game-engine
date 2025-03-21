@@ -33,4 +33,9 @@ namespace engine
 	{
 		m_flags |= ecs::INVALID_OBJECT;
 	}
+
+	EntityHandle Component::GetOwner(void) const
+	{
+		return m_owner;
+	}
 }
