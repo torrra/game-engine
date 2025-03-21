@@ -17,6 +17,8 @@ namespace engine
 		ScriptObject(const ScriptObject&) = default;
 		~ScriptObject(void) = default;
 
+		const std::string& GetType(void) const;
+
 		// Create lua instance
 		void Register(void) const;
 

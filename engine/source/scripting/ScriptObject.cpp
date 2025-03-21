@@ -9,6 +9,11 @@ namespace engine
 		Register();
 	}
 
+	const std::string& ScriptObject::GetType(void) const
+	{
+		return m_type;
+	}
+
 	void ScriptObject::Register(void) const
 	{
 		ScriptSystem::RegisterNewScriptObject(m_type, m_entity);
