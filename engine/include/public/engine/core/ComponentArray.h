@@ -40,6 +40,10 @@ namespace engine
 		bool			HasComponent(EntityHandle entity);
 
 
+		// Get component's location in array from its owner's handle
+		uint64			GetComponentIndex(EntityHandle owner);
+
+
 		// Standard functions necessary to use ranged for loops.
 		// Cannot use PascalCase for these two functions as they must
 		// match a precise syntax. Their return types are STL vector
@@ -181,6 +185,15 @@ namespace engine
 	inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity)
 	{
 		return m_entityIndexMap.contains(entity);
+	}
+
+	template<CValidComponent TComponentType>
+	inline uint64 ComponentArray<TComponentType>::GetComponentIndex(EntityHandle owner)
+	{
+		if (m_entityIndexMap.contains(owner))
+			return m_entityIndexMap[owner];
+		else
+			return static_cast<uint64>(-1);
 	}
 
 	template<CValidComponent TComponentType>
