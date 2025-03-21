@@ -126,6 +126,9 @@ namespace engine
 		}
 
 		text::Serialize(output, "owner", owner);
+
+		output << "\n    ";
+		text::Serialize(output, "hasTexture", (bool)texture);
 		output << "\n    ";
 		text::Serialize(output, "model", *model);
 		output << "\n    ";
@@ -147,6 +150,11 @@ namespace engine
 		text::MoveCursorToVal(input);
 		text::Deserialize(input, m_owner);
 
+		bool hasTexture;
+
+		text::MoveCursorToVal(input);
+		text::Deserialize(input, hasTexture);
+
 		std::string key;
 
 		text::Deserialize(input, key);
@@ -157,22 +165,12 @@ namespace engine
 		text::Deserialize(input, key);
 		m_shader = ResourceManager::GetResource<ShaderProgram>(key);
 
-		input >> key;
-
-		if (key[1] == '@')
+		if (hasTexture)
 		{
 			key.clear();
 			text::Deserialize(input, key);
 			m_texture = ResourceManager::GetResource<Texture>(key);
-			return;
-		}
-	
-		while (key.size() > 0)
-		{
-			input.putback(key.back());
-			key.pop_back();
-		}
-		
+		}		
 	}
 
 	void Renderer::DrawModel(void) const
