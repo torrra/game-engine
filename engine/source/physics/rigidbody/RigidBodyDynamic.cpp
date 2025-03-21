@@ -29,20 +29,6 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene
 	m_rigidBodyImpl = new RigidBodyDynamicImpl();
 	m_owner			= owner;
 	m_currentScene	= scene;
-
-	Transform* transform = scene->GetComponent<Transform>(owner);
-
-	if (transform != nullptr)
-	{
-		CreateDynamicRigidBody(m_physicsEngine->Get(), *transform);
-		std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
-	}
-	else
-	{
-		Transform* transform2 = scene->CreateComponent<Transform>(owner);
-		CreateDynamicRigidBody(m_physicsEngine->Get(), *transform2);
-		std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
-	}
 }
 
 void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine,

@@ -66,7 +66,7 @@ namespace engine
 		/// Private members
 		RigidBodyDynamicImpl*	m_rigidBodyImpl;
 		PhysicsEngine*			m_physicsEngine		= nullptr;
-		bool					m_isGravityDisabled = false;
+		bool					m_isGravityDisabled = true;
 
 	}; // !Class RigidBodyDynamic
 } //!Namespace engine

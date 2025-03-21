@@ -8,6 +8,7 @@
 
 #include "engine/core/SceneGraph.h"
 #include "engine/core/Entity.h"
+#include "engine/core/components/Transform.h"
 
 #include "engine/core/systems/ScriptSystem.h"
 
@@ -33,6 +34,18 @@ int main(void)
 		physics->Get().Init();
 
 		engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(entityHandle, scene);
+		engine::Transform* transform = scene->GetComponent<engine::Transform>(entityHandle);
+		if (transform != nullptr)
+		{
+			rigidBody->CreateDynamicRigidBody(physics->Get(), *transform);
+			std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
+		}
+		else
+		{
+			engine::Transform* transform2 = scene->CreateComponent<engine::Transform>(entityHandle);
+			rigidBody->CreateDynamicRigidBody(physics->Get(), *transform2);
+			std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
+		}
 
 		for (int i = 0; i < 300; ++i)
 		{
