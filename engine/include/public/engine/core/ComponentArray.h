@@ -34,14 +34,15 @@ namespace engine
 		TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent,
 										class SceneGraph* scene);
 
-		TComponentType* GetComponent(EntityHandle owner);
+		TComponentType*			GetComponent(EntityHandle owner);
+		const TComponentType*	GetComponent(EntityHandle owner) const;
 
 		// Check if an entity owns a component in this array
-		bool			HasComponent(EntityHandle entity);
+		bool			HasComponent(EntityHandle entity) const;
 
 
 		// Get component's location in array from its owner's handle
-		uint64			GetComponentIndex(EntityHandle owner);
+		uint64			GetComponentIndex(EntityHandle owner) const;
 
 
 		// Standard functions necessary to use ranged for loops.
@@ -181,17 +182,26 @@ namespace engine
 		return &m_components[m_entityIndexMap[owner]];
 	}
 
+	template<CValidComponent TComponentType> inline
+	const TComponentType* ComponentArray<TComponentType>::GetComponent(EntityHandle owner) const
+	{
+		if (!m_entityIndexMap.contains(owner))
+			return nullptr;
+
+		return &m_components[m_entityIndexMap.at(owner)];
+	}
+
 	template<CValidComponent TComponentType>
-	inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity)
+	inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity) const
 	{
 		return m_entityIndexMap.contains(entity);
 	}
 
 	template<CValidComponent TComponentType>
-	inline uint64 ComponentArray<TComponentType>::GetComponentIndex(EntityHandle owner)
+	inline uint64 ComponentArray<TComponentType>::GetComponentIndex(EntityHandle owner) const
 	{
 		if (m_entityIndexMap.contains(owner))
-			return m_entityIndexMap[owner];
+			return m_entityIndexMap.at(owner);
 		else
 			return static_cast<uint64>(-1);
 	}
