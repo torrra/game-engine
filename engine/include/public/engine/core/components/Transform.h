@@ -91,7 +91,9 @@ namespace engine
 		ENGINE_API void					AddScale(const math::Vector3f& inScale);
 
 		// Serialize rotation, position and scale in plain text
-		ENGINE_API void					SerializeText(std::ofstream& output);
+		ENGINE_API void					SerializeText(std::ofstream& output,
+													  EntityHandle owner,
+													  uint64 index) const;
 
 		/// Operators
 		// Copy assignement set to default

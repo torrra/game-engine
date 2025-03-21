@@ -157,9 +157,20 @@ void engine::Transform::AddScale(const math::Vector3f& scale)
 	m_dirty = true;
 }
 
-void engine::Transform::SerializeText(std::ofstream& output)
+void engine::Transform::SerializeText(std::ofstream& output, EntityHandle owner,
+									 uint64 index) const
 {
 	output << "[Transform]\n    ";
+
+	if constexpr (UpdateAfterParent<Transform>::m_value)
+	{
+		text::Serialize(output, "index", index);
+		output << "\n    ";
+	}
+
+
+	text::Serialize(output, "owner", owner);
+	output << "\n    ";
 	text::Serialize(output, "rotation", m_rotation);
 	output << "\n    ";
 	text::Serialize(output, "position", m_position);

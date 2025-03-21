@@ -106,21 +106,30 @@ namespace engine
 			m_texture = texture;
 	}
 
-	void Renderer::SerializeText(std::ofstream& output)
+	void Renderer::SerializeText(std::ofstream& output, EntityHandle owner,
+								 uint64 index) const
 	{
-		// TODO: uncomment shader serialization when UI branch is merged
 
 		const std::string* model = ResourceManager::FindKeyByVal(m_model);
 		const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
-		//const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
+		const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
 
-		if ((!model) /*|| (!shader)*/)
+		if ((!model) || (!shader))
 			return;
 
 		output << "[Renderer]\n    ";
+
+		if constexpr (UpdateAfterParent<Renderer>::m_value)
+		{
+			text::Serialize(output, "index", index);
+			output << "\n    ";
+		}
+
+		text::Serialize(output, "owner", owner);
+		output << "\n    ";
 		text::Serialize(output, "model", *model);
-		/*output << "\n    ";
-		text::Serialize(output, "shader", *shader);*/
+		output << "\n    ";
+		text::Serialize(output, "shader", *shader);
 		output << "\n    ";
 
 		if (texture)

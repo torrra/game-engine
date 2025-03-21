@@ -50,7 +50,9 @@ namespace engine
 		void SetTexture(const char* key);
 
 		ENGINE_API
-		void SerializeText(std::ofstream& output);
+		void SerializeText(std::ofstream& output,
+						   EntityHandle owner,
+						   uint64 index) const;
 
 	private:
 

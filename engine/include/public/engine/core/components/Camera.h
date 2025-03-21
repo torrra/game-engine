@@ -51,7 +51,9 @@ namespace engine
 		ENGINE_API void SetNearPlane(f32 nearPlane);
 		ENGINE_API void SetFarPlane(f32 farPlane);
 
-		ENGINE_API void SerializeText(std::ofstream& output);
+		ENGINE_API void SerializeText(std::ofstream& output,
+									  EntityHandle owner,
+									  uint64 index) const;
 
 
 	private:

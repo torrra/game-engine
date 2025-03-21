@@ -107,9 +107,18 @@ void engine::Camera::SetFarPlane(f32 farPlane)
 	GetProjectionMatrix();
 }
 
-void engine::Camera::SerializeText(std::ofstream& output)
+void engine::Camera::SerializeText(std::ofstream& output, EntityHandle owner,
+								   uint64 index) const
 {
 	output << "[Camera]\n    ";
+
+	if constexpr (UpdateAfterParent<Camera>::m_value)
+	{
+		text::Serialize(output, "index", index);
+		output << "\n    ";
+	}
+	text::Serialize(output, "owner", owner);
+	output << "\n    ";
 	text::Serialize(output, "near", m_frustum.m_near);
 	output << "\n    ";
 	text::Serialize(output, "far", m_frustum.m_far);
