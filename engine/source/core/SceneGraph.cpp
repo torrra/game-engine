@@ -1,9 +1,10 @@
 #include "core/SceneGraph.h"
 #include "core/Entity.h"
-
 #include "core/systems/ScriptSystem.h"
 
 #include "thread/ThreadManager.h"
+
+#include "serialization/TextSerializer.h"
 
 #include <iostream>
 
@@ -301,6 +302,62 @@ namespace engine
 	int64 SceneGraph::Random::Generate()
 	{
 		return m_distribution(m_generator);
+	}
+
+
+	SceneGraph::HandleMap SceneGraph::SerializeValidEntitiesText(std::ofstream& file)
+	{
+		std::vector<Entity> validEntities;
+		HandleMap			handles;
+
+		uint64 index = 0;
+		for (const Entity& entity : m_sceneEntities)
+		{
+			if (!entity.IsValid())
+				continue;
+
+			EntityHandle newHandle = MakeHandle(index, entity.m_handle & Entity::UID_MASK);
+
+			handles[entity.m_handle] = newHandle;
+			validEntities.push_back(entity);
+			++index;
+		}
+
+		for (Entity& entity : validEntities)
+		{
+			entity.m_handle = handles[entity.m_handle];
+			entity.m_parent = handles[entity.m_parent];
+
+			SerializeEntityText(file, entity);
+		}
+
+		return handles;
+	}
+
+	void SceneGraph::SerializeEntityText(std::ofstream& file, const Entity& entity)
+	{
+		file << "[Entity]\n";
+		text::Serialize(file, "name", entity.m_name);
+		file << "\n   ";
+		text::Serialize(file, "handle", entity.m_handle);
+		file << "\n   ";
+		text::Serialize(file, "parent", entity.m_parent);
+		file << "\n   ";
+		text::Serialize(file, "flags", entity.m_statusFlags);
+		file << "\n   ";
+		text::Serialize(file, "components", entity.m_components);
+		file << '\n';
+	}
+
+
+	void SceneGraph::SerializeText(std::ofstream& file)
+	{
+		HandleMap newHandles = SerializeValidEntitiesText(file);
+
+		SerializeComponents<Transform>(file, newHandles);
+		SerializeComponents<Camera>(file, newHandles);
+		SerializeComponents<Renderer>(file, newHandles);
+
 	}
 
 }

@@ -22,6 +22,9 @@ namespace engine
 
 	private:
 
+		using HandleMap = std::unordered_map<EntityHandle, EntityHandle>;
+
+
 		// Random uint64 generator.
 		class Random
 		{
@@ -148,6 +151,9 @@ namespace engine
 		void CacheComponents(void);
 
 		ENGINE_API
+		void SerializeText(std::ofstream& file);
+
+		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
 		// Output a int64 between LONG_MIN and LONG_MAX
@@ -174,6 +180,13 @@ namespace engine
 		template <CValidComponent TComponentType>
 		void RegisterComponents(void);
 
+		HandleMap SerializeValidEntitiesText(std::ofstream& text);
+
+		void SerializeEntityText(std::ofstream& file, const Entity& entity);
+
+
+		template <CValidComponent TComponentType>
+		void SerializeComponents(std::ofstream& file, HandleMap& handles);
 
 
 		// All transform components in the scene
@@ -262,6 +275,19 @@ namespace engine
 		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
 		return array.GetComponent(ownerEntity);
+	}
+
+
+	template<CValidComponent TComponentType>
+	inline void SceneGraph::SerializeComponents(std::ofstream& file, HandleMap& handles)
+	{
+		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+		for (const TComponentType& component : array)
+		{
+			uint64 index = array.GetComponentIndex(component.GetOwner());
+			component.SerializeText(file, handles[component.GetOwner()], index);
+		}
 	}
 
 
