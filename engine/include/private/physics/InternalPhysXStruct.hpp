@@ -25,4 +25,10 @@ namespace engine
 		physx::PxRigidDynamic*			m_rigidBodyDynamic	= nullptr;
 
 	}; // !Struct RigidBodyImpl
+
+	struct MaterialImpl
+	{
+		physx::PxMaterial*				m_material			= nullptr;
+
+	}; // !Struct MaterialImpl
 } // !Namespace engine
