@@ -14,6 +14,30 @@ namespace engine::text
 		const char* valName((name) ? name : "unnamed val");
 		file << "@" << "string " << length << " | " << valName << '=' << val;
 	}
+
+	void MoveCursorToVal(uint64& pos, const std::string& line)
+	{
+		while (line[pos] != '=' && pos < line.size())
+			++pos;
+
+		// Get to first character of value
+		if (pos < line.size())
+			++pos;
+	}
+
+	void MoveCursorToVal(std::ifstream& file)
+	{
+		while (file.peek() != '=' && !file.eof())
+		{
+			if (!isalnum(file.peek()))
+				file.seekg(2, std::ios::cur);
+			else
+				file.seekg(1, std::ios::cur);
+		}
+
+		if (!file.eof())
+			file.seekg(1, std::ios::cur);
+	}
 }
 
 namespace engine::text::types

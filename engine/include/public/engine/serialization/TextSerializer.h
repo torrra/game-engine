@@ -116,6 +116,9 @@ namespace engine::text
 
 	template <CSerializableType TValueType>
 	void Deserialize(std::ifstream& file, TValueType& val);	
+
+	void MoveCursorToVal(uint64& pos, const std::string& line);
+	void MoveCursorToVal(std::ifstream& file);
 }
 
 namespace engine::text::types
