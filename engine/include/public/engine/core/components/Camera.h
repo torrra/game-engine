@@ -53,7 +53,9 @@ namespace engine
 
 		ENGINE_API void SerializeText(std::ofstream& output,
 									  EntityHandle owner,
-									  uint64 index) const;
+									  uint64 index) const override;
+
+		ENGINE_API void DeserializeText(std::ifstream& input) override;
 
 
 	private:

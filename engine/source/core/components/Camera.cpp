@@ -135,6 +135,34 @@ void engine::Camera::SerializeText(std::ofstream& output, EntityHandle owner,
 	output << '\n';
 }
 
+
+void engine::Camera::DeserializeText(std::ifstream& input)
+{	
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_owner);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_frustum.m_near);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_frustum.m_far);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_frustum.m_fovRad);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_frustum.m_ratio);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_rotation);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_position);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_flags);
+}
+
 math::Matrix4f engine::Camera::GetViewMatrix(void)
 {
 	math::Matrix4f matrix(1.0f);
