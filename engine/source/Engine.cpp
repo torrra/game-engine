@@ -134,18 +134,20 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 {
 	static bool initialized = false;
 
-	if (projectDir)
-	{
-		ScriptSystem::SetUserScriptLocation(projectDir);
-		ScriptSystem::RunAllUserScripts();
-	}
-	
+	ScriptSystem::SetCurrentScene(m_graph);
+
 	if (!initialized)
 	{
 		ScriptSystem::Startup();
 		initialized = true;
 	}
 
+	if (projectDir)
+	{
+		ScriptSystem::SetUserScriptLocation(projectDir);
+		ScriptSystem::RunAllUserScripts();
+	}
+	
 	return SUCCESS;
 }
 
