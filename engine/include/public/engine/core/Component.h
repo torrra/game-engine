@@ -45,6 +45,17 @@ namespace engine
 		ENGINE_API
 		EntityHandle GetOwner(void) const;
 
+		ENGINE_API
+		virtual	void SerializeText(std::ofstream&,
+								   EntityHandle,
+								   uint64) const {}
+
+		ENGINE_API
+		void DeserializeIndexedText(std::ifstream& input, uint64& index);
+
+		ENGINE_API
+		virtual void DeserializeText(std::ifstream&) {}
+
 	protected:
 
 		// which entity in scene graph owns this component

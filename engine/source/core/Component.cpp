@@ -1,5 +1,6 @@
 #include "core/Component.h"
 #include "core/SceneGraph.h"
+#include "serialization/TextSerializer.h"
 
 namespace engine
 {
@@ -37,5 +38,12 @@ namespace engine
 	EntityHandle Component::GetOwner(void) const
 	{
 		return m_owner;
+	}
+
+	void Component::DeserializeIndexedText(std::ifstream& input, uint64& index)
+	{
+		text::MoveCursorToVal(input);
+		text::Deserialize(input, index);
+		DeserializeText(input);
 	}
 }
