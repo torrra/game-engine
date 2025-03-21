@@ -2,7 +2,6 @@
 
 #include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
-#include "engine/physics/Material.h"
 
 #include <math/VectorGeneric.hpp>
 #include <math/Vector3.hpp>
@@ -31,8 +30,7 @@ int main(void)
 		engine::SceneGraph* scene = new engine::SceneGraph();
 
 		/// ---------------- Create entity ---------------- 
-		engine::EntityHandle entityHandle = scene->CreateEntity("First");
-		scene->CreateComponent<engine::Transform>(entityHandle)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
+		engine::EntityHandle object = scene->CreateEntity("First");
 
 		/// ---------------- PhysicsEngine use ---------------- 
 		engine::PhysicsEngine* physics;
@@ -43,27 +41,16 @@ int main(void)
 		material->SetRestitution(1.f);
 
 		/// ---------------- Create rigidbody ----------------
-		engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(entityHandle, scene);
-		engine::Transform* transform = scene->GetComponent<engine::Transform>(entityHandle);
-		if (transform != nullptr)
-		{
-			rigidBody->CreateDynamicRigidBody(physics->Get(), *transform, *material);
-			std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
-		}
-		else
-		{
-			engine::Transform* transform2 = scene->CreateComponent<engine::Transform>(entityHandle);
-			rigidBody->CreateDynamicRigidBody(physics->Get(), *transform2, *material);
-			std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
-		}
+		engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(object, scene);
+		rigidBody->CreateDynamicRigidBody(physics->Get(), *material, engine::CAPSULE);
 
 		/// ---------------- Simulation loop ---------------- 
 		for (int i = 0; i < 300; ++i)
 		{
 			physics->Get().StepSimulation(1.f / 60.f);
-			//rigidBody->UpdateEntity();
-			scene->GetComponent<engine::Transform>(entityHandle)->AddRotation(0.f, 0.f, 10.f);
-			rigidBody->UpdateRigidBody(*scene->GetComponent<engine::Transform>(entityHandle));
+			rigidBody->UpdateEntity();
+			scene->GetComponent<engine::Transform>(object)->AddRotation(0.f, 0.f, 10.f);
+			rigidBody->UpdateRigidBody(*scene->GetComponent<engine::Transform>(object));
 
 		}
 
