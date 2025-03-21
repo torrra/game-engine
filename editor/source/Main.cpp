@@ -26,14 +26,18 @@ int main(void)
 	{
 
 		engine::Engine engine;
-		if (engine.Startup("Editor", nullptr))
+		if (engine.Startup("Editor", "C:\\Users\\maLev\\OneDrive\\Desktop\\project\\"))
 			return -1;
 
+		engine::Input::RegisterInput(KEY_UP);
+		engine::Input::RegisterInput(KEY_DOWN);
+		engine::Input::RegisterInput(KEY_LEFT);
+		engine::Input::RegisterInput(KEY_RIGHT);
 		engine::Input::RegisterInput(KEY_W);
 		engine::Input::RegisterInput(KEY_S);
 		engine::Input::RegisterInput(KEY_A);
 		engine::Input::RegisterInput(KEY_D);
-		engine::Input::SetCursorMode(engine::ECursorMode::DISABLED);
+		engine::Input::RegisterInput(KEY_ESCAPE);
 
 		// Load resources
 		engine::ResourceManager::Load<engine::Model>(MODEL_FILE);
@@ -54,8 +58,7 @@ int main(void)
 		
 		controllerScript->AddScriptObject("ControllerScript");
 		controllerScript->Start();
-
-
+	
 		entityRenderer->SetModel(MODEL_FILE);
 		entityRenderer->SetTexture(TEXTURE_FILE);
 		entityRenderer->SetShader(SHADER_PROGRAM_NAME);
@@ -78,15 +81,22 @@ int main(void)
 				0.25F
 			);
 
-			if (engine::Input::IsInputDown(KEY_W))
+			if (engine::Input::IsInputDown(KEY_UP))
 				camera->Move({0.0f, 0.0f, -1.0f}, 1.0f, engine.GetTime().GetDeltaTime());
-			else if (engine::Input::IsInputDown(KEY_S))
+			else if (engine::Input::IsInputDown(KEY_DOWN))
 				camera->Move({0.0f, 0.0f, 1.0f}, 1.0f, engine.GetTime().GetDeltaTime());
 
-			if (engine::Input::IsInputDown(KEY_A))
+			if (engine::Input::IsInputDown(KEY_LEFT))
 				camera->Move({-1.0f, 0.0f, 0.0f}, 1.0f, engine.GetTime().GetDeltaTime());
-			else if (engine::Input::IsInputDown(KEY_D))
+			else if (engine::Input::IsInputDown(KEY_RIGHT))
 				camera->Move({1.0f, 0.0f, 0.0f}, 1.0f, engine.GetTime().GetDeltaTime());
+
+
+			static bool cursorState = true;
+			if (engine::Input::IsInputReleased(KEY_ESCAPE))
+				cursorState = !cursorState;
+
+			engine::Input::SetCursorMode((cursorState) ? engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
 
 			lastCursorPos = cursorPos;
 
