@@ -27,8 +27,8 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene
 }
 
 void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine,
-													  const engine::Transform& inEntityTransform,
-													  const engine::Material& inMaterial)
+													  const engine::Material& inMaterial,
+													  const Geometry& inGeometry)
 {
 	/*
 		Create a dynamic rigid body
@@ -38,12 +38,28 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 		<param> inMaterial: The material of the rigid body
 		<param> Density: The density of the rigid body
 	*/
-	m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
-										  ToPxTransform(inEntityTransform),
-										  physx::PxSphereGeometry(0.5f), *inMaterial.GetImpl().m_material, 1.0f);
+	if (m_currentScene->GetComponent<engine::Transform>(m_owner) != nullptr)
+	{
+		m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
+			ToPxTransform(*m_currentScene->GetComponent<engine::Transform>(m_owner)),
+			*inGeometry.GetGeometryImpl().m_geometry,
+			*inMaterial.GetImpl().m_material, 1.0f);
+
+		std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
+	}
+	else
+	{
+		m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
+			ToPxTransform(*m_currentScene->CreateComponent<engine::Transform>(m_owner)),
+			*inGeometry.GetGeometryImpl().m_geometry,
+			*inMaterial.GetImpl().m_material, 1.0f);
+
+		std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
+	}
 
 	// Update the rigid body transform rotation to be in the correct orientation
-	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(SetTransform(inEntityTransform)));
+	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(SetTransform(
+						*m_currentScene->GetComponent<engine::Transform>(m_owner))));
 
 	// Set the gravity by default
 	m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 

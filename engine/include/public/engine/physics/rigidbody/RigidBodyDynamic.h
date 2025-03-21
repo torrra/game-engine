@@ -16,6 +16,7 @@
 
 #include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/Material.h"
+#include "engine/physics/geometry/Geometry.h"
 
 #pragma endregion
 
@@ -54,9 +55,9 @@ namespace engine
 		/// Functions
 		// Create a dynamic rigid body with default values
 		// <param> inPhysicsEngine : the physics engine
-		ENGINE_API	void		CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine, 
-													   const Transform& inEntityTransform,
-													   const Material& inMaterial);
+		ENGINE_API	void		CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine,
+													   const Material& inMaterial,
+													   const Geometry& inGeometry);
 		// Update the entity transform in reference to the dynamic rigid body
 		ENGINE_API	void		UpdateEntity(void);
 		// Update the dynamic rigid body transform in reference to the entity
@@ -80,7 +81,7 @@ namespace engine
 		RigidBodyDynamicImpl*	m_rigidBodyImpl;
 		PhysicsEngine*			m_physicsEngine		= nullptr;
 		Material*				m_material			= nullptr;
-		bool					m_isGravityDisabled = true;
+		bool					m_isGravityDisabled = false;
 
 	}; // !Class RigidBodyDynamic
 } //!Namespace engine
