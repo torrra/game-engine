@@ -9,6 +9,7 @@
 #pragma region Core
 
 #include "engine/core/components/Transform.h"
+#include "engine/core/Component.h"
 
 #pragma endregion
 
@@ -27,12 +28,6 @@
 
 #pragma endregion
 
-#pragma region Core
-
-#include "engine/core/Component.h"
-
-#pragma endregion
-
 namespace engine
 {
 	struct RigidBodyDynamicImpl;
@@ -45,7 +40,6 @@ namespace engine
 		// Delete the default constructor
 								RigidBodyDynamic(void) = delete;
 		// Initialize the pointer to struct RigidBodyDynamicImpl
-		//ENGINE_API		RigidBodyDynamic(void);
 		ENGINE_API				RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
 
 		/// Destructor
