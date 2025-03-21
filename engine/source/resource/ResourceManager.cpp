@@ -37,7 +37,7 @@ void engine::ResourceManager::UnloadAll(void)
 	}
 }
 
-void engine::ResourceManager::CloseResourceManager(void)
+void engine::ResourceManager::ShutDown(void)
 {
 	if (!GetInstance()->m_resources.empty())
 		GetInstance()->UnloadAll();

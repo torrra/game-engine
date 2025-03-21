@@ -53,7 +53,7 @@ namespace engine
 		// Input manager functions
 		ENGINE_API static void RegisterInput(int32 key);
 		ENGINE_API static void UnregisterInput(int32 key);
-		ENGINE_API static void ShutDownInputManager(void);
+		ENGINE_API static void ShutDown(void);
 		ENGINE_API static void SetCursorMode(ECursorMode cursorMode);
 		ENGINE_API static void ResetKeys(void);
 
