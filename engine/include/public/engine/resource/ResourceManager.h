@@ -11,12 +11,6 @@
 
 /*
 *	-------- Resource Manager --------
-*	- Load resource					DONE
-*	- Get resource members			DONE
-*	- Unload resource				DONE
-*	- check memory leak				DONE
-*	- Clean up resource manager		DONE
-*	- Multi-threading
 *	- Meta data
 *	----------------------------------
 */
@@ -33,10 +27,10 @@ namespace engine
 										const char* vertShader, 
 										const char* fragShader);
 		template<typename TResourceType>
-		static const TResourceType*		GetResource(std::string const& fileName);
+		static const TResourceType*	GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
 		ENGINE_API static void		UnloadAll(void);
-		ENGINE_API static void		CloseResourceManager(void);
+		ENGINE_API static void		ShutDown(void);
 
 		ENGINE_API static const std::string* FindKeyByVal(const IResource* resource);
 
@@ -45,8 +39,8 @@ namespace engine
 									ResourceManager(ResourceManager const& rManager) = delete;
 		ResourceManager&			operator=(ResourceManager const& rManager) = delete;
 
-		ENGINE_API static ResourceManager*		GetInstance(void);
-		ENGINE_API static bool					HasResource(std::string const& fileName);
+		ENGINE_API static ResourceManager*	GetInstance(void);
+		ENGINE_API static bool				HasResource(std::string const& fileName);
 
 		static std::mutex			m_mutex;
 		static ResourceManager*		m_instance;

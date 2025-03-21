@@ -147,7 +147,7 @@ engine::Input::Input(void)
 {
 }
 
-void engine::Input::ShutDownInputManager(void)
+void engine::Input::ShutDown(void)
 {
 	delete m_instance;
 }
