@@ -42,32 +42,36 @@ namespace engine
 
 		/// Constructor
 		// Delete the default constructor
-							RigidBodyDynamic(void) = delete;
+								RigidBodyDynamic(void) = delete;
 		// Initialize the pointer to struct RigidBodyDynamicImpl
 		//ENGINE_API		RigidBodyDynamic(void);
-		ENGINE_API			RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
+		ENGINE_API				RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
 
 		/// Destructor
 		// Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
-		ENGINE_API			~RigidBodyDynamic(void) override;
+		ENGINE_API				~RigidBodyDynamic(void) override;
 
 		/// Functions
 		// Create a dynamic rigid body with default values
 		// <param> inPhysicsEngine : the physics engine
-		ENGINE_API	void	CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine, 
-											   const Transform& inEntityTransform,
-											   const Material& inMaterial);
-
-		ENGINE_API	void	UpdateEntity(void);
-		ENGINE_API	void	UpdateRigidBody(const Transform& inEntityTransform);
+		ENGINE_API	void		CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine, 
+													   const Transform& inEntityTransform,
+													   const Material& inMaterial);
+		// Update the entity transform in reference to the dynamic rigid body
+		ENGINE_API	void		UpdateEntity(void);
+		// Update the dynamic rigid body transform in reference to the entity
+		ENGINE_API	void		UpdateRigidBody(const Transform& inEntityTransform);
 
 		// Delete the dynamic rigid body
-		ENGINE_API	void	RigidBodyDynamicCleanUp(void);
+		ENGINE_API	void		RigidBodyDynamicCleanUp(void);
 
-		ENGINE_API	void	Register(void) override {}
+		ENGINE_API	void		Register(void) override {}
 
 	private :
 
+		/// Setter
+		// Set the transform rotation of the rigidbody by default in reference 
+		// to the entity transform
 					Transform	SetTransform(const Transform& inEntityTransform);
 		/// TODO : Check transform to directly use the component transform
 		///		   of the entity

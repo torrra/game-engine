@@ -19,11 +19,6 @@
 
 #pragma endregion
 
-//engine::RigidBodyDynamic::RigidBodyDynamic(void)
-//{
-//	m_rigidBodyImpl = new RigidBodyDynamicImpl();
-//}
-
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
 	m_rigidBodyImpl = new RigidBodyDynamicImpl();
@@ -35,15 +30,26 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 													  const engine::Transform& inEntityTransform,
 													  const engine::Material& inMaterial)
 {
+	/*
+		Create a dynamic rigid body
+		<param> inPhysicsEngine: The physics engine SDK
+		<param> inEntityTransform: The transform of the entity
+		<param> PxGeometry: The geometry of the rigid body (box, capsule, sphere, etc.)
+		<param> inMaterial: The material of the rigid body
+		<param> Density: The density of the rigid body
+	*/
 	m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
 										  ToPxTransform(inEntityTransform),
 										  physx::PxSphereGeometry(0.5f), *inMaterial.GetImpl().m_material, 1.0f);
 
+	// Update the rigid body transform rotation to be in the correct orientation
 	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(SetTransform(inEntityTransform)));
 
+	// Set the gravity by default
 	m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
 													  m_isGravityDisabled);
 
+	// Add the rigid body to the physics scene
 	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
 }
 
