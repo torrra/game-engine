@@ -54,6 +54,9 @@ namespace engine
 						   EntityHandle owner,
 						   uint64 index) const;
 
+		ENGINE_API
+		void DeserializeText(std::ifstream& input) override;
+
 	private:
 
 		void DrawModel(void) const;

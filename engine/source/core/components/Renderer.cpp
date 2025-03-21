@@ -3,10 +3,10 @@
 #include "core/components/Renderer.h"
 #include "core/components/Transform.h"
 
-#include "resource/ResourceManager.h"
 #include "resource/model/Model.h"
 #include "resource/shader/Shader.h"
 #include "resource/texture/Texture.h"
+#include "resource/ResourceManager.h"
 
 #include "core/SceneGraph.h"
 
@@ -140,6 +140,39 @@ namespace engine
 
 		text::Serialize(output, "flags", m_flags);
 		output << '\n';
+	}
+
+	void Renderer::DeserializeText(std::ifstream& input)
+	{
+		text::MoveCursorToVal(input);
+		text::Deserialize(input, m_owner);
+
+		std::string key;
+
+		text::Deserialize(input, key);
+
+		m_model = ResourceManager::GetResource<Model>(key);
+
+		key.clear();
+		text::Deserialize(input, key);
+		m_shader = ResourceManager::GetResource<ShaderProgram>(key);
+
+		input >> key;
+
+		if (key[1] == '@')
+		{
+			key.clear();
+			text::Deserialize(input, key);
+			m_texture = ResourceManager::GetResource<Texture>(key);
+			return;
+		}
+	
+		while (key.size() > 0)
+		{
+			input.putback(key.back());
+			key.pop_back();
+		}
+		
 	}
 
 	void Renderer::DrawModel(void) const
