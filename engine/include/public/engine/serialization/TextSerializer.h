@@ -178,6 +178,12 @@ namespace engine::text::types
 // fundamental types
 
 	template<> inline
+	std::string GetTypeName<bool>(void)
+	{
+		return "bool";
+	}
+
+	template<> inline
 	std::string GetTypeName<int32>(void)
 	{
 		return "int32";
