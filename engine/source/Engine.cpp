@@ -142,11 +142,10 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 		initialized = true;
 	}
 
-	if (projectDir)
-	{
-		ScriptSystem::SetUserScriptLocation(projectDir);
-		ScriptSystem::RunAllUserScripts();
-	}
+	std::string path((projectDir) ? projectDir : "..\\");
+
+	ScriptSystem::SetUserScriptLocation(path.c_str());
+	ScriptSystem::RunAllUserScripts();
 	
 	return SUCCESS;
 }
