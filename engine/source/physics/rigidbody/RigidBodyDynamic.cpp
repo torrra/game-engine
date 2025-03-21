@@ -3,20 +3,54 @@
 #pragma region Internal
 
 #include "physics/InternalPhysXStruct.hpp"
+#include "physics/InternalPhyxConversion.hpp"
 
 #pragma endregion
 
-engine::RigidBodyDynamic::RigidBodyDynamic(void)
+#pragma region Core
+
+#include "engine/core/SceneGraph.h"
+
+#pragma endregion
+
+#pragma region Standard
+
+#include <iostream>
+
+#pragma endregion
+
+//engine::RigidBodyDynamic::RigidBodyDynamic(void)
+//{
+//	m_rigidBodyImpl = new RigidBodyDynamicImpl();
+//}
+
+engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
 	m_rigidBodyImpl = new RigidBodyDynamicImpl();
+	m_owner			= owner;
+	m_currentScene	= scene;
+
+	Transform* transform = scene->GetComponent<Transform>(owner);
+
+	if (transform != nullptr)
+	{
+		CreateDynamicRigidBody(m_physicsEngine->Get(), *transform);
+		std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
+	}
+	else
+	{
+		Transform* transform2 = scene->CreateComponent<Transform>(owner);
+		CreateDynamicRigidBody(m_physicsEngine->Get(), *transform2);
+		std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
+	}
 }
 
-void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine)
+void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine,
+													  const engine::Transform& inEntityTransform)
 {
 	physx::PxMaterial* material = inPhysicsEngine.GetImpl().m_physics->createMaterial(0.f, 0.f, 0.f);
 	m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
-										  physx::PxTransform(physx::PxVec3(-10.f, 2.f, 0.f),
-											  physx::PxQuat(3.14f / 2, physx::PxVec3(0, 0, 1))),
+										  ToPxTransform(inEntityTransform),
 										  physx::PxCapsuleGeometry(0.5f, 1.f), *material, 1.0f);
 
 	m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 

@@ -77,5 +77,5 @@ namespace engine
 	}; // !Class RigidBody
 } // !Namespace engine
 
-ENGINE_API physx::PxVec3T<float> ToPxVec3(const math::Vector3f& inVector);
-ENGINE_API math::Vector3f ToVector3(const physx::PxVec3T<float>& inVector);
+//ENGINE_API physx::PxVec3T<float> ToPxVec3(const math::Vector3f& inVector);
+//ENGINE_API math::Vector3f ToVector3(const physx::PxVec3T<float>& inVector);

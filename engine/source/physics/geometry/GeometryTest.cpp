@@ -105,53 +105,53 @@ physx::PxMaterial* engine::Physics::GetMaterial(void) const
 	return m_material;
 }
 
-engine::RigidBody::RigidBody(physx::PxPhysics* inPhysics, physx::PxScene* inScene, physx::PxMaterial* inMaterial, math::Vector3f inPosition/*, f32 inMass*/)
-{
-	m_rigidDynamicBody = physx::PxCreateDynamic(*inPhysics, physx::PxTransform(ToPxVec3(inPosition), physx::PxQuat(3.14f / 2, physx::PxVec3(0, 0, 1))), physx::PxCapsuleGeometry(1.f, 0.5f), *inMaterial, 1.f);
+//engine::RigidBody::RigidBody(physx::PxPhysics* inPhysics, physx::PxScene* inScene, physx::PxMaterial* inMaterial, math::Vector3f inPosition/*, f32 inMass*/)
+//{
+//	//m_rigidDynamicBody = physx::PxCreateDynamic(*inPhysics, physx::PxTransform(ToPxVec3(inPosition), physx::PxQuat(3.14f / 2, physx::PxVec3(0, 0, 1))), physx::PxCapsuleGeometry(1.f, 0.5f), *inMaterial, 1.f);
+//
+//	//m_rigidDynamicBody = inPhysics->createRigidDynamic(physx::PxTransform(ToPxVec3(inPosition), physx::PxQuat(3.14f / 2, physx::PxVec3(0, 0, 1))));
+//	//physx::PxShape* shape = inPhysics->createShape(physx::PxBoxGeometry(1, 1, 1), *inMaterial);
+//	//physx::PxShape* shape = inPhysics->createShape(physx::PxSphereGeometry(1), *inMaterial);
+//	//physx::PxShape* shape = inPhysics->createShape(physx::PxCapsuleGeometry(0.5f, 1.f), *inMaterial);
+//	//shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+//	//shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+//	//m_rigidDynamicBody->attachShape(*shape);
+//	m_rigidDynamicBody->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
+//	//physx::PxRigidBodyExt::updateMassAndInertia(*m_rigidDynamicBody, inMass);
+//	inScene->addActor(*m_rigidDynamicBody);
+//	//shape->release();
+//
+//	physx::PxRigidDynamic* body = inPhysics->createRigidDynamic(physx::PxTransform(physx::PxVec3(10.f, 2.0f, 0.f)));
+//	physx::PxMaterial* material = inPhysics->createMaterial(0.f, 0.f, 0.f);
+//	physx::PxShape* shape2 = inPhysics->createShape(physx::PxBoxGeometry(1, 1, 1), *material);
+//	//body->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
+//	body->setLinearVelocity(physx::PxVec3(-10, 0, 0));
+//	body->attachShape(*shape2);
+//	inScene->addActor(*body);
+//	shape2->release();
+//}
 
-	//m_rigidDynamicBody = inPhysics->createRigidDynamic(physx::PxTransform(ToPxVec3(inPosition), physx::PxQuat(3.14f / 2, physx::PxVec3(0, 0, 1))));
-	//physx::PxShape* shape = inPhysics->createShape(physx::PxBoxGeometry(1, 1, 1), *inMaterial);
-	//physx::PxShape* shape = inPhysics->createShape(physx::PxSphereGeometry(1), *inMaterial);
-	//physx::PxShape* shape = inPhysics->createShape(physx::PxCapsuleGeometry(0.5f, 1.f), *inMaterial);
-	//shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-	//shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
-	//m_rigidDynamicBody->attachShape(*shape);
-	m_rigidDynamicBody->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
-	//physx::PxRigidBodyExt::updateMassAndInertia(*m_rigidDynamicBody, inMass);
-	inScene->addActor(*m_rigidDynamicBody);
-	//shape->release();
-
-	physx::PxRigidDynamic* body = inPhysics->createRigidDynamic(physx::PxTransform(physx::PxVec3(10.f, 2.0f, 0.f)));
-	physx::PxMaterial* material = inPhysics->createMaterial(0.f, 0.f, 0.f);
-	physx::PxShape* shape2 = inPhysics->createShape(physx::PxBoxGeometry(1, 1, 1), *material);
-	//body->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
-	body->setLinearVelocity(physx::PxVec3(-10, 0, 0));
-	body->attachShape(*shape2);
-	inScene->addActor(*body);
-	shape2->release();
-}
-
-void engine::RigidBody::SetVelocity(const math::Vector3f& inVelocity)
-{
-	m_rigidDynamicBody->setLinearVelocity(ToPxVec3(inVelocity));
-}
+//void engine::RigidBody::SetVelocity(const math::Vector3f& inVelocity)
+//{
+//	m_rigidDynamicBody->setLinearVelocity(ToPxVec3(inVelocity));
+//}
 
 physx::PxRigidDynamic* engine::RigidBody::GetRigidDynamicBody(void) const
 {
 	return m_rigidDynamicBody;
 }
 
-math::Vector3f engine::RigidBody::GetPosition(void) const
-{
-	return ToVector3(m_rigidDynamicBody->getGlobalPose().p);
-}
+//math::Vector3f engine::RigidBody::GetPosition(void) const
+//{
+//	return ToVector3(m_rigidDynamicBody->getGlobalPose().p);
+//}
 
-physx::PxVec3 ToPxVec3(const math::Vector3f& inVector)
-{
-	return physx::PxVec3(inVector.GetX(), inVector.GetY(), inVector.GetZ());
-}
+//physx::PxVec3 ToPxVec3(const math::Vector3f& inVector)
+//{
+//	return physx::PxVec3(inVector.GetX(), inVector.GetY(), inVector.GetZ());
+//}
 
-math::Vector3f ToVector3(const physx::PxVec3T<float>& inVector)
-{
-	return math::Vector3f(inVector.x, inVector.y, inVector.z);
-}
+//math::Vector3f ToVector3(const physx::PxVec3T<float>& inVector)
+//{
+//	return math::Vector3f(inVector.x, inVector.y, inVector.z);
+//}
