@@ -52,7 +52,7 @@ namespace engine
 		// Copy the scale from another transform
 		ENGINE_API void 				CopyScale(const Transform& inTransform);
 
-		ENGINE_API void					Update(void) {}
+		ENGINE_API void					Update(const Transform& inTransform);
 		ENGINE_API void					Register(void);
 
 		/// Getters
@@ -120,5 +120,11 @@ namespace engine
 	{
 		return TRANSFORM;
 	}
+
+	template <>
+	struct UpdateComponent<Transform>
+	{
+		static constexpr bool m_value = true;
+	};
 
 } // !Namespace engine
