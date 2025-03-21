@@ -243,11 +243,24 @@ namespace engine
 	EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
 	{
 		// if either half is over 32 bits, the handle is invalid
-		if (index >= ULONG_MAX || uid >= ULONG_MAX)
+		if (index >= LONG_MAX || uid >= LONG_MAX)
+			return Entity::INVALID_HANDLE;
+
+		if (index <= LONG_MIN || uid <= LONG_MIN)
 			return Entity::INVALID_HANDLE;
 
 		index |= (uid << 32);
 		return index;
+	}
+
+	EntityHandle SceneGraph::GetHandleUID(EntityHandle handle)
+	{
+		return (handle & Entity::UID_MASK) >> 32;
+	}
+
+	EntityHandle SceneGraph::GetHandleIndex(EntityHandle handle)
+	{
+		return handle & Entity::INDEX_MASK;
 	}
 
 	void SceneGraph::ReparentEntity(Entity* toReparent, EntityHandle newParent)
@@ -316,7 +329,7 @@ namespace engine
 			if (!entity.IsValid())
 				continue;
 
-			EntityHandle newHandle = MakeHandle(index, entity.m_handle & Entity::UID_MASK);
+			EntityHandle newHandle = MakeHandle(index, GetHandleUID(entity.m_handle));
 
 			handles[entity.m_handle] = newHandle;
 			validEntities.push_back(entity);
@@ -329,6 +342,9 @@ namespace engine
 			entity.m_parent = handles[entity.m_parent];
 
 			SerializeEntityText(file, entity);
+			SerializeSingleComponent<Transform>(file, entity, handles);
+			SerializeSingleComponent<Camera>(file, entity, handles);
+			SerializeSingleComponent<Renderer>(file, entity, handles);
 		}
 
 		return handles;
@@ -336,7 +352,7 @@ namespace engine
 
 	void SceneGraph::SerializeEntityText(std::ofstream& file, const Entity& entity)
 	{
-		file << "[Entity]\n";
+		file << "[Entity]\n   ";
 		text::Serialize(file, "name", entity.m_name);
 		file << "\n   ";
 		text::Serialize(file, "handle", entity.m_handle);
@@ -354,10 +370,10 @@ namespace engine
 	{
 		HandleMap newHandles = SerializeValidEntitiesText(file);
 
-		SerializeComponents<Transform>(file, newHandles);
-		SerializeComponents<Camera>(file, newHandles);
-		SerializeComponents<Renderer>(file, newHandles);
-
+		//SerializeComponents<Transform>(file, newHandles);
+		//SerializeComponents<Camera>(file, newHandles);
+		//SerializeComponents<Renderer>(file, newHandles);
+		//
 	}
 
 }
