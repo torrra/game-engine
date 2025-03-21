@@ -31,6 +31,9 @@ int main(void)
 
 		/// ---------------- Create entity ---------------- 
 		engine::EntityHandle object = scene->CreateEntity("First");
+		scene->CreateComponent<engine::Transform>(object)->SetTransform(
+								math::Vector3f(0.f, 5.f, 0.f), 
+								math::Quatf(1.f, 0.f, 0.f, 0.f));
 
 		/// ---------------- PhysicsEngine use ---------------- 
 		engine::PhysicsEngine* physics;

@@ -38,24 +38,10 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 		<param> inMaterial: The material of the rigid body
 		<param> Density: The density of the rigid body
 	*/
-	if (m_currentScene->GetComponent<engine::Transform>(m_owner) != nullptr)
-	{
-		m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
-			ToPxTransform(*m_currentScene->GetComponent<engine::Transform>(m_owner)),
-			*inGeometry.GetGeometryImpl().m_geometry,
-			*inMaterial.GetImpl().m_material, 1.0f);
-
-		std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
-	}
-	else
-	{
-		m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
-			ToPxTransform(*m_currentScene->CreateComponent<engine::Transform>(m_owner)),
-			*inGeometry.GetGeometryImpl().m_geometry,
-			*inMaterial.GetImpl().m_material, 1.0f);
-
-		std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
-	}
+	m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
+		ToPxTransform(CheckEntityTransform()),
+		*inGeometry.GetGeometryImpl().m_geometry,
+		*inMaterial.GetImpl().m_material, 1.0f);
 
 	// Update the rigid body transform rotation to be in the correct orientation
 	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(SetTransform(
@@ -93,6 +79,20 @@ engine::Transform engine::RigidBodyDynamic::SetTransform(const Transform& inEnti
 
 	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(temp));
 	return ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+}
+
+engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
+{
+	if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
+	{
+		std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
+
+		return *temp;
+	}
+
+	std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
+
+	return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }
 
 engine::RigidBodyDynamic::~RigidBodyDynamic(void)

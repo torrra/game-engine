@@ -74,6 +74,11 @@ namespace engine
 		// Set the transform rotation of the rigidbody by default in reference 
 		// to the entity transform
 					Transform	SetTransform(const Transform& inEntityTransform);
+
+		/// Functions
+		// Check if the entity has a transform component if not create one
+		// <return> the entity transform
+					Transform&	CheckEntityTransform(void);
 		/// TODO : Check transform to directly use the component transform
 		///		   of the entity
 
