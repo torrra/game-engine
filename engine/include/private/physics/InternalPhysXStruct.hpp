@@ -24,7 +24,13 @@ namespace engine
 	{
 		physx::PxRigidDynamic*			m_rigidBodyDynamic	= nullptr;
 
-	}; // !Struct RigidBodyImpl
+	}; // !Struct RigidBodyDynamicImpl
+
+	struct RigidBodyStaticImpl
+	{
+		physx::PxRigidStatic*			m_rigidBodyStatic	= nullptr;
+
+	}; // !Struct RigidBodyStaticImpl
 
 	struct MaterialImpl
 	{
