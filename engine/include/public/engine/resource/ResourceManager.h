@@ -11,12 +11,6 @@
 
 /*
 *	-------- Resource Manager --------
-*	- Load resource					DONE
-*	- Get resource members			DONE
-*	- Unload resource				DONE
-*	- check memory leak				DONE
-*	- Clean up resource manager		DONE
-*	- Multi-threading
 *	- Meta data
 *	----------------------------------
 */
@@ -28,19 +22,23 @@ namespace engine
 	public:
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName);
+		ENGINE_API static void		LoadShader(
+										const char* shaderProgramName, 
+										const char* vertShader, 
+										const char* fragShader);
 		template<typename TResourceType>
-		static const TResourceType*		GetResource(std::string const& fileName);
+		static const TResourceType*	GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
 		ENGINE_API static void		UnloadAll(void);
-		ENGINE_API static void		CloseResourceManager(void);
+		ENGINE_API static void		ShutDown(void);
 
 	private:
 									ResourceManager(void) = default;
 									ResourceManager(ResourceManager const& rManager) = delete;
 		ResourceManager&			operator=(ResourceManager const& rManager) = delete;
 
-		ENGINE_API static ResourceManager*		GetInstance(void);
-		ENGINE_API static bool					HasResource(std::string const& fileName);
+		ENGINE_API static ResourceManager*	GetInstance(void);
+		ENGINE_API static bool				HasResource(std::string const& fileName);
 
 		static std::mutex			m_mutex;
 		static ResourceManager*		m_instance;
@@ -55,7 +53,7 @@ namespace engine
 		// Check if resource exists
 		if (HasResource(fileName))
 		{
-			std::printf("Resource already loaded\n");
+			std::printf("Resource '%s' already loaded\n", fileName.c_str());
 			return;
 		}
 

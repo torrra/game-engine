@@ -16,7 +16,7 @@ namespace engine
 	class Window
 	{
 	public:
-		ENGINE_API					Window(const char* title = "Window", uint32 width = 800, uint32 height = 600);
+		ENGINE_API					Window(const char* title = "Window", uint32 width = 800, uint32 height = 600, bool fullScreen = false);
 		ENGINE_API					~Window(void) = default;
 
 		template<math::CScalarType TValueType = uint32>
@@ -25,6 +25,9 @@ namespace engine
 		template<math::CScalarType TValueType = uint32>
 		TValueType					GetHeight(void) const noexcept;
 
+		template<math::CScalarType TValueType = uint32>
+		math::Vector2<TValueType>	GetSize(void) const noexcept;
+
 		ENGINE_API f32				GetAspectRatio(void) const noexcept;
 		ENGINE_API GLFWwindow*		GetWindowPtr(void) const noexcept;
 		ENGINE_API bool				IsIconified(void) const noexcept;
@@ -32,16 +35,16 @@ namespace engine
 		ENGINE_API bool				ShouldWindowClose(void);
 		ENGINE_API void				MakeCurrentContext(void);
 
+		ENGINE_API static int16		InitGLFW(void);
 		ENGINE_API void				ClearWindow(f32 red = 0.0f, f32 green = 0.0f, f32 blue = 0.0f, f32 alpha = 1.0f);
 		ENGINE_API void				UpdateBuffers(void);
 		ENGINE_API void				Shutdown(void);
 
 		ENGINE_API static GLFWwindow* GetCurrentContext(void);
+	
 	private:
-		int32						Init(void);
-		inline int32				InitGLFW(void);
 		inline int32				InitGlad(void);
-		inline int32				CreateWindow(void);
+		inline int32				CreateWindow(bool fullScreen);
 
 		void						SetSize(uint32 width, uint32 height);
 		void						SetAspectRatio(void);
@@ -57,15 +60,24 @@ namespace engine
 
 	// Template function definitions
 	template<math::CScalarType TValueType>
-	TValueType Window::GetWidth(void) const noexcept
+	TValueType engine::Window::GetWidth(void) const noexcept
 	{
 		return static_cast<TValueType>(m_size.GetX());
 	}
 
 	template<math::CScalarType TValueType>
-	TValueType Window::GetHeight(void) const noexcept
+	TValueType engine::Window::GetHeight(void) const noexcept
 	{
 		return static_cast<TValueType>(m_size.GetY());
 	}
 
+	template<math::CScalarType TValueType>
+	math::Vector2<TValueType> engine::Window::GetSize(void) const noexcept
+	{
+		return 
+		{
+			static_cast<TValueType>(m_size.GetX()),
+			static_cast<TValueType>(m_size.GetY())
+		};
+	}
 }

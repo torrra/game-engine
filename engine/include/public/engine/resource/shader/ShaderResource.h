@@ -5,7 +5,7 @@
 
 namespace engine
 {
-	enum EShaderType
+	enum EShaderType : uint16
 	{
 		INVALID_SHADER,
 		VERTEX_SHADER = 0x8B31,
@@ -26,7 +26,7 @@ namespace engine
 
 	private:
 		EShaderType ShaderType(const char* fileName) const;
-		EShaderType m_shaderType;
 		uint32 m_shader;
+		EShaderType m_shaderType;
 	};
 }

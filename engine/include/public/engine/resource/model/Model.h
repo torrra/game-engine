@@ -23,8 +23,6 @@ namespace engine
 		ENGINE_API virtual		~Model(void) = default;
 
 		ENGINE_API virtual void	LoadResource(const char* fileName) override;
-		ENGINE_API void			Update(void); // TODO: temporary function remove
-
 
 	private:
 		void					ProcessNodes(aiNode* node, const aiScene* scene);
