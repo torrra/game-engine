@@ -44,6 +44,9 @@ namespace engine
 
 		ENGINE_API	void		Register(void) override {}
 
+		// Delete the dynamic rigid body
+		ENGINE_API	void		RigidBodyStaticCleanUp(void);
+
 	private :
 
 		/// Setter

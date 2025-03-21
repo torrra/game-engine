@@ -66,8 +66,10 @@ int main(void)
 
 		/// ---------------- Clean ---------------- 
 		delete rigidBody;
+		delete floorRigidBody;
 		physics->Get().CleanUp();
 		delete material;
+		delete floorMaterial;
 		delete scene;
 
 		engine::ScriptSystem::Shutdown();

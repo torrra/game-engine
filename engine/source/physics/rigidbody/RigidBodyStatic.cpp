@@ -28,6 +28,8 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle owner, SceneGraph* scene)
 
 engine::RigidBodyStatic::~RigidBodyStatic(void)
 {
+	RigidBodyStaticCleanUp();
+
 	delete m_rigidBodyStaticImpl;
 	m_rigidBodyStaticImpl = nullptr;
 }
@@ -46,6 +48,11 @@ void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysi
 
 	// Add the rigid body to the physics scene
 	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+}
+
+void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
+{
+	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
 }
 
 engine::Transform engine::RigidBodyStatic::SetTransform(const Transform& inEntityTransform)
