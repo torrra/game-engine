@@ -2,6 +2,7 @@
 
 #include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
+#include "engine/physics/rigidbody/RigidBodyStatic.h"
 
 #include <math/VectorGeneric.hpp>
 #include <math/Vector3.hpp>
@@ -34,6 +35,7 @@ int main(void)
 		scene->CreateComponent<engine::Transform>(object)->SetTransform(
 								math::Vector3f(0.f, 5.f, 0.f), 
 								math::Quatf(1.f, 0.f, 0.f, 0.f));
+		engine::EntityHandle floor = scene->CreateEntity("Floor");
 
 		/// ---------------- PhysicsEngine use ---------------- 
 		engine::PhysicsEngine* physics;
@@ -43,9 +45,14 @@ int main(void)
 		engine::Material* material = new engine::Material(physics->Get());
 		material->SetRestitution(1.f);
 
+		engine::Material* floorMaterial = new engine::Material(physics->Get());
+
 		/// ---------------- Create rigidbody ----------------
 		engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(object, scene);
 		rigidBody->CreateDynamicRigidBody(physics->Get(), *material, engine::CAPSULE);
+
+		engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, scene);
+		floorRigidBody->CreateStaticRigidBody(physics->Get(), *floorMaterial, engine::PLANE);
 
 		/// ---------------- Simulation loop ---------------- 
 		for (int i = 0; i < 300; ++i)
