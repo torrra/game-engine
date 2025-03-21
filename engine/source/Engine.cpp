@@ -8,18 +8,16 @@
 
 #include <math/Vector2.hpp>
 
-#define USER_SCRIPT_PATH "\\assets\\scripts\\"
-
 #define SUCCESS		0
 #define ERROR		1
 
 #define DEFAULT_NAME "Editor";
 
-#define FIX_UPDATE_PER_SECOND 20
+#define FIX_UPDATE_FREQUENCY 20
 #define TO_MILLISECONDS 0.001f
 
 engine::Engine::Engine(void)
-	: m_graph(nullptr), m_window(nullptr), m_timeScale(1.0f)
+	: m_graph(nullptr), m_window(nullptr), m_projectDir("\0"), m_timeScale(1.0f)
 {
 }
 
@@ -72,40 +70,48 @@ void engine::Engine::ShutDown(void)
 
 void engine::Engine::Update(void)
 {	
+	static const f32 updateFrequency = (FIX_UPDATE_FREQUENCY * m_timeScale) * TO_MILLISECONDS;
+	static f32 runTime = 0.0f;
+	static f32 nextUpdateTime = runTime + updateFrequency;
+
+	// Sync game logic
 	ThreadManager::SynchronizeGameThread(m_graph);
+	
+	// Update physics (fixed update)
+	runTime = m_time.GetTotalTime();
+	if (runTime >= nextUpdateTime)
+	{
+		nextUpdateTime = runTime + updateFrequency;
+
+		FixedUpdate();
+	}
+
+	// Update game logic
 	ThreadManager::UpdateGameLogic(m_graph, m_time.GetDeltaTime());
 
-	m_window->ClearWindow();
+	m_window->ClearWindow(0.1f, 0.1f, 0.1f);
 
+	ThreadManager::RenderScene(m_graph);
+
+	// Render
+	Input::ResetKeys();
 	m_window->UpdateBuffers();
 	m_time.Update();
 }
 
+void engine::Engine::RunTimeUpdate(void)
+{
+	// TODO: add run time update logic
+}
+
 void engine::Engine::FixedUpdate(void)
 {
-	static const f32 updateFrequency = (FIX_UPDATE_PER_SECOND * m_timeScale) * TO_MILLISECONDS;
-	
-	f32 runTime = 0.0f;
-	f32 nextUpdateTime = runTime + updateFrequency;
+	// TODO: add fixed update logic
+}
 
-	while (!m_window->ShouldWindowClose())
-	{
-		runTime = m_time.GetTotalTime();
-		if (runTime >= nextUpdateTime)
-		{
-			nextUpdateTime = runTime + updateFrequency;
-
-#ifdef DEBUG_FIXED_UPDATE
-			static f32 prevTime = m_time.GetTotalTime();
-			std::printf("Update delta time %.5fs\n", runTime - prevTime);
-			prevTime = runTime;
-#endif
-			// Place functions needing fixed update here...
-
-		}
-
-		m_time.Update();
-	}
+void engine::Engine::SetProject(const char* projectDir)
+{
+	InitScriptSystem(projectDir);
 }
 
 engine::Window* engine::Engine::GetWindow(void) const noexcept
@@ -113,20 +119,32 @@ engine::Window* engine::Engine::GetWindow(void) const noexcept
 	return m_window;
 }
 
+
+engine::Time& engine::Engine::GetTime(void) noexcept
+{
+	return m_time;
+}
+
+engine::SceneGraph* engine::Engine::GetGraph(void)
+{
+	return m_graph;
+}
+
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 {
-	char scriptPath[256];
+	static bool initialized = false;
 
 	if (projectDir)
 	{
-		// Concatenate file path
-		memcpy(scriptPath, projectDir, strlen(projectDir) + strlen(USER_SCRIPT_PATH));
-		strcat_s(scriptPath, USER_SCRIPT_PATH);
-
-		ScriptSystem::SetUserScriptLocation(scriptPath);
+		ScriptSystem::SetUserScriptLocation(projectDir);
+		ScriptSystem::RunAllUserScripts();
 	}
-
-	ScriptSystem::Startup();
+	
+	if (!initialized)
+	{
+		ScriptSystem::Startup();
+		initialized = true;
+	}
 
 	return SUCCESS;
 }
@@ -152,7 +170,6 @@ inline int16 engine::Engine::InitWindow(const char* projectName)
 
 inline int16 engine::Engine::LoadEngineResources(void)
 {
-	// TODO: Load engine shaders, scripts, fonts, etc...
 	ResourceManager::LoadShader(
 		"Default", 
 		"..\\engineShader\\Default.vs", 
