@@ -27,6 +27,9 @@ engine::Geometry::Geometry(EGeometryType geometryType)
 		case EGeometryType::CAPSULE :
 			m_geometryImpl->m_geometry = new physx::PxCapsuleGeometry(1.0f, 1.0f);
 			break;
+		case EGeometryType::PLANE :
+			m_geometryImpl->m_geometry = new physx::PxPlaneGeometry();
+			break;
 	}
 }
 

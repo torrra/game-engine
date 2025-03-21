@@ -20,7 +20,8 @@ namespace engine
 	{
 		BOX,
 		SPHERE,
-		CAPSULE
+		CAPSULE,
+		PLANE
 	};
 
 	class Geometry
