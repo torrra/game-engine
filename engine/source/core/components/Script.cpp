@@ -3,6 +3,8 @@
 #include "core/components/Script.h"
 #include "core/systems/ScriptSystem.h"
 
+#include "serialization/TextSerializer.h"
+
 #include <iostream>
 
 namespace engine
@@ -36,5 +38,37 @@ namespace engine
 		}
 
 		m_scriptObjects.emplace_back(m_owner, formattedType);
+	}
+
+	void Script::SerializeText(std::ofstream& output, EntityHandle owner, uint64 index) const
+	{
+		output << "[Script]\n    ";
+
+		if constexpr (UpdateAfterParent<Script>::m_value)
+		{
+			text::Serialize(output, "index", index);
+			output << "\n    ";
+		}
+
+		text::Serialize(output, "owner", owner);
+		output << "\n   ";
+
+		text::Serialize(output, "count", m_scriptObjects.size());
+		output << "\n   ";
+
+		for (const ScriptObject& object : m_scriptObjects)
+		{
+			text::Serialize(output, "scriptObject", object.GetType());
+			output << "\n   ";
+		}
+
+		text::Serialize(output, "flags", m_flags);
+		output << '\n';
+
+	}
+
+	void Script::DeserializeText(std::ifstream& /*input*/)
+	{
+		
 	}
 }
