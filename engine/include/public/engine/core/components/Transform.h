@@ -95,6 +95,9 @@ namespace engine
 													  EntityHandle owner,
 													  uint64 index) const;
 
+		ENGINE_API void DeserializeText(std::ifstream& input) override;
+
+
 		/// Operators
 		// Copy assignement set to default
 		Transform& operator=(const Transform& inTransform) = default;
@@ -102,6 +105,8 @@ namespace engine
 		Transform& operator=(Transform&& inTransform) = default;
 		// Operator to print a transform
 		std::ostream& operator<<(std::ostream& os);
+	
+		friend ENGINE_API std::ostream& operator<<(std::ostream& os, Transform& transform);
 
 	private:
 
@@ -119,6 +124,7 @@ namespace engine
 		bool			m_dirty = false;
 
 	}; // !Class Transform
+
 
 	template <>
 	struct UpdateAfterParent<Transform>

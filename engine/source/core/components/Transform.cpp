@@ -181,12 +181,38 @@ void engine::Transform::SerializeText(std::ofstream& output, EntityHandle owner,
 	output << '\n';
 }
 
+void engine::Transform::DeserializeText(std::ifstream& input)
+{
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_owner);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_rotation);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_position);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_scale);
+
+	text::MoveCursorToVal(input);
+	text::Deserialize(input, m_flags);
+}
+
 std::ostream& engine::Transform::operator<<(std::ostream& os)
 {
 	return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
 		<< m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " "
 		<< m_rotation.Z() << " "
 		<< m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+}
+
+std::ostream& engine::operator<<(std::ostream& os, engine::Transform& transform)
+{
+	return os << "position: " << transform.m_position.X() << " " << transform.m_position.Y() << " " << transform.m_position.Z() << "\nrotation: "
+		<< transform.m_rotation.W() << " " << transform.m_rotation.X() << " " << transform.m_rotation.Y() << " "
+		<< transform.m_rotation.Z() << "\nscale: "
+		<< transform.m_scale.X() << " " << transform.m_scale.Y() << " " << transform.m_scale.Z() << '\n';
 }
 
 void engine::Transform::UpdateLocalMatrix(void)
