@@ -368,12 +368,7 @@ namespace engine
 
 	void SceneGraph::SerializeText(std::ofstream& file)
 	{
-		HandleMap newHandles = SerializeValidEntitiesText(file);
-
-		//SerializeComponents<Transform>(file, newHandles);
-		//SerializeComponents<Camera>(file, newHandles);
-		//SerializeComponents<Renderer>(file, newHandles);
-		//
+		SerializeValidEntitiesText(file);
 	}
 
 }
