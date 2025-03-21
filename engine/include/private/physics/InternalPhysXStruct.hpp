@@ -31,4 +31,10 @@ namespace engine
 		physx::PxMaterial*				m_material			= nullptr;
 
 	}; // !Struct MaterialImpl
+
+	struct GeometryImpl
+	{
+		physx::PxGeometry*				m_geometry			= nullptr;
+
+	}; // !Struct GeometryImpl
 } // !Namespace engine
