@@ -39,30 +39,21 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	// Add component to camera entity
 	m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");
-	engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
+	engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
 	engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
+
+	camera->Rotation() = {-44.5f, 26.5f, 0.0f};
+	camera->Position() = {1.5f, 3.0f, 3.2f};
 }
 
 void ExampleProject::Update(engine::Engine& engine)
 {
-	math::Vector2<float> cursorPos = engine::Input::GetCursorPosition<float>();
-	static math::Vector2<float> lastCursorPos(cursorPos);
-	math::Vector2<float> deltaPos = cursorPos - lastCursorPos;
-
+	// Get camera component
 	engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(m_cameraHandle);
 	
-	camera->Rotate(deltaPos.GetY(), deltaPos.GetX(), 0.0f, 0.25F);
-
-	// Move camera
-	if (engine::Input::IsInputDown(KEY_UP))
-		camera->Move({0.0f, 0.0f, -1.0f}, 1.0f, engine.GetTime().GetDeltaTime());
-	else if (engine::Input::IsInputDown(KEY_DOWN))
-		camera->Move({0.0f, 0.0f, 1.0f}, 1.0f, engine.GetTime().GetDeltaTime());
-
-	if (engine::Input::IsInputDown(KEY_LEFT))
-		camera->Move({-1.0f, 0.0f, 0.0f}, 1.0f, engine.GetTime().GetDeltaTime());
-	else if (engine::Input::IsInputDown(KEY_RIGHT))
-		camera->Move({1.0f, 0.0f, 0.0f}, 1.0f, engine.GetTime().GetDeltaTime());
+	// Rotate camera
+	math::Vector2f cursorDelta = engine::Input::GetCursorDeltaPos<f32>();
+	camera->Rotate(cursorDelta.GetY(), cursorDelta.GetX(), 0.0f, 0.20F);
 
 	// Change cursor state (lock / unlock)
 	static bool cursorState = true;
@@ -71,8 +62,6 @@ void ExampleProject::Update(engine::Engine& engine)
 
 	engine::Input::SetCursorMode((cursorState) ? 
 		engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
-
-	lastCursorPos = cursorPos;
 }
 
 void ExampleProject::RegisterInputs(void)
