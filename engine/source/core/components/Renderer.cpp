@@ -170,7 +170,10 @@ namespace engine
 			key.clear();
 			text::Deserialize(input, key);
 			m_texture = ResourceManager::GetResource<Texture>(key);
-		}		
+		}
+
+		text::MoveCursorToVal(input);
+		text::Deserialize(input, m_flags);
 	}
 
 	void Renderer::DrawModel(void) const
