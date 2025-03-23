@@ -42,12 +42,12 @@ namespace engine
 
 	void Script::SerializeText(std::ofstream& output, EntityHandle owner, uint64 index) const
 	{
-		output << "[Script]\n    ";
+		output << "[Script]\n   ";
 
 		if constexpr (UpdateAfterParent<Script>::m_value)
 		{
 			text::Serialize(output, "index", index);
-			output << "\n    ";
+			output << "\n   ";
 		}
 
 		text::Serialize(output, "owner", owner);
