@@ -126,7 +126,7 @@ namespace engine::text
 namespace engine::text::types
 {
 	template <CSerializableType TValueType>
-	std::string GetTypeName(void);
+	constexpr const char* GetTypeName(void);
 
 	ESerializedType GetTypeFromName(const std::string& typeName);
 
@@ -170,7 +170,7 @@ namespace engine::text
 namespace engine::text::types
 {
 	template<CSerializableType TValueType> inline
-	std::string GetTypeName(void)
+	constexpr const char* GetTypeName(void)
 	{
 		return "unrecognized type";
 	}
@@ -178,67 +178,67 @@ namespace engine::text::types
 // fundamental types
 
 	template<> inline
-	std::string GetTypeName<bool>(void)
+	constexpr const char* GetTypeName<bool>(void)
 	{
 		return "bool";
 	}
 
 	template<> inline
-	std::string GetTypeName<int32>(void)
+	constexpr const char* GetTypeName<int32>(void)
 	{
 		return "int32";
 	}
 
 	template<> inline
-	std::string GetTypeName<int64>(void)
+	constexpr const char* GetTypeName<int64>(void)
 	{
 		return "int64";
 	}
 
 	template<> inline
-	std::string GetTypeName<int16>(void)
+	constexpr const char* GetTypeName<int16>(void)
 	{
 		return "int16";
 	}
 
 	template<> inline
-	std::string GetTypeName<int8>(void)
+	constexpr const char* GetTypeName<int8>(void)
 	{
 		return "int8";
 	}
 
 	template<> inline
-	std::string GetTypeName<uint32>(void)
+	constexpr const char* GetTypeName<uint32>(void)
 	{
 		return "uint32";
 	}
 
 	template<> inline
-	std::string GetTypeName<uint64>(void)
+	constexpr const char* GetTypeName<uint64>(void)
 	{
 		return "uint64";
 	}
 
 	template<> inline
-	std::string GetTypeName<uint16>(void)
+	constexpr const char* GetTypeName<uint16>(void)
 	{
 		return "uint16";
 	}
 
 	template<> inline
-	std::string GetTypeName<uint8>(void)
+	constexpr const char* GetTypeName<uint8>(void)
 	{
 		return "uint8";
 	}
 
 	template<> inline
-	std::string GetTypeName<f32>(void)
+	constexpr const char* GetTypeName<f32>(void)
 	{
 		return "f32";
 	}
 
 	template<> inline
-	std::string GetTypeName<f64>(void)
+	constexpr const char* GetTypeName<f64>(void)
 	{
 		return "f64";
 	}
@@ -246,62 +246,62 @@ namespace engine::text::types
 // Vector3
 
 	template<> inline
-	std::string GetTypeName<math::Vector3f>(void)
+	constexpr const char* GetTypeName<math::Vector3f>(void)
 	{
 		return "vec3f32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3d>(void)
+	constexpr const char* GetTypeName<math::Vector3d>(void)
 	{
 		return "vec3f64";
 	}
 
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<uint32>>(void)
+	constexpr const char* GetTypeName<math::Vector3<uint32>>(void)
 	{
 		return "vec3ui32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<uint64>>(void)
+	constexpr const char* GetTypeName<math::Vector3<uint64>>(void)
 	{
 		return "vec3ui64";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<uint16>>(void)
+	constexpr const char* GetTypeName<math::Vector3<uint16>>(void)
 	{
 		return "vec3ui16";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<uint8>>(void)
+	constexpr const char* GetTypeName<math::Vector3<uint8>>(void)
 	{
 		return "vec3ui8";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3i>(void)
+	constexpr const char* GetTypeName<math::Vector3i>(void)
 	{
 		return "vec3i32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<int64>>(void)
+	constexpr const char* GetTypeName<math::Vector3<int64>>(void)
 	{
 		return "vec3i64";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<int16>>(void)
+	constexpr const char* GetTypeName<math::Vector3<int16>>(void)
 	{
 		return "vec3i16";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector3<int8>>(void)
+	constexpr const char* GetTypeName<math::Vector3<int8>>(void)
 	{
 		return "vec3i8";
 	}
@@ -310,62 +310,62 @@ namespace engine::text::types
 // Vector2
 
 	template<> inline
-	std::string GetTypeName<math::Vector2f>(void)
+	constexpr const char* GetTypeName<math::Vector2f>(void)
 	{
 		return "vec2f32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2d>(void)
+	constexpr const char* GetTypeName<math::Vector2d>(void)
 	{
 		return "vec2f64";
 	}
 
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<uint32>>(void)
+	constexpr const char* GetTypeName<math::Vector2<uint32>>(void)
 	{
 		return "vec2ui32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<uint64>>(void)
+	constexpr const char* GetTypeName<math::Vector2<uint64>>(void)
 	{
 		return "vec2ui64";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<uint16>>(void)
+	constexpr const char* GetTypeName<math::Vector2<uint16>>(void)
 	{
 		return "vec2ui16";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<uint8>>(void)
+	constexpr const char* GetTypeName<math::Vector2<uint8>>(void)
 	{
 		return "vec2ui8";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2i>(void)
+	constexpr const char* GetTypeName<math::Vector2i>(void)
 	{
 		return "vec2i32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<int64>>(void)
+	constexpr const char* GetTypeName<math::Vector2<int64>>(void)
 	{
 		return "vec2i64";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<int16>>(void)
+	constexpr const char* GetTypeName<math::Vector2<int16>>(void)
 	{
 		return "vec2i16";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector2<int8>>(void)
+	constexpr const char* GetTypeName<math::Vector2<int8>>(void)
 	{
 		return "vec2i8";
 	}
@@ -374,62 +374,62 @@ namespace engine::text::types
 // Vector4
 
 	template<> inline
-	std::string GetTypeName<math::Vector4f>(void)
+	constexpr const char* GetTypeName<math::Vector4f>(void)
 	{
 		return "vec4f32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4d>(void)
+	constexpr const char* GetTypeName<math::Vector4d>(void)
 	{
 		return "vec4f64";
 	}
 
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<uint32>>(void)
+	constexpr const char* GetTypeName<math::Vector4<uint32>>(void)
 	{
 		return "vec4ui32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<uint64>>(void)
+	constexpr const char* GetTypeName<math::Vector4<uint64>>(void)
 	{
 		return "vec4ui64";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<uint16>>(void)
+	constexpr const char* GetTypeName<math::Vector4<uint16>>(void)
 	{
 		return "vec4ui16";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<uint8>>(void)
+	constexpr const char* GetTypeName<math::Vector4<uint8>>(void)
 	{
 		return "vec4ui8";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4i>(void)
+	constexpr const char* GetTypeName<math::Vector4i>(void)
 	{
 		return "vec4i32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<int64>>(void)
+	constexpr const char* GetTypeName<math::Vector4<int64>>(void)
 	{
 		return "vec4i64";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<int16>>(void)
+	constexpr const char* GetTypeName<math::Vector4<int16>>(void)
 	{
 		return "vec4i16";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Vector4<int8>>(void)
+	constexpr const char* GetTypeName<math::Vector4<int8>>(void)
 	{
 		return "vec4i8";
 	}
@@ -438,26 +438,26 @@ namespace engine::text::types
 // Radian / Degree
 
 	template<> inline
-	std::string GetTypeName<math::Radian<f32>>(void)
+	constexpr const char* GetTypeName<math::Radian<f32>>(void)
 	{
 		return "rad32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Radian<f64>>(void)
+	constexpr const char* GetTypeName<math::Radian<f64>>(void)
 	{
 		return "rad64";
 	}
 
 
 	template<> inline
-	std::string GetTypeName<math::Degree<f32>>(void)
+	constexpr const char* GetTypeName<math::Degree<f32>>(void)
 	{
 		return "deg32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Degree<f64>>(void)
+	constexpr const char* GetTypeName<math::Degree<f64>>(void)
 	{
 		return "deg64";
 	}
@@ -465,13 +465,13 @@ namespace engine::text::types
 // Quaternion
 
 	template<> inline
-	std::string GetTypeName<math::Quatf>(void)
+	constexpr const char* GetTypeName<math::Quatf>(void)
 	{
 		return "quat32";
 	}
 
 	template<> inline
-	std::string GetTypeName<math::Quaternion<f64>>(void)
+	constexpr const char* GetTypeName<math::Quaternion<f64>>(void)
 	{
 		return "quat64";
 	}
