@@ -15,9 +15,6 @@
 *	--------- Keyboard Input ---------
 *	- Handle modifier keys		
 *	- Controller support		
-* 
-*	- Fix is input pressed
-*	- Fix scroll delta 
 *	- Remove singleton			
 *	----------------------------------
 */
@@ -94,9 +91,9 @@ namespace engine
 		math::Vector2d					m_cursorPos;
 		math::Vector2d					m_scrollDelta;
 
-		static std::mutex						m_mutex;
-		static Input*							m_instance;
-		bool									m_resetKeys;
+		static std::mutex			    m_mutex;
+		static Input*					m_instance;
+		bool							m_dirty;
 	};
 
 	// Template function definitions
@@ -127,6 +124,10 @@ namespace engine
 	template<math::CScalarType TValueType>
 	inline math::Vector2<TValueType> Input::GetScrollDelta(void)
 	{
-		return reinterpret_cast<TValueType>(m_scrollDelta);
+		return math::Vector2<TValueType>
+		(
+		    static_cast<TValueType>(GetInstance()->m_scrollDelta.GetX()),
+		    static_cast<TValueType>(GetInstance()->m_scrollDelta.GetY())
+		);
 	}
 }
