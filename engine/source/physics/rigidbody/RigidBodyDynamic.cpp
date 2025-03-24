@@ -59,7 +59,6 @@ void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
 {
 	physx::PxTransform transformTemp = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
 
-	//m_currentScene->UpdateComponents<engine::Transform>(ToTransform(transformTemp));
     *m_currentScene->GetComponent<Transform>(inEntityHandle) = ToTransform(transformTemp);
 }
 
@@ -86,12 +85,8 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 {
 	if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
 	{
-		std::cout << "RigidBodyDynamic created, with existing transform" << std::endl;
-
 		return *temp;
 	}
-
-	std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
 
 	return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }

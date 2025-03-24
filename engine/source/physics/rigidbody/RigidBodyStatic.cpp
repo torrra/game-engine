@@ -68,12 +68,8 @@ engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
 {
 	if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
 	{
-		std::cout << "RigidBodyStatic created, with existing transform" << std::endl;
-
 		return *temp;
 	}
-
-	std::cout << "RigidBodyDynamic created, with created transform" << std::endl;
 
 	return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }
