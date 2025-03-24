@@ -100,7 +100,11 @@ void engine::Input::KeyboardCallback(GLFWwindow* window, int32 key, int32 scanCo
 		input.m_prevState = input.m_currentState;
 		input.m_currentState = static_cast<EInputState>(action);
 		
-		GetInstance()->m_resetKeys = (input.m_currentState == KEY_STATE_RELEASED);
+		GetInstance()->m_resetKeys =
+		(
+			input.m_currentState == KEY_STATE_RELEASED ||
+			input.m_currentState == KEY_STATE_PRESSED
+		);
 	}
 }
 
@@ -116,7 +120,11 @@ void engine::Input::MouseButtonCallback(GLFWwindow* window, int32 button, int32 
 		input.m_prevState = input.m_currentState;
 		input.m_currentState = static_cast<EInputState>(action);
 
-		GetInstance()->m_resetKeys = (input.m_currentState == KEY_STATE_RELEASED);
+		GetInstance()->m_resetKeys = 
+		(
+			input.m_currentState == KEY_STATE_RELEASED ||
+			input.m_currentState == KEY_STATE_PRESSED
+		);
 	}
 }
 
@@ -167,6 +175,11 @@ void engine::Input::ResetKeys(void)
 		if (key.second.m_currentState == EInputState::UP &&
 			key.second.m_prevState != EInputState::UP)
 			key.second.m_prevState = EInputState::UP;
+		else if (key.second.m_currentState == EInputState::PRESSED)
+		{
+			key.second.m_prevState = EInputState::PRESSED;
+		}
+
 	}
 
 	GetInstance()->m_resetKeys = false;

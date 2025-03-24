@@ -15,6 +15,9 @@
 *	--------- Keyboard Input ---------
 *	- Handle modifier keys		
 *	- Controller support		
+* 
+*	- Fix is input pressed
+*	- Fix scroll delta 
 *	- Remove singleton			
 *	----------------------------------
 */
@@ -25,10 +28,9 @@ namespace engine
 {
 	enum EInputState
 	{
+		UP = KEY_STATE_RELEASED,
 		PRESSED = KEY_STATE_PRESSED,
 		HELD = KEY_STATE_HELD,
-		UP = KEY_STATE_RELEASED,
-		NONE = KEY_STATE_NONE
 	};
 
 	enum ECursorMode
