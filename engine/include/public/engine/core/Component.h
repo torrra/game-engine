@@ -12,6 +12,12 @@ namespace engine
 	{
 	private:
 
+		template<CValidComponent TComponentType>
+		using IndexedComponent = std::pair<uint64, TComponentType>;
+
+		template<CValidComponent TComponentType>
+		using DeserializedArray = std::vector<std::pair<uint64, TComponentType>>;
+
 		friend class SceneGraph;
 
 	public:
@@ -50,13 +56,17 @@ namespace engine
 								   EntityHandle,
 								   uint64) const {}
 
+		template <CValidComponent TComponentType>
+		static void DeserializeComponentText(DeserializedArray<TComponentType>& array,
+											std::ifstream& file);
+
+	protected:
+
 		ENGINE_API
 		void DeserializeIndexedText(std::ifstream& input, uint64& index);
 
 		ENGINE_API
 		virtual void DeserializeText(std::ifstream&) {}
-
-	protected:
 
 		// which entity in scene graph owns this component
 		EntityHandle	m_owner = static_cast<EntityHandle>(-1);
@@ -85,5 +95,20 @@ namespace engine
 	{
 		static constexpr bool m_value = false;
 	};
+
+	template<CValidComponent TComponentType>
+	inline void Component::DeserializeComponentText(DeserializedArray<TComponentType>& array,
+													std::ifstream& file)
+	{
+		constexpr EntityHandle invalid = static_cast<EntityHandle>(-1);
+
+		IndexedComponent<TComponentType>& component = array.emplace_back(invalid, TComponentType(invalid, nullptr));
+
+		if constexpr (UpdateAfterParent<TComponentType>::m_value)
+			component.second.DeserializeIndexedText(file, component.first);
+
+		else
+			component.second.DeserializeText(file);
+	}
 
 }
