@@ -42,10 +42,10 @@ int main(void)
 		project.StartUp(engine);
 
         /// ---------------- Create entity ---------------- 
-        engine::EntityHandle object = engine.GetGraph()->CreateEntity("First");
-        engine.GetGraph()->CreateComponent<engine::Transform>(object)->SetTransform(
-            math::Vector3f(0.f, 20.f, -20.f),
-            math::Quatf(1.f, 0.f, 0.f, 0.f));
+        //engine::EntityHandle object = engine.GetGraph()->CreateEntity("First");
+        //engine.GetGraph()->CreateComponent<engine::Transform>(object)->SetTransform(
+        //    math::Vector3f(0.f, 20.f, -20.f),
+        //    math::Quatf(1.f, 0.f, 0.f, 0.f));
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
 
         /// ---------------- PhysicsEngine use ---------------- 
@@ -59,7 +59,7 @@ int main(void)
         floorMaterial->SetMaterial(0.5f, 0.5f, 0.f);
 
         /// ---------------- Create rigidbody ----------------
-        engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(object, engine.GetGraph());
+        engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
         rigidBody->CreateDynamicRigidBody(engine::PhysicsEngine::Get(), *material, engine::CAPSULE);
 
         engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());
@@ -71,8 +71,8 @@ int main(void)
 			engine.Update();
 
             engine::PhysicsEngine::Get().StepSimulation(1.f / 60.f);
-            rigidBody->UpdateEntity(object);
-            rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(object));
+            rigidBody->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
+            rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
 		}
 
         /// ---------------- Clean ---------------- 

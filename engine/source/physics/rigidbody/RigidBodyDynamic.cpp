@@ -68,10 +68,7 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 
 engine::Transform engine::RigidBodyDynamic::SetTransform(const Transform& inEntityTransform)
 {
-	Transform temp;
-	temp.SetTransform(inEntityTransform.GetPosition(), math::Quatf(math::Vector3f(0.f, 0.f, 1.f), math::Radian(3.14f / 2)));
-
-	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(temp));
+	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(inEntityTransform));
 	return ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
 }
 
