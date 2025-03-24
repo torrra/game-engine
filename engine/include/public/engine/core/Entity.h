@@ -37,9 +37,8 @@ namespace engine
 
 	public:
 
-			 ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
-			 ENGINE_API Entity(void) = delete;
-			 ENGINE_API Entity(const Entity&) = default;
+		ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
+		ENGINE_API Entity(const Entity&) = default;
 
 		// Is this entity a valid object?
 		// true: this object is a valid entity instance
@@ -87,6 +86,10 @@ namespace engine
 		void Invalidate(void);
 
 	private:
+
+		Entity(void) = default;
+
+
 		// Get EComponentFlag corresponding to the component type
 		// NO_COMPONENT by default, must be manually instantiated for
 		// each component type in their respective headers
@@ -94,7 +97,7 @@ namespace engine
 		static constexpr EComponentFlags GetComponentFlag();
 
 		std::string			m_name;
-		EntityHandle		m_handle;
+		EntityHandle		m_handle = static_cast<EntityHandle>(-1);
 		EntityHandle		m_parent = INVALID_HANDLE;
 
 		// status modifiers that affect behavior (inactive, invalid)
