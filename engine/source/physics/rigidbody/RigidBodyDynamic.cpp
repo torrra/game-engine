@@ -55,11 +55,12 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
 }
 
-void engine::RigidBodyDynamic::UpdateEntity(void)
+void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
 {
 	physx::PxTransform transformTemp = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
 
-	m_currentScene->UpdateComponents<engine::Transform>(ToTransform(transformTemp));
+	//m_currentScene->UpdateComponents<engine::Transform>(ToTransform(transformTemp));
+    *m_currentScene->GetComponent<Transform>(inEntityHandle) = ToTransform(transformTemp);
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody(const Transform& inEntityTransform)

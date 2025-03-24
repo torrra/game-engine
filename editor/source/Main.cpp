@@ -17,6 +17,11 @@
 
 #include "Example.h"
 
+#include "engine/resource/ResourceManager.h"
+#include "engine/resource/model/Model.h"
+
+#define MODEL_FILE "..\\assets\\bunny.obj"
+
 // Use dedicated graphics card
 extern "C" 
 {
@@ -40,7 +45,7 @@ int main(void)
         /// ---------------- Create entity ---------------- 
         engine::EntityHandle object = engine.GetGraph()->CreateEntity("First");
         engine.GetGraph()->CreateComponent<engine::Transform>(object)->SetTransform(
-            math::Vector3f(0.f, 5.f, 0.f),
+            math::Vector3f(0.f, 20.f, -20.f),
             math::Quatf(1.f, 0.f, 0.f, 0.f));
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
 
@@ -68,7 +73,7 @@ int main(void)
 			engine.Update();
 
             physics->Get().StepSimulation(1.f / 60.f);
-            rigidBody->UpdateEntity();
+            rigidBody->UpdateEntity(object);
             rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(object));
 		}
 

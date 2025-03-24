@@ -53,7 +53,7 @@ namespace engine
 													   const Material& inMaterial,
 													   const Geometry& inGeometry);
 		// Update the entity transform in reference to the dynamic rigid body
-		ENGINE_API	void		UpdateEntity(void);
+		ENGINE_API	void		UpdateEntity(EntityHandle inEntityHandle);
 		// Update the dynamic rigid body transform in reference to the entity
 		ENGINE_API	void		UpdateRigidBody(const Transform& inEntityTransform);
 
