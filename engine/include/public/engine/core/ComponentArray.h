@@ -45,6 +45,9 @@ namespace engine
 		uint64			GetComponentIndex(EntityHandle owner) const;
 
 
+		void AddDeserializedComponent(const TComponentType& component);
+
+		
 		// Standard functions necessary to use ranged for loops.
 		// Cannot use PascalCase for these two functions as they must
 		// match a precise syntax. Their return types are STL vector
@@ -204,6 +207,13 @@ namespace engine
 			return m_entityIndexMap.at(owner);
 		else
 			return static_cast<uint64>(-1);
+	}
+
+	template<CValidComponent TComponentType>
+	inline void ComponentArray<TComponentType>::AddDeserializedComponent(const TComponentType& component)
+	{
+		m_entityIndexMap[component.GetOwner()] = m_components.size();
+		m_components.push_back(component);
 	}
 
 	template<CValidComponent TComponentType>
