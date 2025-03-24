@@ -26,7 +26,7 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	// Add component to model entity
 	m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
-	engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle);
+    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 20.f, -100.f));
 	engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
 	engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);
 
