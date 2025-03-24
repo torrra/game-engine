@@ -37,10 +37,6 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 		*inGeometry.GetGeometryImpl().m_geometry,
 		*inMaterial.GetImpl().m_material, 1.0f);
 
-	// Update the rigid body transform rotation to be in the correct orientation
-	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(SetTransform(
-						*m_currentScene->GetComponent<engine::Transform>(m_owner))));
-
 	// Set the gravity by default
 	m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
 													  m_isGravityDisabled);
