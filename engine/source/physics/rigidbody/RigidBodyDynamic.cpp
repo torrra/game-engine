@@ -1,4 +1,4 @@
-#include "engine/physics/rigidbody/RigidBodyDynamic.h"
+#include "physics/rigidbody/RigidBodyDynamic.h"
 
 #pragma region Internal
 
@@ -9,7 +9,7 @@
 
 #pragma region Core
 
-#include "engine/core/SceneGraph.h"
+#include "core/SceneGraph.h"
 
 #pragma endregion
 

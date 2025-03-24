@@ -15,7 +15,7 @@
 
 #pragma region Core
 
-#include "engine/core/SceneGraph.h"
+#include "core/SceneGraph.h"
 
 #pragma endregion
 
