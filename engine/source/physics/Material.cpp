@@ -12,12 +12,6 @@
 
 #pragma endregion
 
-#pragma region Standard
-
-#include <iostream>
-
-#pragma endregion
-
 engine::Material::Material(const PhysicsEngine& inPhysicsEngine, f32 inDynamicFriction,
 						   f32 inStaticFriction, f32 inRestitution)
 {
@@ -25,8 +19,6 @@ engine::Material::Material(const PhysicsEngine& inPhysicsEngine, f32 inDynamicFr
 
 	m_materialImpl->m_material = inPhysicsEngine.GetImpl().m_physics->createMaterial(
 								 inDynamicFriction, inStaticFriction, inRestitution);
-
-	std::cout << "Material created to given values" << std::endl;
 }
 
 engine::Material::~Material(void)

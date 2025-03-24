@@ -7,12 +7,6 @@
 
 #pragma endregion
 
-#pragma region Standard
-
-#include <iostream>
-
-#pragma endregion
-
 #pragma region Core
 
 #include "core/SceneGraph.h"

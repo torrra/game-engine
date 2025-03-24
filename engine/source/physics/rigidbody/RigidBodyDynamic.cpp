@@ -13,12 +13,6 @@
 
 #pragma endregion
 
-#pragma region Standard
-
-#include <iostream>
-
-#pragma endregion
-
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
 	m_rigidBodyImpl = new RigidBodyDynamicImpl();
