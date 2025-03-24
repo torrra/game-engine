@@ -32,7 +32,7 @@ namespace engine
 {
 	struct RigidBodyDynamicImpl;
 
-	class RigidBodyDynamic : Component
+	class RigidBodyDynamic : public Component
 	{
 	public :
 
