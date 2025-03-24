@@ -345,6 +345,7 @@ namespace engine
 			SerializeSingleComponent<Transform>(file, entity, handles);
 			SerializeSingleComponent<Camera>(file, entity, handles);
 			SerializeSingleComponent<Renderer>(file, entity, handles);
+			SerializeSingleComponent<Script>(file, entity, handles);
 		}
 
 		return handles;
@@ -365,10 +366,82 @@ namespace engine
 		file << '\n';
 	}
 
+	void SceneGraph::DeserializeTextVersion1(std::ifstream& file, std::string& line)
+	{
+		Component::DeserializedArray<Transform> transforms;
+		Component::DeserializedArray<Camera>	cameras;
+		Component::DeserializedArray<Renderer>	renderers;
+		Component::DeserializedArray<Script>	scripts;
+
+		while (std::getline(file, line))
+		{
+			if (line.compare("[Entity]") == 0)
+				DeserializeEntityTextVersion1(file);
+
+			else if (line.compare("[Transform]") == 0)
+				Component::DeserializeComponentText(transforms, file);
+
+			else if (line.compare("[Camera]") == 0)
+				Component::DeserializeComponentText(cameras, file);
+
+			else if (line.compare("[Renderer]") == 0)
+				Component::DeserializeComponentText(renderers, file);
+
+			else if (line.compare("[Script]") == 0)
+				Component::DeserializeComponentText(scripts, file);
+		}
+
+		ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+	}
+
+	void SceneGraph::DeserializeEntityTextVersion1(std::ifstream& file)
+	{
+		Entity newEntity;
+
+		text::Deserialize(file, newEntity.m_name);
+
+		text::MoveCursorToVal(file);
+		text::Deserialize(file, newEntity.m_handle);
+
+		text::MoveCursorToVal(file);
+		text::Deserialize(file, newEntity.m_parent);
+
+		text::MoveCursorToVal(file);
+		text::Deserialize(file, newEntity.m_statusFlags);
+
+		text::MoveCursorToVal(file);
+		text::Deserialize(file, newEntity.m_components);
+
+		m_sceneEntities.push_back(newEntity);	
+	}
+
 
 	void SceneGraph::SerializeText(std::ofstream& file)
 	{
+		text::Serialize(file, "formatVersion", 1);
+		file << '\n';
 		SerializeValidEntitiesText(file);
+	}
+
+	void SceneGraph::DeserializeText(std::ifstream& file)
+	{
+		uint64		cursor = 0;
+		std::string firstLine;
+
+		std::getline(file, firstLine);
+		text::MoveCursorToVal(cursor, firstLine);
+
+		int32 formatVersion = strtol(firstLine.c_str() + cursor, nullptr, 0);
+
+		switch (formatVersion)
+		{
+		case 1:
+			DeserializeTextVersion1(file, firstLine);
+			break;
+
+		default: break;
+		}
+
 	}
 
 }

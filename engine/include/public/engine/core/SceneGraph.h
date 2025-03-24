@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "engine/EngineExport.h"
 #include "TypesECS.h"
@@ -23,7 +24,6 @@ namespace engine
 	private:
 
 		using HandleMap = std::unordered_map<EntityHandle, EntityHandle>;
-
 
 		// Random uint64 generator.
 		class Random
@@ -154,6 +154,9 @@ namespace engine
 		void SerializeText(std::ofstream& file);
 
 		ENGINE_API
+		void DeserializeText(std::ifstream& file);
+
+		ENGINE_API
 		SceneGraph& operator=(const SceneGraph&) = default;
 
 		// Output a int64 between LONG_MIN and LONG_MAX
@@ -204,6 +207,16 @@ namespace engine
 		void SerializeSingleComponent(std::ofstream& file,
 									  const Entity& entity,
 									  HandleMap& handles) const;
+
+		void DeserializeTextVersion1(std::ifstream& file, std::string& line);
+
+		void DeserializeEntityTextVersion1(std::ifstream& file);
+
+		template <typename... TVariadicArgs>
+		void ReorderDeserializedTextArrays(TVariadicArgs&... args);
+
+		template <CValidComponent TComponentType>
+		void ReorderTextArray(Component::DeserializedArray<TComponentType>& array);
 
 
 		// All transform components in the scene
@@ -305,6 +318,13 @@ namespace engine
 		return m_sceneScripts;
 	}
 
+	template<> inline
+	const ComponentArray<Script>& SceneGraph::GetComponentArray<Script>(void) const
+	{
+		return m_sceneScripts;
+	}
+
+
 
 	template<CValidComponent TComponentType>
 	inline TComponentType* SceneGraph::GetComponent(EntityHandle ownerEntity)
@@ -340,6 +360,29 @@ namespace engine
 			component->SerializeText(file, handles[entity.m_handle], index);
 		}
 
+	}
+
+	template<typename ...TVariadicArgs>
+	inline void SceneGraph::ReorderDeserializedTextArrays(TVariadicArgs& ...args)
+	{
+		(ReorderTextArray(args), ...);
+	}
+
+	template<CValidComponent TComponentType>
+	inline void SceneGraph::ReorderTextArray(Component::DeserializedArray<TComponentType>& array)
+	{
+		using CompIndex = Component::IndexedComponent<TComponentType>;
+
+		if constexpr (UpdateAfterParent<TComponentType>::m_value)
+		{
+			std::sort(array.begin(), array.end(),
+			[](const CompIndex& lhs, const CompIndex& rhs) -> bool {return lhs.first < rhs.first; });
+		}
+
+		ComponentArray<TComponentType>& compArray = GetComponentArray<TComponentType>();
+
+		for (const CompIndex& component : array)
+			compArray.AddDeserializedComponent(component.second);
 	}
 
 	template<CValidComponent TComponentType>
