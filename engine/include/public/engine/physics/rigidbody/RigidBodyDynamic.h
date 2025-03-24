@@ -23,7 +23,6 @@
 
 #pragma region MathLib
 
-#include <math/VectorGeneric.hpp>
 #include <math/Vector3.hpp>
 
 #pragma endregion
