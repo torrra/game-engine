@@ -21,12 +21,12 @@
 #pragma endregion
 
 /// Vector
-inline physx::PxVec3T<float> ToPxVec3(const math::Vector3f& inVector)
+inline physx::PxVec3T<f32> ToPxVec3(const math::Vector3f& inVector)
 {
-	return physx::PxVec3T<float>(inVector.GetX(), inVector.GetY(), inVector.GetZ());
+	return physx::PxVec3T<f32>(inVector.GetX(), inVector.GetY(), inVector.GetZ());
 }
 
-inline math::Vector3f ToVector3f(const physx::PxVec3T<float>& inVector)
+inline math::Vector3f ToVector3f(const physx::PxVec3T<f32>& inVector)
 {
 	return math::Vector3f(inVector.x, inVector.y, inVector.z);
 }

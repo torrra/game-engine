@@ -5,7 +5,6 @@
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
 
-#include <math/VectorGeneric.hpp>
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
 
@@ -50,7 +49,6 @@ int main(void)
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
 
         /// ---------------- PhysicsEngine use ---------------- 
-        //engine::PhysicsEngine physics;
         engine::PhysicsEngine::Get().Init();
 
         /// ---------------- Create material ----------------
