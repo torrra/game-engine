@@ -142,7 +142,6 @@ namespace engine
 
 		// default to sibling folder
 		else
-			/// TODO : clear the string before application shutdown
 			return parentPath.append("scripts\\").string();
 	}
 
