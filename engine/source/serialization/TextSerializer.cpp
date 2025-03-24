@@ -60,9 +60,12 @@ namespace engine::text
 				file.seekg(1, std::ios::cur);
 
 			currentChar = static_cast<char>(file.peek());
+
+			if (currentChar == -1)
+				break;
 		}
 
-		if (!file.eof())
+		if (!file.eof() && currentChar != -1)
 			file.seekg(1, std::ios::cur);
 	}
 }
