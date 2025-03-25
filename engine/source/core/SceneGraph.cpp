@@ -7,6 +7,7 @@
 #include "serialization/TextSerializer.h"
 
 #include <iostream>
+#include <sstream>
 
 namespace engine
 {
@@ -318,7 +319,7 @@ namespace engine
 	}
 
 
-	SceneGraph::HandleMap SceneGraph::SerializeValidEntitiesText(std::ofstream& file)
+	SceneGraph::HandleMap SceneGraph::SerializeValidEntitiesText(std::ostream& file)
 	{
 		std::vector<Entity> validEntities;
 		HandleMap			handles;
@@ -351,7 +352,7 @@ namespace engine
 		return handles;
 	}
 
-	void SceneGraph::SerializeEntityText(std::ofstream& file, const Entity& entity)
+	void SceneGraph::SerializeEntityText(std::ostream& file, const Entity& entity)
 	{
 		file << "[Entity]\n   ";
 		text::Serialize(file, "name", entity.m_name);
@@ -366,7 +367,7 @@ namespace engine
 		file << '\n';
 	}
 
-	void SceneGraph::DeserializeTextVersion1(std::ifstream& file, std::string& line)
+	void SceneGraph::DeserializeTextV1(std::ifstream& file, std::string& line)
 	{
 		Component::DeserializedArray<Transform> transforms;
 		Component::DeserializedArray<Camera>	cameras;
@@ -375,26 +376,62 @@ namespace engine
 
 		while (std::getline(file, line))
 		{
-			if (line.compare("[Entity]") == 0)
-				DeserializeEntityTextVersion1(file);
+			if (memcmp(line.c_str(), "[Entity]", 8) == 0)
+				DeserializeEntityTextV1(file);
 
-			else if (line.compare("[Transform]") == 0)
+			else if (memcmp(line.c_str(), "[Transform]", 11) == 0)
 				Component::DeserializeComponentText(transforms, file);
 
-			else if (line.compare("[Camera]") == 0)
+			else if (memcmp(line.c_str(), "[Camera]", 8) == 0)
 				Component::DeserializeComponentText(cameras, file);
 
-			else if (line.compare("[Renderer]") == 0)
+			else if (memcmp(line.c_str(), "[Renderer]", 10) == 0)
 				Component::DeserializeComponentText(renderers, file);
 
-			else if (line.compare("[Script]") == 0)
+			else if (memcmp(line.c_str(), "[Script]", 8) == 0)
 				Component::DeserializeComponentText(scripts, file);
 		}
 
 		ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
 	}
 
-	void SceneGraph::DeserializeEntityTextVersion1(std::ifstream& file)
+	void SceneGraph::DeserializeTextV2(std::ifstream& file)
+	{
+		Component::DeserializedArray<Transform> transforms;
+		Component::DeserializedArray<Camera>	cameras;
+		Component::DeserializedArray<Renderer>	renderers;
+		Component::DeserializedArray<Script>	scripts;
+
+		const char* start;
+		const char* end;
+		const char* data = text::LoadFileData(file, start, end);
+
+		while (start != end)
+		{
+			if (memcmp(start, "[Entity]", 8) == 0)
+				start = DeserializeEntityTextV2(start, end);
+
+			else if (memcmp(start, "[Transform]", 11) == 0)
+				start = Component::DeserializeComponentText(transforms, start, end);
+
+			else if (memcmp(start, "[Camera]", 8) == 0)
+				start = Component::DeserializeComponentText(cameras, start, end);
+
+			else if (memcmp(start, "[Renderer]", 10) == 0)
+				start = Component::DeserializeComponentText(renderers, start, end);
+
+			else if (memcmp(start, "[Script]", 8) == 0)
+				start = Component::DeserializeComponentText(scripts, start, end);
+
+			start = text::GetNewLine(start, end);
+		}
+
+		ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+		text::UnloadFileData(data);
+	}
+	
+
+	void SceneGraph::DeserializeEntityTextV1(std::ifstream& file)
 	{
 		Entity newEntity;
 
@@ -415,10 +452,32 @@ namespace engine
 		m_sceneEntities.push_back(newEntity);	
 	}
 
-
-	void SceneGraph::SerializeText(std::ofstream& file)
+	const char* SceneGraph::DeserializeEntityTextV2(const char* text, const char* end)
 	{
-		text::Serialize(file, "formatVersion", 1);
+		Entity newEntity;
+
+		text = text::DeserializeString(text, end, newEntity.m_name);
+
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, newEntity.m_handle);
+
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, newEntity.m_parent);
+
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, newEntity.m_statusFlags);
+
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, newEntity.m_components);
+
+		m_sceneEntities.push_back(newEntity);
+		return text;
+	}
+
+
+	void SceneGraph::SerializeText(std::ofstream& file, int32 version)
+	{
+		text::Serialize(file, "formatVersion", version);
 		file << '\n';
 		SerializeValidEntitiesText(file);
 	}
@@ -436,7 +495,11 @@ namespace engine
 		switch (formatVersion)
 		{
 		case 1:
-			DeserializeTextVersion1(file, firstLine);
+			DeserializeTextV1(file, firstLine);
+			break;
+
+		case 2:
+			DeserializeTextV2(file);
 			break;
 
 		default: break;

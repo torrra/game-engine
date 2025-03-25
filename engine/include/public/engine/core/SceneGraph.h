@@ -151,7 +151,7 @@ namespace engine
 		void CacheComponents(void);
 
 		ENGINE_API
-		void SerializeText(std::ofstream& file);
+		void SerializeText(std::ofstream& file, int32 version = 2);
 
 		ENGINE_API
 		void DeserializeText(std::ifstream& file);
@@ -194,23 +194,25 @@ namespace engine
 		// potentially leaving empty spots to be filled by valid entities.
 		// These new handles are only applied upon next deserialization to avoid breaking
 		// existing references
-		HandleMap SerializeValidEntitiesText(std::ofstream& text);
+		HandleMap SerializeValidEntitiesText(std::ostream& text);
 
 		// Serialize a single entity
-		void SerializeEntityText(std::ofstream& file, const Entity& entity);
+		void SerializeEntityText(std::ostream& file, const Entity& entity);
 
 		// Serialize all components of a type
 		template <CValidComponent TComponentType>
-		void SerializeComponents(std::ofstream& file, HandleMap& handles);
+		void SerializeComponents(std::ostream& file, HandleMap& handles);
 
 		template <CValidComponent TComponentType>
-		void SerializeSingleComponent(std::ofstream& file,
+		void SerializeSingleComponent(std::ostream& file,
 									  const Entity& entity,
 									  HandleMap& handles) const;
 
-		void DeserializeTextVersion1(std::ifstream& file, std::string& line);
+		void DeserializeTextV1(std::ifstream& file, std::string& line);
+		void DeserializeTextV2(std::ifstream& file);
 
-		void DeserializeEntityTextVersion1(std::ifstream& file);
+		void DeserializeEntityTextV1(std::ifstream& file);
+		const char* DeserializeEntityTextV2(const char* text, const char* end);
 
 		template <typename... TVariadicArgs>
 		void ReorderDeserializedTextArrays(TVariadicArgs&... args);
@@ -336,7 +338,7 @@ namespace engine
 
 
 	template<CValidComponent TComponentType>
-	inline void SceneGraph::SerializeComponents(std::ofstream& file, HandleMap& handles)
+	inline void SceneGraph::SerializeComponents(std::ostream& file, HandleMap& handles)
 	{
 		ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
@@ -348,7 +350,7 @@ namespace engine
 	}
 
 	template<CValidComponent TComponentType>
-	inline void SceneGraph::SerializeSingleComponent(std::ofstream& file,
+	inline void SceneGraph::SerializeSingleComponent(std::ostream& file,
 													 const Entity& entity,
 													 HandleMap& handles) const
 	{
