@@ -258,7 +258,6 @@ namespace engine
 			if (component.IsValid() && component.IsActive())
 				component.Update(std::forward<TVariadicArgs>(args)...);
 		}
-
 	}
 
 	template<>
