@@ -6,7 +6,6 @@ namespace engine
 	ScriptObject::ScriptObject(EntityHandle entity, const std::string& filepath)
 		: m_entity(entity), m_type(filepath)
 	{
-		Register();
 	}
 
 	const std::string& ScriptObject::GetType(void) const
