@@ -36,10 +36,6 @@ void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysi
 		*inGeometry.GetGeometryImpl().m_geometry,
 		*inMaterial.GetImpl().m_material);
 
-	// Update the rigid body transform rotation to be in the correct orientation
-	m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(SetTransform(
-		*m_currentScene->GetComponent<engine::Transform>(m_owner))));
-
 	// Add the rigid body to the physics scene
 	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
 }
@@ -47,12 +43,6 @@ void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysi
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
 	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
-}
-
-engine::Transform engine::RigidBodyStatic::SetTransform(const Transform& inEntityTransform)
-{
-	m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(inEntityTransform));
-	return ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
 }
 
 engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
