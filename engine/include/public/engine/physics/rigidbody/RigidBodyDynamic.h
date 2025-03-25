@@ -3,6 +3,7 @@
 #pragma region Engine
 
 #include "engine/EngineExport.h"
+#include "engine/CoreTypes.h"
 
 #pragma endregion
 
@@ -51,6 +52,16 @@ namespace engine
 		ENGINE_API	void		CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine,
 													   const Material& inMaterial,
 													   const Geometry& inGeometry);
+        ENGINE_API  void        CreateDynamicBoxRigidBody(const PhysicsEngine& inPhysicsEngine,
+                                                          const Material& inMaterial,
+                                                          const math::Vector3f& inHalfHeight);
+        ENGINE_API  void        CreateDynamicSphereRigidBody(const PhysicsEngine& inPhysicsEngine,
+                                                             const Material& inMaterial,
+                                                             const f32 inRadius);
+        ENGINE_API  void        CreateDynamicCapsuleRigidBody(const PhysicsEngine& inPhysicsEngine,
+                                                               const Material& inMaterial,
+                                                               const f32 inRadius,
+                                                               const f32 inHalfHeight);
 		// Update the entity transform in reference to the dynamic rigid body
 		ENGINE_API	void		UpdateEntity(EntityHandle inEntityHandle);
 		// Update the dynamic rigid body transform in reference to the entity

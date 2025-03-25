@@ -32,7 +32,8 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 		<param> inMaterial: The material of the rigid body
 		<param> Density: The density of the rigid body
 	*/
-	m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(*inPhysicsEngine.GetImpl().m_physics,
+	m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+        *inPhysicsEngine.GetImpl().m_physics,
 		ToPxTransform(CheckEntityTransform()),
 		*inGeometry.GetGeometryImpl().m_geometry,
 		*inMaterial.GetImpl().m_material, 1.0f);
@@ -43,6 +44,55 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 
 	// Add the rigid body to the physics scene
 	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+}
+
+void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(const PhysicsEngine& inPhysicsEngine, 
+    const Material& inMaterial, const math::Vector3f& inHalfHeight)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+        *inPhysicsEngine.GetImpl().m_physics,
+        ToPxTransform(CheckEntityTransform()),
+        physx::PxBoxGeometry(inHalfHeight.GetX(), inHalfHeight.GetY(), inHalfHeight.GetZ()),
+        *inMaterial.GetImpl().m_material, 1.0f);
+
+    // Set the gravity by default
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+        m_isGravityDisabled);
+
+    // Add the rigid body to the physics scene
+    inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+}
+
+void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(const PhysicsEngine& inPhysicsEngine, const Material& inMaterial, const f32 inRadius)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+        *inPhysicsEngine.GetImpl().m_physics,
+        ToPxTransform(CheckEntityTransform()),
+        physx::PxSphereGeometry(inRadius),
+        *inMaterial.GetImpl().m_material, 1.0f);
+
+    // Set the gravity by default
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+        m_isGravityDisabled);
+
+    // Add the rigid body to the physics scene
+    inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+}
+
+void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(const PhysicsEngine& inPhysicsEngine, const Material& inMaterial, const f32 inRadius, const f32 inHalfHeight)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+        *inPhysicsEngine.GetImpl().m_physics,
+        ToPxTransform(CheckEntityTransform()),
+        physx::PxCapsuleGeometry(inRadius, inHalfHeight),
+        *inMaterial.GetImpl().m_material, 1.0f);
+
+    // Set the gravity by default
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+        m_isGravityDisabled);
+
+    // Add the rigid body to the physics scene
+    inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
 }
 
 void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
