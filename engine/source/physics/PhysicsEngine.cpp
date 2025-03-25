@@ -208,6 +208,9 @@ void engine::PhysicsEngine::InitScene(void)
 			<param> Restitution : Bounce capacity (elasticity)
 		*/
 		m_impl->m_material = m_impl->m_physics->createMaterial(0.5f, 0.5f, 0.6f);
+
+        m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+        m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eWORLD_AXES, 5.0f);
 	}
 }
 
