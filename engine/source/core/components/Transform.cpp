@@ -73,6 +73,14 @@ void engine::Transform::CopyScale(const Transform& inTransform)
 	m_dirty = true;
 }
 
+void engine::Transform::Update(const Transform& inTransform)
+{
+	m_position = inTransform.m_position;
+	m_rotation = inTransform.m_rotation;
+	m_scale = inTransform.m_scale;
+	m_dirty = true;
+}
+
 void engine::Transform::Register(void)
 {
 	engine::ScriptSystem::RegisterNewComponent("_NewTransformComponent", m_owner);
@@ -114,6 +122,14 @@ void engine::Transform::SetScale(const math::Vector3f& inScale)
 {
 	m_scale = inScale;
 	m_dirty = true;
+}
+
+void engine::Transform::SetTransform(const Transform& inTransform)
+{
+    m_position = inTransform.m_position;
+    m_rotation = inTransform.m_rotation;
+    m_scale = inTransform.m_scale;
+    m_dirty = true;
 }
 
 void engine::Transform::SetTransform(const math::Vector3f& inPosition,

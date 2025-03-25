@@ -26,7 +26,7 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	// Add component to model entity
 	m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
-	engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle);
+    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 20.f, -10.f));
 	engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
 	engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);
 
@@ -42,7 +42,7 @@ void ExampleProject::StartUp(engine::Engine& engine)
 	engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
 	engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
 
-	camera->Rotation() = {-44.5f, 26.5f, 0.0f};
+	camera->Rotation() = {-10.5f, 26.5f, 0.0f};
 	camera->Position() = {1.5f, 3.0f, 3.2f};
 }
 

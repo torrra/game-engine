@@ -30,7 +30,8 @@ namespace engine
 			NO_COMPONENTS = 0,
 			TRANSFORM = 1,
 			SCRIPT = (uint64) (1 << 1),
-			RENDERER = (uint64) (1 << 2)
+			RENDERER = (uint64) (1 << 2),
+			RIGIDBODYDYNAMIC = (uint64) (1 << 3)
 		};
 
 		friend class SceneGraph;
