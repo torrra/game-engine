@@ -72,6 +72,8 @@ namespace engine
 		ENGINE_API	void					SetRotation(const math::Quatf& inRotation);
 		// Set the scale of the transform
 		ENGINE_API	void					SetScale(const math::Vector3f& inScale);
+        // Set the transform
+        ENGINE_API  void                    SetTransform(const Transform& inTransform);
 		// Set all parameters of the transform
 		ENGINE_API	void 					SetTransform(const math::Vector3f& inPosition,
 														 const math::Quatf& inRotation,

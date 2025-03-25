@@ -124,6 +124,14 @@ void engine::Transform::SetScale(const math::Vector3f& inScale)
 	m_dirty = true;
 }
 
+void engine::Transform::SetTransform(const Transform& inTransform)
+{
+    m_position = inTransform.m_position;
+    m_rotation = inTransform.m_rotation;
+    m_scale = inTransform.m_scale;
+    m_dirty = true;
+}
+
 void engine::Transform::SetTransform(const math::Vector3f& inPosition,
 	const math::Quatf& inRotation, const math::Vector3f& inScale)
 {
