@@ -62,12 +62,6 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 	PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
 }
 
-engine::Transform engine::RigidBodyDynamic::SetTransform(const Transform& inEntityTransform)
-{
-	m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(inEntityTransform));
-	return ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
-}
-
 engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 {
 	if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
