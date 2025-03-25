@@ -37,10 +37,10 @@ namespace engine
 				character += 32;
 		}
 
-		m_scriptObjects.emplace_back(m_owner, formattedType);
+		m_scriptObjects.emplace_back(m_owner, formattedType).Register();
 	}
 
-	void Script::SerializeText(std::ofstream& output, EntityHandle owner, uint64 index) const
+	void Script::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
 	{
 		output << "[Script]\n   ";
 
@@ -86,5 +86,26 @@ namespace engine
 
 		text::MoveCursorToVal(input);
 		text::Deserialize(input, m_flags);
+	}
+
+	const char* Script::DeserializeText(const char* text, const char* end)
+	{
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, m_owner);
+
+		uint64 scriptObjectCount = 0;
+
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, scriptObjectCount);
+
+		for (uint64 obj = 0; obj < scriptObjectCount; ++obj)
+		{
+			std::string objName;
+			text = text::DeserializeString(text, end, objName);
+			m_scriptObjects.emplace_back(m_owner, objName);
+		}
+
+		MOVE_TEXT_CURSOR(text, end);
+		return text::DeserializeInteger(text, m_flags);
 	}
 }

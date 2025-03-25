@@ -52,7 +52,7 @@ namespace engine
 		EntityHandle GetOwner(void) const;
 
 		ENGINE_API
-		virtual	void SerializeText(std::ofstream&,
+		virtual	void SerializeText(std::ostream&,
 								   EntityHandle,
 								   uint64) const {}
 
@@ -60,13 +60,23 @@ namespace engine
 		static void DeserializeComponentText(DeserializedArray<TComponentType>& array,
 											std::ifstream& file);
 
+		template <CValidComponent TComponentType>
+		static const char* DeserializeComponentText(DeserializedArray<TComponentType>& array,
+													const char* text, const char* end);
+
 	protected:
 
 		ENGINE_API
 		void DeserializeIndexedText(std::ifstream& input, uint64& index);
 
 		ENGINE_API
+		const char* DeserializeIndexedText(const char* text, const char* end, uint64& index);
+
+		ENGINE_API
 		virtual void DeserializeText(std::ifstream&) {}
+
+		ENGINE_API
+		virtual const char* DeserializeText(const char* text, const char*) { return text; }
 
 		// which entity in scene graph owns this component
 		EntityHandle	m_owner = static_cast<EntityHandle>(-1);
@@ -102,13 +112,30 @@ namespace engine
 	{
 		constexpr EntityHandle invalid = static_cast<EntityHandle>(-1);
 
-		IndexedComponent<TComponentType>& component = array.emplace_back(invalid, TComponentType(invalid, nullptr));
+		IndexedComponent<TComponentType>& component =
+		array.emplace_back(invalid, TComponentType(invalid, nullptr));
 
 		if constexpr (UpdateAfterParent<TComponentType>::m_value)
 			component.second.DeserializeIndexedText(file, component.first);
 
 		else
 			component.second.DeserializeText(file);
+	}
+
+	template<CValidComponent TComponentType>
+	inline const char* Component::DeserializeComponentText(DeserializedArray<TComponentType>& array,
+											        const char* text, const char* end)
+	{
+		constexpr EntityHandle invalid = static_cast<EntityHandle>(-1);
+
+		IndexedComponent<TComponentType>& component =
+		array.emplace_back(invalid, TComponentType(invalid, nullptr));
+
+		if constexpr (UpdateAfterParent<TComponentType>::m_value)
+			return component.second.DeserializeIndexedText(text, end, component.first);
+
+		else
+			return component.second.DeserializeText(text, end);
 	}
 
 }

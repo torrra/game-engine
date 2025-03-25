@@ -157,7 +157,7 @@ void engine::Transform::AddScale(const math::Vector3f& scale)
 	m_dirty = true;
 }
 
-void engine::Transform::SerializeText(std::ofstream& output, EntityHandle owner,
+void engine::Transform::SerializeText(std::ostream& output, EntityHandle owner,
 									 uint64 index) const
 {
 	output << "[Transform]\n    ";
@@ -197,6 +197,25 @@ void engine::Transform::DeserializeText(std::ifstream& input)
 
 	text::MoveCursorToVal(input);
 	text::Deserialize(input, m_flags);
+}
+
+const char* engine::Transform::DeserializeText(const char* text, const char* end)
+{
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeInteger(text, m_owner);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeQuaternion(text, m_rotation);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_position);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_scale);
+
+	MOVE_TEXT_CURSOR(text, end);
+	return text::DeserializeInteger(text, m_flags);
+	
 }
 
 std::ostream& engine::Transform::operator<<(std::ostream& os)

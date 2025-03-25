@@ -106,7 +106,7 @@ namespace engine
 			m_texture = texture;
 	}
 
-	void Renderer::SerializeText(std::ofstream& output, EntityHandle owner,
+	void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
 								 uint64 index) const
 	{
 
@@ -174,6 +174,36 @@ namespace engine
 
 		text::MoveCursorToVal(input);
 		text::Deserialize(input, m_flags);
+	}
+
+	const char* Renderer::DeserializeText(const char* text, const char* end)
+	{
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, m_owner);
+
+		uint8 hasTexture;
+
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, hasTexture);
+
+		std::string key;
+		text = text::DeserializeString(text, end, key);
+
+		m_model = ResourceManager::GetResource<Model>(key);
+
+		key.clear();
+		text = text::DeserializeString(text, end, key);
+		m_shader = ResourceManager::GetResource<ShaderProgram>(key);
+
+		if (hasTexture)
+		{
+			key.clear();
+			text = text::DeserializeString(text, end, key);
+			m_texture = ResourceManager::GetResource<Texture>(key);
+		}
+
+		MOVE_TEXT_CURSOR(text, end);
+		return text::DeserializeInteger(text, m_flags);
 	}
 
 	void Renderer::DrawModel(void) const

@@ -107,7 +107,7 @@ void engine::Camera::SetFarPlane(f32 farPlane)
 	GetProjectionMatrix();
 }
 
-void engine::Camera::SerializeText(std::ofstream& output, EntityHandle owner,
+void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
 								   uint64 index) const
 {
 	output << "[Camera]\n    ";
@@ -161,6 +161,33 @@ void engine::Camera::DeserializeText(std::ifstream& input)
 
 	text::MoveCursorToVal(input);
 	text::Deserialize(input, m_flags);
+}
+
+const char* engine::Camera::DeserializeText(const char* text, const char* end)
+{
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeInteger(text, m_owner);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_near);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_far);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_fovRad);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_ratio);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_rotation);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_position);
+
+	MOVE_TEXT_CURSOR(text, end);
+	return text::DeserializeInteger(text, m_flags);
 }
 
 math::Matrix4f engine::Camera::GetViewMatrix(void)

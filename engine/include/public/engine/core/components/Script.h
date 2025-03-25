@@ -38,12 +38,15 @@ namespace engine
 		void AddScriptObject(const std::string& type);
 
 		ENGINE_API
-		void SerializeText(std::ofstream& output,
+		void SerializeText(std::ostream& output,
 						   EntityHandle owner,
 						   uint64 index) const override;
 
 		ENGINE_API
 		void DeserializeText(std::ifstream& input) override;
+
+		ENGINE_API
+		const char* DeserializeText(const char* text, const char* end) override;
 
 	private:
 

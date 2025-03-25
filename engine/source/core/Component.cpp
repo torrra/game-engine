@@ -46,4 +46,12 @@ namespace engine
 		text::Deserialize(input, index);
 		DeserializeText(input);
 	}
+
+	const char* Component::DeserializeIndexedText(const char* text, const char* end, uint64& index)
+	{
+		MOVE_TEXT_CURSOR(text, end);
+		text = text::DeserializeInteger(text, index);
+
+		return DeserializeText(text, end);
+	}
 }
