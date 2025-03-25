@@ -28,7 +28,7 @@ engine::RigidBodyStatic::~RigidBodyStatic(void)
 	m_rigidBodyStaticImpl = nullptr;
 }
 
-void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysicsEngine, 
+void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysicsEngine,
 	const Material& inMaterial, const Geometry& inGeometry)
 {
 	m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(*inPhysicsEngine.GetImpl().m_physics,
@@ -38,6 +38,17 @@ void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysi
 
 	// Add the rigid body to the physics scene
 	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+}
+
+void engine::RigidBodyStatic::CreatePlaneStaticRigidBody(const PhysicsEngine& inPhysicsEngine,
+    const Material& inMaterial)
+{
+    m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreatePlane(
+        *inPhysicsEngine.GetImpl().m_physics,
+        physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 0.f),
+        *inMaterial.GetImpl().m_material);
+
+    inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
 }
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)

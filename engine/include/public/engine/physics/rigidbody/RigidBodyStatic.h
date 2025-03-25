@@ -41,6 +41,8 @@ namespace engine
 		ENGINE_API	void		CreateStaticRigidBody(const PhysicsEngine& inPhysicsEngine,
 													  const Material& inMaterial,
 													  const Geometry& inGeometry);
+        ENGINE_API  void        CreatePlaneStaticRigidBody(const PhysicsEngine& inPhysicsEngine,
+                                                           const Material& inMaterial);
 
 		ENGINE_API	void		Register(void) override {}
 

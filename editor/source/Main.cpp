@@ -42,10 +42,10 @@ int main(void)
 		project.StartUp(engine);
 
         /// ---------------- Create entity ---------------- 
-        //engine::EntityHandle object = engine.GetGraph()->CreateEntity("First");
-        //engine.GetGraph()->CreateComponent<engine::Transform>(object)->SetTransform(
-        //    math::Vector3f(0.f, 20.f, -20.f),
-        //    math::Quatf(1.f, 0.f, 0.f, 0.f));
+        engine::EntityHandle object = engine.GetGraph()->CreateEntity("First");
+        engine.GetGraph()->CreateComponent<engine::Transform>(object)->SetTransform(
+            math::Vector3f(0.f, 2.f, 0.f),
+            math::Quatf(1.f, 0.f, 0.f, 0.f));
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
 
         /// ---------------- PhysicsEngine use ---------------- 
@@ -62,8 +62,11 @@ int main(void)
         engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
         rigidBody->CreateDynamicRigidBody(engine::PhysicsEngine::Get(), *material, engine::CAPSULE);
 
+        engine::RigidBodyDynamic* first = new engine::RigidBodyDynamic(object, engine.GetGraph());
+        first->CreateDynamicSphereRigidBody(engine::PhysicsEngine::Get(), *material, 1.f);
+
         engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());
-        floorRigidBody->CreateStaticRigidBody(engine::PhysicsEngine::Get(), *floorMaterial, engine::PLANE);
+        floorRigidBody->CreatePlaneStaticRigidBody(engine::PhysicsEngine::Get(), *floorMaterial);
 		
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
