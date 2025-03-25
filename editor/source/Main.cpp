@@ -63,8 +63,8 @@ int main(void)
         rigidBody->CreateDynamicRigidBody(engine::PhysicsEngine::Get(), *material, engine::CAPSULE);
 
         engine::RigidBodyDynamic* first = new engine::RigidBodyDynamic(object, engine.GetGraph());
+        first->SetGravityDisabled(true);
         first->CreateDynamicSphereRigidBody(engine::PhysicsEngine::Get(), *material, 1.f);
-
         engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());
         floorRigidBody->CreatePlaneStaticRigidBody(engine::PhysicsEngine::Get(), *floorMaterial);
 		

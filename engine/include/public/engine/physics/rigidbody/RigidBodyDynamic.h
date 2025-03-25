@@ -46,6 +46,16 @@ namespace engine
 		// Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
 		ENGINE_API				~RigidBodyDynamic(void) override;
 
+        /// Getter
+        // Get the gravity status of the rigid body
+        // <return> the gravity status : true = disabled, false = enabled
+        ENGINE_API  bool        GetIsGravityDisabled(void) const;
+
+        /// Setter
+        // Set the gravity status of the rigid body
+        // <param> inIsGravityDisabled : the gravity status : true = disabled, false = enabled
+        ENGINE_API  void        SetGravityDisabled(bool inIsGravityDisabled);
+
 		/// Functions
 		// Create a dynamic rigid body with default values
 		// <param> inPhysicsEngine : the physics engine
@@ -78,6 +88,7 @@ namespace engine
 		// Check if the entity has a transform component if not create one
 		// <return> the entity transform
 					Transform&	CheckEntityTransform(void);
+                    
 		/// TODO : Check transform to directly use the component transform
 		///		   of the entity
 
@@ -85,7 +96,7 @@ namespace engine
 		RigidBodyDynamicImpl*	m_rigidBodyImpl;
 		PhysicsEngine*			m_physicsEngine		= nullptr;
 		Material*				m_material			= nullptr;
-		bool					m_isGravityDisabled = false;
+        bool					m_isGravityDisabled = false;
 
 	}; // !Class RigidBodyDynamic
 } //!Namespace engine

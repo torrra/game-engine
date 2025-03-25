@@ -129,3 +129,13 @@ engine::RigidBodyDynamic::~RigidBodyDynamic(void)
 	delete m_rigidBodyImpl;
 	m_rigidBodyImpl = nullptr;
 }
+
+bool engine::RigidBodyDynamic::GetIsGravityDisabled(void) const
+{
+    return m_isGravityDisabled;
+}
+
+void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
+{
+    m_isGravityDisabled = inIsGravityDisabled;
+}
