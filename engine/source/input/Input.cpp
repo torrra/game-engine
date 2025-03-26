@@ -112,7 +112,7 @@ void engine::Input::KeyboardCallback(int32 key, int32 scanCode, int32 action, in
         input.m_prevState = input.m_currentState;
         input.m_currentState = static_cast<EInputState>(action);
         
-        GetInstance()->m_resetKeys = (input.m_currentState == KEY_STATE_RELEASED);
+        GetInstance()->m_dirty = (input.m_currentState == KEY_STATE_RELEASED);
     }
 }
 
@@ -127,7 +127,7 @@ void engine::Input::MouseButtonCallback(int32 button, int32 action, int32 mods)
         input.m_prevState = input.m_currentState;
         input.m_currentState = static_cast<EInputState>(action);
 
-        GetInstance()->m_resetKeys = (input.m_currentState == KEY_STATE_RELEASED);
+        GetInstance()->m_dirty = (input.m_currentState == KEY_STATE_RELEASED);
     }
 }
 
@@ -142,7 +142,7 @@ void engine::Input::CursorPosCallback(f64 xPos, f64 yPos)
 }
 
 engine::Input::Input(void)
-    : m_cursorPos(0.00), m_scrollDelta(0.00), m_resetKeys(false)
+    : m_cursorPos(0.00), m_scrollDelta(0.00), m_dirty(false)
 {
 }
 
@@ -153,7 +153,7 @@ void engine::Input::SetCursorMode(ECursorMode cursorMode)
 
 void engine::Input::ResetKeys(void)
 {
-    if (!GetInstance()->m_resetKeys)
+    if (!GetInstance()->m_dirty)
         return;
     
     for (auto& key : GetInstance()->m_keyMap)
@@ -161,9 +161,14 @@ void engine::Input::ResetKeys(void)
         if (key.second.m_currentState == EInputState::UP &&
             key.second.m_prevState != EInputState::UP)
             key.second.m_prevState = EInputState::UP;
+        else if (key.second.m_currentState == EInputState::PRESSED)
+            key.second.m_prevState = EInputState::PRESSED;
     }
 
-    GetInstance()->m_resetKeys = false;
+    if (GetInstance()->m_scrollDelta.MagnitudeSquared())
+        GetInstance()->m_scrollDelta = math::Vector2d::Zero();
+
+    GetInstance()->m_dirty = false;
 }
 
 bool engine::Input::HasKey(int32 key) noexcept

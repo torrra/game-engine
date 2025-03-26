@@ -14,7 +14,6 @@ namespace engine::wnd
 
 namespace engine
 {
-    class Input;
     class Window
     {
     public:
@@ -48,7 +47,7 @@ namespace engine
         void SetAspectRatio(f32 aspectRatio);
 
     private:
-        engine::wnd::Wnd* m_windowPtr = nullptr;
+        engine::wnd::Wnd* m_windowPtr;
         std::string m_title;
         math::Vector2i m_size;
         f32 m_aspectRatio;
