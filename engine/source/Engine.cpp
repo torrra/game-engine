@@ -29,25 +29,25 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
 	
 	m_graph = new SceneGraph();
 
-	if (InitScriptSystem(projectDir))
+	if (InitScriptSystem(projectDir) != SUCCESS)
 		return ERROR;
 
-	if (InitWindow(projectName))
+	if (InitWindow(projectName) != SUCCESS)
 		return ERROR;
 
-    if (Input::StartUp())
+    if (Input::StartUp() != SUCCESS)
         return ERROR;
 
     Input::SetCursorMode(ECursorMode::NORMAL);
     
-	// TODO: init UI manager
+	// TODO: call init for UI manager
 
 	
 	// Initialize engine time
 	m_time = Time();
 
 	// Load default resources
-	if (LoadEngineResources())
+	if (LoadEngineResources() != SUCCESS)
 		return ERROR;
 
 	return SUCCESS;
@@ -61,12 +61,10 @@ void engine::Engine::ShutDown(void)
 	Input::ShutDown();
     Window::ShutDown();
 
-	// TODO: shut down ui manager
+	// TODO: call shutdown for ui manager
 
 	if (m_window)
-	{
 		delete m_window;
-	}
 	
 	if (m_graph)
 		delete m_graph;
@@ -145,7 +143,10 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 		ScriptSystem::Startup();
 		initialized = true;
 	}
-
+	/*
+	* TODO: probably dont need this line, as you should not be able to 
+	*		open script files if no projects were selected. 
+	*/
 	std::string path((projectDir) ? projectDir : "..\\");
 
 	ScriptSystem::SetUserScriptLocation(path.c_str());

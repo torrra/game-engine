@@ -14,6 +14,13 @@ namespace engine::wnd
 
 namespace engine
 {
+    /*
+       Window class
+       This class is used to create a window while not making
+       any direct calls to any window dependency. Therefore, the 
+       code can be re-used if the window dependency is later changed.
+    */
+    
     class Window
     {
     public:

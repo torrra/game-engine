@@ -2,6 +2,9 @@
 
 #include "window/WindowLib.h"
 
+// TODO: move this define
+#define SUCCESS 0
+
 engine::Window::Window(const char* title)
     : m_title(title), m_windowPtr(nullptr), m_size(0, 0), m_aspectRatio(1.0f)
 {
@@ -22,7 +25,7 @@ int32 engine::Window::StartUp(void)
     // Init window library
     if (!isInitialized)
     {
-        if (wnd::InitWndLib())
+        if (wnd::InitWndLib() != SUCCESS)
             return -1;
 
         isInitialized = true;
@@ -48,7 +51,7 @@ int32 engine::Window::CreateWindow(void)
     // Init graphics library
     if (!isInitialized)
     {
-        if (wnd::InitGraphicsAPI())
+        if (wnd::InitGraphicsAPI() != SUCCESS)
             return -1;
 
         isInitialized = true;
@@ -69,12 +72,12 @@ int32 engine::Window::CreateWindow(int32 width, int32 height)
     // Init graphics library
     if (!isInitialized)
     {
-        if (wnd::InitGraphicsAPI())
+        if (wnd::InitGraphicsAPI() != SUCCESS)
             return -1;
 
         isInitialized = true;
     }
-
+    
     SetSize({width, height});
     SetAspectRatio((height != 0) ? (f32) (width / height) : width);
 

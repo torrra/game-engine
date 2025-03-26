@@ -26,6 +26,14 @@ namespace engine
 
 namespace engine::wnd
 {
+
+    /*
+        Wnd Class
+        This class is used to encapsulate the internal window pointer
+        from the given window dependency (e.g. GLFW). Therefore, within 
+        the engine 'Wnd' should be used instead of the dependencies
+        window pointer (e.g. GLFWwindow*).
+    */
     class Wnd
     {
     public:
