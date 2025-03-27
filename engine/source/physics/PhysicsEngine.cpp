@@ -15,6 +15,8 @@
 #pragma region Internal
 
 #include "physics/InternalPhysXStruct.hpp"
+#include "physics/InternalPhyxConversion.hpp"
+#include "physics/InternalPhysxDebugDraw.h"
 
 #pragma endregion
 
@@ -29,10 +31,11 @@ physx::PxDefaultErrorCallback	gDefaultErrorCallback;
 // Set the instance to nullptr
 engine::PhysicsEngine* engine::PhysicsEngine::m_instance = nullptr;
 
-engine::PhysicsEngine::PhysicsEngine()
+engine::PhysicsEngine::PhysicsEngine(void)
 {
 	// Create a pointer to the structure of physX elements
 	m_impl = new PhysicsEngineImpl();
+    m_debugDraw = new DebugDraw();
 }
 
 engine::PhysicsEngine::~PhysicsEngine(void)
@@ -78,6 +81,8 @@ void engine::PhysicsEngine::Init(void)
 
 	InitScene();
 
+    m_debugDraw->InitDebugDraw();
+
 	std::cout << "Physics engine initialized" << std::endl;
 }
 
@@ -88,7 +93,8 @@ bool engine::PhysicsEngine::InitPvd(void)
 	if (m_impl->m_foundation != nullptr)
 	{
 		/*
-			Create an instance of physx visual debugger which is the interface of communication
+			Create an instance of physx visual debugger which is the interface of 
+            communication
 				- Recover internal data of physx engine
 				- Send to pvd in real time
 			<param> Foundation : The base of physX
@@ -201,23 +207,33 @@ void engine::PhysicsEngine::InitScene(void)
 		m_impl->m_scene = m_impl->m_physics->createScene(sceneDesc);
 
 		/*
-			Allow to create a physic material to personalize the physic behavior of the objects.
-			Determine wich type of objects will collide, what is the friction, what is the restitution
+			Allow to create a physic material to personalize the physic behavior of the 
+            objects.
+			Determine wich type of objects will collide, what is the friction, what is 
+            the restitution
 			<param> Dynamic friction : Resistance to start a movement
 			<param> Static friction : Resistance during the movement
 			<param> Restitution : Bounce capacity (elasticity)
 		*/
 		m_impl->m_material = m_impl->m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 
-        m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
-        m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eWORLD_AXES, 5.0f);
+        m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 
+            1.0f);
+        m_impl->m_scene->setVisualizationParameter(
+            physx::PxVisualizationParameter::eWORLD_AXES, 5.0f);
 	}
 }
 
-void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
+void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime, math::Matrix4f* inProjViewMatrix)
 {
 	m_impl->m_scene->simulate(inDeltaTime);
 	m_impl->m_scene->fetchResults(true);
+
+    //const physx::PxRenderBuffer& debugData = m_impl->m_scene->getRenderBuffer();
+    m_debugDraw->GetDebugDrawImpl()->m_renderBuffer = &m_impl->m_scene->getRenderBuffer();
+    m_debugDraw->UpdateDebugDraw(*m_debugDraw->GetDebugDrawImpl());
+    m_debugDraw->RenderDebugDraw(inProjViewMatrix, 
+        m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2);
 }
 
 void engine::PhysicsEngine::CleanUp(void)

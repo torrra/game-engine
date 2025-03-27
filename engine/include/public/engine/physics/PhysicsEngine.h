@@ -7,9 +7,16 @@
 
 #pragma endregion
 
+#pragma region LibMath
+
+#include "math/Matrix4.hpp"
+
+#pragma endregion
+
 namespace engine
 {
 	struct PhysicsEngineImpl;
+    class DebugDraw;
 
 	class PhysicsEngine
 	{
@@ -33,7 +40,7 @@ namespace engine
 		*/
 		ENGINE_API void		Init(void);
 		// 
-		ENGINE_API void		StepSimulation(f32 inDeltaTime);
+		ENGINE_API void		StepSimulation(f32 inDeltaTime, math::Matrix4f* inProjViewMatrix);
 		// Release all physx resources
 		ENGINE_API void		CleanUp(void);
 
@@ -60,9 +67,12 @@ namespace engine
 
 		/// Members
 		// Pointer to the implementation of the physx structure
-		PhysicsEngineImpl*		m_impl;
+		PhysicsEngineImpl*		m_impl      = nullptr;
 		// Instance of the physics engine
 		static PhysicsEngine*	m_instance;
+
+        // Debug draw
+        DebugDraw*			    m_debugDraw = nullptr;
 
 	}; // !Class PhysicsEngine
 } // !Namespace engine
