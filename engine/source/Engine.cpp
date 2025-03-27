@@ -3,7 +3,6 @@
 #include "input/Input.h"
 #include "resource/ResourceManager.h"
 #include "core/systems/ScriptSystem.h"
-#include "utility/Monitor.h"
 #include "Window.h"
 
 #include <math/Vector2.hpp>
@@ -11,7 +10,7 @@
 #define SUCCESS		0
 #define ERROR		1
 
-#define DEFAULT_NAME "Editor";
+#define DEFAULT_NAME "Editor"
 
 #define FIX_UPDATE_FREQUENCY 20
 #define TO_MILLISECONDS 0.001f
@@ -30,20 +29,25 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
 	
 	m_graph = new SceneGraph();
 
-	if (InitScriptSystem(projectDir))
+	if (InitScriptSystem(projectDir) != SUCCESS)
 		return ERROR;
 
-	if (InitWindow(projectName))
+	if (InitWindow(projectName) != SUCCESS)
 		return ERROR;
 
-	// TODO: init UI manager
+    if (Input::StartUp() != SUCCESS)
+        return ERROR;
+
+    Input::SetCursorMode(ECursorMode::NORMAL);
+    
+	// TODO: call init for UI manager
 
 	
 	// Initialize engine time
 	m_time = Time();
 
 	// Load default resources
-	if (LoadEngineResources())
+	if (LoadEngineResources() != SUCCESS)
 		return ERROR;
 
 	return SUCCESS;
@@ -55,14 +59,12 @@ void engine::Engine::ShutDown(void)
 	ScriptSystem::Shutdown();
 	ResourceManager::ShutDown();
 	Input::ShutDown();
+    Window::ShutDown();
 
-	// TODO: shut down ui manager
+	// TODO: call shutdown for ui manager
 
 	if (m_window)
-	{
-		m_window->Shutdown();
 		delete m_window;
-	}
 	
 	if (m_graph)
 		delete m_graph;
@@ -95,7 +97,7 @@ void engine::Engine::Update(void)
 
 	// Render
 	Input::ResetKeys();
-	m_window->UpdateBuffers();
+	m_window->Update();
 	m_time.Update();
 }
 
@@ -141,7 +143,10 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 		ScriptSystem::Startup();
 		initialized = true;
 	}
-
+	/*
+	* TODO: probably dont need this line, as you should not be able to 
+	*		open script files if no projects were selected. 
+	*/
 	std::string path((projectDir) ? projectDir : "..\\");
 
 	ScriptSystem::SetUserScriptLocation(path.c_str());
@@ -152,21 +157,15 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 
 inline int16 engine::Engine::InitWindow(const char* projectName)
 {
-	std::string windowTitle(projectName);
+    if (Window::StartUp())
+        return ERROR;
 
-	if (!projectName)
-	{
-		windowTitle = DEFAULT_NAME;
-	}
+    m_window = new Window((projectName) ? projectName : DEFAULT_NAME);
+	// TODO: change dimensions however keep for debugging
+    if (m_window->CreateWindow(800, 600))
+        return ERROR;
 
-	if (Window::InitGLFW())
-		return ERROR;
-
-	// By default open the editor full screen on primary monitor
-	math::Vector2i monitorSize = Monitor::GetPrimaryMonitorSize();
-	m_window = new Window(windowTitle.c_str(), monitorSize.GetX(), monitorSize.GetY(), true);
-
-	return (m_window->GetWindowPtr()) ? SUCCESS : ERROR;
+    return SUCCESS;
 }
 
 inline int16 engine::Engine::LoadEngineResources(void)
