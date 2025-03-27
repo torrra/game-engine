@@ -67,13 +67,15 @@ int main(void)
         first->CreateDynamicSphereRigidBody(engine::PhysicsEngine::Get(), *material, 1.f);
         engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());
         floorRigidBody->CreatePlaneStaticRigidBody(engine::PhysicsEngine::Get(), *floorMaterial);
-		
+
+        engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
+        math::Matrix4f projViewMatrix = camera->ViewProjection();
+
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
 			project.Update(engine);
 			engine.Update();
-
-            engine::PhysicsEngine::Get().StepSimulation(1.f / 60.f);
+            engine::PhysicsEngine::Get().StepSimulation(1.f / 60.f, &projViewMatrix);
             rigidBody->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
             rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
 		}
