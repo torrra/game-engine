@@ -43,4 +43,9 @@ namespace engine
 		physx::PxGeometry*				m_geometry			= nullptr;
 
 	}; // !Struct GeometryImpl
+
+    struct DebugDrawImpl
+    {
+        const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
+    }; // !Struct DebugDrawImpl
 } // !Namespace engine
