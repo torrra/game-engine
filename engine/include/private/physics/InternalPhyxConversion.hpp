@@ -30,6 +30,16 @@ inline math::Vector3f ToVector3f(const physx::PxVec3T<f32>& inVector)
 {
 	return math::Vector3f(inVector.x, inVector.y, inVector.z);
 }
+
+inline math::Vector3f ToVector3fPos0(const physx::PxDebugLine& inVector)
+{
+    return math::Vector3f(inVector.pos0.x, inVector.pos0.y, inVector.pos0.z);
+}
+
+inline math::Vector3f ToVector3fPos1(const physx::PxDebugLine& inVector)
+{
+    return math::Vector3f(inVector.pos1.x, inVector.pos1.y, inVector.pos1.z);
+}
 	
 /// Quaternion
 inline physx::PxQuat ToPxQuat(const math::Quatf& inQuaternion)
