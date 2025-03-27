@@ -4,11 +4,10 @@ layout (location = 1) in vec3 aColor;
 
 out vec3 fragColor;
 
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 projViewMatrix;
 
 void main()
 {
 	fragColor = aColor;
-	gl_Position = projection * view * vec4(aPosition, 1.0);
+	gl_Position = projViewMatrix * vec4(aPosition, 1.0);
 }
