@@ -32,13 +32,7 @@ namespace engine::text
 	void Serialize(std::ostream& file, const char* name, const std::string& val);
 	void Serialize(std::ostream& file, const char* name, const char* val, uint64 length);
 
-	template <CSerializableType TValueType>
-	void Deserialize(std::istream& file, TValueType& val);	
-
-	void Deserialize(std::istream& file, std::string& val);
-
 	void MoveCursorToVal(uint64& pos, const std::string& line);
-	void MoveCursorToVal(std::istream& file);
 
 	template <math::CIntegralType TValueType>
 	const char* DeserializeInteger(const char* text, TValueType& val);
@@ -102,12 +96,6 @@ namespace engine::text
 
 		const char* valName((name) ? name : "unnamed val");
 		file << "@" <<  types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
-	}
-
-	template<CSerializableType TValueType>
-	void Deserialize(std::istream& file, TValueType& val)
-	{
-		file >> val;
 	}
 
 	template<math::CIntegralType TValueType>
