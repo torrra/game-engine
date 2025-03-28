@@ -145,37 +145,6 @@ namespace engine
 		output << '\n';
 	}
 
-	void Renderer::DeserializeText(std::ifstream& input)
-	{
-		text::MoveCursorToVal(input);
-		text::Deserialize(input, m_owner);
-
-		bool hasTexture;
-
-		text::MoveCursorToVal(input);
-		text::Deserialize(input, hasTexture);
-
-		std::string key;
-
-		text::Deserialize(input, key);
-
-		m_model = ResourceManager::GetResource<Model>(key);
-
-		key.clear();
-		text::Deserialize(input, key);
-		m_shader = ResourceManager::GetResource<ShaderProgram>(key);
-
-		if (hasTexture)
-		{
-			key.clear();
-			text::Deserialize(input, key);
-			m_texture = ResourceManager::GetResource<Texture>(key);
-		}
-
-		text::MoveCursorToVal(input);
-		text::Deserialize(input, m_flags);
-	}
-
 	const char* Renderer::DeserializeText(const char* text, const char* end)
 	{
 		MOVE_TEXT_CURSOR(text, end);

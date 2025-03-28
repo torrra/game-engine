@@ -55,9 +55,6 @@ namespace engine
 						   uint64 index) const;
 
 		ENGINE_API
-		void DeserializeText(std::ifstream& input) override;
-
-		ENGINE_API
 		const char* DeserializeText(const char* text, const char* end) override;
 
 	private:
