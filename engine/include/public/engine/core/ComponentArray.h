@@ -199,8 +199,10 @@ namespace engine
 	TComponentType* ComponentArray<TComponentType>::ForceCreateComponent(EntityHandle owner,
 																	class SceneGraph* scene)
 	{
+		EntityHandle size = static_cast<EntityHandle>(m_components.size());
+
 		// write over invalid component if possible
-		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
+		for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
 		{
 			TComponentType& currentComponent = m_components[newIndex];
 
