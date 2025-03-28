@@ -67,13 +67,7 @@ namespace engine
 	protected:
 
 		ENGINE_API
-		void DeserializeIndexedText(std::ifstream& input, uint64& index);
-
-		ENGINE_API
 		const char* DeserializeIndexedText(const char* text, const char* end, uint64& index);
-
-		ENGINE_API
-		virtual void DeserializeText(std::ifstream&) {}
 
 		ENGINE_API
 		virtual const char* DeserializeText(const char* text, const char*) { return text; }

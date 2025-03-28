@@ -367,35 +367,7 @@ namespace engine
 		file << '\n';
 	}
 
-	void SceneGraph::DeserializeTextV1(std::ifstream& file, std::string& line)
-	{
-		Component::DeserializedArray<Transform> transforms;
-		Component::DeserializedArray<Camera>	cameras;
-		Component::DeserializedArray<Renderer>	renderers;
-		Component::DeserializedArray<Script>	scripts;
-
-		while (std::getline(file, line))
-		{
-			if (memcmp(line.c_str(), "[Entity]", 8) == 0)
-				DeserializeEntityTextV1(file);
-
-			else if (memcmp(line.c_str(), "[Transform]", 11) == 0)
-				Component::DeserializeComponentText(transforms, file);
-
-			else if (memcmp(line.c_str(), "[Camera]", 8) == 0)
-				Component::DeserializeComponentText(cameras, file);
-
-			else if (memcmp(line.c_str(), "[Renderer]", 10) == 0)
-				Component::DeserializeComponentText(renderers, file);
-
-			else if (memcmp(line.c_str(), "[Script]", 8) == 0)
-				Component::DeserializeComponentText(scripts, file);
-		}
-
-		ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
-	}
-
-	void SceneGraph::DeserializeTextV2(std::ifstream& file)
+	void SceneGraph::DeserializeTextV1(std::ifstream& file)
 	{
 		Component::DeserializedArray<Transform> transforms;
 		Component::DeserializedArray<Camera>	cameras;
@@ -409,7 +381,7 @@ namespace engine
 		while (start != end)
 		{
 			if (memcmp(start, "[Entity]", 8) == 0)
-				start = DeserializeEntityTextV2(start, end);
+				start = DeserializeEntityText(start, end);
 
 			else if (memcmp(start, "[Transform]", 11) == 0)
 				start = Component::DeserializeComponentText(transforms, start, end);
@@ -430,29 +402,7 @@ namespace engine
 		text::UnloadFileData(data);
 	}
 	
-
-	void SceneGraph::DeserializeEntityTextV1(std::ifstream& file)
-	{
-		Entity newEntity;
-
-		text::Deserialize(file, newEntity.m_name);
-
-		text::MoveCursorToVal(file);
-		text::Deserialize(file, newEntity.m_handle);
-
-		text::MoveCursorToVal(file);
-		text::Deserialize(file, newEntity.m_parent);
-
-		text::MoveCursorToVal(file);
-		text::Deserialize(file, newEntity.m_statusFlags);
-
-		text::MoveCursorToVal(file);
-		text::Deserialize(file, newEntity.m_components);
-
-		m_sceneEntities.push_back(newEntity);	
-	}
-
-	const char* SceneGraph::DeserializeEntityTextV2(const char* text, const char* end)
+	const char* SceneGraph::DeserializeEntityText(const char* text, const char* end)
 	{
 		Entity newEntity;
 
@@ -475,9 +425,9 @@ namespace engine
 	}
 
 
-	void SceneGraph::SerializeText(std::ofstream& file, int32 version)
+	void SceneGraph::SerializeText(std::ofstream& file)
 	{
-		text::Serialize(file, "formatVersion", version);
+		text::Serialize(file, "formatVersion", 1);
 		file << '\n';
 		SerializeValidEntitiesText(file);
 	}
@@ -495,11 +445,7 @@ namespace engine
 		switch (formatVersion)
 		{
 		case 1:
-			DeserializeTextV1(file, firstLine);
-			break;
-
-		case 2:
-			DeserializeTextV2(file);
+			DeserializeTextV1(file);
 			break;
 
 		default: break;

@@ -197,24 +197,6 @@ void engine::Transform::SerializeText(std::ostream& output, EntityHandle owner,
 	output << '\n';
 }
 
-void engine::Transform::DeserializeText(std::ifstream& input)
-{
-	text::MoveCursorToVal(input);
-	text::Deserialize(input, m_owner);
-
-	text::MoveCursorToVal(input);
-	text::Deserialize(input, m_rotation);
-
-	text::MoveCursorToVal(input);
-	text::Deserialize(input, m_position);
-
-	text::MoveCursorToVal(input);
-	text::Deserialize(input, m_scale);
-
-	text::MoveCursorToVal(input);
-	text::Deserialize(input, m_flags);
-}
-
 const char* engine::Transform::DeserializeText(const char* text, const char* end)
 {
 	MOVE_TEXT_CURSOR(text, end);

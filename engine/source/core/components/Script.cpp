@@ -67,27 +67,6 @@ namespace engine
 
 	}
 
-	void Script::DeserializeText(std::ifstream& input)
-	{
-		text::MoveCursorToVal(input);
-		text::Deserialize(input, m_owner);
-
-		uint64 scriptObjectCount = 0;
-
-		text::MoveCursorToVal(input);
-		text::Deserialize(input, scriptObjectCount);
-
-		for (uint64 obj = 0; obj < scriptObjectCount; ++obj)
-		{
-			std::string objName;
-			text::Deserialize(input, objName);
-			m_scriptObjects.emplace_back(m_owner, objName);
-		}
-
-		text::MoveCursorToVal(input);
-		text::Deserialize(input, m_flags);
-	}
-
 	const char* Script::DeserializeText(const char* text, const char* end)
 	{
 		MOVE_TEXT_CURSOR(text, end);

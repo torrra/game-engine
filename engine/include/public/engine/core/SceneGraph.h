@@ -151,7 +151,7 @@ namespace engine
 		void CacheComponents(void);
 
 		ENGINE_API
-		void SerializeText(std::ofstream& file, int32 version = 2);
+		void SerializeText(std::ofstream& file);
 
 		ENGINE_API
 		void DeserializeText(std::ifstream& file);
@@ -208,11 +208,9 @@ namespace engine
 									  const Entity& entity,
 									  HandleMap& handles) const;
 
-		void DeserializeTextV1(std::ifstream& file, std::string& line);
-		void DeserializeTextV2(std::ifstream& file);
+		void DeserializeTextV1(std::ifstream& file);
 
-		void DeserializeEntityTextV1(std::ifstream& file);
-		const char* DeserializeEntityTextV2(const char* text, const char* end);
+		const char* DeserializeEntityText(const char* text, const char* end);
 
 		template <typename... TVariadicArgs>
 		void ReorderDeserializedTextArrays(TVariadicArgs&... args);
