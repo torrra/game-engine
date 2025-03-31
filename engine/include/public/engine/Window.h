@@ -63,13 +63,13 @@ namespace engine
     template<math::CScalarType TValueType>
     inline TValueType engine::Window::GetWidth(void) const noexcept
     {
-        return m_size.GetX();
+        return static_cast<TValueType>(m_size.GetX());
     }
 
     template<math::CScalarType TValueType>
     inline TValueType engine::Window::GetHeight(void) const noexcept
     {
-        return m_size.GetY();
+        return static_cast<TValueType>(m_size.GetY());
     }
 
     template<math::CScalarType TValueType>
