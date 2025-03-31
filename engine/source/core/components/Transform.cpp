@@ -23,13 +23,13 @@ engine::Transform engine::Transform::Interpolate(const Transform& inStartTransfo
     Transform result = Transform();
 
     result.m_position = math::Vector3f::Lerp(inStartTransform.m_position,
-        inEndTransform.m_position, inTime);
+                                             inEndTransform.m_position, inTime);
 
     result.m_rotation = math::Quatf::Slerp(inStartTransform.m_rotation,
-        inEndTransform.m_rotation, inTime);
+                                           inEndTransform.m_rotation, inTime);
 
     result.m_scale = math::Vector3f::Lerp(inStartTransform.m_scale,
-        inEndTransform.m_scale, inTime);
+                                          inEndTransform.m_scale, inTime);
 
     result.m_dirty = true;
 
