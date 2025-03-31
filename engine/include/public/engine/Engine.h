@@ -6,6 +6,8 @@
 #include "engine/thread/ThreadManager.h"
 #include "engine/Window.h"
 #include "engine/core/SceneGraph.h"
+#include "engine/ui/UIManager.h"
+#include "engine/viewport/Viewport.h"
 
 #include <string>
 
@@ -28,6 +30,8 @@ namespace engine
 		ENGINE_API Window*		GetWindow(void) const noexcept;
 		ENGINE_API Time&		GetTime(void) noexcept;
 		ENGINE_API SceneGraph*	GetGraph(void);
+		ENGINE_API ViewportV2*	GetViewport(void);
+		ENGINE_API UIManager&	GetUIManager(void);
 	private:
 		inline int16		InitScriptSystem(const char* projectDir);
 		inline int16		InitWindow(const char* projectName);
@@ -36,6 +40,9 @@ namespace engine
 		std::string		m_projectDir;
 		Window*			m_window;
 		SceneGraph*		m_graph;
+		UIManager		m_uiManager;
+		ViewportV2*		m_viewport;
+		FrameBuffer		m_fbo;
 		Time			m_time;
 		f32				m_timeScale;
 	};
