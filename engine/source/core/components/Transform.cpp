@@ -18,7 +18,7 @@ math::Matrix4f engine::Transform::ToMatrixWithScale(Transform& inTransform)
 }
 
 engine::Transform engine::Transform::Interpolate(const Transform& inStartTransform,
-    const Transform& inEndTransform, f32 inTime)
+                                                 const Transform& inEndTransform, f32 inTime)
 {
     Transform result = Transform();
 
