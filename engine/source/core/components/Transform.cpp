@@ -133,7 +133,8 @@ void engine::Transform::SetTransform(const Transform& inTransform)
 }
 
 void engine::Transform::SetTransform(const math::Vector3f& inPosition,
-    const math::Quatf& inRotation, const math::Vector3f& inScale)
+                                     const math::Quatf& inRotation,
+                                     const math::Vector3f& inScale)
 {
     m_position = inPosition;
     m_rotation = inRotation;
