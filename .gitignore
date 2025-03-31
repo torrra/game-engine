@@ -4,15 +4,10 @@
 .idea/
 
 # notepad++ backup folder
-nppBackup/
+/**/nppBackup/
 
 # Build folder
 *[Bb]uild*/*
-!*[Bb]uild/assets
-!*[Bb]uild/engineShader
-!*[Bb]uild*/scripts
-!*[Bb]uild/fonts
-!*[Bb]uild/userScripts
 
 # vim files
 *.swp
