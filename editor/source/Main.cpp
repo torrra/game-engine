@@ -80,7 +80,7 @@ int main(void)
             rigidBody->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
             rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
 
-            engine.GetWindow()->UpdateBuffers();
+            engine.GetWindow()->Update();
 		}
 
         /// ---------------- Clean ---------------- 
