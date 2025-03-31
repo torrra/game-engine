@@ -92,13 +92,7 @@ void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32
     glBindBuffer(GL_ARRAY_BUFFER, m_debugDrawVBO);
     glDrawArrays(GL_LINES, 0, inLineCount);
     glBindVertexArray(0);
-    //auto debugDraw = glGetError();
-    //if (debugDraw)
-    //{
-    //    glEnable(GL_DEBUG_OUTPUT);
-    //    glDebugMessageCallback(message_callback, nullptr);
-    //    __debugbreak();
-    //}
+
     OpenGLError();
 }
 
