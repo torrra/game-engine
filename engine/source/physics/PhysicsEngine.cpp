@@ -78,7 +78,7 @@ void engine::PhysicsEngine::Init(void)
 	bool isPvdInitialized = InitPvd();
 
 	InitPhysics(isPvdInitialized);
-
+    
 	InitScene();
 
     m_debugDraw->InitDebugDraw();
@@ -220,7 +220,8 @@ void engine::PhysicsEngine::InitScene(void)
         m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 
             1.0f);
         m_impl->m_scene->setVisualizationParameter(
-            physx::PxVisualizationParameter::eWORLD_AXES, 5.0f);
+            physx::PxVisualizationParameter::eWORLD_AXES, 2.0f);
+        m_impl->m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 	}
 }
 
@@ -229,11 +230,10 @@ void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime, math::Matrix4f* inPr
 	m_impl->m_scene->simulate(inDeltaTime);
 	m_impl->m_scene->fetchResults(true);
 
-    //const physx::PxRenderBuffer& debugData = m_impl->m_scene->getRenderBuffer();
     m_debugDraw->GetDebugDrawImpl()->m_renderBuffer = &m_impl->m_scene->getRenderBuffer();
     m_debugDraw->UpdateDebugDraw(*m_debugDraw->GetDebugDrawImpl());
     m_debugDraw->RenderDebugDraw(inProjViewMatrix, 
-        m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2);
+    m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2);
 }
 
 void engine::PhysicsEngine::CleanUp(void)
