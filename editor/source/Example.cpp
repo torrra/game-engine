@@ -26,7 +26,7 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	// Add component to model entity
 	m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
-    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 20.f, -10.f));
+    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 0.f, -2.f));
 	engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
 	engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);
 
@@ -54,14 +54,17 @@ void ExampleProject::Update(engine::Engine& engine)
 	// Rotate camera
 	math::Vector2f cursorDelta = engine::Input::GetCursorDeltaPos<f32>();
 	camera->Rotate(cursorDelta.GetY(), cursorDelta.GetX(), 0.0f, 0.20F);
+	//engine.GetViewport()->GetFBO().Bind();
+	//engine.RunTimeUpdate();
+	//engine.GetViewport()->GetFBO().UnBind();
 
 	// Change cursor state (lock / unlock)
-	static bool cursorState = true;
-	if (engine::Input::IsInputReleased(KEY_ESCAPE))
-		cursorState = !cursorState;
+	//static bool cursorState = true;
+	//if (engine::Input::IsInputReleased(KEY_ESCAPE))
+	//	cursorState = !cursorState;
 
-	engine::Input::SetCursorMode((cursorState) ? 
-		engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
+	//engine::Input::SetCursorMode((cursorState) ? 
+	//	engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
 }
 
 void ExampleProject::RegisterInputs(void)
