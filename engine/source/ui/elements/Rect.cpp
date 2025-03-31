@@ -7,37 +7,37 @@
 #include <imgui/imgui_internal.h>
 
 engine::Rectangle::Rectangle(math::Vector2f const& position, math::Vector2f const& size)
-	: m_rounding(0.0f)
+    : m_rounding(0.0f)
 {
-	// Set transform
-	SetPosition(position);
-	SetScale(size);
-	
-	SetColor(WHITE, 1.0f);
+    // Set transform
+    SetPosition(position);
+    SetScale(size);
+    
+    SetColor(WHITE, 1.0f);
 }
 
 void engine::Rectangle::Render(void)
 {
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
-	const ImGuiID& id = window->GetID(m_uid); // TODO: check, this may cause later issues
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    const ImGuiID& id = window->GetID(m_uid); // TODO: check, this may cause later issues
 
-	ImRect box(
-		window->Pos + m_transform.m_position,
-		window->Pos + m_transform.m_position + m_transform.m_sizePx
-	);
+    ImRect box(
+        window->Pos + m_transform.m_position,
+        window->Pos + m_transform.m_position + m_transform.m_sizePx
+    );
 
-	if (window->SkipItems || !ImGui::ItemAdd(box, id))
-		return;
+    if (window->SkipItems || !ImGui::ItemAdd(box, id))
+        return;
 
-	window->DrawList->AddRectFilled(box.Min, box.Max, m_color, m_rounding);
+    window->DrawList->AddRectFilled(box.Min, box.Max, m_color, m_rounding);
 }
 
 void engine::Rectangle::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
-	m_color = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
+    m_color = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Rectangle::SetRounding(f32 rounding)
 {
-	m_rounding = rounding;
+    m_rounding = rounding;
 }
