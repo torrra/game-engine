@@ -212,7 +212,7 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         char textBuffer[1024];
 
         sprintf_s(textBuffer, fileData, className, className, className,
-                                      formattedName.c_str(), className, className);
+                  formattedName.c_str(), className, className);
 
         newFile << textBuffer;
         newFile.close();
