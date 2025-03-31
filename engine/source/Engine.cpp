@@ -16,6 +16,8 @@
 #define FIX_UPDATE_FREQUENCY 20
 #define TO_MILLISECONDS 0.001f
 
+#include <glad/glad.h>
+
 engine::Engine::Engine(void)
 	: m_graph(nullptr), m_window(nullptr), m_projectDir("\0"), m_timeScale(1.0f)
 {
@@ -92,10 +94,14 @@ void engine::Engine::Update(void)
 	m_window->ClearWindow(0.1f, 0.1f, 0.1f);
 
 	ThreadManager::RenderScene(m_graph);
+    
+    /*auto debugDraw = glGetError();
+    if (debugDraw)
+        __debugbreak();*/
 
 	// Render
 	Input::ResetKeys();
-	m_window->UpdateBuffers();
+	//m_window->UpdateBuffers();
 	m_time.Update();
 }
 
