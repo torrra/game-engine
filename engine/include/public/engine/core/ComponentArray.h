@@ -137,35 +137,38 @@ namespace engine
 		// need to be updated after parent
 		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
 			return ForceCreateComponent(owner, scene);
-
-		// parentIndex is 0 by default so that it is always considered 'before'
-		// the new component when the latter has no actual parent, makes it so it
-		// fails later 'parentIndex > newIndex' check and does not stop overwrite
-		EntityHandle    parentIndex = 0;
-
-		if (m_entityIndexMap.contains(parent))
-			parentIndex = m_entityIndexMap[parent];
-
-		EntityHandle size = static_cast<EntityHandle>(m_components.size());
-
-		for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
+		else
 		{
-			TComponentType& currentComponent = m_components[newIndex];
 
-			// Do not overwrite component if it is valid or before parent
-			if (currentComponent.IsValid() || parentIndex > newIndex)
-				continue;
+		
+			// parentIndex is 0 by default so that it is always considered 'before'
+			// the new component when the latter has no actual parent, makes it so it
+			// fails later 'parentIndex > newIndex' check and does not stop overwrite
+			EntityHandle    parentIndex = 0;
 
-			printf("[Component array]: filling invalid slot\n");
+			if (m_entityIndexMap.contains(parent))
+				parentIndex = m_entityIndexMap[parent];
 
-			currentComponent = TComponentType(owner, scene);
-			m_entityIndexMap[owner] = newIndex;		
-			return &currentComponent;
+			EntityHandle size = static_cast<EntityHandle>(m_components.size());
+
+			for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
+			{
+				TComponentType& currentComponent = m_components[newIndex];
+
+				// Do not overwrite component if it is valid or before parent
+				if (currentComponent.IsValid() || parentIndex > newIndex)
+					continue;
+
+				printf("[Component array]: filling invalid slot\n");
+
+				currentComponent = TComponentType(owner, scene);
+				m_entityIndexMap[owner] = newIndex;		
+				return &currentComponent;
+			}
+			printf("[Component array]: creating new slot\n");
+			m_entityIndexMap[owner] = m_components.size();
+			return &m_components.emplace_back(owner, scene);
 		}
-
-		printf("[Component array]: creating new slot\n");
-		m_entityIndexMap[owner] = m_components.size();
-		return &m_components.emplace_back(owner, scene);
 	}
 
 	template<CValidComponent TComponentType>
@@ -200,6 +203,8 @@ namespace engine
 																	class SceneGraph* scene)
 	{
 		// write over invalid component if possible
+#pragma warning( push )
+#pragma warning( disable : 4018)
 		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
 		{
 			TComponentType& currentComponent = m_components[newIndex];
@@ -213,6 +218,7 @@ namespace engine
 			m_entityIndexMap[owner] = newIndex;
 			return &currentComponent;
 		}
+#pragma warning(pop)
 
 		printf("[Component array]: creating new slot\n");
 
