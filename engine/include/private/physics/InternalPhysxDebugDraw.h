@@ -12,6 +12,13 @@
 
 #pragma endregion
 
+#pragma region GLAD
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#pragma endregion
+
 namespace engine
 {
     struct DebugDrawImpl;
@@ -50,3 +57,5 @@ namespace engine
 
     }; // !Class DebugDraw
 } // !Namespace engine
+
+void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
