@@ -175,9 +175,9 @@ void engine::Transform::AddScale(const math::Vector3f& scale)
 std::ostream& engine::Transform::operator<<(std::ostream& os)
 {
     return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
-        << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " "
-        << m_rotation.Z() << " "
-        << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+              << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " "
+              << m_rotation.Z() << " "
+              << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
 }
 
 void engine::Transform::UpdateLocalMatrix(void)
