@@ -147,7 +147,7 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 	* TODO: probably dont need this line, as you should not be able to 
 	*		open script files if no projects were selected. 
 	*/
-	std::string path((projectDir) ? projectDir : "..\\");
+	std::string path((projectDir) ? projectDir : ".\\");
 
 	ScriptSystem::SetUserScriptLocation(path.c_str());
 	ScriptSystem::RunAllUserScripts();
@@ -172,8 +172,8 @@ inline int16 engine::Engine::LoadEngineResources(void)
 {
 	ResourceManager::LoadShader(
 		"Default", 
-		"..\\engineShader\\Default.vs", 
-		"..\\engineShader\\Default.frag"
+		".\\shaders\\Default.vs", 
+		".\\shaders\\Default.frag"
 	);
 
 	return SUCCESS;
