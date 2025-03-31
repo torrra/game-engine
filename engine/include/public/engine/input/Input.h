@@ -19,12 +19,12 @@
 
 namespace engine
 {
-	enum EInputState
-	{
-		UP = KEY_STATE_RELEASED,
-		PRESSED = KEY_STATE_PRESSED,
-		HELD = KEY_STATE_HELD,
-	};
+    enum EInputState
+    {
+        UP = KEY_STATE_RELEASED,
+        PRESSED = KEY_STATE_PRESSED,
+        HELD = KEY_STATE_HELD,
+    };
 
     enum ECursorMode
     {
@@ -87,10 +87,10 @@ namespace engine
         math::Vector2d m_cursorPos;
         math::Vector2d m_scrollDelta;
 
-		static std::mutex			    m_mutex;
-		static Input*					m_instance;
-		bool							m_dirty;
-	};
+        static std::mutex			    m_mutex;
+        static Input*					m_instance;
+        bool							m_dirty;
+    };
 
     // Template function definitions
     template<math::CScalarType TValueType>
@@ -117,13 +117,13 @@ namespace engine
         return deltaPos;
     }
 
-	template<math::CScalarType TValueType>
-	inline math::Vector2<TValueType> Input::GetScrollDelta(void)
-	{
-		return math::Vector2<TValueType>
-		(
-		    static_cast<TValueType>(GetInstance()->m_scrollDelta.GetX()),
-		    static_cast<TValueType>(GetInstance()->m_scrollDelta.GetY())
-		);
-	}
+    template<math::CScalarType TValueType>
+    inline math::Vector2<TValueType> Input::GetScrollDelta(void)
+    {
+        return math::Vector2<TValueType>
+        (
+            static_cast<TValueType>(GetInstance()->m_scrollDelta.GetX()),
+            static_cast<TValueType>(GetInstance()->m_scrollDelta.GetY())
+        );
+    }
 }
