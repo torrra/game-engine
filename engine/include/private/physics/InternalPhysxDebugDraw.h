@@ -12,13 +12,6 @@
 
 #pragma endregion
 
-#pragma region GLAD
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#pragma endregion
-
 namespace engine
 {
     struct DebugDrawImpl;
@@ -26,7 +19,9 @@ namespace engine
 
     class DebugDraw
     {
-    public :
+        friend class PhysicsEngine;
+
+    private :
 
         /// Constructor
         // Initialize the DebugDrawImpl struct pointer
@@ -48,14 +43,9 @@ namespace engine
         // Render the debug draw
         void            RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount);
 
-    private :
-
         DebugDrawImpl* m_debugDrawImpl      = nullptr;
-        ShaderProgram* m_debugShadeProgram  = nullptr;
         uint32         m_debugDrawVAO       = 0;
         uint32         m_debugDrawVBO       = 0;
 
     }; // !Class DebugDraw
 } // !Namespace engine
-
-void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
