@@ -134,7 +134,6 @@ engine::SceneGraph* engine::Engine::GetGraph(void)
 
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 {
-<<<<<<< engine/source/Engine.cpp
 	static bool initialized = false;
 
 	ScriptSystem::SetCurrentScene(m_graph);
@@ -154,27 +153,6 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 	ScriptSystem::RunAllUserScripts();
 	
 	return SUCCESS;
-=======
-    static bool initialized = false;
-
-    ScriptSystem::SetCurrentScene(m_graph);
-
-    if (!initialized)
-    {
-        ScriptSystem::Startup();
-        initialized = true;
-    }
-    /*
-    * TODO: probably dont need this line, as you should not be able to 
-    *		open script files if no projects were selected. 
-    */
-    std::string path((projectDir) ? projectDir : "..\\");
-
-    ScriptSystem::SetUserScriptLocation(path.c_str());
-    ScriptSystem::RunAllUserScripts();
-    
-    return SUCCESS;
->>>>>>> engine/source/Engine.cpp
 }
 
 inline int16 engine::Engine::InitWindow(const char* projectName)
@@ -192,19 +170,11 @@ inline int16 engine::Engine::InitWindow(const char* projectName)
 
 inline int16 engine::Engine::LoadEngineResources(void)
 {
-<<<<<<< engine/source/Engine.cpp
 	ResourceManager::LoadShader(
 		"Default", 
 		".\\shaders\\Default.vs", 
 		".\\shaders\\Default.frag"
 	);
-=======
-    ResourceManager::LoadShader(
-        "Default", 
-        "..\\engineShader\\Default.vs", 
-        "..\\engineShader\\Default.frag"
-    );
->>>>>>> engine/source/Engine.cpp
 
     return SUCCESS;
 }
