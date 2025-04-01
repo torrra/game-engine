@@ -138,7 +138,7 @@ namespace engine
 
         // look for child folder
         if (std::filesystem::is_directory(currentPath.append("scripts\\")))
-            return parentPath.string();
+            return currentPath.string();
 
         // default to sibling folder
         else
