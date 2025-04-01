@@ -30,8 +30,7 @@ namespace engine
 		ENGINE_API Window*		GetWindow(void) const noexcept;
 		ENGINE_API Time&		GetTime(void) noexcept;
 		ENGINE_API SceneGraph*	GetGraph(void);
-		ENGINE_API ViewportV2*	GetViewport(void);
-		ENGINE_API UIManager&	GetUIManager(void);
+	
 	private:
 		inline int16		InitScriptSystem(const char* projectDir);
 		inline int16		InitWindow(const char* projectName);
@@ -41,8 +40,7 @@ namespace engine
 		Window*			m_window;
 		SceneGraph*		m_graph;
 		UIManager		m_uiManager;
-		ViewportV2*		m_viewport;
-		FrameBuffer		m_fbo;
+		Viewport*		m_viewport;
 		Time			m_time;
 		f32				m_timeScale;
 	};

@@ -7,6 +7,12 @@
 
 #include <math/Vector2.hpp>
 
+#include <glad/glad.h>	
+#include <iostream>
+
+#undef new
+#include <imgui/imgui.h>
+
 #define SUCCESS		0
 #define ERROR		1
 
@@ -39,16 +45,19 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
         return ERROR;
 
     Input::SetCursorMode(ECursorMode::NORMAL);
-    
-	// TODO: call init for UI manager
 
-	
+	m_uiManager = UIManager(m_window->GetPtr());
+	m_viewport = new Viewport("Viewport");
+
+
 	// Initialize engine time
 	m_time = Time();
 
 	// Load default resources
 	if (LoadEngineResources() != SUCCESS)
 		return ERROR;
+
+	
 
 	return SUCCESS;
 }
@@ -62,6 +71,10 @@ void engine::Engine::ShutDown(void)
     Window::ShutDown();
 
 	// TODO: call shutdown for ui manager
+	m_uiManager.ShutDown();
+
+	if (m_viewport)
+		delete m_viewport;
 
 	if (m_window)
 		delete m_window;
@@ -90,10 +103,14 @@ void engine::Engine::Update(void)
 
 	// Update game logic
 	ThreadManager::UpdateGameLogic(m_graph, m_time.GetDeltaTime());
-
+	
 	m_window->ClearWindow(0.1f, 0.1f, 0.1f);
+	
+	m_uiManager.NewFrame();
+	//m_viewport->DrawViewport(); // DRAW VIEWPORT
+	m_uiManager.UpdateUI();
 
-	ThreadManager::RenderScene(m_graph);
+	m_viewport->RenderToViewport(m_graph);
 
 	// Render
 	Input::ResetKeys();
