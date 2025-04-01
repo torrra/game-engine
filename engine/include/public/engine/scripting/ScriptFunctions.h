@@ -2,11 +2,11 @@
 
 extern "C"
 {
-	int script_GetScriptRef(struct lua_State* luaState);
+    int script_GetScriptRef(struct lua_State* luaState);
 }
 
 
 namespace engine
 {
-	void RegisterScriptComponentFunctions(struct lua_State* luaState);
+    void RegisterScriptComponentFunctions(struct lua_State* luaState);
 }

@@ -3,18 +3,18 @@
 
 namespace engine
 {
-	ScriptObject::ScriptObject(EntityHandle entity, const std::string& filepath)
-		: m_entity(entity), m_type(filepath)
-	{
-	}
+    ScriptObject::ScriptObject(EntityHandle entity, const std::string& filepath)
+        : m_entity(entity), m_type(filepath)
+    {
+    }
 
-	const std::string& ScriptObject::GetType(void) const
-	{
-		return m_type;
-	}
+    const std::string& ScriptObject::GetType(void) const
+    {
+        return m_type;
+    }
 
-	void ScriptObject::Register(void) const
-	{
-		ScriptSystem::RegisterNewScriptObject(m_type, m_entity);
-	}
+    void ScriptObject::Register(void) const
+    {
+        ScriptSystem::RegisterNewScriptObject(m_type, m_entity);
+    }
 }

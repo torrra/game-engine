@@ -4,47 +4,47 @@
 
 namespace engine
 {
-	Component::Component(EntityHandle owner, SceneGraph* scene)
-		: m_owner(owner), m_currentScene(scene)
-	{
-	}
+    Component::Component(EntityHandle owner, SceneGraph* scene)
+        : m_owner(owner), m_currentScene(scene)
+    {
+    }
 
-	bool Component::IsValid(void) const
-	{
-		return !(m_flags & ecs::INVALID_OBJECT);
-	}
+    bool Component::IsValid(void) const
+    {
+        return !(m_flags & ecs::INVALID_OBJECT);
+    }
 
-	bool Component::IsActive(void) const
-	{
-		return !(m_flags & ecs::INACTIVE_OBJECT);
-	}
+    bool Component::IsActive(void) const
+    {
+        return !(m_flags & ecs::INACTIVE_OBJECT);
+    }
 
-	void Component::Activate(bool activeState)
-	{
-		// Reset inactive bit
-		if (activeState)
-			m_flags &= (~ecs::EFlags::INACTIVE_OBJECT);
+    void Component::Activate(bool activeState)
+    {
+        // Reset inactive bit
+        if (activeState)
+            m_flags &= (~ecs::EFlags::INACTIVE_OBJECT);
 
-		// Toggle inactive bit
-		else
-			m_flags |= ecs::EFlags::INACTIVE_OBJECT;
-	}
+        // Toggle inactive bit
+        else
+            m_flags |= ecs::EFlags::INACTIVE_OBJECT;
+    }
 
-	void Component::Invalidate(void)
-	{
-		m_flags |= ecs::INVALID_OBJECT;
-	}
+    void Component::Invalidate(void)
+    {
+        m_flags |= ecs::INVALID_OBJECT;
+    }
 
-	EntityHandle Component::GetOwner(void) const
-	{
-		return m_owner;
-	}
+    EntityHandle Component::GetOwner(void) const
+    {
+        return m_owner;
+    }
 
-	const char* Component::DeserializeIndexedText(const char* text, const char* end, uint64& index)
-	{
-		MOVE_TEXT_CURSOR(text, end);
-		text = text::DeserializeInteger(text, index);
+    const char* Component::DeserializeIndexedText(const char* text, const char* end, uint64& index)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, index);
 
-		return DeserializeText(text, end);
-	}
+        return DeserializeText(text, end);
+    }
 }

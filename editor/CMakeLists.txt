@@ -34,11 +34,14 @@ target_sources(${TARGET_NAME} PRIVATE ${TARGET_FILES})
 # -- Set public include directory for this and other projects -- #
 target_include_directories(${TARGET_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
-	# PRIVATE ${ENGINE_INCLUDE_DIR}
 )
 
 target_link_libraries(${TARGET_NAME}
 	PRIVATE ${ENGINE_LIB}
 )
+
+if (MSVC)
+	set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/workspace)
+endif()
 
 message(STATUS "[${TARGET_NAME}] Done..")

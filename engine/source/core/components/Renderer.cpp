@@ -16,174 +16,174 @@
 
 namespace engine
 {
-	void Renderer::Register(void)
-	{
-	}
+    void Renderer::Register(void)
+    {
+    }
 
-	void Renderer::Render(const math::Matrix4f& viewProjection,
-						  ComponentArray<class Transform>& transforms)
-	{
-		if (!m_model || !m_shader)
-			return;
+    void Renderer::Render(const math::Matrix4f& viewProjection,
+                          ComponentArray<class Transform>& transforms)
+    {
+        if (!m_model || !m_shader)
+            return;
 
-		if (m_texture)
-		{
-			m_texture->UseTexture();
-		}
-		else
-			Texture::RemoveTexture();
+        if (m_texture)
+        {
+            m_texture->UseTexture();
+        }
+        else
+            Texture::RemoveTexture();
 
-		m_shader->Use();
+        m_shader->Use();
 
-		if (Transform* transform = transforms.GetComponent(m_owner))
-		{
-			math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
-			math::Matrix4f mvp = viewProjection * transformMat;
+        if (Transform* transform = transforms.GetComponent(m_owner))
+        {
+            math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
+            math::Matrix4f mvp = viewProjection * transformMat;
 
-			math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
-			math::Matrix3f normalMat3x3 = math::Matrix3f(normalMat4x4);
+            math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
+            math::Matrix3f normalMat3x3 = math::Matrix3f(normalMat4x4);
 
-			m_shader->Set("model", &transformMat);
-			m_shader->Set("mvp", &mvp);
-			m_shader->Set("normalMat", &normalMat3x3);		
-		}
-		else
-		{
-			math::Matrix3f identityMat{ 1.f };
+            m_shader->Set("model", &transformMat);
+            m_shader->Set("mvp", &mvp);
+            m_shader->Set("normalMat", &normalMat3x3);		
+        }
+        else
+        {
+            math::Matrix3f identityMat{ 1.f };
 
-			m_shader->Set("mvp", &viewProjection);
-			m_shader->Set("normalMat", &identityMat);
-		}
+            m_shader->Set("mvp", &viewProjection);
+            m_shader->Set("normalMat", &identityMat);
+        }
 
-		DrawModel();
-	}
+        DrawModel();
+    }
 
-	const Model* Renderer::GetModel(void) const
-	{
-		return m_model;
-	}
+    const Model* Renderer::GetModel(void) const
+    {
+        return m_model;
+    }
 
-	const ShaderProgram* Renderer::GetShader(void) const
-	{
-		return m_shader;
-	}
+    const ShaderProgram* Renderer::GetShader(void) const
+    {
+        return m_shader;
+    }
 
-	const Texture* Renderer::GetTexture(void) const
-	{
-		return m_texture;
-	}
+    const Texture* Renderer::GetTexture(void) const
+    {
+        return m_texture;
+    }
 
-	void Renderer::SetModel(const Model* model)
-	{
-		m_model = model;
-	}
+    void Renderer::SetModel(const Model* model)
+    {
+        m_model = model;
+    }
 
-	void Renderer::SetModel(const char* key)
-	{
-		if (const Model* model = ResourceManager::GetResource<Model>(key))
-			m_model = model;
-	}
+    void Renderer::SetModel(const char* key)
+    {
+        if (const Model* model = ResourceManager::GetResource<Model>(key))
+            m_model = model;
+    }
 
-	void Renderer::SetShader(const ShaderProgram* shader)
-	{
-		m_shader = shader;
-	}
+    void Renderer::SetShader(const ShaderProgram* shader)
+    {
+        m_shader = shader;
+    }
 
-	void Renderer::SetShader(const char* key)
-	{
-		if (const ShaderProgram* shader = ResourceManager::GetResource<ShaderProgram>(key))
-			m_shader = shader;
-	}
+    void Renderer::SetShader(const char* key)
+    {
+        if (const ShaderProgram* shader = ResourceManager::GetResource<ShaderProgram>(key))
+            m_shader = shader;
+    }
 
-	void Renderer::SetTexture(const Texture* texture)
-	{
-		m_texture = texture;
-	}
+    void Renderer::SetTexture(const Texture* texture)
+    {
+        m_texture = texture;
+    }
 
-	void Renderer::SetTexture(const char* key)
-	{
-		if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
-			m_texture = texture;
-	}
+    void Renderer::SetTexture(const char* key)
+    {
+        if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
+            m_texture = texture;
+    }
 
-	void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
-								 uint64 index) const
-	{
+    void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
+                                 uint64 index) const
+    {
 
-		const std::string* model = ResourceManager::FindKeyByVal(m_model);
-		const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
-		const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
+        const std::string* model = ResourceManager::FindKeyByVal(m_model);
+        const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
+        const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
 
-		if ((!model) || (!shader))
-			return;
+        if ((!model) || (!shader))
+            return;
 
-		output << "[Renderer]\n    ";
+        output << "[Renderer]\n    ";
 
-		if constexpr (UpdateAfterParent<Renderer>::m_value)
-		{
-			text::Serialize(output, "index", index);
-			output << "\n    ";
-		}
+        if constexpr (UpdateAfterParent<Renderer>::m_value)
+        {
+            text::Serialize(output, "index", index);
+            output << "\n    ";
+        }
 
-		text::Serialize(output, "owner", owner);
+        text::Serialize(output, "owner", owner);
 
-		output << "\n    ";
-		text::Serialize(output, "hasTexture", (bool)texture);
-		output << "\n    ";
-		text::Serialize(output, "model", *model);
-		output << "\n    ";
-		text::Serialize(output, "shader", *shader);
-		output << "\n    ";
+        output << "\n    ";
+        text::Serialize(output, "hasTexture", (bool)texture);
+        output << "\n    ";
+        text::Serialize(output, "model", *model);
+        output << "\n    ";
+        text::Serialize(output, "shader", *shader);
+        output << "\n    ";
 
-		if (texture)
-		{
-			text::Serialize(output, "texture", *texture);
-			output << "\n    ";
-		}
+        if (texture)
+        {
+            text::Serialize(output, "texture", *texture);
+            output << "\n    ";
+        }
 
-		text::Serialize(output, "flags", m_flags);
-		output << '\n';
-	}
+        text::Serialize(output, "flags", m_flags);
+        output << '\n';
+    }
 
-	const char* Renderer::DeserializeText(const char* text, const char* end)
-	{
-		MOVE_TEXT_CURSOR(text, end);
-		text = text::DeserializeInteger(text, m_owner);
+    const char* Renderer::DeserializeText(const char* text, const char* end)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, m_owner);
 
-		uint8 hasTexture;
+        uint8 hasTexture;
 
-		MOVE_TEXT_CURSOR(text, end);
-		text = text::DeserializeInteger(text, hasTexture);
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, hasTexture);
 
-		std::string key;
-		text = text::DeserializeString(text, end, key);
+        std::string key;
+        text = text::DeserializeString(text, end, key);
 
-		m_model = ResourceManager::GetResource<Model>(key);
+        m_model = ResourceManager::GetResource<Model>(key);
 
-		key.clear();
-		text = text::DeserializeString(text, end, key);
-		m_shader = ResourceManager::GetResource<ShaderProgram>(key);
+        key.clear();
+        text = text::DeserializeString(text, end, key);
+        m_shader = ResourceManager::GetResource<ShaderProgram>(key);
 
-		if (hasTexture)
-		{
-			key.clear();
-			text = text::DeserializeString(text, end, key);
-			m_texture = ResourceManager::GetResource<Texture>(key);
-		}
+        if (hasTexture)
+        {
+            key.clear();
+            text = text::DeserializeString(text, end, key);
+            m_texture = ResourceManager::GetResource<Texture>(key);
+        }
 
-		MOVE_TEXT_CURSOR(text, end);
-		return text::DeserializeInteger(text, m_flags);
-	}
+        MOVE_TEXT_CURSOR(text, end);
+        return text::DeserializeInteger(text, m_flags);
+    }
 
-	void Renderer::DrawModel(void) const
-	{
-		for (const Mesh& mesh : m_model->GetMeshes())
-		{
-			glBindVertexArray(mesh.m_vao);
-			glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-		}
-	}
+    void Renderer::DrawModel(void) const
+    {
+        for (const Mesh& mesh : m_model->GetMeshes())
+        {
+            glBindVertexArray(mesh.m_vao);
+            glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
+    }
 
 
 
