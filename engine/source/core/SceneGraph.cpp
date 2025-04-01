@@ -1,11 +1,13 @@
 #include "core/SceneGraph.h"
 #include "core/Entity.h"
-
 #include "core/systems/ScriptSystem.h"
 
 #include "thread/ThreadManager.h"
 
+#include "serialization/TextSerializer.h"
+
 #include <iostream>
+#include <sstream>
 
 namespace engine
 {
@@ -242,11 +244,24 @@ namespace engine
     EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
     {
         // if either half is over 32 bits, the handle is invalid
-        if (index >= ULONG_MAX || uid >= ULONG_MAX)
+        if (index >= LONG_MAX || uid >= LONG_MAX)
+            return Entity::INVALID_HANDLE;
+
+        if (index <= LONG_MIN || uid <= LONG_MIN)
             return Entity::INVALID_HANDLE;
 
         index |= (uid << 32);
         return index;
+    }
+
+    EntityHandle SceneGraph::GetHandleUID(EntityHandle handle)
+    {
+        return (handle & Entity::UID_MASK) >> 32;
+    }
+
+    EntityHandle SceneGraph::GetHandleIndex(EntityHandle handle)
+    {
+        return handle & Entity::INDEX_MASK;
     }
 
     void SceneGraph::ReparentEntity(Entity* toReparent, EntityHandle newParent)
@@ -301,6 +316,141 @@ namespace engine
     int64 SceneGraph::Random::Generate()
     {
         return m_distribution(m_generator);
+    }
+
+
+    SceneGraph::HandleMap SceneGraph::SerializeValidEntitiesText(std::ostream& file)
+    {
+        std::vector<Entity> validEntities;
+        HandleMap			handles;
+
+        uint64 index = 0;
+        for (const Entity& entity : m_sceneEntities)
+        {
+            if (!entity.IsValid())
+                continue;
+
+            EntityHandle newHandle = MakeHandle(index, GetHandleUID(entity.m_handle));
+
+            handles[entity.m_handle] = newHandle;
+            validEntities.push_back(entity);
+            ++index;
+        }
+
+        for (Entity& entity : validEntities)
+        {
+            entity.m_handle = handles[entity.m_handle];
+            entity.m_parent = handles[entity.m_parent];
+
+            SerializeEntityText(file, entity);
+            SerializeSingleComponent<Transform>(file, entity, handles);
+            SerializeSingleComponent<Camera>(file, entity, handles);
+            SerializeSingleComponent<Renderer>(file, entity, handles);
+            SerializeSingleComponent<Script>(file, entity, handles);
+        }
+
+        return handles;
+    }
+
+    void SceneGraph::SerializeEntityText(std::ostream& file, const Entity& entity)
+    {
+        file << "[Entity]\n   ";
+        text::Serialize(file, "name", entity.m_name);
+        file << "\n   ";
+        text::Serialize(file, "handle", entity.m_handle);
+        file << "\n   ";
+        text::Serialize(file, "parent", entity.m_parent);
+        file << "\n   ";
+        text::Serialize(file, "flags", entity.m_statusFlags);
+        file << "\n   ";
+        text::Serialize(file, "components", entity.m_components);
+        file << '\n';
+    }
+
+    void SceneGraph::DeserializeTextV1(std::ifstream& file)
+    {
+        Component::DeserializedArray<Transform> transforms;
+        Component::DeserializedArray<Camera>	cameras;
+        Component::DeserializedArray<Renderer>	renderers;
+        Component::DeserializedArray<Script>	scripts;
+
+        const char* start;
+        const char* end;
+        const char* data = text::LoadFileData(file, start, end);
+
+        while (start != end)
+        {
+            if (memcmp(start, "[Entity]", 8) == 0)
+                start = DeserializeEntityText(start, end);
+
+            else if (memcmp(start, "[Transform]", 11) == 0)
+                start = Component::DeserializeComponentText(transforms, start, end);
+
+            else if (memcmp(start, "[Camera]", 8) == 0)
+                start = Component::DeserializeComponentText(cameras, start, end);
+
+            else if (memcmp(start, "[Renderer]", 10) == 0)
+                start = Component::DeserializeComponentText(renderers, start, end);
+
+            else if (memcmp(start, "[Script]", 8) == 0)
+                start = Component::DeserializeComponentText(scripts, start, end);
+
+            start = text::GetNewLine(start, end);
+        }
+
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+        text::UnloadFileData(data);
+    }
+    
+    const char* SceneGraph::DeserializeEntityText(const char* text, const char* end)
+    {
+        Entity newEntity;
+
+        text = text::DeserializeString(text, end, newEntity.m_name);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, newEntity.m_handle);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, newEntity.m_parent);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, newEntity.m_statusFlags);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, newEntity.m_components);
+
+        m_sceneEntities.push_back(newEntity);
+        return text;
+    }
+
+
+    void SceneGraph::SerializeText(std::ofstream& file)
+    {
+        text::Serialize(file, "formatVersion", 1);
+        file << '\n';
+        SerializeValidEntitiesText(file);
+    }
+
+    void SceneGraph::DeserializeText(std::ifstream& file)
+    {
+        uint64		cursor = 0;
+        std::string firstLine;
+
+        std::getline(file, firstLine);
+        text::MoveCursorToVal(cursor, firstLine);
+
+        int32 formatVersion = strtol(firstLine.c_str() + cursor, nullptr, 0);
+
+        switch (formatVersion)
+        {
+        case 1:
+            DeserializeTextV1(file);
+            break;
+
+        default: break;
+        }
+
     }
 
 }
