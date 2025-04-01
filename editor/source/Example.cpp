@@ -6,13 +6,13 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-#define MODEL_FILE "..\\assets\\padoru.obj"
-#define TEXTURE_FILE "..\\assets\\padoru.png"
+#define MODEL_FILE ".\\assets\\padoru.obj"
+#define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 
 #define SHADER_PROGRAM_NAME		"ModelTextured"
-#define SHADER_PROGRAM_VERTEX	"..\\engineShader\\ModelTextured.vs"
-#define SHADER_PROGRAM_FRAGMENT "..\\engineShader\\ModelTextured.frag"
+#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vs"
+#define SHADER_PROGRAM_FRAGMENT ".\\shaders\\ModelTextured.frag"
 
 ExampleProject::ExampleProject(void)
 	: m_cameraHandle(-1), m_modelHandle(-1)
@@ -88,5 +88,5 @@ void ExampleProject::LoadResources(void)
 		SHADER_PROGRAM_FRAGMENT
 	);
 
-	engine::ScriptSystem::CreateUserScript("..\\userScripts\\", CONTROLLER_SCRIPT_FILE);
+	engine::ScriptSystem::CreateUserScript(".\\userScripts\\", CONTROLLER_SCRIPT_FILE);
 }

@@ -4,226 +4,225 @@
 
 namespace engine
 {
-	template <CValidComponent TComponentType>
-	class ComponentArray
-	{
-	public:
+    template <CValidComponent TComponentType>
+    class ComponentArray
+    {
+    public:
 
 
-		ComponentArray(void) = default;
-		ComponentArray(const ComponentArray&) = default;
-		~ComponentArray(void) = default;
+        ComponentArray(void) = default;
+        ComponentArray(const ComponentArray&) = default;
+        ~ComponentArray(void) = default;
 
-		// Check if a component should be moved to the back of the array. The component will
-		// only be moved if the component type requires children to be updated after parents,
-		// and if the child is found before the parent.
-		// false: component has not been found or has not been moved
-		// true: component was found and moved to the back of the array
-		bool			MoveReparentedComponent(EntityHandle owner, EntityHandle parent);
+        // Check if a component should be moved to the back of the array. The component will
+        // only be moved if the component type requires children to be updated after parents,
+        // and if the child is found before the parent.
+        // false: component has not been found or has not been moved
+        // true: component was found and moved to the back of the array
+        bool			MoveReparentedComponent(EntityHandle owner, EntityHandle parent);
 
-		// Force component to move to the back of the array. Only check if the component
-		// exists
-		// false: component has not been found
-		// true: component was found and moved
-		bool			MoveReparentedComponent(EntityHandle owner);
+        // Force component to move to the back of the array. Only check if the component
+        // exists
+        // false: component has not been found
+        // true: component was found and moved
+        bool			MoveReparentedComponent(EntityHandle owner);
 
-		// Permanently et a component up for destruction
-		void			InvalidateComponent(EntityHandle owner);
+        // Permanently et a component up for destruction
+        void			InvalidateComponent(EntityHandle owner);
 
-		// Create a new component
-		TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent,
-										class SceneGraph* scene);
+        // Create a new component
+        TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent,
+                                        class SceneGraph* scene);
 
-		TComponentType* GetComponent(EntityHandle owner);
+        TComponentType* GetComponent(EntityHandle owner);
 
-		// Check if an entity owns a component in this array
-		bool			HasComponent(EntityHandle entity);
-
-
-		// Standard functions necessary to use ranged for loops.
-		// Cannot use PascalCase for these two functions as they must
-		// match a precise syntax. Their return types are STL vector
-		// iterators
-
-		auto begin(void);
-		auto end(void);
-
-		ComponentArray& operator=(const ComponentArray&) = default;
-
-	private:
-
-		// Create a component without checking if the object's parent is
-		// before its new memory location
-		TComponentType* ForceCreateComponent(EntityHandle owner, class SceneGraph* scene);
-
-		std::unordered_map<EntityHandle, uint64>	m_entityIndexMap;
-		std::vector<TComponentType>					m_components;
-	};
+        // Check if an entity owns a component in this array
+        bool			HasComponent(EntityHandle entity);
 
 
-	template<CValidComponent TComponentType>
-	inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner,
-																		EntityHandle parent)
-	{
-		// do not do anything if the contained type is not sensitive to
-		// the memory layout (if parents don't need to be updated before children)
-		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
-		{
-			printf("not moving component");
-			return false;
-		}
+        // Standard functions necessary to use ranged for loops.
+        // Cannot use PascalCase for these two functions as they must
+        // match a precise syntax. Their return types are STL vector
+        // iterators
 
-		if ((!m_entityIndexMap.contains(owner)))
-			return false;
+        auto begin(void);
+        auto end(void);
 
-		if (!m_entityIndexMap.contains(parent) ||
-			m_entityIndexMap[parent] < m_entityIndexMap[owner])
-		{
-			printf("parent is already before child\n");
-			return false;
-		}
+        ComponentArray& operator=(const ComponentArray&) = default;
 
-		uint64				newIndex = m_components.size();
-		TComponentType&		toMove = m_components[m_entityIndexMap[owner]];
+    private:
 
-		m_components.emplace_back(toMove);
+        // Create a component without checking if the object's parent is
+        // before its new memory location
+        TComponentType* ForceCreateComponent(EntityHandle owner, class SceneGraph* scene);
 
-		toMove.Invalidate();
-		m_entityIndexMap[owner] = newIndex;
+        std::unordered_map<EntityHandle, uint64>	m_entityIndexMap;
+        std::vector<TComponentType>					m_components;
+    };
 
-		printf("yea we moving the component\n");
-		return true;
 
-	}
+    template<CValidComponent TComponentType>
+    inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner,
+                                                                        EntityHandle parent)
+    {
+        // do not do anything if the contained type is not sensitive to
+        // the memory layout (if parents don't need to be updated before children)
+        if constexpr (!UpdateAfterParent<TComponentType>::m_value)
+        {
+            printf("not moving component");
+            return false;
+        }
 
-	template<CValidComponent TComponentType>
-	inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner)
-	{	
-		if (!m_entityIndexMap.contains(owner))
-			return false;
+        if ((!m_entityIndexMap.contains(owner)))
+            return false;
 
-		uint64			newIndex = m_components.size();
-		TComponentType& toMove = m_components[m_entityIndexMap[owner]];
+        if (!m_entityIndexMap.contains(parent) ||
+            m_entityIndexMap[parent] < m_entityIndexMap[owner])
+        {
+            printf("parent is already before child\n");
+            return false;
+        }
 
-		// copy component to move in the back of the array and invalidate old version
-		m_components.emplace_back(toMove);
+        uint64				newIndex = m_components.size();
+        TComponentType&		toMove = m_components[m_entityIndexMap[owner]];
 
-		toMove.Invalidate();
-		m_entityIndexMap[owner] = newIndex;
+        m_components.emplace_back(toMove);
 
-		printf("yea we moving the component\n");
-		return true;
-	}
+        toMove.Invalidate();
+        m_entityIndexMap[owner] = newIndex;
 
-	template<CValidComponent TComponentType>
-	inline void ComponentArray<TComponentType>::InvalidateComponent(EntityHandle owner)
-	{
-		if (!m_entityIndexMap.contains(owner))
-			return;
+        printf("yea we moving the component\n");
+        return true;
 
-		// set component to be written over
-		m_components[m_entityIndexMap[owner]].Invalidate();
+    }
 
-		// erase mapping to owner entity
-		m_entityIndexMap.erase(owner);
-	}
+    template<CValidComponent TComponentType>
+    inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner)
+    {	
+        if (!m_entityIndexMap.contains(owner))
+            return false;
 
-	template<CValidComponent TComponentType> inline 
-	TComponentType* ComponentArray<TComponentType>::CreateComponent(EntityHandle owner,
-															        EntityHandle parent,
-																	class SceneGraph* scene)
-	{	
-		// Creates new component with no regard for ordering if new component does not
-		// need to be updated after parent
-		if constexpr (!UpdateAfterParent<TComponentType>::m_value)
-			return ForceCreateComponent(owner, scene);
-		else
-		{
+        uint64			newIndex = m_components.size();
+        TComponentType& toMove = m_components[m_entityIndexMap[owner]];
 
-		
-			// parentIndex is 0 by default so that it is always considered 'before'
-			// the new component when the latter has no actual parent, makes it so it
-			// fails later 'parentIndex > newIndex' check and does not stop overwrite
-			EntityHandle    parentIndex = 0;
+        // copy component to move in the back of the array and invalidate old version
+        m_components.emplace_back(toMove);
 
-			if (m_entityIndexMap.contains(parent))
-				parentIndex = m_entityIndexMap[parent];
+        toMove.Invalidate();
+        m_entityIndexMap[owner] = newIndex;
 
-			EntityHandle size = static_cast<EntityHandle>(m_components.size());
+        printf("yea we moving the component\n");
+        return true;
+    }
 
-			for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
-			{
-				TComponentType& currentComponent = m_components[newIndex];
+    template<CValidComponent TComponentType>
+    inline void ComponentArray<TComponentType>::InvalidateComponent(EntityHandle owner)
+    {
+        if (!m_entityIndexMap.contains(owner))
+            return;
 
-				// Do not overwrite component if it is valid or before parent
-				if (currentComponent.IsValid() || parentIndex > newIndex)
-					continue;
+        // set component to be written over
+        m_components[m_entityIndexMap[owner]].Invalidate();
 
-				printf("[Component array]: filling invalid slot\n");
+        // erase mapping to owner entity
+        m_entityIndexMap.erase(owner);
+    }
 
-				currentComponent = TComponentType(owner, scene);
-				m_entityIndexMap[owner] = newIndex;		
-				return &currentComponent;
-			}
-			printf("[Component array]: creating new slot\n");
-			m_entityIndexMap[owner] = m_components.size();
-			return &m_components.emplace_back(owner, scene);
-		}
-	}
+    template<CValidComponent TComponentType> inline 
+    TComponentType* ComponentArray<TComponentType>::CreateComponent(EntityHandle owner,
+                                                                    EntityHandle parent,
+                                                                    class SceneGraph* scene)
+    {	
+        // Creates new component with no regard for ordering if new component does not
+        // need to be updated after parent
+        if constexpr (!UpdateAfterParent<TComponentType>::m_value)
+            return ForceCreateComponent(owner, scene);
 
-	template<CValidComponent TComponentType>
-	inline TComponentType* ComponentArray<TComponentType>::GetComponent(EntityHandle owner)
-	{
-		if (!m_entityIndexMap.contains(owner))
-			return nullptr;
+        else
+        {
+            // parentIndex is 0 by default so that it is always considered 'before'
+            // the new component when the latter has no actual parent, makes it so it
+            // fails later 'parentIndex > newIndex' check and does not stop overwrite
+            EntityHandle    parentIndex = 0;
 
-		return &m_components[m_entityIndexMap[owner]];
-	}
+            if (m_entityIndexMap.contains(parent))
+                parentIndex = m_entityIndexMap[parent];
 
-	template<CValidComponent TComponentType>
-	inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity)
-	{
-		return m_entityIndexMap.contains(entity);
-	}
+            EntityHandle size = static_cast<EntityHandle>(m_components.size());
 
-	template<CValidComponent TComponentType>
-	inline auto ComponentArray<TComponentType>::begin(void)
-	{
-		return m_components.begin();
-	}
+            for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
+            {
+                TComponentType& currentComponent = m_components[newIndex];
 
-	template<CValidComponent TComponentType>
-	inline auto ComponentArray<TComponentType>::end(void)
-	{
-		return m_components.end();
-	}
+                // Do not overwrite component if it is valid or before parent
+                if (currentComponent.IsValid() || parentIndex > newIndex)
+                    continue;
 
-	template<CValidComponent TComponentType> inline
-	TComponentType* ComponentArray<TComponentType>::ForceCreateComponent(EntityHandle owner,
-																	class SceneGraph* scene)
-	{
-		// write over invalid component if possible
-#pragma warning( push )
-#pragma warning( disable : 4018)
-		for (EntityHandle newIndex = 0; newIndex < m_components.size(); ++newIndex)
-		{
-			TComponentType& currentComponent = m_components[newIndex];
+                printf("[Component array]: filling invalid slot\n");
 
-			if (currentComponent.IsValid())
-				continue;
+                currentComponent = TComponentType(owner, scene);
+                m_entityIndexMap[owner] = newIndex;
+                return &currentComponent;
+            }
 
-			printf("[Component array]: filling invalid slot\n");
+            printf("[Component array]: creating new slot\n");
+            m_entityIndexMap[owner] = m_components.size();
+            return &m_components.emplace_back(owner, scene);
+        }
+    }
 
-			currentComponent = TComponentType(owner, scene);
-			m_entityIndexMap[owner] = newIndex;
-			return &currentComponent;
-		}
-#pragma warning(pop)
+    template<CValidComponent TComponentType>
+    inline TComponentType* ComponentArray<TComponentType>::GetComponent(EntityHandle owner)
+    {
+        if (!m_entityIndexMap.contains(owner))
+            return nullptr;
 
-		printf("[Component array]: creating new slot\n");
+        return &m_components[m_entityIndexMap[owner]];
+    }
 
-		// create new component if no invalid component was found
-		m_entityIndexMap[owner] = m_components.size();
-		return &m_components.emplace_back(owner, scene);
-	}
+    template<CValidComponent TComponentType>
+    inline bool ComponentArray<TComponentType>::HasComponent(EntityHandle entity)
+    {
+        return m_entityIndexMap.contains(entity);
+    }
+
+    template<CValidComponent TComponentType>
+    inline auto ComponentArray<TComponentType>::begin(void)
+    {
+        return m_components.begin();
+    }
+
+    template<CValidComponent TComponentType>
+    inline auto ComponentArray<TComponentType>::end(void)
+    {
+        return m_components.end();
+    }
+
+    template<CValidComponent TComponentType> inline
+    TComponentType* ComponentArray<TComponentType>::ForceCreateComponent(EntityHandle owner,
+                                                                    class SceneGraph* scene)
+    {
+        EntityHandle size = static_cast<EntityHandle>(m_components.size());
+
+        // write over invalid component if possible
+        for (EntityHandle newIndex = 0; newIndex < size; ++newIndex)
+        {
+            TComponentType& currentComponent = m_components[newIndex];
+
+            if (currentComponent.IsValid())
+                continue;
+
+            printf("[Component array]: filling invalid slot\n");
+
+            currentComponent = TComponentType(owner, scene);
+            m_entityIndexMap[owner] = newIndex;
+            return &currentComponent;
+        }
+
+        printf("[Component array]: creating new slot\n");
+
+        // create new component if no invalid component was found
+        m_entityIndexMap[owner] = m_components.size();
+        return &m_components.emplace_back(owner, scene);
+    }
 }
