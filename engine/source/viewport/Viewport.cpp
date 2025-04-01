@@ -7,76 +7,44 @@
 
 #include <glad/glad.h>
 
-
-
 #undef new
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
 
-void engine::Viewport::Update(FrameBuffer& fbo)
+engine::Viewport::Viewport(const char* title)
+	: m_title(title), m_bgColor(0.1f, 0.1f, 0.1f, 0.1f)
+{}
+
+engine::Viewport::Viewport(const char* title, math::Vector4f bgColor)
+	: m_title(title), m_bgColor(bgColor)
+{}
+
+void engine::Viewport::DrawViewport(void)
 {
-	static const ImGuiWindowFlags flags =
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoScrollWithMouse;
-
-	ImGui::Begin("Viewport", nullptr, flags);
-	
-	math::Vector2f regionAvail = ImGui::GetContentRegionAvail();
-	math::Vector2f position = ImGui::GetCursorScreenPos();
-	
-	glViewport(0, 0, (int32) regionAvail.GetX(), (int32) regionAvail.GetY());
-	fbo.RescaleFBO((int32) regionAvail.GetX(), (int32) regionAvail.GetY());
-
-	ImGui::GetWindowDrawList()->AddImage(
-		fbo.GetFrameTexture(),
-		position,
-		position + regionAvail,
-		math::Vector2f(0.F, 1.F),
-		math::Vector2f(1.F, 0.F)
-	);
-
-	ImGui::End();
-}
-
-engine::ViewportV2::ViewportV2(FrameBuffer const& fbo)
-	: m_fbo(fbo), m_prevSize(0), m_render(true)
-{
-}
-
-void engine::ViewportV2::Update(void)
-{
+	// Window flags
 	static const ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoScrollbar |
 		ImGuiWindowFlags_NoScrollWithMouse |
-		ImGuiWindowFlags_NoBackground;
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoSavedSettings;
 
-	ImGui::Begin("ViewportV2", nullptr, flags);
+	
+	// TODO: add default docking node
+	ImGui::SetNextWindowSize({960, 540}, ImGuiCond_Once);
+	ImGui::Begin(m_title.c_str(), nullptr, flags);
 
+	// Transform
+	math::Vector2f position = ImGui::GetCursorScreenPos();
 	math::Vector2f regionAvail = ImGui::GetContentRegionAvail();
-	math::Vector2i sizePx(
+	math::Vector2i sizePx
+	(
 		static_cast<int32>(regionAvail.GetX()),
 		static_cast<int32>(regionAvail.GetY())
 	);
+
 	glViewport(0, 0, sizePx.GetX(), sizePx.GetY());
+	m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
 
-	//if (m_prevSize != sizePx)
-	//{
-		m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
-		m_prevSize = sizePx;
-		//ImGui::GetWindowDrawList()->AddImage(
-		//	m_fbo.GetFrameTexture(),
-		//	position,
-		//	position + regionAvail,
-		//	math::Vector2f(0.F, 1.F),
-		//	math::Vector2f(1.F, 0.F)
-		//);
-
-	//}
-
-	math::Vector2f position = ImGui::GetCursorScreenPos();
 	ImGui::Image(
 		m_fbo.GetFrameTexture(),
 		regionAvail,
@@ -87,13 +55,15 @@ void engine::ViewportV2::Update(void)
 	ImGui::End();
 }
 
-void engine::ViewportV2::RenderScene(SceneGraph* sceneGraph, math::Vector4f bgColor)
+void engine::Viewport::RenderToViewport(SceneGraph* sceneGraph)
 {
-
 	m_fbo.Bind();
-
-	wnd::ClearWindow(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
+	wnd::ClearWindow(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
 	ThreadManager::RenderScene(sceneGraph);
+	m_fbo.Unbind();
+}
 
-	m_fbo.UnBind();
+void engine::Viewport::SetBgColor(math::Vector4f const& bgColor)
+{
+	m_bgColor = bgColor;
 }
