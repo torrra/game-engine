@@ -53,7 +53,7 @@ void engine::DebugDraw::InitDebugDraw(void)
 
     glVertexArrayVertexBuffer(m_debugDrawVAO, 0, m_debugDrawVBO, 0, sizeof(math::Vector3f));
 
-    ResourceManager::LoadShader("DebugDrawShader", "..\\engineShader\\DebugShader.vs", "..\\engineShader\\DebugShader.frag");
+    ResourceManager::LoadShader("DebugDrawShader", ".\\shaders\\DebugShader.vs", ".\\shaders\\DebugShader.frag");
 
 }
 
