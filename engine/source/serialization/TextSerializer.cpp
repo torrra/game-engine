@@ -6,13 +6,13 @@ namespace engine::text
     void Serialize(std::ostream& file, const char* name, const std::string& val)
     {
         const char* valName((name) ? name : "unnamed val");
-        file << "@" << "string " << val.size() << " | " << valName << '=' << val;
+        file << "@string " << val.size() << " | " << valName << '=' << val;
     }
 
     void Serialize(std::ostream& file, const char* name, const char* val, uint64 length)
     {
         const char* valName((name) ? name : "unnamed val");
-        file << "@" << "string " << length << " | " << valName << '=' << val;
+        file << "@string " << length << " | " << valName << '=' << val;
     }
 
     void MoveCursorToVal(uint64& pos, const std::string& line)
