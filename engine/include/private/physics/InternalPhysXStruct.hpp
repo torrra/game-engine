@@ -48,4 +48,6 @@ namespace engine
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
     }; // !Struct DebugDrawImpl
+
+    using PxVisualParam = physx::PxVisualizationParameter;
 } // !Namespace engine
