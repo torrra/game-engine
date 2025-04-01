@@ -19,30 +19,30 @@ namespace engine
         // and if the child is found before the parent.
         // false: component has not been found or has not been moved
         // true: component was found and moved to the back of the array
-        bool			MoveReparentedComponent(EntityHandle owner, EntityHandle parent);
+        bool     MoveReparentedComponent(EntityHandle owner, EntityHandle parent);
 
         // Force component to move to the back of the array. Only check if the component
         // exists
         // false: component has not been found
         // true: component was found and moved
-        bool			MoveReparentedComponent(EntityHandle owner);
+        bool      MoveReparentedComponent(EntityHandle owner);
 
         // Permanently et a component up for destruction
-        void			InvalidateComponent(EntityHandle owner);
+        void      InvalidateComponent(EntityHandle owner);
 
         // Create a new component
         TComponentType* CreateComponent(EntityHandle owner, EntityHandle parent,
                                         class SceneGraph* scene);
 
-        TComponentType*			GetComponent(EntityHandle owner);
-        const TComponentType*	GetComponent(EntityHandle owner) const;
+        TComponentType*         GetComponent(EntityHandle owner);
+        const TComponentType*   GetComponent(EntityHandle owner) const;
 
         // Check if an entity owns a component in this array
-        bool			HasComponent(EntityHandle entity) const;
+        bool  HasComponent(EntityHandle entity) const;
 
 
         // Get component's location in array from its owner's handle
-        uint64			GetComponentIndex(EntityHandle owner) const;
+        uint64 GetComponentIndex(EntityHandle owner) const;
 
 
         void AddDeserializedComponent(const TComponentType& component);
@@ -64,8 +64,8 @@ namespace engine
         // before its new memory location
         TComponentType* ForceCreateComponent(EntityHandle owner, class SceneGraph* scene);
 
-        std::unordered_map<EntityHandle, uint64>	m_entityIndexMap;
-        std::vector<TComponentType>					m_components;
+        std::unordered_map<EntityHandle, uint64>    m_entityIndexMap;
+        std::vector<TComponentType>                    m_components;
     };
 
 
@@ -91,8 +91,8 @@ namespace engine
             return false;
         }
 
-        uint64				newIndex = m_components.size();
-        TComponentType&		toMove = m_components[m_entityIndexMap[owner]];
+        uint64                newIndex = m_components.size();
+        TComponentType&        toMove = m_components[m_entityIndexMap[owner]];
 
         m_components.emplace_back(toMove);
 
@@ -106,11 +106,11 @@ namespace engine
 
     template<CValidComponent TComponentType>
     inline bool ComponentArray<TComponentType>::MoveReparentedComponent(EntityHandle owner)
-    {	
+    {    
         if (!m_entityIndexMap.contains(owner))
             return false;
 
-        uint64			newIndex = m_components.size();
+        uint64            newIndex = m_components.size();
         TComponentType& toMove = m_components[m_entityIndexMap[owner]];
 
         // copy component to move in the back of the array and invalidate old version
@@ -140,7 +140,7 @@ namespace engine
     TComponentType* ComponentArray<TComponentType>::CreateComponent(EntityHandle owner,
                                                                     EntityHandle parent,
                                                                     class SceneGraph* scene)
-    {	
+    {    
         // Creates new component with no regard for ordering if new component does not
         // need to be updated after parent
         if constexpr (!UpdateAfterParent<TComponentType>::m_value)

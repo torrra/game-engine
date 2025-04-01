@@ -38,8 +38,8 @@ namespace engine
 
     public:
 
-		ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
-		ENGINE_API Entity(const Entity&) = default;
+        ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
+        ENGINE_API Entity(const Entity&) = default;
 
         // Is this entity a valid object?
         // true: this object is a valid entity instance
@@ -77,7 +77,7 @@ namespace engine
         std::string  GetName(void) const;
 
         ENGINE_API
-        void		 SetName(const std::string& name);
+        void         SetName(const std::string& name);
 
         ENGINE_API
         Entity& operator=(const Entity& rhs);
@@ -86,26 +86,26 @@ namespace engine
         ENGINE_API
         void Invalidate(void);
 
-	private:
+    private:
 
-		Entity(void) = default;
+        Entity(void) = default;
 
 
-		// Get EComponentFlag corresponding to the component type
-		// NO_COMPONENT by default, must be manually instantiated for
-		// each component type in their respective headers
-		template<CValidComponent TComponentType>
-		static constexpr EComponentFlags GetComponentFlag();
+        // Get EComponentFlag corresponding to the component type
+        // NO_COMPONENT by default, must be manually instantiated for
+        // each component type in their respective headers
+        template<CValidComponent TComponentType>
+        static constexpr EComponentFlags GetComponentFlag();
 
-		std::string			m_name;
-		EntityHandle		m_handle = INVALID_HANDLE;
-		EntityHandle		m_parent = INVALID_HANDLE;
+        std::string         m_name;
+        EntityHandle        m_handle = INVALID_HANDLE;
+        EntityHandle        m_parent = INVALID_HANDLE;
 
         // status modifiers that affect behavior (inactive, invalid)
-        uint64				m_statusFlags = ecs::NONE;
+        uint64              m_statusFlags = ecs::NONE;
 
         // what component this entity hass
-        uint64				m_components = NO_COMPONENTS;
+        uint64              m_components = NO_COMPONENTS;
 
     };
 
