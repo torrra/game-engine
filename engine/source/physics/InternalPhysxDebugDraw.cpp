@@ -8,16 +8,10 @@
 
 #pragma endregion
 
-#pragma region GLAD
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#pragma endregion
-
 #pragma region Resource
 
 #include "engine/resource/shader/Shader.h"
+#include "engine/resource/ResourceManager.h"
 
 #pragma endregion
 
@@ -27,10 +21,6 @@
 
 #pragma endregion
 
-#include <iostream>
-
-
-
 engine::DebugDraw::DebugDraw()
 {
     m_debugDrawImpl = new engine::DebugDrawImpl();
@@ -38,6 +28,9 @@ engine::DebugDraw::DebugDraw()
 
 engine::DebugDraw::~DebugDraw(void)
 {
+    glBindBuffer(0, 0);
+    glBindVertexArray(0);
+
     delete m_debugDrawImpl;
     m_debugDrawImpl = nullptr;
 }
@@ -60,8 +53,7 @@ void engine::DebugDraw::InitDebugDraw(void)
 
     glVertexArrayVertexBuffer(m_debugDrawVAO, 0, m_debugDrawVBO, 0, sizeof(math::Vector3f));
 
-    m_debugShadeProgram = new ShaderProgram("..\\engineShader\\DebugShader.vs",
-        "..\\engineShader\\DebugShader.frag");
+    ResourceManager::LoadShader("DebugDrawShader", "..\\engineShader\\DebugShader.vs", "..\\engineShader\\DebugShader.frag");
 
 }
 
@@ -86,8 +78,8 @@ void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
 
 void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount)
 {
-    m_debugShadeProgram->Use();
-    m_debugShadeProgram->Set("projViewMatrix", inProjViewMatrix);
+    ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader")->Use();
+    ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader")->Set("projViewMatrix", inProjViewMatrix);
     glBindVertexArray(m_debugDrawVAO);
     glBindBuffer(GL_ARRAY_BUFFER, m_debugDrawVBO);
     glDrawArrays(GL_LINES, 0, inLineCount);
@@ -95,4 +87,3 @@ void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32
 
     OpenGLError();
 }
-

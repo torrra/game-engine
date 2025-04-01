@@ -238,6 +238,8 @@ void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime, math::Matrix4f* inPr
 
 void engine::PhysicsEngine::CleanUp(void)
 {
+    delete m_debugDraw;
+
 	// Release all physX elements in the good order
 	PX_RELEASE(m_impl->m_material);
 	PX_RELEASE(m_impl->m_scene);

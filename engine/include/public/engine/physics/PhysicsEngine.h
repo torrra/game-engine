@@ -67,12 +67,12 @@ namespace engine
 
 		/// Members
 		// Pointer to the implementation of the physx structure
-		PhysicsEngineImpl*		m_impl      = nullptr;
+		        PhysicsEngineImpl*	m_impl      = nullptr;
 		// Instance of the physics engine
-		static PhysicsEngine*	m_instance;
+		static  PhysicsEngine*	    m_instance;
 
         // Debug draw
-        DebugDraw*			    m_debugDraw = nullptr;
+                DebugDraw*			m_debugDraw = nullptr;
 
 	}; // !Class PhysicsEngine
 } // !Namespace engine
