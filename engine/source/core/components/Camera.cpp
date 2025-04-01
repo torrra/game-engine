@@ -5,7 +5,8 @@
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
 
-
+#include <fstream>
+#include "serialization/TextSerializer.h"
 
 engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
 {
@@ -104,6 +105,61 @@ void engine::Camera::SetFarPlane(f32 farPlane)
     m_frustum.m_far = farPlane;
 
     GetProjectionMatrix();
+}
+
+void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
+								   uint64 index) const
+{
+	output << "[Camera]\n    ";
+
+	if constexpr (UpdateAfterParent<Camera>::m_value)
+	{
+		text::Serialize(output, "index", index);
+		output << "\n    ";
+	}
+	text::Serialize(output, "owner", owner);
+	output << "\n    ";
+	text::Serialize(output, "near", m_frustum.m_near);
+	output << "\n    ";
+	text::Serialize(output, "far", m_frustum.m_far);
+	output << "\n    ";
+	text::Serialize(output, "fov", m_frustum.m_fovRad);
+	output << "\n    ";
+	text::Serialize(output, "aspectRatio", m_frustum.m_ratio);
+	output << "\n    ";
+	text::Serialize(output, "rotationEuler", m_rotation);
+	output << "\n    ";
+	text::Serialize(output, "position", m_position);
+	output << "\n    ";
+	text::Serialize(output, "flags", m_flags);
+	output << '\n';
+}
+
+const char* engine::Camera::DeserializeText(const char* text, const char* end)
+{
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeInteger(text, m_owner);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_near);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_far);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_fovRad);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeReal(text, m_frustum.m_ratio);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_rotation);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_position);
+
+	MOVE_TEXT_CURSOR(text, end);
+	return text::DeserializeInteger(text, m_flags);
 }
 
 math::Matrix4f engine::Camera::GetViewMatrix(void)

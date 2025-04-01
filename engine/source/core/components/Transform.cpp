@@ -2,6 +2,8 @@
 #include "core/systems/ScriptSystem.h"
 #include "core/SceneGraph.h"
 
+#include "serialization/TextSerializer.h"
+
 math::Matrix4f engine::Transform::ToMatrixWithoutScale(const Transform& inTransform)
 {
     math::Matrix4f transformMatrix = math::TransformMatrix(inTransform.m_rotation, inTransform.m_position);
@@ -172,12 +174,63 @@ void engine::Transform::AddScale(const math::Vector3f& scale)
     m_dirty = true;
 }
 
+void engine::Transform::SerializeText(std::ostream& output, EntityHandle owner,
+									 uint64 index) const
+{
+	output << "[Transform]\n    ";
+
+	if constexpr (UpdateAfterParent<Transform>::m_value)
+	{
+		text::Serialize(output, "index", index);
+		output << "\n    ";
+	}
+
+
+	text::Serialize(output, "owner", owner);
+	output << "\n    ";
+	text::Serialize(output, "rotation", m_rotation);
+	output << "\n    ";
+	text::Serialize(output, "position", m_position);
+	output << "\n    ";
+	text::Serialize(output, "scale", m_scale);
+	output << "\n    ";
+	text::Serialize(output, "flags", m_flags);
+	output << '\n';
+}
+
+const char* engine::Transform::DeserializeText(const char* text, const char* end)
+{
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeInteger(text, m_owner);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeQuaternion(text, m_rotation);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_position);
+
+	MOVE_TEXT_CURSOR(text, end);
+	text = text::DeserializeVector(text, m_scale);
+
+	MOVE_TEXT_CURSOR(text, end);
+	return text::DeserializeInteger(text, m_flags);
+	
+}
+
 std::ostream& engine::Transform::operator<<(std::ostream& os)
 {
     return os << m_position.X() << " " << m_position.Y() << " " << m_position.Z() << " "
               << m_rotation.W() << " " << m_rotation.X() << " " << m_rotation.Y() << " "
               << m_rotation.Z() << " "
               << m_scale.X() << " " << m_scale.Y() << " " << m_scale.Z();
+}
+
+std::ostream& engine::operator<<(std::ostream& os, engine::Transform& transform)
+{
+	return os << "position: " << transform.m_position.X() << " " << transform.m_position.Y() << " " << transform.m_position.Z() << "\nrotation: "
+		<< transform.m_rotation.W() << " " << transform.m_rotation.X() << " " << transform.m_rotation.Y() << " "
+		<< transform.m_rotation.Z() << "\nscale: "
+		<< transform.m_scale.X() << " " << transform.m_scale.Y() << " " << transform.m_scale.Z() << '\n';
 }
 
 void engine::Transform::UpdateLocalMatrix(void)
