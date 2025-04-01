@@ -9,56 +9,56 @@
 
 namespace engine
 {
-	class Script : public Component
-	{
-	public:
+    class Script : public Component
+    {
+    public:
 
-		// Use parent class constructors
-		using Component::Component;
-		
-		ENGINE_API
-		~Script(void) = default;
+        // Use parent class constructors
+        using Component::Component;
+        
+        ENGINE_API
+        ~Script(void) = default;
 
-		// Call Start() in all script objects
+        // Call Start() in all script objects
 
-		ENGINE_API
-		void Start(void);
+        ENGINE_API
+        void Start(void);
 
-		// Tick all script objects
-		ENGINE_API
-		void Update(f32 deltaTime);
+        // Tick all script objects
+        ENGINE_API
+        void Update(f32 deltaTime);
 
-		// Register script component and save a reference in lua
-		ENGINE_API
-		void Register(void) override;
+        // Register script component and save a reference in lua
+        ENGINE_API
+        void Register(void) override;
 
-		// Add a new lua script object to this component, and register it
-		// in lua
-		ENGINE_API
-		void AddScriptObject(const std::string& type);
+        // Add a new lua script object to this component, and register it
+        // in lua
+        ENGINE_API
+        void AddScriptObject(const std::string& type);
 
-	private:
+    private:
 
-		std::vector<ScriptObject> m_scriptObjects;
-		
-	};
+        std::vector<ScriptObject> m_scriptObjects;
+        
+    };
 
-	template <>
-	struct UpdateAfterParent<Script>
-	{
-		static constexpr bool m_value = true;
-	};
+    template <>
+    struct UpdateAfterParent<Script>
+    {
+        static constexpr bool m_value = true;
+    };
 
-	template <>
-	struct UpdateComponent<Script>
-	{
-		static constexpr bool m_value = true;
-	};
+    template <>
+    struct UpdateComponent<Script>
+    {
+        static constexpr bool m_value = true;
+    };
 
-	template<>
-	inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Script>()
-	{
-		return SCRIPT;
-	}
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Script>()
+    {
+        return SCRIPT;
+    }
 
 }
