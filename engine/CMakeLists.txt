@@ -7,12 +7,6 @@ message(STATUS "[${TARGET_NAME}] Starting source file fetching..")
 
 set(ENGINE_SHADER_DIR ${CMAKE_BINARY_DIR}/engineShader)
 
-# Create directory for engine shader files if it does not exist
-if (NOT EXISTS ${ENGINE_SHADER_DIR})
-	message(STATUS "[${TARGET_NAME}] Creating engine shader folder..")
-	file(MAKE_DIRECTORY ${ENGINE_SHADER_DIR})
-endif()
-
 # -- Header files -- #
 file(GLOB_RECURSE TARGET_HEADER_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.h
@@ -46,10 +40,6 @@ file(GLOB_RECURSE TARGET_SCRIPT_FILES
 	${CMAKE_BINARY_DIR}/scripts/*.lua
 )
 
-
-#file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug)
-#file(COPY ${DLL_DEPENDENCIES} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release)
-
 set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
@@ -68,7 +58,6 @@ target_include_directories(${TARGET_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/private
 )
 
-#set_target_properties(${DEPENDENCY_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${TARGET_NAME}
 	PRIVATE ${DEPENDENCIES_LIBRARY}
 	PUBLIC ${MATHLIB_LIB}
@@ -89,6 +78,5 @@ if (MSVC)
 endif()
 
 set(ENGINE_LIB ${TARGET_NAME} PARENT_SCOPE)
-#set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include PARENT_SCOPE)
 
 message(STATUS "[${TARGET_NAME}] Done..")
