@@ -26,6 +26,12 @@ namespace engine
 										const char* shaderProgramName, 
 										const char* vertShader, 
 										const char* fragShader);
+
+        // Create a resource from data that already exists in memory instead
+        // of loading a file from disk
+        template <typename TResourceType, typename... TVariadicArgs>
+        static void CreateFromData(const std::string& name, TVariadicArgs&&... args);
+
 		template<typename TResourceType>
 		static const TResourceType*	GetResource(std::string const& fileName);
 		ENGINE_API static void		Unload(std::string const& fileName);
@@ -40,7 +46,8 @@ namespace engine
 		ENGINE_API static ResourceManager*	GetInstance(void);
 		ENGINE_API static bool				HasResource(std::string const& fileName);
 
-		static std::mutex			m_mutex;
+		ENGINE_API
+        static std::mutex			m_mutex;
 		static ResourceManager*		m_instance;
 
 		std::unordered_map<std::string, IResource*> m_resources;
@@ -50,18 +57,42 @@ namespace engine
 	template<typename TResourceType>
 	inline void engine::ResourceManager::Load(std::string const& fileName)
 	{
-		// Check if resource exists
-		if (HasResource(fileName))
-		{
-			std::printf("Resource '%s' already loaded\n", fileName.c_str());
-			return;
-		}
+        TResourceType* newVal = nullptr;
 
-		GetInstance()->m_resources[fileName] = new TResourceType();
-		GetInstance()->m_resources[fileName]->LoadResource(fileName.c_str());
+        {
+            std::lock_guard lock(m_mutex);
+
+            // Check if resource exists
+            if (HasResource(fileName))
+            {
+                std::printf("Resource '%s' already loaded\n", fileName.c_str());
+                return;
+            }
+
+            newVal = new TResourceType();
+            GetInstance()->m_resources[fileName] = newVal;
+        }
+
+		newVal->LoadResource(fileName.c_str());
 	}
 
-	template<typename TResourceType>
+    template<typename TResourceType, typename ...TVariadicArgs>
+    inline void ResourceManager::CreateFromData(const std::string& name, TVariadicArgs && ...args)
+    {
+        std::lock_guard lock(m_mutex);
+        
+        // Check if resource exists
+        if (HasResource(name))
+        {
+            std::printf("Resource '%s' already loaded\n", name.c_str());
+            return;
+        }
+        
+        TResourceType* newVal = new TResourceType(std::forward<TVariadicArgs>(args)...);
+        GetInstance()->m_resources[name] = newVal;
+    }
+
+    template<typename TResourceType>
 	inline const TResourceType* engine::ResourceManager::GetResource(std::string const& fileName)
 	{
 		// Check if resource exists
