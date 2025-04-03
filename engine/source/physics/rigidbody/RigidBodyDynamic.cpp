@@ -13,6 +13,12 @@
 
 #pragma endregion
 
+#pragma region engine
+
+#include "engine/ConsoleLog.hpp"
+
+#pragma endregion
+
 #include <iostream>
 
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
@@ -26,9 +32,11 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 {
     if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
+        PrintLog(SuccessPreset(), "Found transform component on entity.");
         return *temp;
     }
 
+    PrintLog(WarningPreset(), "No transform component found on entity create new one.");
     return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }
 
@@ -48,6 +56,8 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+
+    PrintLog(SuccessPreset(), "Created dynamic box rigid body.");
 }
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
@@ -66,6 +76,8 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+
+    PrintLog(SuccessPreset(), "Created dynamic sphere rigid body.");
 }
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
@@ -94,6 +106,8 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+
+    PrintLog(SuccessPreset(), "Created dynamic capsule rigid body.");
 }
 
 void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
@@ -121,6 +135,8 @@ engine::RigidBodyDynamic::~RigidBodyDynamic(void)
 
     delete m_rigidBodyImpl;
     m_rigidBodyImpl = nullptr;
+
+    PrintLog(SuccessPreset(), "Cleaned up dynamic rigid body.");
 }
 
 bool engine::RigidBodyDynamic::GetIsGravityDisabled(void) const
@@ -142,10 +158,10 @@ math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
             return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                                   boxGeometry.halfExtents.z);
         }
-        std::cerr << "Invalid geometry type" << " : ";
+        PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
         return math::Vector3f(EErrorGeometryType_Invalid);
     }
-    std::cerr << "Invalid shapes" << " : ";
+    PrintLog(ErrorPreset(), "Invalid shapes");
     return math::Vector3f(EErrorGeometryType_Invalid);
 }
 
@@ -161,29 +177,29 @@ f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
             const physx::PxSphereGeometry& sphereGeometry = static_cast<const physx::PxSphereGeometry&>(*geometry);
             return sphereGeometry.radius;
         }
-        std::cerr << "Invalid geometry type" << " : ";
+        PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
         return EErrorGeometryType_Invalid;
     }
-    std::cerr << "Invalid shapes" << " : ";
+    PrintLog(ErrorPreset(), ("Invalid shapes"));
     return EErrorGeometryType_Invalid;
 }
 
-math::Vector2f engine::RigidBodyDynamic::GetCapsuleRadius(void) const
+math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
 {
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
         {
             const physx::PxGeometry* geometry = &shapes->getGeometry();
             const physx::PxCapsuleGeometry capsuleGeometry = static_cast<const physx::PxCapsuleGeometry&>(*geometry);
             return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
         }
-        std::cerr << "Invalid geometry type" << " : ";
+        PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
         return math::Vector2f(EErrorGeometryType_Invalid);
     }
-    std::cerr << "Invalid shapes" << " : ";
+    PrintLog(ErrorPreset(), "Invalid shape");
     return math::Vector2f(EErrorGeometryType_Invalid);
 }
 
@@ -191,6 +207,8 @@ void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
         inIsGravityDisabled);
+
+    PrintLog(SuccessPreset(), "Successfully set gravity.");
 }
 
 void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
@@ -203,11 +221,51 @@ void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) c
         {
             shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
                                 inHalfExtents.GetZ()));
+            PrintLog(SuccessPreset(), "Successfully set box half extents.");
+            return;
         }
-        std::cerr << "Invalid geometry type" << std::endl;
+        PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
         return;
     }
-    std::cerr << "Invalid shapes" << std::endl;
+    PrintLog(ErrorPreset(), "Invalid shape");
+    return;
+}
+
+void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius) const
+{
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+        {
+            shapes->setGeometry(physx::PxSphereGeometry(inRadius));
+            PrintLog(SuccessPreset(), "Successfully set sphere radius.");
+            return;
+        }
+        PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
+        return;
+    }
+    PrintLog(ErrorPreset(), "Invalid shape");
+    return;
+}
+
+void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const
+{
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+        {
+            shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
+            PrintLog(SuccessPreset(), "Successfully set capsule format.");
+            return;
+        }
+        PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
+        return;
+    }
+    PrintLog(ErrorPreset(), "Invalid shape");
     return;
 }
 
@@ -232,9 +290,10 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::Create(SceneGraph* sc
             return temp;
             break;
         default:
-            std::cout << "Geometry type not supported" << std::endl;
+            PrintLog(ErrorPreset(), "Invalid geometry type");
             break;
         }
     }
+    PrintLog(ErrorPreset(), "Failed to create dynamic rigid body.");
     return nullptr;
 }

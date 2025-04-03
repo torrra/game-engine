@@ -45,6 +45,8 @@ int main(void)
 
         /// ---------------- Create entity ---------------- 
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
+        engine::EntityHandle object = engine.GetGraph()->CreateEntity("Object");
+        engine::EntityHandle object2 = engine.GetGraph()->CreateEntity("Object2");
 
         /// ---------------- PhysicsEngine use ---------------- 
         engine::PhysicsEngine::Get().Init();
@@ -53,18 +55,12 @@ int main(void)
         engine::Material* floorMaterial = new engine::Material(0.5f, 0.5f, 0.f);
 
         /// ---------------- Create rigidbody dynamic ----------------
+        std::cout << "\t" << std::endl;
+
         engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::Create(engine.GetGraph(), 
-                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::SPHERE);
-        //rb->SetGravityDisabled(true);
-        //std::cout << rb->GetBoxHalfExtents() << std::endl;
-        //std::cout << rb->GetCapsuleRadius() << std::endl;
-        //std::cout << rb->GetSphereRadius() << std::endl;
-
-        engine::printLog(engine::errorPreset(), "RigidBodyDynamic error !");
-        engine::printLog(engine::warningPreset(), "RigidBodyDynamic warning !");
-        engine::printLog(engine::infoPreset(), "RigidBodyDynamic info !");
-
-
+                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
+        rb->SetGravityDisabled(true);
+        rb->GetCapsuleFormat();
         rb->SetBoxHalfExtents(math::Vector3f(2.f, 2.f, 2.f));
 
         /// ---------------- Create rigidbody static ----------------
@@ -97,7 +93,7 @@ int main(void)
 
 	// Memory leak check
 	if (!_CrtDumpMemoryLeaks())
-		std::printf("No memory leaks found\n");
+		engine::PrintLog(engine::SuccessPreset(), "No memory leak detected.");
 
 	return 0;
 }
