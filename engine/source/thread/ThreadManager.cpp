@@ -1,7 +1,7 @@
 #include "engine/thread/ThreadManager.h"
 #include "engine/core/SceneGraph.h"
 
-engine::ThreadManager*  engine::ThreadManager::m_instance = nullptr;
+engine::ThreadManager* engine::ThreadManager::m_instance = nullptr;
 std::once_flag			engine::ThreadManager::m_instanceCreatedFlag;
 
 void engine::ThreadManager::Startup(uint32 numThreads)
@@ -62,8 +62,28 @@ void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
 
 void engine::ThreadManager::RenderScene(SceneGraph* scene)
 {
+    ExecuteRenderThreadTasks();
+
     if (scene)
         scene->RenderFromCache();
+}
+
+void engine::ThreadManager::ExecuteRenderThreadTasks(void)
+{
+    ThreadManager* instance = GetInstance();
+    TaskQueue& tasks = instance->GetQueue<ETaskType::GRAPHICS>();
+
+    instance->m_poolMutex.lock();
+
+    while (!tasks.empty())
+    {
+        std::function<void()>& function = tasks.front();
+
+        function();
+        tasks.pop();
+    }
+
+    instance->m_poolMutex.unlock();
 }
 
 void engine::ThreadManager::ThreadLoop(void)
