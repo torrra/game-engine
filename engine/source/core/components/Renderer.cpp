@@ -3,12 +3,14 @@
 #include "core/components/Renderer.h"
 #include "core/components/Transform.h"
 
-#include "resource/ResourceManager.h"
 #include "resource/model/Model.h"
 #include "resource/shader/Shader.h"
 #include "resource/texture/Texture.h"
+#include "resource/ResourceManager.h"
 
 #include "core/SceneGraph.h"
+
+#include "serialization/TextSerializer.h"
 
 #include "glad/glad.h"
 
@@ -105,6 +107,75 @@ namespace engine
     {
         if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
             m_texture = texture;
+    }
+
+    void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
+                                 uint64 index) const
+    {
+
+        const std::string* model = ResourceManager::FindKeyByVal(m_model);
+        const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
+        const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
+
+        if ((!model) || (!shader))
+            return;
+
+        output << "[Renderer]\n    ";
+
+        if constexpr (UpdateAfterParent<Renderer>::m_value)
+        {
+            text::Serialize(output, "index", index);
+            output << "\n    ";
+        }
+
+        text::Serialize(output, "owner", owner);
+
+        output << "\n    ";
+        text::Serialize(output, "hasTexture", (bool)texture);
+        output << "\n    ";
+        text::Serialize(output, "model", *model);
+        output << "\n    ";
+        text::Serialize(output, "shader", *shader);
+        output << "\n    ";
+
+        if (texture)
+        {
+            text::Serialize(output, "texture", *texture);
+            output << "\n    ";
+        }
+
+        text::Serialize(output, "flags", m_flags);
+        output << '\n';
+    }
+
+    const char* Renderer::DeserializeText(const char* text, const char* end)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, m_owner);
+
+        uint8 hasTexture;
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, hasTexture);
+
+        std::string key;
+        text = text::DeserializeString(text, end, key);
+
+        m_model = ResourceManager::GetResource<Model>(key);
+
+        key.clear();
+        text = text::DeserializeString(text, end, key);
+        m_shader = ResourceManager::GetResource<ShaderProgram>(key);
+
+        if (hasTexture)
+        {
+            key.clear();
+            text = text::DeserializeString(text, end, key);
+            m_texture = ResourceManager::GetResource<Texture>(key);
+        }
+
+        MOVE_TEXT_CURSOR(text, end);
+        return text::DeserializeInteger(text, m_flags);
     }
 
     void Renderer::DrawModel(void) const

@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "engine/EngineExport.h"
 #include "TypesECS.h"
@@ -21,6 +22,8 @@ namespace engine
     {
 
     private:
+
+        using HandleMap = std::unordered_map<EntityHandle, EntityHandle>;
 
         // Random uint64 generator.
         class Random
@@ -148,6 +151,12 @@ namespace engine
         void CacheComponents(void);
 
         ENGINE_API
+        void SerializeText(std::ofstream& file);
+
+        ENGINE_API
+        void DeserializeText(std::ifstream& file);
+
+        ENGINE_API
         SceneGraph& operator=(const SceneGraph&) = default;
 
         // Output a int64 between LONG_MIN and LONG_MAX
@@ -160,8 +169,14 @@ namespace engine
         template <CValidComponent TComponentType>
         ComponentArray<TComponentType>& GetComponentArray(void);
 
+        // Get the component array corresponding to a type
+        template <CValidComponent TComponentType>
+        const ComponentArray<TComponentType>& GetComponentArray(void) const;
+
         // Group the index and uid bits together in a 64-bit handle
         EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
+        EntityHandle GetHandleUID(EntityHandle handle);
+        EntityHandle GetHandleIndex(EntityHandle handle);
 
         // Internal ReparentEntity overload. Directly uses an entity's pointer
         void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
@@ -174,6 +189,34 @@ namespace engine
         template <CValidComponent TComponentType>
         void RegisterComponents(void);
 
+        // Serialize all valid entities and recalculate their handles
+        // The handles are recalculated as invalid entities are filtered out,
+        // potentially leaving empty spots to be filled by valid entities.
+        // These new handles are only applied upon next deserialization to avoid breaking
+        // existing references
+        HandleMap SerializeValidEntitiesText(std::ostream& text);
+
+        // Serialize a single entity
+        void SerializeEntityText(std::ostream& file, const Entity& entity);
+
+        // Serialize all components of a type
+        template <CValidComponent TComponentType>
+        void SerializeComponents(std::ostream& file, HandleMap& handles);
+
+        template <CValidComponent TComponentType>
+        void SerializeSingleComponent(std::ostream& file,
+                                      const Entity& entity,
+                                      HandleMap& handles) const;
+
+        void DeserializeTextV1(std::ifstream& file);
+
+        const char* DeserializeEntityText(const char* text, const char* end);
+
+        template <typename... TVariadicArgs>
+        void ReorderDeserializedTextArrays(TVariadicArgs&... args);
+
+        template <CValidComponent TComponentType>
+        void ReorderTextArray(Component::DeserializedArray<TComponentType>& array);
 
 
         // All transform components in the scene
@@ -235,6 +278,26 @@ namespace engine
     }
 
 
+    template<> inline
+    const ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void) const
+    {
+        return m_sceneTransforms;
+    }
+
+
+    template<> inline
+    const ComponentArray<Camera>& SceneGraph::GetComponentArray<Camera>(void) const
+    {
+        return m_sceneCameras;
+    }
+
+    template<> inline
+    const ComponentArray<Renderer>& SceneGraph::GetComponentArray<Renderer>(void) const
+    {
+        return m_sceneRenderers;
+    }
+
+
     template<CValidComponent TComponentType>
     inline void SceneGraph::RegisterComponents(void)
     {
@@ -254,6 +317,13 @@ namespace engine
         return m_sceneScripts;
     }
 
+    template<> inline
+    const ComponentArray<Script>& SceneGraph::GetComponentArray<Script>(void) const
+    {
+        return m_sceneScripts;
+    }
+
+
 
     template<CValidComponent TComponentType>
     inline TComponentType* SceneGraph::GetComponent(EntityHandle ownerEntity)
@@ -263,6 +333,56 @@ namespace engine
         return array.GetComponent(ownerEntity);
     }
 
+
+    template<CValidComponent TComponentType>
+    inline void SceneGraph::SerializeComponents(std::ostream& file, HandleMap& handles)
+    {
+        ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+        for (const TComponentType& component : array)
+        {
+            uint64 index = array.GetComponentIndex(component.GetOwner());
+            component.SerializeText(file, handles[component.GetOwner()], index);
+        }
+    }
+
+    template<CValidComponent TComponentType>
+    inline void SceneGraph::SerializeSingleComponent(std::ostream& file,
+                                                     const Entity& entity,
+                                                     HandleMap& handles) const
+    {
+        const ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
+
+        if (const TComponentType* component = array.GetComponent(entity.m_handle))
+        {
+            uint64 index = array.GetComponentIndex(entity.m_handle);
+            component->SerializeText(file, handles[entity.m_handle], index);
+        }
+
+    }
+
+    template<typename ...TVariadicArgs>
+    inline void SceneGraph::ReorderDeserializedTextArrays(TVariadicArgs& ...args)
+    {
+        (ReorderTextArray(args), ...);
+    }
+
+    template<CValidComponent TComponentType>
+    inline void SceneGraph::ReorderTextArray(Component::DeserializedArray<TComponentType>& array)
+    {
+        using CompIndex = Component::IndexedComponent<TComponentType>;
+
+        if constexpr (UpdateAfterParent<TComponentType>::m_value)
+        {
+            std::sort(array.begin(), array.end(),
+            [](const CompIndex& lhs, const CompIndex& rhs) -> bool {return lhs.first < rhs.first; });
+        }
+
+        ComponentArray<TComponentType>& compArray = GetComponentArray<TComponentType>();
+
+        for (const CompIndex& component : array)
+            compArray.AddDeserializedComponent(component.second);
+    }
 
     template<CValidComponent TComponentType>
     inline TComponentType* SceneGraph::CreateComponent(EntityHandle ownerEntity)
