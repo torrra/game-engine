@@ -24,6 +24,9 @@ namespace engine
         if (!m_model || !m_shader)
             return;
 
+        if (!m_model->CanRender())
+            return;
+
         if (m_texture)
         {
             m_texture->UseTexture();
@@ -106,11 +109,23 @@ namespace engine
 
     void Renderer::DrawModel(void) const
     {
-        for (const Mesh& mesh : m_model->GetMeshes())
+        if (m_model->IsDynamic())
         {
-            glBindVertexArray(mesh.m_vao);
-            glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
+            for (const DynamicMesh& mesh : m_model->GetDynamicMeshes())
+            {
+                glBindVertexArray(mesh.GetVertexArrayID());
+                glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
+                glBindVertexArray(0);
+            }
+        }
+        else
+        {
+            for (const Mesh& mesh : m_model->GetStaticMeshes())
+            {
+                glBindVertexArray(mesh.GetVertexArrayID());
+                glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
+                glBindVertexArray(0);
+            }
         }
     }
 
