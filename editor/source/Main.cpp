@@ -59,7 +59,8 @@ int main(void)
         floorMaterial->SetMaterial(0.5f, 0.5f, 0.f);
 
         /// ---------------- Create rigidbody ----------------
-        engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
+        engine::RigidBodyDynamic* rigidBody = new engine::RigidBodyDynamic(
+            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
         rigidBody->CreateDynamicRigidBody(engine::PhysicsEngine::Get(), *material, engine::CAPSULE);
 
         //engine::RigidBodyDynamic* first = new engine::RigidBodyDynamic(object, engine.GetGraph());
@@ -76,7 +77,8 @@ int main(void)
             math::Matrix4f projViewMatrix = camera->ViewProjection();
 			project.Update(engine);
 			engine.Update();
-            engine::PhysicsEngine::Get().StepSimulation(0.001f, &projViewMatrix);
+            engine::PhysicsEngine::Get().StepSimulation(0.001f);
+            engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
             rigidBody->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
             rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
 

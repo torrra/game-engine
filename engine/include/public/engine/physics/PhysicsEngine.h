@@ -15,64 +15,75 @@
 
 namespace engine
 {
-	struct PhysicsEngineImpl;
+    /// Forward declaration
+    struct PhysicsEngineImpl;
     class DebugDraw;
 
-	class PhysicsEngine
-	{
-	public :
+    class PhysicsEngine
+    {
+    public :
 
-		/// Getter
-		// Get the instance of PhysicsEngine
-		ENGINE_API static	PhysicsEngine& Get(void);
+        /// Getter
+        // Get the instance of PhysicsEngine
+        ENGINE_API static	PhysicsEngine& Get(void);
+        // Get the pointer to the structure implementation of physx
+        ENGINE_API          PhysicsEngineImpl& GetImpl(void) const;
 
-		ENGINE_API PhysicsEngineImpl& GetImpl(void) const;
+        /// Functions
+        /*
+            Initialize the physics engine by intializing
+                - Foundation
+                - Pvd
+                - Transport
+                - Physics
+                - Scene
+                - Material
+        */
+        ENGINE_API void		Init(void);
+        /*
+            Update the physics simulation into the physx scene
+            <param> [in] inDeltaTime : The delta time since the last frame
+        */
+        ENGINE_API void		StepSimulation(f32 inDeltaTime);
+        /*
+            Update the debug draw from the physx scene into the openGL scene
+            <param> [in] inProjViewMatrix : The projection view matrix
+        */
+        ENGINE_API void     UpdateDebugDraw(math::Matrix4f* inProjViewMatrix);
+        // Release all physx resources
+        ENGINE_API void		CleanUp(void);
 
-		/// Functions
-		/*
-			Initialize the physics engine by intializing
-				- Foundation
-				- Pvd
-				- Transport
-				- Physics
-				- Scene
-				- Material
-		*/
-		ENGINE_API void		Init(void);
-		// 
-		ENGINE_API void		StepSimulation(f32 inDeltaTime, math::Matrix4f* inProjViewMatrix);
-		// Release all physx resources
-		ENGINE_API void		CleanUp(void);
+    private :
 
-	private :
+        /// Constructor
+        // Empty private constructor to initialize the PhysicsEngineImpl structure
+                            PhysicsEngine(void);
+        // Copy constructor deleted to make a singleton
+                            PhysicsEngine(const PhysicsEngine&) = delete;
 
-		/// Constructor
-		// Empty private constructor to initialize the PhysicsEngineImpl structure
-							PhysicsEngine(void);
-		// Copy constructor deleted to make a singleton
-							PhysicsEngine(const PhysicsEngine&) = delete;
+        /// Destructor
+        // Delete the PhyscsEngineImpl pointer
+                            ~PhysicsEngine(void);
 
-		/// Destructor
-		// Delete the PhyscsEngineImpl pointer
-							~PhysicsEngine(void);
-
-		/// Functions
-		// Initialize PVD/transport
-		bool				InitPvd(void);
-		// Initialize physics
-		void 				InitPhysics(bool inIsPvdConnected);
-		// Initialize the scene/material/dispatcher
-		void				InitScene(void);
+        /// Functions
+        // Initialize PVD/transport
+        bool				InitPvd(void);
+        /*
+            Initialize physics in regard to the pvd connection
+            <param> [in] inIsPvdConnected : Is the pvd connected
+        */
+        void 				InitPhysics(bool inIsPvdConnected);
+        // Initialize the scene/material/dispatcher
+        void				InitScene(void);
 
 
-		/// Members
-		// Pointer to the implementation of the physx structure
-		        PhysicsEngineImpl*	m_impl      = nullptr;
-		// Instance of the physics engine
-		static  PhysicsEngine*	    m_instance;
-
+        /// Members
+        // Pointer to the implementation of the physx structure
+                PhysicsEngineImpl*	m_impl      = nullptr;
+        // Instance of the physics engine
+        static  PhysicsEngine*	    m_instance;
         // Debug draw
                 DebugDraw*			m_debugDraw = nullptr;
 
-	}; // !Class PhysicsEngine
+    }; // !Class PhysicsEngine
 } // !Namespace engine
