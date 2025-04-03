@@ -29,6 +29,11 @@
 
 namespace engine
 {
+    enum EErrorGeometryType
+    {
+        EErrorGeometryType_None = -1,
+        EErrorGeometryType_Invalid = 0
+    };
     /// Forward declaration
     struct RigidBodyDynamicImpl;
 
@@ -55,15 +60,20 @@ namespace engine
             Get the gravity status of the rigid body
             <return> [out] the gravity status : true = disabled, false = enabled
         */
-        ENGINE_API  bool        GetIsGravityDisabled(void) const;
-
+        ENGINE_API  bool            GetIsGravityDisabled(void) const;
+        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void) const;
+        ENGINE_API  f32             GetSphereRadius(void) const;
+        ENGINE_API  math::Vector2f  GetCapsuleRadius(void) const;
         /// Setter
         /*
             Set the gravity status of the rigid body
             <param> [in] inIsGravityDisabled : the gravity status : true = disabled, 
                                                                     false = enabled
         */
-        ENGINE_API  void        SetGravityDisabled(bool inIsGravityDisabled);
+        ENGINE_API  void            SetGravityDisabled(bool inIsGravityDisabled);
+        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents) const;
+        ENGINE_API  void            SetSphereRadius(f32 inRadius) const;
+        ENGINE_API  void            SetCapsuleRadius(f32 inRadius, f32 inHalfHeight) const;
 
         /// Functions
         // Update the entity transform in reference to the dynamic rigid body

@@ -34,16 +34,13 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 
 void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 {
-    physx::PxMaterial* material = 
-        PhysicsEngine::Get().GetImpl().m_physics->createMaterial(0.5f, 0.5f, 0.6f);
+    m_material = new Material(0.5f, 0.5f, 0.6f);
 
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
-                                            *material, 1.0f);
-
-    PX_RELEASE(material);
+                                            *m_material->GetImpl().m_material, 1.0f);
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
@@ -55,16 +52,13 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 {
-    physx::PxMaterial* material =
-        PhysicsEngine::Get().GetImpl().m_physics->createMaterial(0.5f, 0.5f, 0.6f);
+    m_material = new Material(0.5f, 0.5f, 0.6f);
 
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxSphereGeometry(0.5f),
-                                            *material, 1.0f);
-
-    PX_RELEASE(material);
+                                            *m_material->GetImpl().m_material, 1.0f);
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
@@ -76,16 +70,13 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 {
-    physx::PxMaterial* material =
-        PhysicsEngine::Get().GetImpl().m_physics->createMaterial(0.5f, 0.5f, 0.6f);
+    m_material = new Material(0.5f, 0.5f, 0.6f);
 
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxCapsuleGeometry(0.25f, 0.25f),
-                                            *material, 1.0f);
-
-    PX_RELEASE(material);
+                                            *m_material->GetImpl().m_material, 1.0f);
 
     physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
     physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
@@ -119,6 +110,8 @@ void engine::RigidBodyDynamic::UpdateRigidBody(const Transform& inEntityTransfor
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
+    PX_RELEASE(m_material->GetImpl().m_material);
+    delete m_material;
     PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
 }
 
@@ -136,11 +129,86 @@ bool engine::RigidBodyDynamic::GetIsGravityDisabled(void) const
                 physx::PxActorFlag::eDISABLE_GRAVITY);
 }
 
+math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
+{
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        {
+            const physx::PxGeometry* geometry = &shapes->getGeometry();
+            const physx::PxBoxGeometry& boxGeometry = static_cast<const physx::PxBoxGeometry&>(*geometry);
+            return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
+                                  boxGeometry.halfExtents.z);
+        }
+        std::cerr << "Invalid geometry type" << " : ";
+        return math::Vector3f(EErrorGeometryType_Invalid);
+    }
+    std::cerr << "Invalid shapes" << " : ";
+    return math::Vector3f(EErrorGeometryType_Invalid);
+}
+
+f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
+{
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+        {
+            const physx::PxGeometry* geometry = &shapes->getGeometry();
+            const physx::PxSphereGeometry& sphereGeometry = static_cast<const physx::PxSphereGeometry&>(*geometry);
+            return sphereGeometry.radius;
+        }
+        std::cerr << "Invalid geometry type" << " : ";
+        return EErrorGeometryType_Invalid;
+    }
+    std::cerr << "Invalid shapes" << " : ";
+    return EErrorGeometryType_Invalid;
+}
+
+math::Vector2f engine::RigidBodyDynamic::GetCapsuleRadius(void) const
+{
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        {
+            const physx::PxGeometry* geometry = &shapes->getGeometry();
+            const physx::PxCapsuleGeometry capsuleGeometry = static_cast<const physx::PxCapsuleGeometry&>(*geometry);
+            return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
+        }
+        std::cerr << "Invalid geometry type" << " : ";
+        return math::Vector2f(EErrorGeometryType_Invalid);
+    }
+    std::cerr << "Invalid shapes" << " : ";
+    return math::Vector2f(EErrorGeometryType_Invalid);
+}
+
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
-    //m_isGravityDisabled = inIsGravityDisabled;
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
         inIsGravityDisabled);
+}
+
+void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
+{
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        {
+            shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
+                                inHalfExtents.GetZ()));
+        }
+        std::cerr << "Invalid geometry type" << std::endl;
+        return;
+    }
+    std::cerr << "Invalid shapes" << std::endl;
+    return;
 }
 
 engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::Create(SceneGraph* scene, 
@@ -164,6 +232,7 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::Create(SceneGraph* sc
             return temp;
             break;
         default:
+            std::cout << "Geometry type not supported" << std::endl;
             break;
         }
     }
