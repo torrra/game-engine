@@ -13,6 +13,8 @@
 
 #pragma endregion
 
+#include <iostream>
+
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
 	m_rigidBodyImpl = new RigidBodyDynamicImpl();
@@ -37,6 +39,16 @@ void engine::RigidBodyDynamic::CreateDynamicRigidBody(const PhysicsEngine& inPhy
 		ToPxTransform(CheckEntityTransform()),
 		*inGeometry.GetGeometryImpl().m_geometry,
 		*inMaterial.GetImpl().m_material, 1.0f);
+
+    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), rotation * currentPose.q));
+    }
 
 	// Set the gravity by default
 	m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
@@ -87,6 +99,16 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(const PhysicsEngine
         physx::PxCapsuleGeometry(inRadius, inHalfHeight),
         *inMaterial.GetImpl().m_material, 1.0f);
 
+    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q));
+    }
+
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         m_isGravityDisabled);
@@ -97,6 +119,8 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(const PhysicsEngine
 
 void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
 {
+    //m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(physx::PxVec3(0.f, -9.81f, 1.f));
+    //m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(physx::PxVec3(0.f, 5.f, 0.f));
 	physx::PxTransform transformTemp = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
 
     *m_currentScene->GetComponent<Transform>(inEntityHandle) = ToTransform(transformTemp);
