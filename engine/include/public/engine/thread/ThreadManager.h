@@ -13,7 +13,11 @@
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 
-#define DEFAULT_NUM_THREADS ((std::thread::hardware_concurrency() / 4) * 3)
+/* 
+    Use 3 quarters of the current hardware's logical processors, minus one to account for the
+    render thread
+*/
+#define DEFAULT_NUM_THREADS (((std::thread::hardware_concurrency() / 4) * 3) - 1)
 
 namespace engine
 {
