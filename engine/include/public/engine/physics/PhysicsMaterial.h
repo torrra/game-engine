@@ -22,8 +22,13 @@ namespace engine
     public :
 
         /// Constructor
-        // Default constructor deleted
-        ENGINE_API					Material(void) = delete;
+        /*
+            Create default material constructor with value set to default
+            static friction = 0.5f
+            dynamic friction = 0.5f
+            restitution = 0.6f
+        */
+        ENGINE_API					Material(void);
         /*
              Initialize the struct MaterialImpl pointer and create a material with the 
              given parameters set by default to 0
@@ -32,10 +37,9 @@ namespace engine
              <param> [in] inStaticFriction : The static friction
              <param> [in] inRestitution : The restitution
         */
-        ENGINE_API					Material(const PhysicsEngine& inPhysicsEngine, 
-                                             f32 inStaticFriction = 0.f, 
-                                             f32 inDynamicFriction = 0.f,
-                                             f32 inRestitution = 0.f);
+        ENGINE_API					Material(f32 inStaticFriction, 
+                                             f32 inDynamicFriction = 0.5f,
+                                             f32 inRestitution = 0.6f);
 
         /// Destructor
         // Delete the struct MaterialImpl pointer

@@ -6,8 +6,21 @@
 
 #pragma endregion
 
-engine::Material::Material(const PhysicsEngine& inPhysicsEngine, f32 inStaticFriction, 
-                           f32 inDynamicFriction, f32 inRestitution)
+engine::Material::Material(void)
+{
+    // Create the pointer to the structure of material implementation
+    m_materialImpl = new MaterialImpl();
+    /*
+        Create the material with the parameters asked
+        <param> [in] StaticFriction : coefficient of static friction set to 0.5
+        <param> [in] DynamicFriction : coefficient of dynamic friction set to 0.5
+        <param> [in] Restitution : coefficient of restitution set to 0.6
+    */
+    m_materialImpl->m_material = PhysicsEngine::Get().GetImpl().m_physics->createMaterial(
+        0.5f, 0.5f, 0.6f);
+}
+
+engine::Material::Material(f32 inStaticFriction, f32 inDynamicFriction, f32 inRestitution)
 {
     // Create the pointer to the structure of material implementation
     m_materialImpl = new MaterialImpl();
@@ -17,7 +30,7 @@ engine::Material::Material(const PhysicsEngine& inPhysicsEngine, f32 inStaticFri
         <param> [in] DynamicFriction : coefficient of dynamic friction
         <param> [in] Restitution : coefficient of restitution
     */
-    m_materialImpl->m_material = inPhysicsEngine.GetImpl().m_physics->createMaterial(
+    m_materialImpl->m_material = PhysicsEngine::Get().GetImpl().m_physics->createMaterial(
                                         inStaticFriction, inDynamicFriction, inRestitution);
 }
 
