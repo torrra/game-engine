@@ -4,11 +4,13 @@
 #include "resource/ResourceManager.h"
 #include "core/systems/ScriptSystem.h"
 #include "Window.h"
+#include "sceneGraphViewer/SceneGraphUI.h"
 
 #include <math/Vector2.hpp>
 
 #include <glad/glad.h>	
 #include <iostream>
+
 
 #undef new
 #include <imgui/imgui.h>
@@ -49,7 +51,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     m_uiManager = UIManager(m_window->GetPtr());
     m_viewport = new Viewport("Viewport");
 
-    
+
     // Initialize engine time
     m_time = Time();
 
@@ -57,6 +59,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     if (LoadEngineResources() != SUCCESS)
         return ERROR;
 
+    
     return SUCCESS;
 }
 
@@ -71,6 +74,9 @@ void engine::Engine::ShutDown(void)
     // TODO: call shutdown for ui manager
     m_uiManager.ShutDown();
 
+    if (m_graphViewer)
+        delete m_graphViewer;
+
     if (m_viewport)
         delete m_viewport;
 
@@ -83,6 +89,14 @@ void engine::Engine::ShutDown(void)
 
 void engine::Engine::Update(void)
 {	
+    static bool isInit = false;
+
+    if (!isInit)
+    {
+        m_graphViewer = new SceneGraphViewer("Scene Graph", m_graph);
+        isInit = true;
+    }
+
     static const f32 updateFrequency = (FIX_UPDATE_FREQUENCY * m_timeScale) * TO_MILLISECONDS;
     static f32 runTime = 0.0f;
     static f32 nextUpdateTime = runTime + updateFrequency;
@@ -105,12 +119,11 @@ void engine::Engine::Update(void)
     m_window->ClearWindow(0.1f, 0.1f, 0.1f);
     
     m_uiManager.NewFrame();
-    //m_viewport->DrawViewport(); // DRAW VIEWPORT
+    m_graphViewer->DrawGraph();
+    m_viewport->DrawViewport(); // DRAW VIEWPORT
     m_uiManager.UpdateUI();
-
-    m_viewport->RenderToViewport(m_graph);
-
     // Render
+    m_viewport->RenderToViewport(m_graph);
     Input::ResetKeys();
     m_window->Update();
     m_time.Update();

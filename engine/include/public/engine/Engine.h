@@ -8,6 +8,7 @@
 #include "engine/core/SceneGraph.h"
 #include "engine/ui/UIManager.h"
 #include "engine/viewport/Viewport.h"
+#include "engine/sceneGraphViewer/SceneGraphUI.h"
 
 #include <string>
 
@@ -40,6 +41,7 @@ namespace engine
         SceneGraph*		m_graph;
         UIManager		m_uiManager;
         Viewport*		m_viewport;
+        SceneGraphViewer*  m_graphViewer;
         Time			m_time;
         f32				m_timeScale;
     };

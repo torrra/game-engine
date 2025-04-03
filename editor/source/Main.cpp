@@ -73,7 +73,7 @@ int main(void)
             engine::PhysicsEngine::Get().StepSimulation(1.f / 60.f);
             rigidBody->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
             rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
-		}
+        }
 
         /// ---------------- Clean ---------------- 
         delete rigidBody;

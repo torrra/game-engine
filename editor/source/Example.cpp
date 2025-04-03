@@ -41,9 +41,18 @@ void ExampleProject::StartUp(engine::Engine& engine)
 	m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");
 	engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
 	engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
-
+    //engine.GetGraph()->ReparentEntity(m_cameraHandle, m_modelHandle);
 	camera->Rotation() = {-10.5f, 26.5f, 0.0f};
 	camera->Position() = {1.5f, 3.0f, 3.2f};
+
+    //m_test1 = engine.GetGraph()->CreateEntity("Test1");
+    //m_test2 = engine.GetGraph()->CreateEntity("Test2");
+    //m_test3 = engine.GetGraph()->CreateEntity("Test3");
+    //m_test4 = engine.GetGraph()->CreateEntity("Test4");
+    //
+    //engine.GetGraph()->ReparentEntity(m_test2, m_test1);
+    //engine.GetGraph()->ReparentEntity(m_test3, m_test1);
+    //engine.GetGraph()->ReparentEntity(m_test4, m_test1);
 }
 
 void ExampleProject::Update(engine::Engine& engine)
