@@ -54,6 +54,11 @@ int main(void)
         engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::Create(engine.GetGraph(), 
                                             engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::SPHERE);
         //rb->SetGravityDisabled(true);
+        //std::cout << rb->GetBoxHalfExtents() << std::endl;
+        //std::cout << rb->GetCapsuleRadius() << std::endl;
+        //std::cout << rb->GetSphereRadius() << std::endl;
+
+        rb->SetBoxHalfExtents(math::Vector3f(2.f, 2.f, 2.f));
 
         /// ---------------- Create rigidbody static ----------------
         engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());
