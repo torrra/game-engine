@@ -19,6 +19,8 @@
 #include "engine/resource/ResourceManager.h"
 #include "engine/resource/model/Model.h"
 
+#include "engine/ConsoleLog.hpp"
+
 #define MODEL_FILE "..\\assets\\bunny.obj"
 
 // Use dedicated graphics card
@@ -57,6 +59,11 @@ int main(void)
         //std::cout << rb->GetBoxHalfExtents() << std::endl;
         //std::cout << rb->GetCapsuleRadius() << std::endl;
         //std::cout << rb->GetSphereRadius() << std::endl;
+
+        engine::printLog(engine::errorPreset(), "RigidBodyDynamic error !");
+        engine::printLog(engine::warningPreset(), "RigidBodyDynamic warning !");
+        engine::printLog(engine::infoPreset(), "RigidBodyDynamic info !");
+
 
         rb->SetBoxHalfExtents(math::Vector3f(2.f, 2.f, 2.f));
 
