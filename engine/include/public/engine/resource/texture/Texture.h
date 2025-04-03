@@ -13,6 +13,7 @@ namespace engine
 	{
 	public:
 		ENGINE_API Texture(void);
+		ENGINE_API Texture(void* data, int32 width, int32 height, int32 channelCount);
 		ENGINE_API ~Texture(void) = default;
 		
 		ENGINE_API virtual void LoadResource(const char* fileName) override;
@@ -24,6 +25,10 @@ namespace engine
 		math::Vector2i GetSize(void) const noexcept;
 	
 	private:
+
+
+        void ProcessTexelData(void* data, int32 channelCount);
+
 		enum ETextureWrapping
 		{
 			REPEAT = 0x2901,
