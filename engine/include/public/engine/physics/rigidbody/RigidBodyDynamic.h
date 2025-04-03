@@ -16,7 +16,6 @@
 
 #pragma region Physics
 
-#include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/PhysicsMaterial.h"
 #include "engine/physics/geometry/Geometry.h"
 
@@ -30,73 +29,83 @@
 
 namespace engine
 {
-	struct RigidBodyDynamicImpl;
+    /// Forward declaration
+    struct RigidBodyDynamicImpl;
 
-	class RigidBodyDynamic : public Component
-	{
-	public :
+    class RigidBodyDynamic : public Component
+    {
+    public :
 
-		/// Constructor
-		// Delete the default constructor
-								RigidBodyDynamic(void) = delete;
-		// Initialize the pointer to struct RigidBodyDynamicImpl
-		ENGINE_API				RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
+        /// Constructor
+        // Delete the default constructor
+                                RigidBodyDynamic(void) = delete;
+        /*
+            Initialize the pointer to struct RigidBodyDynamicImpl
+            <param> [in] owner : the entity owner
+            <param> [in] scene : the scene openGL
+        */
+        ENGINE_API				RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
 
-		/// Destructor
-		// Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
-		ENGINE_API				~RigidBodyDynamic(void) override;
+        /// Destructor
+        // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
+        ENGINE_API				~RigidBodyDynamic(void) override;
 
         /// Getter
-        // Get the gravity status of the rigid body
-        // <return> the gravity status : true = disabled, false = enabled
+        /*
+            Get the gravity status of the rigid body
+            <return> [out] the gravity status : true = disabled, false = enabled
+        */
         ENGINE_API  bool        GetIsGravityDisabled(void) const;
 
         /// Setter
-        // Set the gravity status of the rigid body
-        // <param> inIsGravityDisabled : the gravity status : true = disabled, false = enabled
+        /*
+            Set the gravity status of the rigid body
+            <param> [in] inIsGravityDisabled : the gravity status : true = disabled, 
+                                                                    false = enabled
+        */
         ENGINE_API  void        SetGravityDisabled(bool inIsGravityDisabled);
 
-		/// Functions
-		// Create a dynamic rigid body with default values
-		// <param> inPhysicsEngine : the physics engine
-		ENGINE_API	void		CreateDynamicRigidBody(const PhysicsEngine& inPhysicsEngine,
-													   const Material& inMaterial,
-													   const Geometry& inGeometry);
-        ENGINE_API  void        CreateDynamicBoxRigidBody(const PhysicsEngine& inPhysicsEngine,
-                                                          const Material& inMaterial,
-                                                          const math::Vector3f& inHalfHeight);
-        ENGINE_API  void        CreateDynamicSphereRigidBody(const PhysicsEngine& inPhysicsEngine,
-                                                             const Material& inMaterial,
-                                                             const f32 inRadius);
-        ENGINE_API  void        CreateDynamicCapsuleRigidBody(const PhysicsEngine& inPhysicsEngine,
-                                                               const Material& inMaterial,
-                                                               const f32 inRadius,
-                                                               const f32 inHalfHeight);
-		// Update the entity transform in reference to the dynamic rigid body
-		ENGINE_API	void		UpdateEntity(EntityHandle inEntityHandle);
-		// Update the dynamic rigid body transform in reference to the entity
-		ENGINE_API	void		UpdateRigidBody(const Transform& inEntityTransform);
+        /// Functions
+        // Update the entity transform in reference to the dynamic rigid body
+        ENGINE_API	void		UpdateEntity(EntityHandle inEntityHandle);
+        // Update the dynamic rigid body transform in reference to the entity
+        ENGINE_API	void		UpdateRigidBody(const Transform& inEntityTransform);
 
-		// Delete the dynamic rigid body
-		ENGINE_API	void		RigidBodyDynamicCleanUp(void);
+        // Delete the dynamic rigid body
+        ENGINE_API	void		RigidBodyDynamicCleanUp(void);
 
-		ENGINE_API	void		Register(void) override {}
+        ENGINE_API	void		Register(void) override {}
 
-	private :
+    private :
 
-		/// Functions
-		// Check if the entity has a transform component if not create one
-		// <return> the entity transform
-					Transform&	CheckEntityTransform(void);
+        friend class RigidBodyDynamicFactory;
+
+        /// Functions
+        // Check if the entity has a transform component if not create one
+        // <return> the entity transform
+                    Transform&	CheckEntityTransform(void);
+
+        // Preset of a box dynamic rigid body
+                    void        CreateDynamicBoxRigidBody(void);
+        // Preset of a sphere dynamic rigid body
+                    void        CreateDynamicSphereRigidBody(void);
+        // Preset of a capsule dynamic rigid body
+                    void        CreateDynamicCapsuleRigidBody(void);
                     
-		/// TODO : Check transform to directly use the component transform
-		///		   of the entity
+        /// TODO : Check transform to directly use the component transform
+        ///		   of the entity
 
-		/// Private members
-		RigidBodyDynamicImpl*	m_rigidBodyImpl;
-		PhysicsEngine*			m_physicsEngine		= nullptr;
-		Material*				m_material			= nullptr;
-        bool					m_isGravityDisabled = false;
+        /// Private members
+        RigidBodyDynamicImpl*	m_rigidBodyImpl;
+        Material*				m_material			= nullptr;
 
-	}; // !Class RigidBodyDynamic
+    }; // !Class RigidBodyDynamic
+
+    class RigidBodyDynamicFactory
+    {
+    public :
+
+        ENGINE_API static RigidBodyDynamic* Create(class SceneGraph* scene, EntityHandle owner,
+                                                   const EGeometryType& inGeometry);
+    };
 } //!Namespace engine
