@@ -70,25 +70,25 @@ namespace engine
 
     }; // !Struct ConsoleLog
 
-    void printLog(ConsoleLog consoleLog, const std::string& message)
+    void PrintLog(ConsoleLog consoleLog, const std::string& message)
     {
         printf("\033[%d;%d;%dm%s %s\033[0m\n", (int)consoleLog.m_textFormat, (int)consoleLog.m_bgColor,
                (int)consoleLog.m_fgColor, consoleLog.m_prefix.c_str(), message.c_str());
     }
 
-    ConsoleLog errorPreset()
+    ConsoleLog ErrorPreset()
     {
         ConsoleLog consoleLog;
 
         consoleLog.m_bgColor    = EBGColor::BG_BLACK;
         consoleLog.m_fgColor    = EFGColor::FG_RED;
-        consoleLog.m_textFormat = EGRP::CROSSED;
+        consoleLog.m_textFormat = EGRP::NORMAL;
         consoleLog.m_prefix     = "[ERROR]";
 
         return consoleLog;
     }
 
-    ConsoleLog warningPreset()
+    ConsoleLog WarningPreset()
     {
         ConsoleLog consoleLog;
 
@@ -100,7 +100,7 @@ namespace engine
         return consoleLog;
     }
 
-    ConsoleLog infoPreset()
+    ConsoleLog InfoPreset()
     {
         ConsoleLog consoleLog;
 
@@ -108,6 +108,18 @@ namespace engine
         consoleLog.m_fgColor    = EFGColor::FG_BLUE;
         consoleLog.m_textFormat = EGRP::NORMAL;
         consoleLog.m_prefix     = "[INFO]";
+
+        return consoleLog;
+    }
+
+    ConsoleLog SuccessPreset()
+    {
+        ConsoleLog consoleLog;
+
+        consoleLog.m_bgColor    = EBGColor::BG_BLACK;
+        consoleLog.m_fgColor    = EFGColor::FG_GREEN;
+        consoleLog.m_textFormat = EGRP::NORMAL;
+        consoleLog.m_prefix     = "[SUCCESS]";
 
         return consoleLog;
     }
