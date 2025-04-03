@@ -13,14 +13,17 @@ namespace engine
 	{
 	public:
 					Buffer(void);
+                    Buffer(int32);
 					~Buffer(void);
 
 		uint32		GetBufferID(void) const noexcept;
-		void		SetData(Vertex const* vertexData, uint64 size) const;
-		void		SetData(int32 const* indexData, uint64 size) const;
+		void		SetData(void* data, uint64 size);
 		void		DeleteData(void);
 
 	private:
+
 		uint32		m_buffer;
+
+        friend class Mesh;
 	};
 }
