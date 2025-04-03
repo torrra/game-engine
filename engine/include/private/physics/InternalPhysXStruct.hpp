@@ -49,5 +49,9 @@ namespace engine
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
     }; // !Struct DebugDrawImpl
 
+    /// PhysX using
     using PxVisualParam = physx::PxVisualizationParameter;
+    using PxInstruFlag  = physx::PxPvdInstrumentationFlag;
+    using PxTolerances  = physx::PxTolerancesScale;
+
 } // !Namespace engine
