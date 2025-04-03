@@ -16,7 +16,7 @@
 #pragma region Physics
 
 #include "engine/physics/PhysicsEngine.h"
-#include "engine/physics/Material.h"
+#include "engine/physics/PhysicsMaterial.h"
 #include "engine/physics/geometry/Geometry.h"
 
 #pragma endregion
