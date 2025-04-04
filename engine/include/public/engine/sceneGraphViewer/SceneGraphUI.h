@@ -14,6 +14,8 @@ namespace engine
     {
         ~TreeNode(void);
 
+        void Init(TreeNode* parent, EntityHandle handle);
+
         std::vector<TreeNode*> m_children;
         TreeNode* m_parent;
         EntityHandle m_handle;
@@ -37,7 +39,9 @@ namespace engine
         void DeleteGraph(void);
         void ReparentNode(TreeNode* toReparent, TreeNode* newParent);
         void DrawCurrentAndChildrenNodes(TreeNode* node);
-        const ImGuiPayload* DragDropBackground(const char* payloadID);
+
+        const ImGuiPayload* DragDropNode(const char* payloadID, TreeNode* node, int32 flags);
+        const ImGuiPayload* DragDropBackground(const char* payloadID, int32 flags);
 
         std::string m_title;
         class SceneGraph* m_graph;

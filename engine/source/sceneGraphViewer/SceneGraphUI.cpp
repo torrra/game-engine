@@ -7,14 +7,30 @@
 
 #include "utility/MemoryCheck.h"
 
+// Node Functions
+engine::TreeNode::~TreeNode(void)
+{
+    m_children.clear();
+    m_handle = 0;
+    m_parent = nullptr;
+}
+
+void engine::TreeNode::Init(TreeNode* parent, EntityHandle handle)
+{
+    m_children = std::vector<TreeNode*>();
+    m_parent = parent;
+    m_handle = handle;
+}
+
+// Graph Window Functions
 engine::SceneGraphViewer::SceneGraphViewer(const char* title)
-    : m_title(title), m_graph(nullptr)
+    : m_title(title), m_graph(nullptr), m_reset(false)
 {
     InitRootNode();
 }
 
 engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
-    : m_title(title), m_graph(graph)
+    : m_title(title), m_graph(graph), m_reset(false)
 {
     InitRootNode();
     CreateGraph();
@@ -41,6 +57,7 @@ void engine::SceneGraphViewer::DrawGraph(void)
     for (TreeNode* node : m_root->m_children)
     {
         DrawCurrentAndChildrenNodes(node);
+        
         if (m_reset)
         {
             m_reset = false;
@@ -64,12 +81,8 @@ void engine::SceneGraphViewer::SetGraph(SceneGraph* graph)
 
 void engine::SceneGraphViewer::InitRootNode(void)
 {
-    m_root = new TreeNode
-    {
-        .m_children = std::vector<TreeNode*>(),
-        .m_parent = nullptr,
-        .m_handle = Entity::EHandleUtils::INVALID_HANDLE,
-    };
+    m_root = new TreeNode();
+    m_root->Init(nullptr, Entity::EHandleUtils::INVALID_HANDLE);
 }
 
 void engine::SceneGraphViewer::CreateGraph(void)
@@ -77,36 +90,30 @@ void engine::SceneGraphViewer::CreateGraph(void)
     std::vector<EntityHandle> handles = m_graph->GetChildrenAllLevels(m_root->m_handle);
     std::vector<TreeNode*> nodes;
 
-    for (uint64 i = 0; i < handles.size(); ++i)
+    for (uint64 handleIndex = 0; handleIndex < handles.size(); ++handleIndex)
     {
-        TreeNode* newNode = new TreeNode;
-
-        EntityHandle parentHandle = m_graph->GetEntity(handles[i])->GetParent();
+        TreeNode* newNode = new TreeNode();
+        EntityHandle parentHandle = m_graph->GetEntity(handles[handleIndex])->GetParent();
 
         // Find parent node
         if (parentHandle != Entity::EHandleUtils::INVALID_HANDLE)
         {
             for (TreeNode* parentNode : nodes)
             {
-                if (parentNode->m_handle == parentHandle)
-                {
-                    newNode->m_children = std::vector<TreeNode*>();
-                    newNode->m_parent = parentNode;
-                    newNode->m_handle = handles[i];
+                if (parentNode->m_handle != parentHandle)
+                    continue;
+                
+                newNode->Init(parentNode, handles[handleIndex]);
+                parentNode->m_children.emplace_back(newNode);
 
-                    parentNode->m_children.push_back(newNode);
-                    break;
-                }
+                break;
             }
         }
         else
         {
-            // Root
-            newNode->m_children = std::vector<TreeNode*>();
-            newNode->m_parent = m_root;
-            newNode->m_handle = handles[i];
-
-            m_root->m_children.push_back(newNode);
+            // Root level
+            newNode->Init(m_root, handles[handleIndex]);
+            m_root->m_children.emplace_back(newNode);
         }
 
         nodes.push_back(newNode);
@@ -147,73 +154,41 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
     TreeNode* prevParent = toReparent->m_parent;
 
     // Find node
-    uint64 i = 0;
-    for (; i < prevParent->m_children.size(); ++i)
+    uint64 childIndex = 0;
+    for (; childIndex < prevParent->m_children.size(); ++childIndex)
     {
-        if (prevParent->m_children[i]->m_handle == toReparent->m_handle)
+        if (prevParent->m_children[childIndex]->m_handle == toReparent->m_handle)
             break;
     }
 
-    m_graph->ReparentEntity(prevParent->m_children[i]->m_handle, newParent->m_handle);
-    prevParent->m_children[i]->m_parent = newParent;
-    newParent->m_children.emplace_back(prevParent->m_children[i]);
-    prevParent->m_children.erase(prevParent->m_children.begin() + i);
+    m_graph->ReparentEntity(prevParent->m_children[childIndex]->m_handle, newParent->m_handle);
+    prevParent->m_children[childIndex]->m_parent = newParent;
+    newParent->m_children.emplace_back(prevParent->m_children[childIndex]);
+    prevParent->m_children.erase(prevParent->m_children.begin() + childIndex);
 }
 
 void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 {
-    static constexpr ImGuiDragDropFlags dragDropFlags = 
-        ImGuiDragDropFlags_PayloadNoCrossContext;
-    
+    static constexpr ImGuiDragDropFlags dragDropFlags = ImGuiDragDropFlags_PayloadNoCrossContext;
     ImGuiTreeNodeFlags nodeFlags =
-        ImGuiTreeNodeFlags_SpanFullWidth |
-        ImGuiTreeNodeFlags_FramePadding |
-        ImGuiTreeNodeFlags_OpenOnDoubleClick |
-        ImGuiTreeNodeFlags_OpenOnArrow;
-    
+        ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_FramePadding |
+        ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+
     if (node && node->m_children.empty())
         nodeFlags |= ImGuiTreeNodeFlags_Leaf;
 
-    if (ImGui::TreeNodeEx(m_graph->GetEntity(node->m_handle)->GetName().c_str(), nodeFlags))
+    std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
+    if (ImGui::TreeNodeEx(entityName.c_str(), nodeFlags))
     {
-        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+        if (ImGui::BeginDragDropSource(dragDropFlags))
         {
             ImGui::SetDragDropPayload("Entity", node, sizeof(TreeNode));
-            ImGui::Text("%s", m_graph->GetEntity(node->m_handle)->GetName().c_str());
+            ImGui::Text("%s", entityName.c_str());
             ImGui::EndDragDropSource();
         }
-        
-        if (ImGui::BeginDragDropTarget())
-        {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity", dragDropFlags) )
-            {
-                ImGui::TreePop();
-                TreeNode* entity = reinterpret_cast<TreeNode*>(payload->Data);
-                bool blockAction = false;
-                TreeNode* prevParent = node->m_parent;
-                while (prevParent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
-                {
-                    if (prevParent->m_handle == entity->m_handle)
-                    {
-                        blockAction = true;
-                        break;
-                    }
-                    else
-                        prevParent = prevParent->m_parent;
-                }
 
-                if (!blockAction)
-                    ReparentNode(entity, node);
-                
-                m_reset = true;
-            }
-
-            ImGui::EndDragDropTarget();
-
-            if (m_reset)
-                return;
-        }
-        if (DragDropBackground("Entity"))
+        if (DragDropNode("Entity", node, 0) ||
+            DragDropBackground("Entity", 0))
         {
             ImGui::TreePop();
             ImGui::EndDragDropTarget();
@@ -225,50 +200,71 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
         for (TreeNode* childNode : node->m_children)
         {
             if (m_reset)
-            {
-                ImGui::TreePop();
-                return;
-            }
+                break;
 
             DrawCurrentAndChildrenNodes(childNode);
         }
-        
         ImGui::TreePop();
     }
 }
 
-const ImGuiPayload* engine::SceneGraphViewer::DragDropBackground(const char* payloadID)
+const ImGuiPayload* engine::SceneGraphViewer::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
 {
-    ImRect transform = ImGui::GetCurrentWindow()->Rect();
-    if (ImGui::BeginDragDropTargetCustom(transform, ImGui::GetID(m_title.c_str())))
+    if (ImGui::BeginDragDropTarget())
     {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payloadID, 0))
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payloadID, flags))
         {
-            if (payload->IsPreview())
+            TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload->Data);
+            TreeNode* prevParent = node->m_parent;
+
+            bool blockAction = false;
+
+            while (prevParent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
             {
-                ImDrawList* drawList = ImGui::GetForegroundDrawList();
-                drawList->AddRectFilled(transform.Min, transform.Max, ImGui::GetColorU32(ImGuiCol_DragDropTarget, 0.05f));
-                drawList->AddRect(transform.Min, transform.Max, ImGui::GetColorU32(ImGuiCol_DragDropTarget, 0.0f), 2.0f);
+                if (prevParent->m_handle == selectedNode->m_handle)
+                {
+                    blockAction = true;
+                    break;
+                }
+                else
+                    prevParent = prevParent->m_parent;
             }
 
-            if (payload->IsDelivery())
-            {
-                TreeNode* entity = reinterpret_cast<TreeNode*>(payload->Data);
-                ReparentNode(entity, m_root);
+            if (!blockAction)
+                ReparentNode(selectedNode, node);
 
-                return payload;
-            }
-
+            return payload;
         }
+
         ImGui::EndDragDropTarget();
     }
 
     return nullptr;
 }
 
-engine::TreeNode::~TreeNode(void)
+const ImGuiPayload* engine::SceneGraphViewer::DragDropBackground(const char* payloadID, int32 flags)
 {
-    m_children.clear();
-    m_handle = 0;
-    m_parent = nullptr;
+    ImRect transform = ImGui::GetCurrentWindow()->Rect();
+    if (ImGui::BeginDragDropTargetCustom(transform, ImGui::GetID(m_title.c_str())))
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payloadID, flags))
+        {
+            if (payload->IsPreview())
+            {
+                ImDrawList* drawList = ImGui::GetForegroundDrawList();
+                drawList->AddRectFilled(transform.Min, transform.Max, ImGui::GetColorU32(ImGuiCol_DragDropTarget, 0.05f));
+            }
+
+            if (payload->IsDelivery())
+            {
+                TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload->Data);
+                ReparentNode(selectedNode, m_root);
+
+                return payload;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    return nullptr;
 }
