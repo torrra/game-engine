@@ -12,3 +12,5 @@
 # vim files
 *.swp
 
+# ImGui meta data
+/workspace/imgui.ini
