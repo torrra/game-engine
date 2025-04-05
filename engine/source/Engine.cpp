@@ -5,6 +5,7 @@
 #include "core/systems/ScriptSystem.h"
 #include "Window.h"
 #include "sceneGraphViewer/SceneGraphUI.h"
+#include "ui/UIWindow.h"
 
 #include <math/Vector2.hpp>
 
@@ -119,7 +120,7 @@ void engine::Engine::Update(void)
     m_window->ClearWindow(0.1f, 0.1f, 0.1f);
     
     m_uiManager.NewFrame();
-    m_graphViewer->DrawGraph();
+    m_graphViewer->Render();
     m_viewport->DrawViewport(); // DRAW VIEWPORT
     m_uiManager.UpdateUI();
     // Render

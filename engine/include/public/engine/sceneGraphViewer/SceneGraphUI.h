@@ -3,13 +3,18 @@
 #include "engine/CoreTypes.h"
 #include "engine/core/Entity.h"
 
+#include "engine/ui/UIWindow.h"
+
 #include <string>
 #include <vector>
 
-struct ImGuiPayload;
-
 namespace engine
 {
+    namespace ui
+    {
+        class Payload;
+    }
+
     struct TreeNode
     {
         ~TreeNode(void);
@@ -21,7 +26,7 @@ namespace engine
         EntityHandle m_handle;
     };
 
-    class SceneGraphViewer
+    class SceneGraphViewer : public UIWindow
     {
     public:
         SceneGraphViewer(void) = delete;
@@ -29,9 +34,11 @@ namespace engine
         SceneGraphViewer(const char* title, class SceneGraph* graph);
         ~SceneGraphViewer(void);
 
-        void DrawGraph(void);
         void SetGraph(class SceneGraph* graph);
-
+    
+    protected:
+        virtual void RenderContents(void) override;
+    
     private:
         void InitRootNode(void);
         void CreateGraph(void);
@@ -39,11 +46,10 @@ namespace engine
         void DeleteGraph(void);
         void ReparentNode(TreeNode* toReparent, TreeNode* newParent);
         void DrawCurrentAndChildrenNodes(TreeNode* node);
+        
+        const ui::Payload DragDropNode(const char* payloadID, TreeNode* node, int32 flags);
+        const ui::Payload DragDropBackground(const char* payloadID, int32 flags);
 
-        const ImGuiPayload* DragDropNode(const char* payloadID, TreeNode* node, int32 flags);
-        const ImGuiPayload* DragDropBackground(const char* payloadID, int32 flags);
-
-        std::string m_title;
         class SceneGraph* m_graph;
         TreeNode* m_root;
         bool m_reset = false;

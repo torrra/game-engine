@@ -1,9 +1,13 @@
 #include "sceneGraphViewer/SceneGraphUI.h"
 #include "core/SceneGraph.h"
 
-#undef new
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
+#include "ui/UIWindow.h"
+#include "ui/InternalUIDraw.h"
+#include "ui/InternalUIWindow.h"
+#include "ui/InternalUIDragDrop.h"
+#include "ui/InternalUITree.h"
+#include "ui/InternalUIText.h"
+#include "ui/InternalUIStyle.h"
 
 #include "utility/MemoryCheck.h"
 
@@ -24,14 +28,18 @@ void engine::TreeNode::Init(TreeNode* parent, EntityHandle handle)
 
 // Graph Window Functions
 engine::SceneGraphViewer::SceneGraphViewer(const char* title)
-    : m_title(title), m_graph(nullptr), m_reset(false)
+    : m_graph(nullptr), m_reset(false)
 {
+    SetName(title);
+    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE);
     InitRootNode();
 }
 
 engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
-    : m_title(title), m_graph(graph), m_reset(false)
+    : m_graph(graph), m_reset(false)
 {
+    SetName(title);
+    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE);
     InitRootNode();
     CreateGraph();
 }
@@ -39,33 +47,6 @@ engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
 engine::SceneGraphViewer::~SceneGraphViewer(void)
 {
     DeleteGraph();
-}
-
-void engine::SceneGraphViewer::DrawGraph(void)
-{
-    if (!m_graph)
-        return;
-
-    // Window flags
-    static const ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
-
-    // TODO: add default docking node
-    // TODO: change default size
-    ImGui::SetNextWindowSize({300, 900}, ImGuiCond_Once);
-    ImGui::Begin(m_title.c_str(), nullptr, flags);
-    
-    for (TreeNode* node : m_root->m_children)
-    {
-        DrawCurrentAndChildrenNodes(node);
-        
-        if (m_reset)
-        {
-            m_reset = false;
-            break;
-        }
-    }
-
-    ImGui::End();
 }
 
 void engine::SceneGraphViewer::SetGraph(SceneGraph* graph)
@@ -77,6 +58,23 @@ void engine::SceneGraphViewer::SetGraph(SceneGraph* graph)
 
     InitRootNode();
     CreateGraph();
+}
+
+void engine::SceneGraphViewer::RenderContents(void)
+{
+    if (!m_graph)
+        return;
+    
+    for (TreeNode* node : m_root->m_children)
+    {
+        DrawCurrentAndChildrenNodes(node);
+
+        if (m_reset)
+        {
+            m_reset = false;
+            break;
+        }
+    }
 }
 
 void engine::SceneGraphViewer::InitRootNode(void)
@@ -169,29 +167,30 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
 
 void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 {
-    static constexpr ImGuiDragDropFlags dragDropFlags = ImGuiDragDropFlags_PayloadNoCrossContext;
-    ImGuiTreeNodeFlags nodeFlags =
-        ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_FramePadding |
-        ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    static constexpr ui::EDragDropSrcFlags dragDropFlags = 
+        ui::EDragDropSrcFlags::PAYLOAD_NO_CROSS_CONTEXT;
+    int32 nodeFlags =
+        ui::SPAN_FULL_WIDTH | ui::FRAME_PADDING |
+        ui::OPEN_ON_DOUBLE_CLICK | ui::OPEN_WITH_ARROW;
 
     if (node && node->m_children.empty())
-        nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+        nodeFlags |= ui::NO_ICON;
 
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
-    if (ImGui::TreeNodeEx(entityName.c_str(), nodeFlags))
+    if (ui::TreeNode(entityName, nodeFlags))
     {
-        if (ImGui::BeginDragDropSource(dragDropFlags))
+        if (ui::StartDragDropSource(dragDropFlags))
         {
-            ImGui::SetDragDropPayload("Entity", node, sizeof(TreeNode));
-            ImGui::Text("%s", entityName.c_str());
-            ImGui::EndDragDropSource();
+            ui::CreatePayload("Entity", node, sizeof(TreeNode));
+            ui::Text("%s", entityName.c_str());
+            ui::EndDragDropSource();
         }
 
         if (DragDropNode("Entity", node, 0) ||
             DragDropBackground("Entity", 0))
         {
-            ImGui::TreePop();
-            ImGui::EndDragDropTarget();
+            ui::EndTreeNode();
+            ui::EndDragDropTarget();
 
             m_reset = true;
             return;
@@ -204,17 +203,17 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 
             DrawCurrentAndChildrenNodes(childNode);
         }
-        ImGui::TreePop();
+        ui::EndTreeNode();
     }
 }
 
-const ImGuiPayload* engine::SceneGraphViewer::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
+const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
 {
-    if (ImGui::BeginDragDropTarget())
+    if (ui::StartDragDropTarget())
     {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payloadID, flags))
+        if (ui::Payload payload = ui::AcceptPayload(payloadID, flags))
         {
-            TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload->Data);
+            TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
             TreeNode* prevParent = node->m_parent;
 
             bool blockAction = false;
@@ -236,34 +235,35 @@ const ImGuiPayload* engine::SceneGraphViewer::DragDropNode(const char* payloadID
             return payload;
         }
 
-        ImGui::EndDragDropTarget();
+        ui::EndDragDropTarget();
     }
 
     return nullptr;
 }
 
-const ImGuiPayload* engine::SceneGraphViewer::DragDropBackground(const char* payloadID, int32 flags)
+const engine::ui::Payload engine::SceneGraphViewer::DragDropBackground(const char* payloadID, int32 flags)
 {
-    ImRect transform = ImGui::GetCurrentWindow()->Rect();
-    if (ImGui::BeginDragDropTargetCustom(transform, ImGui::GetID(m_title.c_str())))
+    if (ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str()))
     {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payloadID, flags))
+        if (ui::Payload payload = ui::AcceptPayload(payloadID, flags))
         {
-            if (payload->IsPreview())
+            if (payload.IsPreview())
             {
-                ImDrawList* drawList = ImGui::GetForegroundDrawList();
-                drawList->AddRectFilled(transform.Min, transform.Max, ImGui::GetColorU32(ImGuiCol_DragDropTarget, 0.05f));
+                ui::DrawList drawList = ui::GetForegroundDrawList();
+                const ui::UIWindowRect transform = ui::GetCurrentWindowRect();
+                uint32 color = ::ui::GetColor(::ui::DRAG_DROP_TARGET_COLOR, 0.05f);
+                drawList.AddRectFilled(transform.m_min, transform.m_max, color);
             }
 
-            if (payload->IsDelivery())
+            if (payload.IsDelivery())
             {
-                TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload->Data);
+                TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
                 ReparentNode(selectedNode, m_root);
 
                 return payload;
             }
         }
-        ImGui::EndDragDropTarget();
+        ui::EndDragDropTarget();
     }
 
     return nullptr;
