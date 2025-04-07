@@ -19,6 +19,8 @@ namespace engine
     void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
 
 } // !Namespace engine
+
+// Check for openGL errors
 inline void engine::OpenGLError(void)
 {
     auto error = glGetError();
@@ -30,6 +32,7 @@ inline void engine::OpenGLError(void)
     }
 }
 
+// Debug message callback
 inline void engine::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param)
 {
     user_param;
