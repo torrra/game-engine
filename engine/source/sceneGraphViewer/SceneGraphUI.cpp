@@ -1,15 +1,19 @@
 #include "sceneGraphViewer/SceneGraphUI.h"
 #include "core/SceneGraph.h"
+#include "input/Input.h"
 
 #include "ui/UIWindow.h"
 #include "ui/InternalUIDraw.h"
 #include "ui/InternalUIWindow.h"
 #include "ui/InternalUIDragDrop.h"
 #include "ui/InternalUITree.h"
-#include "ui/InternalUIText.h"
+#include "ui/InternalUIComponent.h"
 #include "ui/InternalUIStyle.h"
 
 #include "utility/MemoryCheck.h"
+
+#undef new
+//#include <imgui/imgui.h>
 
 // Node Functions
 engine::TreeNode::~TreeNode(void)
@@ -31,17 +35,23 @@ engine::SceneGraphViewer::SceneGraphViewer(const char* title)
     : m_graph(nullptr), m_reset(false)
 {
     SetName(title);
-    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE);
+    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE | EWndFlags::MENU_BAR);
     InitRootNode();
+
+    Input::RegisterInput(MOUSE_BUTTON_RIGHT);
+    Input::RegisterInput(KEY_ENTER);
 }
 
 engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
     : m_graph(graph), m_reset(false)
 {
     SetName(title);
-    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE);
+    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE | EWndFlags::MENU_BAR);
     InitRootNode();
     CreateGraph();
+
+    Input::RegisterInput(MOUSE_BUTTON_RIGHT);
+    Input::RegisterInput(KEY_ENTER);
 }
 
 engine::SceneGraphViewer::~SceneGraphViewer(void)
@@ -62,6 +72,8 @@ void engine::SceneGraphViewer::SetGraph(SceneGraph* graph)
 
 void engine::SceneGraphViewer::RenderContents(void)
 {
+    RenderMenuBar();
+
     if (!m_graph)
         return;
     
@@ -81,6 +93,30 @@ void engine::SceneGraphViewer::InitRootNode(void)
 {
     m_root = new TreeNode();
     m_root->Init(nullptr, Entity::EHandleUtils::INVALID_HANDLE);
+}
+
+void engine::SceneGraphViewer::AddNode(TreeNode* parentNode)
+{
+    // Create new entity
+    int32 id = 0;
+    std::string newEntityName("New Entity ");
+    char idStr[5];
+
+    while (1)
+    {
+        _itoa_s(id++, idStr, 10);
+
+        if (!m_graph->GetEntity(newEntityName + std::string(idStr)))
+            break;
+    }
+
+    newEntityName += std::string(idStr);
+    EntityHandle handle = m_graph->CreateEntity(newEntityName);
+
+    // Create new node
+    TreeNode* newNode = new TreeNode();
+    newNode->Init(m_root, handle);
+    parentNode->m_children.emplace_back(newNode);
 }
 
 void engine::SceneGraphViewer::CreateGraph(void)
@@ -123,7 +159,7 @@ void engine::SceneGraphViewer::CreateGraph(void)
 void engine::SceneGraphViewer::DeleteAllChildren(TreeNode* node)
 {
     TreeNode* currentNode = node;
-    while (!m_root->m_children.empty())
+    while (!node->m_children.empty())
     {
         while (!currentNode->m_children.empty())
         {
@@ -165,10 +201,17 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
     prevParent->m_children.erase(prevParent->m_children.begin() + childIndex);
 }
 
+/*
+    TODO:
+    - Add ability to create new node from right click menu
+    - Don't delete recursively (reparent children to deleted node's parent)
+    - Encapsulate
+    - Clean up
+*/
 void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 {
-    static constexpr ui::EDragDropSrcFlags dragDropFlags = 
-        ui::EDragDropSrcFlags::PAYLOAD_NO_CROSS_CONTEXT;
+    int32 dragDropFlags = (node->m_handle == m_renamingHandle) ? ui::EDragDropSrcFlags::ALLOW_NULL_ID : 0;
+        /*ui::EDragDropSrcFlags::PAYLOAD_NO_CROSS_CONTEXT | ui::EDragDropSrcFlags::ALLOW_NULL_ID*/;
     int32 nodeFlags =
         ui::SPAN_FULL_WIDTH | ui::FRAME_PADDING |
         ui::OPEN_ON_DOUBLE_CLICK | ui::OPEN_WITH_ARROW;
@@ -177,15 +220,70 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
         nodeFlags |= ui::NO_ICON;
 
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
-    if (ui::TreeNode(entityName, nodeFlags))
+
+    
+    ImGui::PushID(entityName.c_str());
+    bool result = ui::TreeNode(/*std::string("e###") + entityName*/node->m_handle == m_renamingHandle ? std::string("###") + entityName : entityName, nodeFlags);
+
+    if (ImGui::BeginPopupContextItem("Options"))
     {
-        if (ui::StartDragDropSource(dragDropFlags))
+        if (ImGui::MenuItem("Rename"))
         {
-            ui::CreatePayload("Entity", node, sizeof(TreeNode));
-            ui::Text("%s", entityName.c_str());
-            ui::EndDragDropSource();
+            //enableRename = true;
+            m_renamingHandle = node->m_handle;
+            printf("Renaming %s...\n", entityName.c_str());
         }
 
+        if (ImGui::MenuItem("Delete"))
+        {
+            DeleteAllChildren(node);
+
+            TreeNode* parentNode = node->m_parent;
+            for (uint64 childIndex = 0; childIndex < parentNode->m_children.size(); ++childIndex)
+            {
+                if (parentNode->m_children[childIndex]->m_handle == node->m_handle)
+                {
+                    delete node;
+                    parentNode->m_children.erase(parentNode->m_children.begin() + childIndex);
+                    break;
+                }
+            }
+
+            m_graph->DestroyEntity(node->m_handle);
+
+            printf("Deleting %s...\n", entityName.c_str());
+        }
+        ImGui::EndPopup();
+    }
+
+    if (m_renamingHandle == node->m_handle)
+    {
+        ImGui::SameLine();
+        constexpr const uint16 bufferLength = 128;
+        char renameBuffer[bufferLength] = "\0";
+        ImGui::SetKeyboardFocusHere();
+        if (ImGui::InputTextWithHint("##rename", entityName.c_str(), renameBuffer, bufferLength, ImGuiInputTextFlags_EnterReturnsTrue) ||
+            ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Middle) || ImGui::IsMouseDown(ImGuiMouseButton_Right))
+        {
+            if (renameBuffer[0] != '\0' && !m_graph->GetEntity(renameBuffer))
+                m_graph->GetEntity(m_renamingHandle)->SetName(renameBuffer);
+
+            m_renamingHandle = 0;
+        }
+        else
+            m_renamingHandle = node->m_handle;
+    }
+    ImGui::PopID();
+
+    if (ui::StartDragDropSource(dragDropFlags))
+    {
+        ui::CreatePayload("Entity", node, sizeof(TreeNode));
+        ui::Text("%s", entityName.c_str());
+        ui::EndDragDropSource();
+    }
+
+    if (result)
+    {
         if (DragDropNode("Entity", node, 0) ||
             DragDropBackground("Entity", 0))
         {
@@ -195,6 +293,7 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
             m_reset = true;
             return;
         }
+    
 
         for (TreeNode* childNode : node->m_children)
         {
@@ -205,6 +304,8 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
         }
         ui::EndTreeNode();
     }
+    
+    
 }
 
 const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
@@ -268,3 +369,27 @@ const engine::ui::Payload engine::SceneGraphViewer::DragDropBackground(const cha
 
     return nullptr;
 }
+
+void engine::SceneGraphViewer::RenderMenuBar(void)
+{
+    ui::StartDisabledSection(!m_graph);
+    if (ui::StartMenuBar())
+    {
+        if (ui::Button("Add Entity"))
+            AddNode(m_root);
+        
+        ui::EndMenuBar();
+    }
+    ui::EndDisabledSection();
+}
+
+void engine::SceneGraphViewer::RenderPopupMenu(void)
+{
+    if (ImGui::BeginPopup("Options"))
+    {
+
+        ImGui::EndPopup();
+    }
+}
+
+

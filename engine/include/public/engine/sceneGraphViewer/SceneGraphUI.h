@@ -41,6 +41,7 @@ namespace engine
     
     private:
         void InitRootNode(void);
+        void AddNode(TreeNode* parentNode);
         void CreateGraph(void);
         void DeleteAllChildren(TreeNode* node);
         void DeleteGraph(void);
@@ -50,8 +51,12 @@ namespace engine
         const ui::Payload DragDropNode(const char* payloadID, TreeNode* node, int32 flags);
         const ui::Payload DragDropBackground(const char* payloadID, int32 flags);
 
+        void RenderMenuBar(void);
+        void RenderPopupMenu(void);
+
         class SceneGraph* m_graph;
         TreeNode* m_root;
+        int64 m_renamingHandle;
         bool m_reset = false;
     };
 }
