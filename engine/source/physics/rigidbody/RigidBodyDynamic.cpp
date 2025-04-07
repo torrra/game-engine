@@ -332,7 +332,7 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGr
             return temp;
             break;
         default:
-            PrintLog(ErrorPreset(), "Invalid geometry type");
+            PrintLog(ErrorPreset(), "Invalid geometry type, create box by default.");
             temp->CreateDynamicBoxRigidBody();
             return temp;
             break;
