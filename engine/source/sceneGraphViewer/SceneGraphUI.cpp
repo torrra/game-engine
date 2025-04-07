@@ -319,25 +319,28 @@ const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* pay
         if (ui::Payload payload = ui::AcceptPayload(payloadID, flags))
         {
             TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
-            TreeNode* prevParent = node->m_parent;
 
-            bool blockAction = false;
-
-            while (prevParent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
+            if (payload.IsDelivery() && node->m_handle != selectedNode->m_parent->m_handle)
             {
-                if (prevParent->m_handle == selectedNode->m_handle)
+                bool blockAction = false;
+
+                TreeNode* prevParent = node->m_parent;
+                while (prevParent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
                 {
-                    blockAction = true;
-                    break;
+                    if (prevParent->m_handle == selectedNode->m_handle)
+                    {
+                        blockAction = true;
+                        break;
+                    }
+                    else
+                        prevParent = prevParent->m_parent;
                 }
-                else
-                    prevParent = prevParent->m_parent;
+
+                if (!blockAction)
+                    ReparentNode(selectedNode, node);
+
+                return payload;
             }
-
-            if (!blockAction)
-                ReparentNode(selectedNode, node);
-
-            return payload;
         }
 
         ui::EndDragDropTarget();
@@ -360,9 +363,9 @@ const engine::ui::Payload engine::SceneGraphViewer::DragDropBackground(const cha
                 drawList.AddRectFilled(transform.m_min, transform.m_max, color);
             }
 
-            if (payload.IsDelivery())
+            TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
+            if (payload.IsDelivery() && selectedNode->m_parent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
             {
-                TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
                 ReparentNode(selectedNode, m_root);
 
                 return payload;
