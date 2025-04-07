@@ -211,7 +211,6 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
 void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 {
     int32 dragDropFlags = (node->m_handle == m_renamingHandle) ? ui::EDragDropSrcFlags::ALLOW_NULL_ID : 0;
-        /*ui::EDragDropSrcFlags::PAYLOAD_NO_CROSS_CONTEXT | ui::EDragDropSrcFlags::ALLOW_NULL_ID*/;
     int32 nodeFlags =
         ui::SPAN_FULL_WIDTH | ui::FRAME_PADDING |
         ui::OPEN_ON_DOUBLE_CLICK | ui::OPEN_WITH_ARROW;
@@ -223,10 +222,13 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 
     
     ImGui::PushID(entityName.c_str());
-    bool result = ui::TreeNode(/*std::string("e###") + entityName*/node->m_handle == m_renamingHandle ? std::string("###") + entityName : entityName, nodeFlags);
+    bool result = ui::TreeNode((node->m_handle == m_renamingHandle) ? std::string("###") + entityName : entityName, nodeFlags);
 
     if (ImGui::BeginPopupContextItem("Options"))
     {
+        if (ImGui::MenuItem("Add Entity"))
+            AddNode(node);
+
         if (ImGui::MenuItem("Rename"))
         {
             //enableRename = true;
