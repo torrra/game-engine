@@ -23,27 +23,34 @@
 
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
+    // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
+    // Set the owner and the current scene
     m_owner			= owner;
     m_currentScene	= scene;
 }
 
 engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 {
+    // Check if the entity has a transform
     if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
+        // If true take the entity transform
         PrintLog(SuccessPreset(), "Found transform component on entity.");
         return *temp;
     }
 
+    // If not create a new transform to the entity
     PrintLog(WarningPreset(), "No transform component found on entity create new one.");
     return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }
 
 void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 {
+    // Create a new material with default values
     m_material = new Material(0.5f, 0.5f, 0.6f);
 
+    // Create a new dynamic rigid body with box geometry and default values
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
@@ -62,8 +69,10 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 {
+    // Create a new material with default values
     m_material = new Material(0.5f, 0.5f, 0.6f);
 
+    // Create a new dynamic rigid body with sphere geometry and default values
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
@@ -82,22 +91,28 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 {
+    // Create a new material with default values
     m_material = new Material(0.5f, 0.5f, 0.6f);
 
+    // Create a new dynamic rigid body with capsule geometry and default values
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxCapsuleGeometry(0.25f, 0.25f),
                                             *m_material->GetImpl().m_material, 1.0f);
 
+    // Rotate the intiale position of the capsule to be at the vertical by default
+    // By using the local pose to not rotate the entity attach to it
     physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
     physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
 
+    // Update the local pose via the shape
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
     {
-        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q));
+        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
+                            );
     }
 
     // Set the gravity by default
@@ -112,27 +127,34 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 
 void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
 {
-    physx::PxTransform transformTemp = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
-
-    *m_currentScene->GetComponent<Transform>(inEntityHandle) = ToTransform(transformTemp);
+    // Update the entity transform in regard to the rigid body for exemple,
+    // if the rigid body is under gravity then the rigid body fall so the entity fall
+    *m_currentScene->GetComponent<Transform>(inEntityHandle) = 
+                            ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody(const Transform& inEntityTransform)
 {
+    // Update the transform of the rigid body in regard to the entity
     m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(inEntityTransform));
 }
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
+    // Release the material
     PX_RELEASE(m_material->GetImpl().m_material);
+    // Delete the pointer
     delete m_material;
+    // Release the rigid body
     PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
 }
 
 engine::RigidBodyDynamic::~RigidBodyDynamic(void)
 {
+    // Release all rigid body resources
     RigidBodyDynamicCleanUp();
 
+    // Delete the pointer to the implementation structure
     delete m_rigidBodyImpl;
     m_rigidBodyImpl = nullptr;
 
@@ -141,12 +163,15 @@ engine::RigidBodyDynamic::~RigidBodyDynamic(void)
 
 bool engine::RigidBodyDynamic::GetIsGravityDisabled(void) const
 {
+    // Retrieve the gravity state
     return m_rigidBodyImpl->m_rigidBodyDynamic->getActorFlags().isSet(
                 physx::PxActorFlag::eDISABLE_GRAVITY);
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
 {
+    // Retrieve the box half extents by getting the shape of the rigid body to access
+    // the good geometry and retrive the good information about the box
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
@@ -154,7 +179,9 @@ math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
         {
             const physx::PxGeometry* geometry = &shapes->getGeometry();
-            const physx::PxBoxGeometry& boxGeometry = static_cast<const physx::PxBoxGeometry&>(*geometry);
+            const physx::PxBoxGeometry& boxGeometry = 
+                                    static_cast<const physx::PxBoxGeometry&>(*geometry);
+
             return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                                   boxGeometry.halfExtents.z);
         }
@@ -167,6 +194,8 @@ math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
 
 f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
 {
+    // Retrieve the sphere radius by getting the shape of the rigid body to access
+    // the good geometry and retrive the good information about the sphere
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
@@ -174,7 +203,9 @@ f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
         {
             const physx::PxGeometry* geometry = &shapes->getGeometry();
-            const physx::PxSphereGeometry& sphereGeometry = static_cast<const physx::PxSphereGeometry&>(*geometry);
+            const physx::PxSphereGeometry& sphereGeometry = 
+                                    static_cast<const physx::PxSphereGeometry&>(*geometry);
+
             return sphereGeometry.radius;
         }
         PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
@@ -186,6 +217,8 @@ f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
 
 math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
 {
+    // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
+    // access the good geometry and retrive the good information about the capsule
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
@@ -193,7 +226,9 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
         {
             const physx::PxGeometry* geometry = &shapes->getGeometry();
-            const physx::PxCapsuleGeometry capsuleGeometry = static_cast<const physx::PxCapsuleGeometry&>(*geometry);
+            const physx::PxCapsuleGeometry capsuleGeometry = 
+                                        static_cast<const physx::PxCapsuleGeometry&>(*geometry);
+
             return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
         }
         PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
@@ -205,14 +240,17 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
 
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
+    // Set the gravity disabled or enabled state
+    // State by default is enabled
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
-        inIsGravityDisabled);
+                                                      inIsGravityDisabled);
 
     PrintLog(SuccessPreset(), "Successfully set gravity.");
 }
 
 void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
 {
+    // Set the box half extents by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
@@ -233,6 +271,7 @@ void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) c
 
 void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius) const
 {
+    // Set the sphere radius by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
@@ -252,6 +291,8 @@ void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius) const
 
 void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const
 {
+    // Set the capsule half height and radius by using the shape of rigid body to access the 
+    // good geometry
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
     if (shapes)
@@ -273,6 +314,7 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::Create(SceneGraph* sc
                                                                   EntityHandle owner,
                                                                   const EGeometryType& inGeometry)
 {
+    // Create dynamic rigid body in regard to the geometry and give it an owner and a scene
     if (RigidBodyDynamic* temp = new RigidBodyDynamic(owner, scene))
     {
         switch (inGeometry)

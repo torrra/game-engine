@@ -45,8 +45,6 @@ int main(void)
 
         /// ---------------- Create entity ---------------- 
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
-        engine::EntityHandle object = engine.GetGraph()->CreateEntity("Object");
-        engine::EntityHandle object2 = engine.GetGraph()->CreateEntity("Object2");
 
         /// ---------------- PhysicsEngine use ---------------- 
         engine::PhysicsEngine::Get().Init();
@@ -59,9 +57,8 @@ int main(void)
 
         engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::Create(engine.GetGraph(), 
                                             engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
-        rb->SetGravityDisabled(true);
-        rb->GetCapsuleFormat();
-        rb->SetBoxHalfExtents(math::Vector3f(2.f, 2.f, 2.f));
+        rb->SetGravityDisabled(false);
+        //rb->SetCapsuleFormat(2.f, 4.f);
 
         /// ---------------- Create rigidbody static ----------------
         engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());

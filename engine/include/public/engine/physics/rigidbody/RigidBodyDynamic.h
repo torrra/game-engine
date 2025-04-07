@@ -31,8 +31,8 @@ namespace engine
 {
     enum EErrorGeometryType
     {
-        EErrorGeometryType_None = -1,
-        EErrorGeometryType_Invalid = 0
+        EErrorGeometryType_None     = -1,
+        EErrorGeometryType_Invalid  = 0
     };
     /// Forward declaration
     struct RigidBodyDynamicImpl;
@@ -43,17 +43,17 @@ namespace engine
 
         /// Constructor
         // Delete the default constructor
-                                RigidBodyDynamic(void) = delete;
+                                    RigidBodyDynamic(void) = delete;
         /*
             Initialize the pointer to struct RigidBodyDynamicImpl
             <param> [in] owner : the entity owner
             <param> [in] scene : the scene openGL
         */
-        ENGINE_API				RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
+        ENGINE_API				    RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
 
         /// Destructor
         // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
-        ENGINE_API				~RigidBodyDynamic(void) override;
+        ENGINE_API				    ~RigidBodyDynamic(void) override;
 
         /// Getter
         /*
@@ -61,8 +61,20 @@ namespace engine
             <return> [out] the gravity status : true = disabled, false = enabled
         */
         ENGINE_API  bool            GetIsGravityDisabled(void) const;
+        /*
+            Get the half extents of the box
+            <return> [out] the half extents
+        */
         ENGINE_API  math::Vector3f  GetBoxHalfExtents(void) const;
+        /*
+            Get the radius of the sphere
+            <return> [out] the radius
+        */
         ENGINE_API  f32             GetSphereRadius(void) const;
+        /*
+            Get the half height and radius of the capsule
+            <return> [out] the half height and radius
+        */
         ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
         /// Setter
         /*
@@ -71,36 +83,61 @@ namespace engine
                                                                     false = enabled
         */
         ENGINE_API  void            SetGravityDisabled(bool inIsGravityDisabled);
+        /*
+            Set the half extents of the box
+            <param> [in] inHalfExtents : the half extents
+        */
         ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents) const;
+        /*
+            Set the radius of the sphere
+            <param> [in] inRadius : the radius
+        */
         ENGINE_API  void            SetSphereRadius(f32 inRadius) const;
+        /*
+            Set the half height and radius of the capsule
+            <param> [in] inRadius : the radius
+            <param> [in] inHalfHeight : the half height
+        */
         ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const;
 
         /// Functions
-        // Update the entity transform in reference to the dynamic rigid body
-        ENGINE_API	void		UpdateEntity(EntityHandle inEntityHandle);
-        // Update the dynamic rigid body transform in reference to the entity
-        ENGINE_API	void		UpdateRigidBody(const Transform& inEntityTransform);
+        /*
+            Update the entity transform in reference to the dynamic rigid body
+            <param> [in] inEntityHandle : the entity
+        */
+        ENGINE_API	void		    UpdateEntity(EntityHandle inEntityHandle);
+        /*
+            Update the dynamic rigid body transform in reference to the entity
+            <param> [in] inEntityTransform : the entity
+        */
+        ENGINE_API	void		    UpdateRigidBody(const Transform& inEntityTransform);
 
         // Delete the dynamic rigid body
-        ENGINE_API	void		RigidBodyDynamicCleanUp(void);
+        ENGINE_API	void		    RigidBodyDynamicCleanUp(void);
 
-        ENGINE_API	void		Register(void) override {}
+        ENGINE_API	void		    Register(void) override {}
 
     private :
 
         friend class RigidBodyDynamicFactory;
 
+        /// Constructor
+        // Delete the copy constructor
+                                    RigidBodyDynamic(const RigidBodyDynamic& inOther) = delete;
+
         /// Functions
-        // Check if the entity has a transform component if not create one
-        // <return> the entity transform
-                    Transform&	CheckEntityTransform(void);
+        /*
+            Check if the entity has a transform component if not create one
+            <return> the entity transform
+        */
+                    Transform&	    CheckEntityTransform(void);
 
         // Preset of a box dynamic rigid body
-                    void        CreateDynamicBoxRigidBody(void);
+                    void            CreateDynamicBoxRigidBody(void);
         // Preset of a sphere dynamic rigid body
-                    void        CreateDynamicSphereRigidBody(void);
+                    void            CreateDynamicSphereRigidBody(void);
         // Preset of a capsule dynamic rigid body
-                    void        CreateDynamicCapsuleRigidBody(void);
+                    void            CreateDynamicCapsuleRigidBody(void);
                     
         /// TODO : Check transform to directly use the component transform
         ///		   of the entity
@@ -115,7 +152,14 @@ namespace engine
     {
     public :
 
-        ENGINE_API static RigidBodyDynamic* Create(class SceneGraph* scene, EntityHandle owner,
+        /// Functions
+        /*
+            Fonction to create a dynamic rigid body
+            <param> [in] inScene : the scene
+            <param> [in] inOwner : the entity owner
+            <param> [in] inGeometry : the geometry type
+        */
+        ENGINE_API static RigidBodyDynamic* Create(class SceneGraph* inScene, EntityHandle inOwner,
                                                    const EGeometryType& inGeometry);
     };
 } //!Namespace engine
