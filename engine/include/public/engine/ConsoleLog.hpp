@@ -70,13 +70,13 @@ namespace engine
 
     }; // !Struct ConsoleLog
 
-    void PrintLog(ConsoleLog consoleLog, const std::string& message)
+    inline void PrintLog(ConsoleLog consoleLog, const std::string& message)
     {
         printf("\033[%d;%d;%dm%s %s\033[0m\n", (int)consoleLog.m_textFormat, (int)consoleLog.m_bgColor,
                (int)consoleLog.m_fgColor, consoleLog.m_prefix.c_str(), message.c_str());
     }
 
-    ConsoleLog ErrorPreset()
+    inline ConsoleLog ErrorPreset()
     {
         ConsoleLog consoleLog;
 
@@ -88,7 +88,7 @@ namespace engine
         return consoleLog;
     }
 
-    ConsoleLog WarningPreset()
+    inline ConsoleLog WarningPreset()
     {
         ConsoleLog consoleLog;
 
@@ -100,7 +100,7 @@ namespace engine
         return consoleLog;
     }
 
-    ConsoleLog InfoPreset()
+    inline ConsoleLog InfoPreset()
     {
         ConsoleLog consoleLog;
 
@@ -112,7 +112,7 @@ namespace engine
         return consoleLog;
     }
 
-    ConsoleLog SuccessPreset()
+    inline ConsoleLog SuccessPreset()
     {
         ConsoleLog consoleLog;
 
