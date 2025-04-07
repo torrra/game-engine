@@ -31,14 +31,17 @@ namespace engine
 		/// Constructor
 		// Default constructor set to a box geometry by default
 		ENGINE_API					Geometry(void);
-		// Constructor with enum parameter to choose the geometry
-		// Values are set by default
+        /*
+		    Constructor with enum parameter to choose the geometry
+		    Values are set by default
+        */
 		ENGINE_API					Geometry(EGeometryType geometryType);
 
 		/// Destructor
 		ENGINE_API					~Geometry(void);
 
 		/// Getter
+        // Return the geometry implementation structure pointer
 		ENGINE_API GeometryImpl&	GetGeometryImpl(void) const;
 
 		/// Public members
