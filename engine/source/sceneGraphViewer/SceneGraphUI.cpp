@@ -203,8 +203,6 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
 
 /*
     TODO:
-    - Add ability to create new node from right click menu
-    - Don't delete recursively (reparent children to deleted node's parent)
     - Encapsulate
     - Clean up
 */
@@ -220,7 +218,6 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
 
-    
     ImGui::PushID(entityName.c_str());
     bool result = ui::TreeNode((node->m_handle == m_renamingHandle) ? std::string("###") + entityName : entityName, nodeFlags);
 
@@ -231,25 +228,30 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
 
         if (ImGui::MenuItem("Rename"))
         {
-            //enableRename = true;
             m_renamingHandle = node->m_handle;
             printf("Renaming %s...\n", entityName.c_str());
         }
 
         if (ImGui::MenuItem("Delete"))
         {
-            DeleteAllChildren(node);
-
             TreeNode* parentNode = node->m_parent;
+            for (TreeNode* childNode : node->m_children)
+            {
+                ReparentNode(childNode, parentNode);
+            }
+
             for (uint64 childIndex = 0; childIndex < parentNode->m_children.size(); ++childIndex)
             {
                 if (parentNode->m_children[childIndex]->m_handle == node->m_handle)
                 {
                     delete node;
                     parentNode->m_children.erase(parentNode->m_children.begin() + childIndex);
+                    m_reset = true;
                     break;
                 }
             }
+            
+
 
             m_graph->DestroyEntity(node->m_handle);
 
