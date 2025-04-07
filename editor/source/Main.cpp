@@ -49,20 +49,18 @@ int main(void)
         /// ---------------- PhysicsEngine use ---------------- 
         engine::PhysicsEngine::Get().Init();
 
-        /// ---------------- Create material ----------------
-        engine::Material* floorMaterial = new engine::Material(0.5f, 0.5f, 0.f);
-
         /// ---------------- Create rigidbody dynamic ----------------
         std::cout << "\t" << std::endl;
 
-        engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::Create(engine.GetGraph(), 
-                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
-        rb->SetGravityDisabled(false);
-        //rb->SetCapsuleFormat(2.f, 4.f);
+        engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
+                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::PLANE);
+        //rb->SetGravityDisabled(false);
 
         /// ---------------- Create rigidbody static ----------------
-        engine::RigidBodyStatic* floorRigidBody = new engine::RigidBodyStatic(floor, engine.GetGraph());
-        floorRigidBody->CreatePlaneStaticRigidBody(engine::PhysicsEngine::Get(), *floorMaterial);
+        engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
+                                                engine.GetGraph(), floor, engine::BOX);
+
+        floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
 
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
@@ -71,7 +69,7 @@ int main(void)
             math::Matrix4f projViewMatrix = camera->ViewProjection();
 			project.Update(engine);
 			engine.Update();
-            engine::PhysicsEngine::Get().StepSimulation(0.001f);
+            engine::PhysicsEngine::Get().StepSimulation(1 / 120.f);
             engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
             rb->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
             rb->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
@@ -81,8 +79,7 @@ int main(void)
 
         /// ---------------- Clean ---------------- 
         delete rb;
-        delete floorRigidBody;
-        delete floorMaterial;
+        delete floorRb;
         engine::PhysicsEngine::Get().CleanUp();
 
 		engine.ShutDown();
