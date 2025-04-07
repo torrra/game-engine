@@ -310,9 +310,9 @@ void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) 
     return;
 }
 
-engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::Create(SceneGraph* scene, 
-                                                                  EntityHandle owner,
-                                                                  const EGeometryType& inGeometry)
+engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGraph* scene, 
+                                                                         EntityHandle owner,
+                                                                         const EGeometryType& inGeometry)
 {
     // Create dynamic rigid body in regard to the geometry and give it an owner and a scene
     if (RigidBodyDynamic* temp = new RigidBodyDynamic(owner, scene))
@@ -333,6 +333,8 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::Create(SceneGraph* sc
             break;
         default:
             PrintLog(ErrorPreset(), "Invalid geometry type");
+            temp->CreateDynamicBoxRigidBody();
+            return temp;
             break;
         }
     }

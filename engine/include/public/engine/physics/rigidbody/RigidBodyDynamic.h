@@ -49,7 +49,7 @@ namespace engine
             <param> [in] owner : the entity owner
             <param> [in] scene : the scene openGL
         */
-        ENGINE_API				    RigidBodyDynamic(EntityHandle owner, class SceneGraph* scene);
+        ENGINE_API				    RigidBodyDynamic(EntityHandle inOwner, class SceneGraph* inScene);
 
         /// Destructor
         // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
@@ -159,7 +159,8 @@ namespace engine
             <param> [in] inOwner : the entity owner
             <param> [in] inGeometry : the geometry type
         */
-        ENGINE_API static RigidBodyDynamic* Create(class SceneGraph* inScene, EntityHandle inOwner,
-                                                   const EGeometryType& inGeometry);
+        ENGINE_API static RigidBodyDynamic* CreateDynamic(class SceneGraph* inScene, 
+                                                          EntityHandle inOwner,
+                                                          const EGeometryType& inGeometry);
     };
 } //!Namespace engine
