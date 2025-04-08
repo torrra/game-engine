@@ -68,6 +68,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
 

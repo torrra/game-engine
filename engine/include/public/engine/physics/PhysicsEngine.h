@@ -29,6 +29,29 @@ namespace engine
         // Get the pointer to the structure implementation of physx
         ENGINE_API          PhysicsEngineImpl& GetImpl(void) const;
 
+        /// Setter
+        /*
+            Set the debug draw of the linear velocity active with their own scale to 0 by default
+            <param> [in] inScale : The scale : 0 by default : not visible
+                                             : 1            : visible with a normal scale
+                                             : > 1          : visible with a bigger scale
+        */
+        ENGINE_API  void    SetDebugLinearVelocity(f32 inScale = 0.f);
+        /*
+            Set the debug draw of the contact point active with their own scale to 0 by default
+            <param> [in] inScale : The scale : 0 by default : not visible
+                                             : 1            : visible with a normal scale
+                                             : > 1          : visible with a bigger scale
+        */
+        ENGINE_API  void    SetDebugContactPoint(f32 inScale = 0.f);
+        /*
+            Set the debug draw of the actor axes active with their own scale to 0 by default
+            <param> [in] inScale : The scale : 0 by default : not visible
+                                             : 1            : visible with a normal scale
+                                             : > 1          : visible with a bigger scale
+        */
+        ENGINE_API  void    SetDebugActorAxes(f32 inScale = 0.f);
+
         /// Functions
         /*
             Initialize the physics engine by intializing

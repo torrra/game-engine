@@ -45,6 +45,7 @@ int main(void)
 
         /// ---------------- Create entity ---------------- 
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
+        //engine.GetGraph()->CreateComponent<engine::Transform>(floor)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
 
         /// ---------------- PhysicsEngine use ---------------- 
         engine::PhysicsEngine::Get().Init();
@@ -63,12 +64,14 @@ int main(void)
         floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
         floorRb->SetDebugVisualization(true);
 
+        //engine::PhysicsEngine::Get().SetDebugActorAxes(5.f);
+
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
             math::Matrix4f projViewMatrix = camera->ViewProjection();
-            engine::PhysicsEngine::Get().StepSimulation(1 / 60.f);
+            engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
             rb->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 			project.Update(engine);
 			engine.Update();

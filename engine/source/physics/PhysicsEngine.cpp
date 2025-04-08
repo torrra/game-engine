@@ -56,6 +56,21 @@ engine::PhysicsEngineImpl& engine::PhysicsEngine::GetImpl(void) const
     return *m_impl;
 }
 
+void engine::PhysicsEngine::SetDebugLinearVelocity(f32 inScale)
+{
+    m_impl->m_scene->setVisualizationParameter(PxVisualParam::eBODY_LIN_VELOCITY, inScale);
+}
+
+void engine::PhysicsEngine::SetDebugContactPoint(f32 inScale)
+{
+    m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCONTACT_POINT, inScale);
+}
+
+void engine::PhysicsEngine::SetDebugActorAxes(f32 inScale)
+{
+    m_impl->m_scene->setVisualizationParameter(PxVisualParam::eACTOR_AXES, inScale);
+}
+
 void engine::PhysicsEngine::Init(void)
 {
     /*
@@ -219,6 +234,7 @@ void engine::PhysicsEngine::InitScene(void)
         m_impl->m_material = m_impl->m_physics->createMaterial(0.5f, 0.5f, 0.6f);
 
         /// TODO : Check what visualization parameter we want to use
+        /// TO KEEP
         /*
             Set multiple visualization parameters to display information in the pvd scene
             and OpenGL scene
@@ -227,31 +243,6 @@ void engine::PhysicsEngine::InitScene(void)
         m_impl->m_scene->setVisualizationParameter(PxVisualParam::eSCALE, 1.0f);
         // Set the debug draw of the collision shapes active with their own scale to 1 by default
         m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_SHAPES, 1.0f);
-        // Set the debug draw of the bodies axes active with their own scale to 1 by default
-        m_impl->m_scene->setVisualizationParameter(PxVisualParam::eBODY_AXES, 1.0f);
-
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eWORLD_AXES, 2.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eACTOR_AXES, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eBODY_ANG_VELOCITY, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eBODY_LIN_VELOCITY, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_AABBS, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_AXES, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_COMPOUNDS, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_DYNAMIC, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_EDGES, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_FNORMALS, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_STATIC, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCONTACT_ERROR, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCONTACT_FORCE, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCONTACT_IMPULSE, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCONTACT_NORMAL, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCONTACT_POINT, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCULL_BOX, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eFRICTION_IMPULSE, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eFRICTION_NORMAL, 1.0f);
-        //m_impl->m_scene->setVisualizationParameter(PxVisualParam::eFRICTION_POINT, 1.0f);
-
-
     }
 }
 
