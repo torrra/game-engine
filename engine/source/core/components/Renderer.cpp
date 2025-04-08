@@ -29,13 +29,6 @@ namespace engine
         if (!m_model->CanRender())
             return;
 
-        if (m_texture)
-        {
-            m_texture->UseTexture();
-        }
-        else
-            Texture::RemoveTexture();
-
         m_shader->Use();
 
         if (Transform* transform = transforms.GetComponent(m_owner))
@@ -58,7 +51,7 @@ namespace engine
             m_shader->Set("normalMat", &identityMat);
         }
 
-        DrawModel();
+        m_model->Draw();
     }
 
     const Model* Renderer::GetModel(void) const
@@ -98,17 +91,6 @@ namespace engine
             m_shader = shader;
     }
 
-    void Renderer::SetTexture(const Texture* texture)
-    {
-        m_texture = texture;
-    }
-
-    void Renderer::SetTexture(const char* key)
-    {
-        if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
-            m_texture = texture;
-    }
-
     void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
                                  uint64 index) const
     {
@@ -131,18 +113,10 @@ namespace engine
         text::Serialize(output, "owner", owner);
 
         output << "\n    ";
-        text::Serialize(output, "hasTexture", (bool)texture);
-        output << "\n    ";
         text::Serialize(output, "model", *model);
         output << "\n    ";
         text::Serialize(output, "shader", *shader);
         output << "\n    ";
-
-        if (texture)
-        {
-            text::Serialize(output, "texture", *texture);
-            output << "\n    ";
-        }
 
         text::Serialize(output, "flags", m_flags);
         output << '\n';
@@ -153,11 +127,6 @@ namespace engine
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeInteger(text, m_owner);
 
-        uint8 hasTexture;
-
-        MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeInteger(text, hasTexture);
-
         std::string key;
         text = text::DeserializeString(text, end, key);
 
@@ -167,39 +136,8 @@ namespace engine
         text = text::DeserializeString(text, end, key);
         m_shader = ResourceManager::GetResource<ShaderProgram>(key);
 
-        if (hasTexture)
-        {
-            key.clear();
-            text = text::DeserializeString(text, end, key);
-            m_texture = ResourceManager::GetResource<Texture>(key);
-        }
-
         MOVE_TEXT_CURSOR(text, end);
         return text::DeserializeInteger(text, m_flags);
     }
-
-    void Renderer::DrawModel(void) const
-    {
-        if (m_model->IsDynamic())
-        {
-            for (const DynamicMesh& mesh : m_model->GetDynamicMeshes())
-            {
-                glBindVertexArray(mesh.GetVertexArrayID());
-                glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
-                glBindVertexArray(0);
-            }
-        }
-        else
-        {
-            for (const Mesh& mesh : m_model->GetStaticMeshes())
-            {
-                glBindVertexArray(mesh.GetVertexArrayID());
-                glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
-                glBindVertexArray(0);
-            }
-        }
-    }
-
-
 
 }
