@@ -19,6 +19,12 @@
 
 #pragma endregion
 
+#pragma region Physics
+
+#include "engine/physics/PhysicsEngine.h"
+
+#pragma endregion
+
 engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();

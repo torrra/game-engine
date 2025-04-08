@@ -9,7 +9,7 @@
 
 #pragma region Standard
 
-#include <iostream>
+#include <stdio.h>
 
 #pragma endregion
 

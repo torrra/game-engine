@@ -9,7 +9,6 @@
 #pragma region MathLib
 
 #include <math/Vector3.hpp>
-#include <math/VectorGeneric.hpp>
 #include <math/Quaternion.hpp>
 
 #pragma endregion

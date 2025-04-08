@@ -6,12 +6,6 @@
 
 #pragma endregion
 
-#pragma region PhysX
-
-#include <physx/PxPhysicsAPI.h>
-
-#pragma endregion
-
 #pragma region Internal
 
 #include "physics/InternalPhysXStruct.hpp"

@@ -19,7 +19,11 @@
 
 #pragma endregion
 
-#include <iostream>
+#pragma region Physics
+
+#include "engine/physics/PhysicsEngine.h"
+
+#pragma endregion
 
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
@@ -48,14 +52,14 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 {
     // Create a new material with default values
-    m_material = new Material(0.5f, 0.5f, 0.6f);
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new dynamic rigid body with box geometry and default values
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
-                                            *m_material->GetImpl().m_material, 1.0f);
+                                            *m_materialImpl->GetImpl().m_material, 1.0f);
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
@@ -73,14 +77,14 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 {
     // Create a new material with default values
-    m_material = new Material(0.5f, 0.5f, 0.6f);
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new dynamic rigid body with sphere geometry and default values
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxSphereGeometry(0.5f),
-                                            *m_material->GetImpl().m_material, 1.0f);
+                                            *m_materialImpl->GetImpl().m_material, 1.0f);
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
@@ -98,14 +102,14 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 {
     // Create a new material with default values
-    m_material = new Material(0.5f, 0.5f, 0.6f);
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new dynamic rigid body with capsule geometry and default values
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
                                             physx::PxCapsuleGeometry(0.25f, 0.25f),
-                                            *m_material->GetImpl().m_material, 1.0f);
+                                            *m_materialImpl->GetImpl().m_material, 1.0f);
 
     // Rotate the intiale position of the capsule to be at the vertical by default
     // By using the local pose to not rotate the entity attach to it
@@ -152,9 +156,9 @@ void engine::RigidBodyDynamic::UpdateRigidBody(EntityHandle inEntityHandle)
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
     // Release the material
-    PX_RELEASE(m_material->GetImpl().m_material);
+    PX_RELEASE(m_materialImpl->GetImpl().m_material);
     // Delete the pointer
-    delete m_material;
+    delete m_materialImpl;
     // Release the rigid body
     PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
 }

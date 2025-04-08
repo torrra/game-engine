@@ -38,12 +38,6 @@ namespace engine
 
 	}; // !Struct MaterialImpl
 
-	struct GeometryImpl
-	{
-		physx::PxGeometry*				m_geometry			= nullptr;
-
-	}; // !Struct GeometryImpl
-
     struct DebugDrawImpl
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;

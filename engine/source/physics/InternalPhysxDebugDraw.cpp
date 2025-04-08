@@ -15,12 +15,6 @@
 
 #pragma endregion
 
-#pragma region PhysX
-
-#include <physx/PxPhysicsAPI.h>
-
-#pragma endregion
-
 engine::DebugDraw::DebugDraw()
 {
     m_debugDrawImpl = new engine::DebugDrawImpl();

@@ -7,12 +7,6 @@
 
 #pragma endregion
 
-#pragma region Physics
-
-#include "engine/physics/PhysicsEngine.h"
-
-#pragma endregion
-
 namespace engine
 {
     struct MaterialImpl;

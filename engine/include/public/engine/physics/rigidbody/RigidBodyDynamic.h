@@ -17,7 +17,7 @@
 #pragma region Physics
 
 #include "engine/physics/PhysicsMaterial.h"
-#include "engine/physics/geometry/Geometry.h"
+#include "engine/physics/geometry/Geometry.hpp"
 
 #pragma endregion
 
@@ -29,11 +29,6 @@
 
 namespace engine
 {
-    enum EErrorGeometryType
-    {
-        EErrorGeometryType_None     = -1,
-        EErrorGeometryType_Invalid  = 0
-    };
     /// Forward declaration
     struct RigidBodyDynamicImpl;
 
@@ -148,8 +143,8 @@ namespace engine
         ///		   of the entity
 
         /// Private members
-        RigidBodyDynamicImpl*	m_rigidBodyImpl;
-        Material*				m_material			= nullptr;
+        RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
+        Material*				m_materialImpl	= nullptr;
 
     }; // !Class RigidBodyDynamic
 

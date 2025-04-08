@@ -6,6 +6,12 @@
 
 #pragma endregion
 
+#pragma region Physics
+
+#include "engine/physics/PhysicsEngine.h"
+
+#pragma endregion
+
 engine::Material::Material(void)
 {
     // Create the pointer to the structure of material implementation
