@@ -55,6 +55,7 @@ int main(void)
         engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
                                             engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
         rb->SetDebugVisualization(true);
+        //rb->SetGravityDisabled(true);
 
         /// ---------------- Create rigidbody static ----------------
         std::cout << "\t" << std::endl;

@@ -25,6 +25,8 @@
 
 #pragma endregion
 
+#include <iostream>
+
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
 {
     // Initialize the rigidbody implementation struct
@@ -145,6 +147,22 @@ void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
     // if the rigid body is under gravity then the rigid body fall so the entity fall
     *m_currentScene->GetComponent<Transform>(inEntityHandle) = 
                             ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+
+    //std::cout << "Entity rotation : " << m_currentScene->GetComponent<Transform>(inEntityHandle)->GetRotation() << std::endl;
+    //std::cout << "Rigid body rotation : " << m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.w << " " <<
+    //                                         m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.x << " " <<
+    //                                         m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.y << " " <<
+    //                                         m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.z << "\n" << std::endl;
+
+    //physx::PxShape* shapes = nullptr;
+    //m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    //if (shapes)
+    //{
+    //    std::cout << "Rigid body rotation : " << shapes->getLocalPose().q.w << " " <<
+    //                                             shapes->getLocalPose().q.x << " " <<
+    //                                             shapes->getLocalPose().q.y << " " <<
+    //                                             shapes->getLocalPose().q.z << "\n" << std::endl;
+    //}
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody(EntityHandle inEntityHandle)

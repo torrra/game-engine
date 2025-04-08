@@ -108,15 +108,17 @@ engine::Transform engine::Transform::GetTransform(void) const
     return *this;
 }
 
-void engine::Transform::SetPosition(const math::Vector3f& inPosition)
+engine::Transform& engine::Transform::SetPosition(const math::Vector3f& inPosition)
 {
     m_position = inPosition;
     m_dirty = true;
+
+    return *this;
 }
 
 void engine::Transform::SetRotation(const math::Quatf& inRotation)
 {
-    m_rotation = inRotation;
+    m_rotation = inRotation.Normalized();
     m_dirty = true;
 }
 
