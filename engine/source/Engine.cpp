@@ -4,7 +4,6 @@
 #include "resource/ResourceManager.h"
 #include "core/systems/ScriptSystem.h"
 #include "Window.h"
-#include "sceneGraphViewer/SceneGraphUI.h"
 #include "ui/UIWindow.h"
 
 #include <math/Vector2.hpp>
@@ -75,9 +74,6 @@ void engine::Engine::ShutDown(void)
     // TODO: call shutdown for ui manager
     m_uiManager.ShutDown();
 
-    if (m_graphViewer)
-        delete m_graphViewer;
-
     if (m_viewport)
         delete m_viewport;
 
@@ -89,15 +85,7 @@ void engine::Engine::ShutDown(void)
 }
 
 void engine::Engine::Update(void)
-{	
-    static bool isInit = false;
-
-    if (!isInit)
-    {
-        m_graphViewer = new SceneGraphViewer("Scene Graph", m_graph);
-        isInit = true;
-    }
-
+{
     static const f32 updateFrequency = (FIX_UPDATE_FREQUENCY * m_timeScale) * TO_MILLISECONDS;
     static f32 runTime = 0.0f;
     static f32 nextUpdateTime = runTime + updateFrequency;
@@ -120,11 +108,15 @@ void engine::Engine::Update(void)
     m_window->ClearWindow(0.1f, 0.1f, 0.1f);
     
     m_uiManager.NewFrame();
-    m_graphViewer->Render();
     m_viewport->DrawViewport(); // DRAW VIEWPORT
-    m_uiManager.UpdateUI();
     // Render
+
+}
+
+void engine::Engine::LateUpdate(void)
+{
     m_viewport->RenderToViewport(m_graph);
+    m_uiManager.UpdateUI();
     Input::ResetKeys();
     m_window->Update();
     m_time.Update();

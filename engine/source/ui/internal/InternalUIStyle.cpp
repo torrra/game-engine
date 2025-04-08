@@ -1,4 +1,4 @@
-#include "ui/InternalUIStyle.h"
+#include "ui/UIStyle.h"
 
 #undef new
 #include <imgui/imgui.h>

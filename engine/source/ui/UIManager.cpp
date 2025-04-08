@@ -9,7 +9,7 @@
 
 #include "utility/MemoryCheck.h"
 
-#define ENABLE_UI_DEBUG 1
+#define ENABLE_UI_DEBUG 0
 
 engine::UIManager::UIManager(wnd::Wnd* window)
 {

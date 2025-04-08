@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 #include <math/Vector2.hpp>
 #include <math/Vector4.hpp>
@@ -13,6 +14,10 @@ namespace engine
     {
         struct UIWindowRect;
     }
+}
+
+namespace ui
+{
 
     enum EWndFlags
     {
@@ -53,20 +58,20 @@ namespace engine
     class UIWindow
     {
     public:
-        UIWindow(void);
-        ~UIWindow(void) = default;
+        ENGINE_API UIWindow(void);
+        ENGINE_API ~UIWindow(void) = default;
 
-        void Render(void);
+        ENGINE_API void Render(void);
 
     protected:
         virtual void RenderContents(void);
     
-        ui::UIWindowRect GetWindowRect(void);
+        ENGINE_API engine::ui::UIWindowRect GetWindowRect(void);
 
-        void SetName(const char* title);
-        void SetFlags(int32 flags);
-        void SetWindowPos(math::Vector2f const& position, EActive activeFlag);
-        void SetWindowSize(math::Vector2f const& size, EActive activeFlag);
+        ENGINE_API void SetName(const char* title);
+        ENGINE_API void SetFlags(int32 flags);
+        ENGINE_API void SetWindowPos(math::Vector2f const& position, EActive activeFlag);
+        ENGINE_API void SetWindowSize(math::Vector2f const& size, EActive activeFlag);
         
         std::string m_title;
         int32 m_flags;

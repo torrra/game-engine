@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 namespace ui
 {
@@ -66,5 +67,5 @@ namespace ui
         MODAL_WINDOW_DIM_BACKGROUND_COLOR,
     };
 
-    uint32 GetColor(EColor colorID, f32 alpha);
+    ENGINE_API uint32 GetColor(EColor colorID, f32 alpha);
 }

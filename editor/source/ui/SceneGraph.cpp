@@ -1,19 +1,20 @@
-#include "sceneGraphViewer/SceneGraphUI.h"
-#include "core/SceneGraph.h"
-#include "input/Input.h"
+#include "ui/SceneGraph.h"
 
-#include "ui/UIWindow.h"
-#include "ui/InternalUIDraw.h"
-#include "ui/InternalUIWindow.h"
-#include "ui/InternalUIDragDrop.h"
-#include "ui/InternalUITree.h"
-#include "ui/InternalUIComponent.h"
-#include "ui/InternalUIStyle.h"
+#include <engine/core/SceneGraph.h>
+#include <engine/ui/InternalUIWindow.h>
+#include <engine/ui/UIWindow.h>
+#include <engine/ui/UIDraw.h>
+#include <engine/ui/UIWindow.h>
+#include <engine/ui/UIDragDrop.h>
+#include <engine/ui/UITree.h>
+#include <engine/ui/UIComponent.h>
+#include <engine/ui/UIStyle.h>
+#include <engine/input/Input.h>
 
-#include "utility/MemoryCheck.h"
+#include <engine/utility/MemoryCheck.h>
 
 // Node Functions
-engine::TreeNode::~TreeNode(void)
+editor::TreeNode::~TreeNode(void)
 {
     for (TreeNode* node : m_children)
         delete node;
@@ -23,7 +24,7 @@ engine::TreeNode::~TreeNode(void)
     m_parent = nullptr;
 }
 
-void engine::TreeNode::Init(TreeNode* parent, EntityHandle handle)
+void editor::TreeNode::Init(TreeNode* parent, engine::EntityHandle handle)
 {
     m_children = std::vector<TreeNode*>();
     m_parent = parent;
@@ -31,38 +32,47 @@ void engine::TreeNode::Init(TreeNode* parent, EntityHandle handle)
 }
 
 // Graph Window Functions
-engine::SceneGraphViewer::SceneGraphViewer(const char* title)
-    : m_graph(nullptr), m_reset(false)
+editor::SceneGraphUI::SceneGraphUI(const char* title)
+    : m_graph(nullptr), m_reset(false), m_renamingHandle(0)
 {
     SetName(title);
-    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE | EWndFlags::MENU_BAR);
+    SetFlags(::ui::EWndFlags::HORIZONTAL_SCROLL_BAR | ::ui::EWndFlags::NO_COLLAPSE | ::ui::EWndFlags::MENU_BAR);
     InitRootNode();
 
     // TODO: register keys somewhere else
-    Input::RegisterInput(MOUSE_BUTTON_LEFT);
-    Input::RegisterInput(MOUSE_BUTTON_RIGHT);
+    engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
+    engine::Input::RegisterInput(MOUSE_BUTTON_RIGHT);
 }
 
-engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
-    : m_graph(graph), m_reset(false)
+editor::SceneGraphUI::SceneGraphUI(const char* title, engine::SceneGraph* graph)
+    : m_graph(graph), m_reset(false), m_renamingHandle(0)
 {
     SetName(title);
-    SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE | EWndFlags::MENU_BAR);
-    InitRootNode();
-    CreateGraph();
+    SetFlags(::ui::EWndFlags::HORIZONTAL_SCROLL_BAR | ::ui::EWndFlags::NO_COLLAPSE | ::ui::EWndFlags::MENU_BAR);
+    
+    if (graph)
+    {
+        InitRootNode();
+        CreateGraph();
+    }
+    else
+        m_root = nullptr;
 
     // TODO: register keys somewhere else
-    Input::RegisterInput(MOUSE_BUTTON_LEFT);
-    Input::RegisterInput(MOUSE_BUTTON_RIGHT);
+    engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
+    engine::Input::RegisterInput(MOUSE_BUTTON_RIGHT);
 }
 
-engine::SceneGraphViewer::~SceneGraphViewer(void)
+editor::SceneGraphUI::~SceneGraphUI(void)
 {
     DeleteGraph();
 }
 
-void engine::SceneGraphViewer::SetGraph(SceneGraph* graph)
+void editor::SceneGraphUI::SetGraph(engine::SceneGraph* graph)
 {
+    if (!graph)
+        return;
+
     m_graph = graph;
     
     if (m_root)
@@ -72,7 +82,7 @@ void engine::SceneGraphViewer::SetGraph(SceneGraph* graph)
     CreateGraph();
 }
 
-void engine::SceneGraphViewer::RenderContents(void)
+void editor::SceneGraphUI::RenderContents(void)
 {
     RenderMenuBar();
 
@@ -91,13 +101,13 @@ void engine::SceneGraphViewer::RenderContents(void)
     }
 }
 
-void engine::SceneGraphViewer::InitRootNode(void)
+void editor::SceneGraphUI::InitRootNode(void)
 {
     m_root = new TreeNode();
-    m_root->Init(nullptr, Entity::EHandleUtils::INVALID_HANDLE);
+    m_root->Init(nullptr, engine::Entity::EHandleUtils::INVALID_HANDLE);
 }
 
-void engine::SceneGraphViewer::AddNode(TreeNode* parentNode)
+void editor::SceneGraphUI::AddNode(TreeNode* parentNode)
 {
     // Create new entity
     int32 id = 0;
@@ -113,7 +123,7 @@ void engine::SceneGraphViewer::AddNode(TreeNode* parentNode)
     }
 
     newEntityName += std::string(idStr);
-    EntityHandle handle = m_graph->CreateEntity(newEntityName);
+    engine::EntityHandle handle = m_graph->CreateEntity(newEntityName);
 
     // Create new node
     TreeNode* newNode = new TreeNode();
@@ -121,18 +131,18 @@ void engine::SceneGraphViewer::AddNode(TreeNode* parentNode)
     parentNode->m_children.emplace_back(newNode);
 }
 
-void engine::SceneGraphViewer::CreateGraph(void)
+void editor::SceneGraphUI::CreateGraph(void)
 {
-    std::vector<EntityHandle> handles = m_graph->GetChildrenAllLevels(m_root->m_handle);
+    std::vector<engine::EntityHandle> handles = m_graph->GetChildrenAllLevels(m_root->m_handle);
     std::vector<TreeNode*> nodes;
 
     for (uint64 handleIndex = 0; handleIndex < handles.size(); ++handleIndex)
     {
         TreeNode* newNode = new TreeNode;
-        EntityHandle parentHandle = m_graph->GetEntity(handles[handleIndex])->GetParent();
+        engine::EntityHandle parentHandle = m_graph->GetEntity(handles[handleIndex])->GetParent();
 
         // Find parent node
-        if (parentHandle != Entity::EHandleUtils::INVALID_HANDLE)
+        if (parentHandle != engine::Entity::EHandleUtils::INVALID_HANDLE)
         {
             for (TreeNode* parentNode : nodes)
             {
@@ -158,7 +168,7 @@ void engine::SceneGraphViewer::CreateGraph(void)
     nodes.clear();
 }
 
-void engine::SceneGraphViewer::DeleteAllChildren(TreeNode* node)
+void editor::SceneGraphUI::DeleteAllChildren(TreeNode* node)
 {
     // Don't delete the root node
     if (node->m_handle == m_root->m_handle)
@@ -180,18 +190,18 @@ void engine::SceneGraphViewer::DeleteAllChildren(TreeNode* node)
     }
 }
 
-void engine::SceneGraphViewer::DeleteGraph(void)
+void editor::SceneGraphUI::DeleteGraph(void)
 {
-    DeleteAllChildren(m_root);
-
     if (m_root)
     {
+        DeleteAllChildren(m_root);
+        
         delete m_root;
         m_root = nullptr;
     }
 }
 
-void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newParent)
+void editor::SceneGraphUI::ReparentNode(TreeNode* toReparent, TreeNode* newParent)
 {
     TreeNode* prevParent = toReparent->m_parent;
 
@@ -210,7 +220,7 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
     prevParent->m_children.erase(prevParent->m_children.begin() + childIndex);
 }
 
-void engine::SceneGraphViewer::CheckRenameNode(TreeNode* node, std::string const& originalName)
+void editor::SceneGraphUI::CheckRenameNode(TreeNode* node, std::string const& originalName)
 {
     if (m_renamingHandle != node->m_handle)
         return;
@@ -218,10 +228,10 @@ void engine::SceneGraphViewer::CheckRenameNode(TreeNode* node, std::string const
     std::string resultStr;
 
     // Prevent placing input text box on following line
-    ui::SameLine();
-    ui::SetKeyboardFocus();
-    if (ui::InputTextBox(originalName.c_str(), resultStr) ||
-        Input::IsInputDown(MOUSE_BUTTON_LEFT) || Input::IsInputDown(MOUSE_BUTTON_RIGHT))
+    ::ui::SameLine();
+    ::ui::SetKeyboardFocus();
+    if (::ui::InputTextBox(originalName.c_str(), resultStr) ||
+        engine::Input::IsInputDown(MOUSE_BUTTON_LEFT) || engine::Input::IsInputDown(MOUSE_BUTTON_RIGHT))
     {
         if (resultStr[0] != '\0' && !m_graph->GetEntity(resultStr))
             m_graph->GetEntity(m_renamingHandle)->SetName(resultStr);
@@ -232,25 +242,25 @@ void engine::SceneGraphViewer::CheckRenameNode(TreeNode* node, std::string const
         m_renamingHandle = node->m_handle;
 }
 
-void engine::SceneGraphViewer::DrawNodeAndChildren(TreeNode* node)
+void editor::SceneGraphUI::DrawNodeAndChildren(TreeNode* node)
 {
     // Get entity & node name
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
     std::string nodeName = (node->m_handle == m_renamingHandle) ? ("###" + entityName) : entityName;
 
     // Set ID to prevent duplicate menu items
-    ui::SetID(nodeName);
-    bool isOpen = ui::TreeNode(nodeName, GetNodeFlags(node));
+    ::ui::SetID(nodeName);
+    bool isOpen = ::ui::TreeNode(nodeName, GetNodeFlags(node));
     RenderPopupMenu(node);
     CheckRenameNode(node, entityName);
-    ui::UnsetID();
+    ::ui::UnsetID();
 
     // Create drag & drop payload 
-    if (ui::StartDragDropSource(GetDragDropFlags(node->m_handle)))
+    if (::ui::StartDragDropSource(GetDragDropFlags(node->m_handle)))
     {
-        ui::CreatePayload("Entity", node, sizeof(TreeNode));
-        ui::Text("%s", entityName.c_str());
-        ui::EndDragDropSource();
+        ::ui::CreatePayload("Entity", node, sizeof(TreeNode));
+        ::ui::Text("%s", entityName.c_str());
+        ::ui::EndDragDropSource();
     }
     
     // Condition to check node state is open
@@ -260,8 +270,8 @@ void engine::SceneGraphViewer::DrawNodeAndChildren(TreeNode* node)
         if (DragDropNode("Entity", node, 0) ||
             DragDropBackground("Entity", 0))
         {
-            ui::EndTreeNode();
-            ui::EndDragDropTarget();
+            ::ui::EndTreeNode();
+            ::ui::EndDragDropTarget();
 
             m_reset = true;
             return;
@@ -275,15 +285,15 @@ void engine::SceneGraphViewer::DrawNodeAndChildren(TreeNode* node)
 
             DrawNodeAndChildren(childNode);
         }
-        ui::EndTreeNode();
+        ::ui::EndTreeNode();
     }
 }
 
-const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
+const ::ui::Payload editor::SceneGraphUI::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
 {
-    if (ui::StartDragDropTarget())
+    if (::ui::StartDragDropTarget())
     {
-        if (ui::Payload payload = ui::AcceptPayload(payloadID, flags))
+        if (::ui::Payload payload = ::ui::AcceptPayload(payloadID, flags))
         {
             TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
 
@@ -292,7 +302,7 @@ const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* pay
                 bool blockAction = false;
 
                 TreeNode* prevParent = node->m_parent;
-                while (prevParent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
+                while (prevParent->m_handle != engine::Entity::EHandleUtils::INVALID_HANDLE)
                 {
                     if (prevParent->m_handle == selectedNode->m_handle)
                     {
@@ -310,90 +320,90 @@ const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* pay
             }
         }
 
-        ui::EndDragDropTarget();
+        ::ui::EndDragDropTarget();
     }
 
     return nullptr;
 }
 
-const engine::ui::Payload engine::SceneGraphViewer::DragDropBackground(const char* payloadID, int32 flags)
+const ::ui::Payload editor::SceneGraphUI::DragDropBackground(const char* payloadID, int32 flags)
 {
-    if (ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str()))
+    if (::ui::StartDragDropTargetCustom(this->GetWindowRect(), m_title.c_str()))
     {
-        if (ui::Payload payload = ui::AcceptPayload(payloadID, flags))
+        if (::ui::Payload payload = ::ui::AcceptPayload(payloadID, flags))
         {
             if (payload.IsPreview())
             {
-                ui::DrawList drawList = ui::GetForegroundDrawList();
-                const ui::UIWindowRect transform = ui::GetCurrentWindowRect();
+                ::ui::DrawList drawList = ::ui::GetForegroundDrawList();
+                auto transform = this->GetWindowRect();
                 uint32 color = ::ui::GetColor(::ui::DRAG_DROP_TARGET_COLOR, 0.05f);
                 drawList.AddRectFilled(transform.m_min, transform.m_max, color);
             }
 
             TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
-            if (payload.IsDelivery() && selectedNode->m_parent->m_handle != Entity::EHandleUtils::INVALID_HANDLE)
+            if (payload.IsDelivery() && selectedNode->m_parent->m_handle != engine::Entity::EHandleUtils::INVALID_HANDLE)
             {
                 ReparentNode(selectedNode, m_root);
 
                 return payload;
             }
         }
-        ui::EndDragDropTarget();
+        ::ui::EndDragDropTarget();
     }
 
     return nullptr;
 }
 
-int32 engine::SceneGraphViewer::GetNodeFlags(TreeNode* node) const
+int32 editor::SceneGraphUI::GetNodeFlags(TreeNode* node) const
 {
     // Default flags
-    int32 nodeFlags = ui::SPAN_FULL_WIDTH | ui::FRAME_PADDING | ui::OPEN_ON_DOUBLE_CLICK | ui::OPEN_WITH_ARROW;
+    int32 nodeFlags = ::ui::SPAN_FULL_WIDTH | ::ui::FRAME_PADDING | ::ui::OPEN_ON_DOUBLE_CLICK | ::ui::OPEN_WITH_ARROW;
 
     // Only add 'open / close' icon if node contains children
     if (node->m_children.empty())
-        nodeFlags |= ui::NO_ICON;
+        nodeFlags |= ::ui::NO_ICON;
 
     return nodeFlags;
 }
 
-int32 engine::SceneGraphViewer::GetDragDropFlags(int64 const nodeHandle) const
+int32 editor::SceneGraphUI::GetDragDropFlags(int64 const nodeHandle) const
 {
     /*
         Drag Drop flags dependent on if node currently being renamed
         (due to renaming removing the ID).
     */
     return
-        (nodeHandle == m_renamingHandle) ? ui::EDragDropSrcFlags::ALLOW_NULL_ID : 0;
+        (nodeHandle == m_renamingHandle) ? ::ui::EDragDropSrcFlags::ALLOW_NULL_ID : 0;
 }
 
-void engine::SceneGraphViewer::RenderMenuBar(void)
+void editor::SceneGraphUI::RenderMenuBar(void)
 {
-    ui::StartDisabledSection(!m_graph);
-    if (ui::StartMenuBar())
+    ::ui::StartDisabledSection(!m_graph);
+    if (::ui::StartMenuBar())
     {
-        if (ui::Button("Add Entity"))
+        if (::ui::Button("Add Entity"))
             AddNode(m_root);
 
-        ui::EndMenuBar();
+        ::ui::EndMenuBar();
     }
-    ui::EndDisabledSection();
+    ::ui::EndDisabledSection();
 }
 
-void engine::SceneGraphViewer::RenderPopupMenu(TreeNode* node)
+void editor::SceneGraphUI::RenderPopupMenu(TreeNode* node)
 {
     // Scene graph right click menu
-    if (ui::StartPopUp("Options"))
+    if (::ui::StartPopUp("Options"))
     {
         // Add
-        if (ui::MenuItem("Add Entity"))
+        if (::ui::MenuItem("Add Entity"))
             AddNode(node);
 
         // Rename
-        if (ui::MenuItem("Rename"))
+        if (::ui::MenuItem("Rename"))
             m_renamingHandle = node->m_handle;
 
         // Delete
-        if (ui::MenuItem("Delete"))
+        if (::ui::MenuItem("Delete"))
         {
             m_graph->DestroyEntity(node->m_handle);
             TreeNode* parentNode = node->m_parent;
@@ -403,8 +413,6 @@ void engine::SceneGraphViewer::RenderPopupMenu(TreeNode* node)
             DeleteAllChildren(node);
         }
 
-        ui::EndPopUp();
+        ::ui::EndPopUp();
     }
 }
-
-

@@ -8,7 +8,6 @@
 #include "engine/core/SceneGraph.h"
 #include "engine/ui/UIManager.h"
 #include "engine/viewport/Viewport.h"
-#include "engine/sceneGraphViewer/SceneGraphUI.h"
 #include "engine/ui/UIWindow.h"
 
 #include <string>
@@ -25,6 +24,7 @@ namespace engine
                                     uint32 threadCount = DEFAULT_NUM_THREADS);
         ENGINE_API void		ShutDown(void);
         ENGINE_API void		Update(void);
+        ENGINE_API void		LateUpdate(void);
         ENGINE_API void		RunTimeUpdate(void);
                    void		FixedUpdate(void);
 
@@ -42,7 +42,6 @@ namespace engine
         SceneGraph*		m_graph;
         UIManager		m_uiManager;
         Viewport*		m_viewport;
-        SceneGraphViewer*  m_graphViewer;
         Time			m_time;
         f32				m_timeScale;
 

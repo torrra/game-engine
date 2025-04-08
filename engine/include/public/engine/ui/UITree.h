@@ -1,10 +1,11 @@
 #pragma once
 
 #include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 #include <string>
 
-namespace engine::ui
+namespace ui
 {
     enum ETreeNodeFlags
     {
@@ -28,6 +29,6 @@ namespace engine::ui
         COLLAPSING_HEADER = FRAMED | NO_TREE_PUSH_ON_OPEN | NO_AUTO_OPEN_ON_LOG
     };
 
-    bool TreeNode(std::string const& name, int32 flags);
-    void EndTreeNode(void);
+    ENGINE_API bool TreeNode(std::string const& name, int32 flags);
+    ENGINE_API void EndTreeNode(void);
 }

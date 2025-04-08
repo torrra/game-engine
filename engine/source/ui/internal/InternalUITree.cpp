@@ -1,14 +1,14 @@
-#include "ui/InternalUITree.h"
+#include "ui/UITree.h"
 
 #undef new
 #include <imgui/imgui.h>
 
-bool engine::ui::TreeNode(std::string const& name, int32 flags)
+bool ui::TreeNode(std::string const& name, int32 flags)
 {
     return ImGui::TreeNodeEx(name.c_str(), flags);
 }
 
-void engine::ui::EndTreeNode(void)
+void ui::EndTreeNode(void)
 {
     ImGui::TreePop();
 }
