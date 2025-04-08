@@ -5,6 +5,8 @@
 #include "engine/CoreTypes.h"
 #include "engine/resource/model/Mesh.h"
 
+#include <unordered_map>
+
 namespace engine
 {
     struct BoneWeight
@@ -18,22 +20,45 @@ namespace engine
     {
         math::Matrix4f  m_inverseBindPose{ 1.f };
         std::string     m_name;
-        uint64		    m_parent = static_cast<uint64>(-1);
+        int64		    m_parent = -1;
     };
 
 
     class DynamicMesh final : public Mesh
     {
-    public:
-
-        void ProcessMesh(const void* mesh) override;
 
     private:
 
-        uint64 GetVertexCount(void);
+        using BoneIndexMap = std::unordered_map<void*, int64>;
+
+    public:
+
+        
+        DynamicMesh(void) = default;
+        DynamicMesh(DynamicMesh&&) noexcept = default;
+        DynamicMesh(const DynamicMesh&) = delete;
+        ~DynamicMesh(void) = default;
+
+        void ProcessMesh(const void* mesh) override;
+        void DeleteMesh(void) override;
+        void RenderThreadSkeletonSetup(void);
+
+    private:
+
+        void ProcessWeights(const void* bone, uint32 boneIndex);
+        bool ProcessSkeleton(const void* mesh);
+        void ProcessBone(Bone& newBone, void* bonePtr, const BoneIndexMap& nodes);
+
+        void SetBoneIndexAttribute();
+        void SetBoneWeightAttribute();
+        void SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
+                                        void* weightBuffer, uint64 weightBufSize);
 
         std::vector<Bone>           m_skeleton;
         std::vector<BoneWeight>     m_weights;
-        Buffer                      m_skeletonVBO = 0;
+        Buffer                      m_boneIndexVBO = 0;
+        Buffer                      m_boneWeightVBO = 0;
     };
+
+    std::ostream& operator<<(std::ostream& lhs, const Bone& rhs);
 }
