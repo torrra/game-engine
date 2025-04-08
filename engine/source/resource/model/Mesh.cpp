@@ -1,17 +1,19 @@
-
 #include "resource/model/Mesh.h"
 #include "resource/model/Buffer.h"
+#include "resource/texture/Texture.h"
+#include "resource/ResourceManager.h"
 #include "thread/ThreadManager.h"
 
 #include <assimp/mesh.h>
 #include <assimp/vector3.h>
+#include <assimp/scene.h>
 
 #include <glad/glad.h>
 
-
-engine::Mesh::~Mesh(void)
+engine::Mesh::Mesh(void)
 {
-    glDeleteVertexArrays(1, &m_vao);
+    constexpr uint64 pathNum = sizeof(m_maps) / sizeof(m_maps[0]);
+    m_texturePaths = new std::string[pathNum];
 }
 
 void engine::Mesh::ProcessMesh(const void* mesh)
@@ -44,7 +46,14 @@ void engine::Mesh::ProcessMesh(const void* mesh)
     }
 }
 
-void engine::Mesh::SetupBuffers(void)
+void engine::Mesh::DeleteMesh(void)
+{
+    m_vbo.DeleteData();
+    m_ebo.DeleteData();
+    glDeleteVertexArrays(1, &m_vao);
+}
+
+void engine::Mesh::SetupGraphics(void)
 {
     glCreateVertexArrays(1, &m_vao);
     CreateVBO();
@@ -55,6 +64,7 @@ void engine::Mesh::SetupBuffers(void)
     glVertexArrayElementBuffer(m_vao, m_ebo.GetBufferID());
     glVertexArrayVertexBuffer(m_vao, 0, m_vbo.GetBufferID(), 0, stride);
 
+    ImportTexturesFromMaterial();
     PostLoad();
 }
 
@@ -98,16 +108,16 @@ uint32 engine::Mesh::SetAttributes(void)
     return relativeOffset;
 }
 
-void engine::Mesh::SetAttribute(uint32 index, int32 size, uint32 stride) const
+void engine::Mesh::SetAttribute(uint32 index, int32 size, uint32 relativeOffset) const
 {
     glEnableVertexArrayAttrib(m_vao, index);
-    glVertexArrayAttribFormat(m_vao, index, size, GL_FLOAT, GL_FALSE, stride);
+    glVertexArrayAttribFormat(m_vao, index, size, GL_FLOAT, GL_FALSE, relativeOffset);
     glVertexArrayAttribBinding(m_vao, index, 0);
 }
 
 void engine::Mesh::CreateVBO(void)
 {
-    glCreateBuffers(1, &m_vbo.m_buffer);
+    m_vbo.Init();
 
     // Size
     uint64 size = m_vertices.size() * sizeof(f32)/* * sizeof(Vertex)*/;
@@ -119,7 +129,7 @@ void engine::Mesh::CreateVBO(void)
 
 void engine::Mesh::CreateEBO(void)
 {
-    glCreateBuffers(1, &m_ebo.m_buffer);
+    m_ebo.Init();
 
     // Size
     uint64 size = m_indices.size() * sizeof(uint32);
@@ -179,6 +189,76 @@ void engine::Mesh::ProcessVertices(const aiMesh* mesh)
     }
 }
 
+void engine::Mesh::ProcessMaterial(const void* material, const std::string&/* name*/)
+{
+     const aiMaterial* matImpl = reinterpret_cast<const aiMaterial*>(material);
+
+     matImpl->Get(AI_MATKEY_COLOR_DIFFUSE,
+                  *reinterpret_cast<aiColor3D*>(&m_material.m_diffuse));
+
+     matImpl->Get(AI_MATKEY_COLOR_AMBIENT,
+                           *reinterpret_cast<aiColor3D*>(&m_material.m_ambient));
+
+     matImpl->Get(AI_MATKEY_COLOR_SPECULAR,
+                           *reinterpret_cast<aiColor3D*>(&m_material.m_specular));
+     aiString texturePath;
+
+     if (matImpl->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+     {
+         matImpl->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+         m_texturePaths[DIFFUSE] = texturePath.C_Str();
+         texturePath.Clear();
+     }
+
+     if (matImpl->GetTextureCount(aiTextureType_NORMALS) > 0)
+     {
+         matImpl->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+         m_texturePaths[NORMAL] = texturePath.C_Str();
+         texturePath.Clear();
+     }
+
+     if (matImpl->GetTextureCount(aiTextureType_SPECULAR) > 0)
+     {
+         matImpl->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+         m_texturePaths[SPECULAR] = texturePath.C_Str();
+         texturePath.Clear();
+     }
+
+     if (matImpl->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0)
+     {
+         matImpl->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
+         m_texturePaths[ROUGHNESS] = texturePath.C_Str();
+         texturePath.Clear();
+     }
+
+     if (matImpl->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION) > 0)
+     {
+         matImpl->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath);
+         m_texturePaths[AMBIENT_OCCLUSION] = texturePath.C_Str();
+         texturePath.Clear();
+     }
+
+}
+
+void engine::Mesh::ImportTexturesFromMaterial()
+{
+    constexpr uint32 pathNum = static_cast<uint32>(sizeof(m_maps) / sizeof(m_maps[0]));
+
+    for (uint64 pathIndex = 0; pathIndex < pathNum; ++pathIndex)
+    {
+        if (m_texturePaths[pathIndex].empty())
+            continue;
+
+        ResourceManager::Load<Texture>(m_texturePaths[pathIndex]);
+        m_maps[pathIndex] = ResourceManager::GetResource<Texture>(m_texturePaths[pathIndex]);
+
+    }
+
+    delete[] m_texturePaths;
+    m_texturePaths = nullptr;
+
+}
+
 uint32 engine::Mesh::GetVertexArrayID(void) const
 {
     return m_vao;
@@ -187,4 +267,25 @@ uint32 engine::Mesh::GetVertexArrayID(void) const
 uint32 engine::Mesh::GetIndexCount(void) const
 {
     return m_indexCount;
+}
+
+void engine::Mesh::UseTextureMaps(void) const
+{
+    constexpr uint32 mapArraySize = sizeof(m_maps) / sizeof(Texture*);
+
+    for (uint32 textureID = 0; textureID < mapArraySize; ++textureID)
+    {
+        if (m_maps[textureID])
+            m_maps[textureID]->UseTexture(textureID);
+        else
+            Texture::RemoveTexture(textureID);
+    }
+}
+
+void engine::Mesh::Draw(void) const
+{
+    UseTextureMaps();
+    glBindVertexArray(m_vao);
+    glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
