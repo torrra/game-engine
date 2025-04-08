@@ -53,26 +53,27 @@ int main(void)
         std::cout << "\t" << std::endl;
 
         engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
-                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::PLANE);
-        //rb->SetGravityDisabled(false);
+                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
+        rb->SetDebugVisualization(true);
 
         /// ---------------- Create rigidbody static ----------------
         engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
                                                 engine.GetGraph(), floor, engine::BOX);
 
         floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
+        floorRb->SetDebugVisualization(true);
 
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
             math::Matrix4f projViewMatrix = camera->ViewProjection();
+            engine::PhysicsEngine::Get().StepSimulation(1 / 60.f);
+            rb->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 			project.Update(engine);
 			engine.Update();
-            engine::PhysicsEngine::Get().StepSimulation(1 / 120.f);
             engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
-            rb->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
-            rb->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
+            rb->UpdateRigidBody(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 
             engine.GetWindow()->Update();
 		}

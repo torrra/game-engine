@@ -99,7 +99,12 @@ namespace engine
             <param> [in] inHalfHeight : the half height
         */
         ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const;
-
+        /*
+            Set the debug draw visualization status
+            <param> [in] inIsDebugVisualization : the visualization status : true = enabled
+                                                                             false = disabled
+        */
+        ENGINE_API  void            SetDebugVisualization(bool inIsDebugVisualization);
         /// Functions
         /*
             Update the entity transform in reference to the dynamic rigid body
@@ -110,7 +115,7 @@ namespace engine
             Update the dynamic rigid body transform in reference to the entity
             <param> [in] inEntityTransform : the entity
         */
-        ENGINE_API	void		    UpdateRigidBody(const Transform& inEntityTransform);
+        ENGINE_API	void		    UpdateRigidBody(EntityHandle inEntityHandle);
 
         // Delete the dynamic rigid body
         ENGINE_API	void		    RigidBodyDynamicCleanUp(void);

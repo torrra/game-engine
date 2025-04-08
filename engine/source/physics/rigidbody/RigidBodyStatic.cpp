@@ -168,8 +168,11 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
+    // Release the material
     PX_RELEASE(m_materialImpl->GetImpl().m_material);
+    // Delete the pointer to the implementation structure
     delete m_materialImpl;
+    // Release the rigid body
 	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
 }
 
@@ -188,6 +191,7 @@ engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
 
 void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 {
+    // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new static rigid body with box geometry and default values
@@ -197,6 +201,9 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
         physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
 
@@ -205,6 +212,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 
 void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
 {
+    // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new static rigid body with sphere geometry and default values
@@ -214,6 +222,9 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
         physx::PxSphereGeometry(0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
 
@@ -222,6 +233,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
 
 void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 {
+    // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new static rigid body with capsule geometry and default values
@@ -231,6 +243,9 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         physx::PxCapsuleGeometry(0.25f, 0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
 
@@ -239,6 +254,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 
 void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
 {
+    // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
     // Create a new static rigid body with plane geometry and default values
@@ -247,11 +263,19 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
         physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 0.f),
         *m_materialImpl->GetImpl().m_material);
 
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
 
     PrintLog(SuccessPreset(), "Created static plane rigid body.");
 }
 
+void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
+{
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
+                                                           inIsDebugVisualization);
+}
 engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph* inScene, 
                                                                       EntityHandle inOwner, 
                                                                       const EGeometryType& inGeometry)

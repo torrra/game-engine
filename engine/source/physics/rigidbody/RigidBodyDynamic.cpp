@@ -61,6 +61,9 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
 
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
 
@@ -82,6 +85,9 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
+
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
@@ -119,6 +125,9 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
 
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
 
@@ -133,10 +142,11 @@ void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
                             ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
 }
 
-void engine::RigidBodyDynamic::UpdateRigidBody(const Transform& inEntityTransform)
+void engine::RigidBodyDynamic::UpdateRigidBody(EntityHandle inEntityHandle)
 {
     // Update the transform of the rigid body in regard to the entity
-    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(inEntityTransform));
+    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(
+        *m_currentScene->GetComponent<Transform>(inEntityHandle)));
 }
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
@@ -308,6 +318,12 @@ void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) 
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
+}
+
+void engine::RigidBodyDynamic::SetDebugVisualization(bool inIsDebugVisualization)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
+                                                      inIsDebugVisualization);
 }
 
 engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGraph* scene, 

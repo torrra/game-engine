@@ -72,6 +72,12 @@ namespace engine
             <param> [in] inHalfHeight : the half height
         */
         ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const;
+        /*
+            Set the debug draw visualization status
+            <param> [in] inIsDebugVisualization : the visualization status : true = enabled
+                                                                             false = disabled
+        */
+        ENGINE_API  void            SetDebugVisualization(bool inIsDebugVisualization);
 
 		/// Functions
 		ENGINE_API	void		    Register(void) override {}
