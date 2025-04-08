@@ -15,9 +15,11 @@ engine::Buffer::Buffer(int32)
 {
 }
 
-engine::Buffer::~Buffer(void)
+
+void engine::Buffer::Init(void)
 {
-	DeleteData();
+    if (!m_buffer)
+        glCreateBuffers(1, &m_buffer);
 }
 
 uint32 engine::Buffer::GetBufferID(void) const noexcept
