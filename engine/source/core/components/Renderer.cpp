@@ -64,11 +64,6 @@ namespace engine
         return m_shader;
     }
 
-    const Texture* Renderer::GetTexture(void) const
-    {
-        return m_texture;
-    }
-
     void Renderer::SetModel(const Model* model)
     {
         m_model = model;
@@ -96,7 +91,6 @@ namespace engine
     {
 
         const std::string* model = ResourceManager::FindKeyByVal(m_model);
-        const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
         const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
 
         if ((!model) || (!shader))
