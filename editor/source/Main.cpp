@@ -45,7 +45,6 @@ int main(void)
 
         /// ---------------- Create entity ---------------- 
         engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
-        //engine.GetGraph()->CreateComponent<engine::Transform>(floor)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
 
         /// ---------------- PhysicsEngine use ---------------- 
         engine::PhysicsEngine::Get().Init();
@@ -58,24 +57,27 @@ int main(void)
         rb->SetDebugVisualization(true);
 
         /// ---------------- Create rigidbody static ----------------
+        std::cout << "\t" << std::endl;
+        
         engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
                                                 engine.GetGraph(), floor, engine::BOX);
-
         floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
         floorRb->SetDebugVisualization(true);
-
-        //engine::PhysicsEngine::Get().SetDebugActorAxes(5.f);
 
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
             math::Matrix4f projViewMatrix = camera->ViewProjection();
+            // Update physics
             engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
+            // Update the entity in regard to the rigid body (gravity for example)
             rb->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 			project.Update(engine);
 			engine.Update();
+            // Update the debug draw
             engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
+            // Update the rigid body in regard to the entity (movement by keyboard input for example)
             rb->UpdateRigidBody(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 
             engine.GetWindow()->Update();
