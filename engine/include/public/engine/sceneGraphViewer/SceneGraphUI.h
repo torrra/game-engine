@@ -46,13 +46,17 @@ namespace engine
         void DeleteAllChildren(TreeNode* node);
         void DeleteGraph(void);
         void ReparentNode(TreeNode* toReparent, TreeNode* newParent);
-        void DrawCurrentAndChildrenNodes(TreeNode* node);
+        void CheckRenameNode(TreeNode* node, std::string const& originalName);
+        void DrawNodeAndChildren(TreeNode* node);
         
         const ui::Payload DragDropNode(const char* payloadID, TreeNode* node, int32 flags);
         const ui::Payload DragDropBackground(const char* payloadID, int32 flags);
 
+        int32 GetNodeFlags(TreeNode* node) const;
+        int32 GetDragDropFlags(int64 const nodeHandle) const;
+
         void RenderMenuBar(void);
-        void RenderPopupMenu(void);
+        void RenderPopupMenu(TreeNode* node);
 
         class SceneGraph* m_graph;
         TreeNode* m_root;

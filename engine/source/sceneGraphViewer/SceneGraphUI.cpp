@@ -12,12 +12,12 @@
 
 #include "utility/MemoryCheck.h"
 
-#undef new
-//#include <imgui/imgui.h>
-
 // Node Functions
 engine::TreeNode::~TreeNode(void)
 {
+    for (TreeNode* node : m_children)
+        delete node;
+
     m_children.clear();
     m_handle = 0;
     m_parent = nullptr;
@@ -38,8 +38,9 @@ engine::SceneGraphViewer::SceneGraphViewer(const char* title)
     SetFlags(EWndFlags::HORIZONTAL_SCROLL_BAR | EWndFlags::NO_COLLAPSE | EWndFlags::MENU_BAR);
     InitRootNode();
 
+    // TODO: register keys somewhere else
+    Input::RegisterInput(MOUSE_BUTTON_LEFT);
     Input::RegisterInput(MOUSE_BUTTON_RIGHT);
-    Input::RegisterInput(KEY_ENTER);
 }
 
 engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
@@ -50,8 +51,9 @@ engine::SceneGraphViewer::SceneGraphViewer(const char* title, SceneGraph* graph)
     InitRootNode();
     CreateGraph();
 
+    // TODO: register keys somewhere else
+    Input::RegisterInput(MOUSE_BUTTON_LEFT);
     Input::RegisterInput(MOUSE_BUTTON_RIGHT);
-    Input::RegisterInput(KEY_ENTER);
 }
 
 engine::SceneGraphViewer::~SceneGraphViewer(void)
@@ -79,7 +81,7 @@ void engine::SceneGraphViewer::RenderContents(void)
     
     for (TreeNode* node : m_root->m_children)
     {
-        DrawCurrentAndChildrenNodes(node);
+        DrawNodeAndChildren(node);
 
         if (m_reset)
         {
@@ -115,7 +117,7 @@ void engine::SceneGraphViewer::AddNode(TreeNode* parentNode)
 
     // Create new node
     TreeNode* newNode = new TreeNode();
-    newNode->Init(m_root, handle);
+    newNode->Init(parentNode, handle);
     parentNode->m_children.emplace_back(newNode);
 }
 
@@ -126,7 +128,7 @@ void engine::SceneGraphViewer::CreateGraph(void)
 
     for (uint64 handleIndex = 0; handleIndex < handles.size(); ++handleIndex)
     {
-        TreeNode* newNode = new TreeNode();
+        TreeNode* newNode = new TreeNode;
         EntityHandle parentHandle = m_graph->GetEntity(handles[handleIndex])->GetParent();
 
         // Find parent node
@@ -158,17 +160,23 @@ void engine::SceneGraphViewer::CreateGraph(void)
 
 void engine::SceneGraphViewer::DeleteAllChildren(TreeNode* node)
 {
-    TreeNode* currentNode = node;
-    while (!node->m_children.empty())
-    {
-        while (!currentNode->m_children.empty())
-        {
-            currentNode = currentNode->m_children[0];
-        }
+    // Don't delete the root node
+    if (node->m_handle == m_root->m_handle)
+        return;
+
+    TreeNode* parentNode = node->m_parent;
     
-        currentNode = currentNode->m_parent;
-        delete currentNode->m_children[0];
-        currentNode->m_children.erase(currentNode->m_children.begin());
+    // Delete node & children
+    delete node;
+
+    // Delete node from parent's children array
+    for (uint64 index = 0; index < parentNode->m_children.size(); ++index)
+    {
+        if (parentNode->m_children[index]->m_handle == node->m_handle)
+        {
+            parentNode->m_children.erase(parentNode->m_children.begin() + index);
+            break;
+        }
     }
 }
 
@@ -195,99 +203,60 @@ void engine::SceneGraphViewer::ReparentNode(TreeNode* toReparent, TreeNode* newP
             break;
     }
 
+    // Reparent
     m_graph->ReparentEntity(prevParent->m_children[childIndex]->m_handle, newParent->m_handle);
     prevParent->m_children[childIndex]->m_parent = newParent;
     newParent->m_children.emplace_back(prevParent->m_children[childIndex]);
     prevParent->m_children.erase(prevParent->m_children.begin() + childIndex);
 }
 
-/*
-    TODO:
-    - Encapsulate
-    - Clean up
-*/
-void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
+void engine::SceneGraphViewer::CheckRenameNode(TreeNode* node, std::string const& originalName)
 {
-    int32 dragDropFlags = (node->m_handle == m_renamingHandle) ? ui::EDragDropSrcFlags::ALLOW_NULL_ID : 0;
-    int32 nodeFlags =
-        ui::SPAN_FULL_WIDTH | ui::FRAME_PADDING |
-        ui::OPEN_ON_DOUBLE_CLICK | ui::OPEN_WITH_ARROW;
+    if (m_renamingHandle != node->m_handle)
+        return;
 
-    if (node && node->m_children.empty())
-        nodeFlags |= ui::NO_ICON;
+    std::string resultStr;
 
+    // Prevent placing input text box on following line
+    ui::SameLine();
+    ui::SetKeyboardFocus();
+    if (ui::InputTextBox(originalName.c_str(), resultStr) ||
+        Input::IsInputDown(MOUSE_BUTTON_LEFT) || Input::IsInputDown(MOUSE_BUTTON_RIGHT))
+    {
+        if (resultStr[0] != '\0' && !m_graph->GetEntity(resultStr))
+            m_graph->GetEntity(m_renamingHandle)->SetName(resultStr);
+
+        m_renamingHandle = 0;
+    }
+    else
+        m_renamingHandle = node->m_handle;
+}
+
+void engine::SceneGraphViewer::DrawNodeAndChildren(TreeNode* node)
+{
+    // Get entity & node name
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
+    std::string nodeName = (node->m_handle == m_renamingHandle) ? ("###" + entityName) : entityName;
 
-    ImGui::PushID(entityName.c_str());
-    bool result = ui::TreeNode((node->m_handle == m_renamingHandle) ? std::string("###") + entityName : entityName, nodeFlags);
+    // Set ID to prevent duplicate menu items
+    ui::SetID(nodeName);
+    bool isOpen = ui::TreeNode(nodeName, GetNodeFlags(node));
+    RenderPopupMenu(node);
+    CheckRenameNode(node, entityName);
+    ui::UnsetID();
 
-    if (ImGui::BeginPopupContextItem("Options"))
-    {
-        if (ImGui::MenuItem("Add Entity"))
-            AddNode(node);
-
-        if (ImGui::MenuItem("Rename"))
-        {
-            m_renamingHandle = node->m_handle;
-            printf("Renaming %s...\n", entityName.c_str());
-        }
-
-        if (ImGui::MenuItem("Delete"))
-        {
-            TreeNode* parentNode = node->m_parent;
-            for (TreeNode* childNode : node->m_children)
-            {
-                ReparentNode(childNode, parentNode);
-            }
-
-            for (uint64 childIndex = 0; childIndex < parentNode->m_children.size(); ++childIndex)
-            {
-                if (parentNode->m_children[childIndex]->m_handle == node->m_handle)
-                {
-                    delete node;
-                    parentNode->m_children.erase(parentNode->m_children.begin() + childIndex);
-                    m_reset = true;
-                    break;
-                }
-            }
-            
-
-
-            m_graph->DestroyEntity(node->m_handle);
-
-            printf("Deleting %s...\n", entityName.c_str());
-        }
-        ImGui::EndPopup();
-    }
-
-    if (m_renamingHandle == node->m_handle)
-    {
-        ImGui::SameLine();
-        constexpr const uint16 bufferLength = 128;
-        char renameBuffer[bufferLength] = "\0";
-        ImGui::SetKeyboardFocusHere();
-        if (ImGui::InputTextWithHint("##rename", entityName.c_str(), renameBuffer, bufferLength, ImGuiInputTextFlags_EnterReturnsTrue) ||
-            ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Middle) || ImGui::IsMouseDown(ImGuiMouseButton_Right))
-        {
-            if (renameBuffer[0] != '\0' && !m_graph->GetEntity(renameBuffer))
-                m_graph->GetEntity(m_renamingHandle)->SetName(renameBuffer);
-
-            m_renamingHandle = 0;
-        }
-        else
-            m_renamingHandle = node->m_handle;
-    }
-    ImGui::PopID();
-
-    if (ui::StartDragDropSource(dragDropFlags))
+    // Create drag & drop payload 
+    if (ui::StartDragDropSource(GetDragDropFlags(node->m_handle)))
     {
         ui::CreatePayload("Entity", node, sizeof(TreeNode));
         ui::Text("%s", entityName.c_str());
         ui::EndDragDropSource();
     }
-
-    if (result)
+    
+    // Condition to check node state is open
+    if (isOpen)
     {
+        // Allow drop action for reparenting
         if (DragDropNode("Entity", node, 0) ||
             DragDropBackground("Entity", 0))
         {
@@ -297,19 +266,17 @@ void engine::SceneGraphViewer::DrawCurrentAndChildrenNodes(TreeNode* node)
             m_reset = true;
             return;
         }
-    
 
+        // Recursively draw child nodes
         for (TreeNode* childNode : node->m_children)
         {
             if (m_reset)
                 break;
 
-            DrawCurrentAndChildrenNodes(childNode);
+            DrawNodeAndChildren(childNode);
         }
         ui::EndTreeNode();
     }
-    
-    
 }
 
 const engine::ui::Payload engine::SceneGraphViewer::DragDropNode(const char* payloadID, TreeNode* node, int32 flags)
@@ -377,6 +344,28 @@ const engine::ui::Payload engine::SceneGraphViewer::DragDropBackground(const cha
     return nullptr;
 }
 
+int32 engine::SceneGraphViewer::GetNodeFlags(TreeNode* node) const
+{
+    // Default flags
+    int32 nodeFlags = ui::SPAN_FULL_WIDTH | ui::FRAME_PADDING | ui::OPEN_ON_DOUBLE_CLICK | ui::OPEN_WITH_ARROW;
+
+    // Only add 'open / close' icon if node contains children
+    if (node->m_children.empty())
+        nodeFlags |= ui::NO_ICON;
+
+    return nodeFlags;
+}
+
+int32 engine::SceneGraphViewer::GetDragDropFlags(int64 const nodeHandle) const
+{
+    /*
+        Drag Drop flags dependent on if node currently being renamed
+        (due to renaming removing the ID).
+    */
+    return
+        (nodeHandle == m_renamingHandle) ? ui::EDragDropSrcFlags::ALLOW_NULL_ID : 0;
+}
+
 void engine::SceneGraphViewer::RenderMenuBar(void)
 {
     ui::StartDisabledSection(!m_graph);
@@ -384,18 +373,37 @@ void engine::SceneGraphViewer::RenderMenuBar(void)
     {
         if (ui::Button("Add Entity"))
             AddNode(m_root);
-        
+
         ui::EndMenuBar();
     }
     ui::EndDisabledSection();
 }
 
-void engine::SceneGraphViewer::RenderPopupMenu(void)
+void engine::SceneGraphViewer::RenderPopupMenu(TreeNode* node)
 {
-    if (ImGui::BeginPopup("Options"))
+    // Scene graph right click menu
+    if (ui::StartPopUp("Options"))
     {
+        // Add
+        if (ui::MenuItem("Add Entity"))
+            AddNode(node);
 
-        ImGui::EndPopup();
+        // Rename
+        if (ui::MenuItem("Rename"))
+            m_renamingHandle = node->m_handle;
+
+        // Delete
+        if (ui::MenuItem("Delete"))
+        {
+            m_graph->DestroyEntity(node->m_handle);
+            TreeNode* parentNode = node->m_parent;
+            for (TreeNode* childNode : node->m_children)
+                ReparentNode(childNode, parentNode);
+
+            DeleteAllChildren(node);
+        }
+
+        ui::EndPopUp();
     }
 }
 
