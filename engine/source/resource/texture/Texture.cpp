@@ -18,7 +18,7 @@ engine::Texture::Texture(void* data, int32 width, int32 height, int32 channelCou
     ProcessTexelData(data, channelCount);
 }
 
-void engine::Texture::LoadResource(const char* fileName)
+bool engine::Texture::LoadResource(const char* fileName)
 {
 	int32 channelCount = 0;
 	unsigned char* data = stbi_load(fileName, &m_size[0], &m_size[1], &channelCount, 0);
@@ -27,20 +27,23 @@ void engine::Texture::LoadResource(const char* fileName)
 	if (!data)
 	{
 		std::printf("Failed to load texture %s\n", fileName);
-		return;
+		return false;
 	}
 
     ProcessTexelData(data, channelCount);
 	stbi_image_free(data);
+    return true;
 }
 
-void engine::Texture::UseTexture(void) const
+void engine::Texture::UseTexture(uint32 index) const
 {
+    glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
-void engine::Texture::RemoveTexture(void)
+void engine::Texture::RemoveTexture(uint32 index)
 {
+    glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -71,8 +74,8 @@ void engine::Texture::ProcessTexelData(void* data, int32 channelCount)
 
     glGenTextures(1, &m_texture);
     glBindTexture(GL_TEXTURE_2D, m_texture);
+
     glTexImage2D(GL_TEXTURE_2D, 0, format, m_size[0], m_size[1], 0, format, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
 
     if (m_size[1] != 0)
         m_aspectRatio = (f32)m_size[0] / (f32)m_size[1];
@@ -82,6 +85,9 @@ void engine::Texture::ProcessTexelData(void* data, int32 channelCount)
 
     // Set filtering parameter
     SetFiltering(ETextureFiltering::BILINEAR);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
 }
 
 void engine::Texture::SetWrapping(ETextureWrapping const& wrapMode)

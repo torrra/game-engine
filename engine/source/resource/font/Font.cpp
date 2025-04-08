@@ -17,15 +17,19 @@ engine::Font::~Font(void)
 	m_font->ClearOutputData();
 }
 
-void engine::Font::LoadResource(const char* fileName)
+bool engine::Font::LoadResource(const char* fileName)
 {	
 	ImGuiIO& io = ImGui::GetIO();
 
 	// TODO: scale via DPI?
-	m_font = io.Fonts->AddFontFromFileTTF(fileName, DEFAULT_FONT_SIZE);
+    m_font = io.Fonts->AddFontFromFileTTF(fileName, DEFAULT_FONT_SIZE);
 
-	// Build to font atlas
-	io.Fonts->Build();
+	if(!m_font)
+        return false;
+    
+    // Build to font atlas
+    io.Fonts->Build();
+    return true;
 }
 
 ImFont* engine::Font::GetFont(void) const noexcept

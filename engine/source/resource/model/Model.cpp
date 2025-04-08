@@ -16,14 +16,29 @@
 #include <iostream>
 #include <string>
 
-void engine::Model::LoadResource(const char* fileName)
+engine::Model::~Model(void)
+{
+    for (DynamicMesh& mesh : m_dynamicMeshes)
+        mesh.DeleteMesh();
+    
+    for (Mesh& mesh : m_staticMeshes)
+        mesh.DeleteMesh();
+}
+
+bool engine::Model::LoadResource(const char* fileName)
 {
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
+    return true;
 }
 
 bool engine::Model::CanRender(void) const
 {
     return (m_loadStatus & LOADED) && (m_loadStatus & GRAPHICS_CALLS_COMPLETE);
+}
+
+bool engine::Model::HasFailedToLoad(void) const
+{
+    return m_loadStatus & FAILED;
 }
 
 bool engine::Model::IsDynamic(void) const

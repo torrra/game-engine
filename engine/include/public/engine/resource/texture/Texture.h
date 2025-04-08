@@ -9,16 +9,16 @@
 namespace engine
 {
 
-	class Texture : public IResource
+	class Texture  final : public IResource
 	{
 	public:
 		ENGINE_API Texture(void);
 		ENGINE_API Texture(void* data, int32 width, int32 height, int32 channelCount);
 		ENGINE_API ~Texture(void) = default;
 		
-		ENGINE_API virtual void LoadResource(const char* fileName) override;
-		ENGINE_API void UseTexture(void) const;
-		ENGINE_API static void RemoveTexture(void);
+		ENGINE_API bool LoadResource(const char* fileName) override;
+		ENGINE_API void UseTexture(uint32 index = 0) const;
+		ENGINE_API static void RemoveTexture(uint32 index = 0);
 
 		uint32 GetTexture(void) const noexcept;
 		f32 GetAspectRatio(void) const noexcept;

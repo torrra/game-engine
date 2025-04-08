@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "engine/utility/MemoryCheck.h"
+//#include "engine/utility/MemoryCheck.h"
 #include "engine/EngineExport.h"
 
 /*
@@ -50,7 +50,7 @@ namespace engine
 
 		ENGINE_API
         static std::mutex			m_mutex;
-		static ResourceManager*		m_instance;
+        static ResourceManager* m_instance;
 
 		std::unordered_map<std::string, IResource*> m_resources;
 	};
@@ -67,7 +67,7 @@ namespace engine
             // Check if resource exists
             if (HasResource(fileName))
             {
-                std::printf("Resource '%s' already loaded\n", fileName.c_str());
+                //std::printf("Resource '%s' already loaded\n", fileName.c_str());
                 return;
             }
 
@@ -75,7 +75,13 @@ namespace engine
             GetInstance()->m_resources[fileName] = newVal;
         }
 
-		newVal->LoadResource(fileName.c_str());
+        if (!newVal->LoadResource(fileName.c_str()))
+        {
+            m_mutex.lock();
+            GetInstance()->m_resources.erase(fileName);
+            delete newVal;
+            m_mutex.unlock();
+        }
 	}
 
     template<typename TResourceType, typename ...TVariadicArgs>
@@ -101,6 +107,19 @@ namespace engine
 		if (!HasResource(fileName))
 			return nullptr;
 
-		return dynamic_cast<TResourceType*>(GetInstance()->m_resources[fileName]);
+
+        if constexpr (!IsLoadedAsync<TResourceType>::m_value)
+            return dynamic_cast<TResourceType*>(GetInstance()->m_resources[fileName]);
+
+        else
+        {
+            TResourceType* resource = dynamic_cast<TResourceType*>(GetInstance()->m_resources[fileName]);
+
+            if (!resource->HasFailedToLoad())
+                return resource;
+
+            Unload(fileName);
+            return nullptr;
+        }
 	}
 }

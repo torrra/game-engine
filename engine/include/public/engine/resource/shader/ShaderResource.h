@@ -13,13 +13,13 @@ namespace engine
 		GEOMETRY_SHADER = 0x8DD9
 	};
 
-	class Shader : public IResource
+	class Shader final : public IResource
 	{
 	public:
 		Shader(void);
 		~Shader(void) = default;
 
-		virtual void LoadResource(const char* fileName) override;
+		bool LoadResource(const char* fileName) override;
 
 		uint32 GetShader(void) const noexcept;
 		EShaderType GetShaderType(void) const noexcept;
