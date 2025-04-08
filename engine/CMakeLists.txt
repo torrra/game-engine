@@ -5,7 +5,7 @@ get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 message(STATUS "[${TARGET_NAME}] Starting source file fetching..")
 
-set(ENGINE_SHADER_DIR ${CMAKE_BINARY_DIR}/engineShader)
+set(ENGINE_SHADER_DIR ${CMAKE_SOURCE_DIR}/workspace/shaders)
 
 # -- Header files -- #
 file(GLOB_RECURSE TARGET_HEADER_FILES

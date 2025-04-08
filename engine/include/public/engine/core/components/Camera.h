@@ -51,6 +51,13 @@ namespace engine
         ENGINE_API void SetNearPlane(f32 nearPlane);
         ENGINE_API void SetFarPlane(f32 farPlane);
 
+        ENGINE_API void SerializeText(std::ostream& output,
+                                      EntityHandle owner,
+                                      uint64 index) const override;
+        ENGINE_API
+        const char* DeserializeText(const char* text, const char* end) override;
+
+
     private:
         math::Matrix4f GetViewMatrix(void);
         void GetProjectionMatrix(void);

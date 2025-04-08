@@ -1,5 +1,6 @@
 #include "core/Component.h"
 #include "core/SceneGraph.h"
+#include "serialization/TextSerializer.h"
 
 namespace engine
 {
@@ -32,5 +33,18 @@ namespace engine
     void Component::Invalidate(void)
     {
         m_flags |= ecs::INVALID_OBJECT;
+    }
+
+    EntityHandle Component::GetOwner(void) const
+    {
+        return m_owner;
+    }
+
+    const char* Component::DeserializeIndexedText(const char* text, const char* end, uint64& index)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, index);
+
+        return DeserializeText(text, end);
     }
 }

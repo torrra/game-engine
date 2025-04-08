@@ -80,11 +80,25 @@ namespace engine
                                                          const math::Vector3f& inScalein =
                                                          math::Vector3f(1.0f, 1.0f, 1.0f));
 
+        // Add translation to the current translation value
+        ENGINE_API void					AddTranslation(const math::Vector3f& inTranslation);
 
-        ENGINE_API	void					AddTranslation(const math::Vector3f& inTranslation);
-        ENGINE_API	void					AddRotation(f32 angleX, f32 angleY, f32 angleZ);
-        ENGINE_API	void					AddRotation(const math::Quatf& inRotation);
-        ENGINE_API	void					AddScale(const math::Vector3f& inScale);
+        // Add rotation in euler degrees to the current rotation
+        ENGINE_API void					AddRotation(f32 angleX, f32 angleY, f32 angleZ);
+
+        // Add quaternion rotation to current rotation
+        ENGINE_API void					AddRotation(const math::Quatf& inRotation);
+
+        // Multiply current scale by new scale
+        ENGINE_API void					AddScale(const math::Vector3f& inScale);
+
+        // Serialize rotation, position and scale in plain text
+        ENGINE_API void					SerializeText(std::ostream& output,
+                                                      EntityHandle owner,
+                                                      uint64 index) const;
+
+        ENGINE_API const char* DeserializeText(const char* text, const char* end);
+
 
         /// Operators
         // Copy assignement set to default
@@ -92,7 +106,9 @@ namespace engine
         // AddTranslation assignement set to default
                     Transform&				operator=(Transform&& inTransform) = default;
         // Operator to print a transform
-                    std::ostream&			operator<<(std::ostream& os);
+        std::ostream& operator<<(std::ostream& os);
+    
+        friend ENGINE_API std::ostream& operator<<(std::ostream& os, Transform& transform);
 
     private:
 

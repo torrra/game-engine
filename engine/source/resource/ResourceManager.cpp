@@ -45,6 +45,17 @@ void engine::ResourceManager::ShutDown(void)
 	delete m_instance;
 }
 
+const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resource)
+{
+	for (auto const& data : GetInstance()->m_resources)
+	{
+		if (resource == data.second)
+			return &data.first;
+	}
+
+	return nullptr;
+}
+
 engine::ResourceManager* engine::ResourceManager::GetInstance(void)
 {
 	if (!m_instance)
