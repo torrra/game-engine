@@ -12,9 +12,11 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
 
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 engine::Model::~Model(void)
 {
@@ -46,6 +48,20 @@ bool engine::Model::IsDynamic(void) const
     return m_isDynamic;
 }
 
+void engine::Model::Draw(void) const
+{
+    if (m_isDynamic)
+    {
+        for (const Mesh& mesh : m_dynamicMeshes)
+            mesh.Draw();
+    }
+    else
+    {
+        for (const Mesh& mesh : m_staticMeshes)
+            mesh.Draw();
+    } 
+}
+
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const
 {
     return m_staticMeshes;
@@ -65,30 +81,52 @@ void engine::Model::ProcessTextures(const void* scene)
         aiTexture* texture = sceneImpl->mTextures[textureIndex];
         int32 size = (texture->mHeight) ? texture->mWidth * texture->mHeight : texture->mWidth;
 
+        void* data;
+        int32 height;
+        int32 width;
+        int32 channels;
+
+        if (!texture->mHeight)
+        {
+            data = stbi_load_from_memory((unsigned char*)texture->pcData, size, &width, &height, &channels, 4);
+
+            if (!data)
+                continue;
+        }
+
         // aiTexture data will be deleted once we finish importing the model,
         // so we need our own copy to pass relevant data to our render thread
-        void* data = malloc(size * sizeof(*texture->pcData));
+        else
+        {
+            data = malloc(size * sizeof(*texture->pcData));
 
-        if (!data)
-            continue;
+            if (!data)
+                continue;
 
-        memcpy(data, texture->pcData, size);
+            memcpy(data, texture->pcData, size);
+            width = texture->mWidth;
+            height = texture->mHeight;
+        }
 
         ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(
-            [data, width = texture->mWidth,
-             height = texture->mWidth,
-             name = std::string(texture->mFilename.C_Str())]
+            [data, width, height,
+             name = std::string(texture->mFilename.C_Str()),
+             isLoadedWithSTB = (bool) texture->mHeight]
             {
                 // Assimp texture data always uses argb8888 format, so we can pass 4 as
                 // channel count
                 ResourceManager::CreateFromData<Texture>(name, data, width, height, 4);
-                free(data);
+
+                if (isLoadedWithSTB)
+                    stbi_image_free(data);
+                else
+                    free(data);
             }
         );
     }
 }
 
-void engine::Model::ProcessMeshes(const void* scene, const void* node)
+void engine::Model::ProcessMeshes(const void* scene, const void* node, const std::string& name)
 {
     const aiScene*  sceneImpl = reinterpret_cast<const aiScene*>(scene);
     const aiNode*   nodeImpl = reinterpret_cast<const aiNode*>(node);
@@ -104,11 +142,13 @@ void engine::Model::ProcessMeshes(const void* scene, const void* node)
         else
             mesh = &m_staticMeshes.emplace_back();
 
-        mesh->ProcessMesh(sceneImpl->mMeshes[nodeImpl->mMeshes[meshIndex]]);
+        aiMesh* importedMesh = sceneImpl->mMeshes[nodeImpl->mMeshes[meshIndex]];
+        mesh->ProcessMesh(importedMesh);
+        mesh->ProcessMaterial(sceneImpl->mMaterials[importedMesh->mMaterialIndex], name);
     }
 
     for (uint32 childIndex = 0; childIndex < nodeImpl->mNumChildren; ++childIndex)
-        ProcessMeshes(scene, nodeImpl->mChildren[childIndex]);
+        ProcessMeshes(scene, nodeImpl->mChildren[childIndex], name);
 }
 
 void engine::Model::WorkerThreadLoad(const std::string& name)
@@ -117,7 +157,7 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(name,
         aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-        aiProcess_FlipUVs | aiProcess_CalcTangentSpace
+        aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData 
     );
 
     // Error management
@@ -136,8 +176,8 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
         }
     }
 
-    ProcessTextures(scene);  
-    ProcessMeshes(scene, scene->mRootNode);
+    ProcessTextures(scene); 
+    ProcessMeshes(scene, scene->mRootNode, name);
     m_loadStatus |= LOADED;
 
     // Send OpenGL setup to render thread
@@ -149,12 +189,15 @@ void engine::Model::RenderThreadSetup(void)
     if (m_isDynamic)
     {
         for (DynamicMesh& mesh : m_dynamicMeshes)
-            mesh.SetupBuffers();
+        {
+            mesh.SetupGraphics();
+            mesh.RenderThreadSkeletonSetup();
+        }
     }
     else
     {
         for (Mesh& mesh : m_staticMeshes)
-            mesh.SetupBuffers();
+            mesh.SetupGraphics();
     }
 
     m_loadStatus |= GRAPHICS_CALLS_COMPLETE;
