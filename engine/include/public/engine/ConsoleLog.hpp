@@ -8,6 +8,7 @@
 
 namespace engine
 {
+    // Text background color
     enum EBGColor : uint8_t
     {
         BG_BLACK = 40,
@@ -29,6 +30,7 @@ namespace engine
 
     }; // !Enum EBGColor
 
+    // Text foreground color
     enum EFGColor : uint8_t
     {
         FG_BLACK = 30,
@@ -50,6 +52,7 @@ namespace engine
 
     }; // !Enum EFGColor
 
+    // Text format
     enum EGRP
     {
         NORMAL,
@@ -70,12 +73,14 @@ namespace engine
 
     }; // !Struct ConsoleLog
 
+    // Function to print using escape sequence
     inline void PrintLog(ConsoleLog consoleLog, const std::string& message)
     {
         printf("\033[%d;%d;%dm%s %s\033[0m\n", (int)consoleLog.m_textFormat, (int)consoleLog.m_bgColor,
                (int)consoleLog.m_fgColor, consoleLog.m_prefix.c_str(), message.c_str());
     }
 
+    // Preset of an error log
     inline ConsoleLog ErrorPreset()
     {
         ConsoleLog consoleLog;
@@ -88,6 +93,7 @@ namespace engine
         return consoleLog;
     }
 
+    // Preset of a warning log
     inline ConsoleLog WarningPreset()
     {
         ConsoleLog consoleLog;
@@ -100,6 +106,7 @@ namespace engine
         return consoleLog;
     }
 
+    // Preset of an info log
     inline ConsoleLog InfoPreset()
     {
         ConsoleLog consoleLog;
@@ -112,6 +119,7 @@ namespace engine
         return consoleLog;
     }
 
+    // Preset of a success log
     inline ConsoleLog SuccessPreset()
     {
         ConsoleLog consoleLog;
