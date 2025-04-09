@@ -24,15 +24,16 @@ namespace engine
                                     uint32 threadCount = DEFAULT_NUM_THREADS);
         ENGINE_API void		ShutDown(void);
         ENGINE_API void		Update(void);
-        ENGINE_API void		LateUpdate(void);
+        ENGINE_API void		PostUpdate(void);
         ENGINE_API void		RunTimeUpdate(void);
                    void		FixedUpdate(void);
-
+        ENGINE_API void         SetGameState(bool run);
         ENGINE_API void			SetProject(const char* projectDir);
         ENGINE_API Window*		GetWindow(void) const noexcept;
         ENGINE_API Time&		GetTime(void) noexcept;
         ENGINE_API SceneGraph*	GetGraph(void);
     private:
+        void                RunGame();
         inline int16		InitScriptSystem(const char* projectDir);
         inline int16		InitWindow(const char* projectName);
         inline int16		LoadEngineResources(void);
@@ -44,6 +45,7 @@ namespace engine
         Viewport*		m_viewport;
         Time			m_time;
         f32				m_timeScale;
-
+        std::atomic<bool> m_gameState;
+        
     };
 }

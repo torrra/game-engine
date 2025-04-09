@@ -102,8 +102,7 @@ void engine::Engine::Update(void)
         FixedUpdate();
     }
 
-    // Update game logic
-    ThreadManager::UpdateGameLogic(m_graph, m_time.GetDeltaTime());
+
     
     m_window->ClearWindow(0.1f, 0.1f, 0.1f);
     
@@ -113,10 +112,10 @@ void engine::Engine::Update(void)
 
 }
 
-void engine::Engine::LateUpdate(void)
+void engine::Engine::PostUpdate(void)
 {
-    m_viewport->RenderToViewport(m_graph);
     m_uiManager.UpdateUI();
+    m_viewport->RenderToViewport(m_graph);
     Input::ResetKeys();
     m_window->Update();
     m_time.Update();
@@ -124,12 +123,19 @@ void engine::Engine::LateUpdate(void)
 
 void engine::Engine::RunTimeUpdate(void)
 {
-    // TODO: add run time update logic
 }
 
 void engine::Engine::FixedUpdate(void)
 {
     // TODO: add fixed update logic
+}
+
+void engine::Engine::SetGameState(bool run)
+{
+    m_gameState = run;
+
+    if (run)
+        ThreadManager::AddTask(&Engine::RunGame, this);
 }
 
 void engine::Engine::SetProject(const char* projectDir)
@@ -151,6 +157,18 @@ engine::Time& engine::Engine::GetTime(void) noexcept
 engine::SceneGraph* engine::Engine::GetGraph(void)
 {
     return m_graph;
+}
+
+void engine::Engine::RunGame()
+{
+    printf("Running...\n");
+
+    // Update game logic
+    while (m_gameState)
+    {
+    
+    }
+
 }
 
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
