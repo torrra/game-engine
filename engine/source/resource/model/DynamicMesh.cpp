@@ -27,8 +27,13 @@ namespace engine
 
     void DynamicMesh::RenderThreadSkeletonSetup(void)
     {
+        if (!m_metaData.m_hasBones)
+            return;
+
         m_skeletonSSBO.Init();
         m_skeletonSSBO.SetData(m_weights.data(), m_weights.size() * sizeof(m_weights[0]));
+        m_weights.clear();
+        m_weights.shrink_to_fit();
     }
 
     void DynamicMesh::Draw(void) const
