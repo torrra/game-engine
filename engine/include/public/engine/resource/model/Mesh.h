@@ -23,6 +23,7 @@ namespace engine
 
         f32             m_refractionIndex = 1.f;
         f32             m_opacity = 1.f;
+        f32             m_shininess = 1.f;
     };
 
     class Mesh
@@ -54,16 +55,16 @@ namespace engine
 
             // tangent and bi tangent
             bool m_hasTangents = false;
-            bool m_hasVertexColors : 1 = false;
+            bool m_hasVertexColors = false;
         };
 
         enum EMapIndex
         {
-            DIFFUSE           = 0,
-            NORMAL            = 1,
-            SPECULAR          = 2,
-            ROUGHNESS         = 3,
-            AMBIENT_OCCLUSION = 4
+            DIFFUSE,
+            NORMAL,
+            SPECULAR,
+            ROUGHNESS,
+            AMBIENT_OCCLUSION 
         };
 
     public:
@@ -91,23 +92,28 @@ namespace engine
         virtual void        DeleteMesh(void);
         virtual void        SetupGraphics(void);
 
+    private:
+
         uint32		SetAttributes(void);
         void		SetAttribute(uint32 index, int32 size, uint32 relativeOffset) const;
         void		CreateVBO(void);
         void		CreateEBO(void);
+        void        CreateMaterialBuffer(void);
         void		PostLoad(void);
 
         void		ProcessVertices(const aiMesh* mesh);
-        void        ProcessMaterial(const void* material, const std::string& name);
+        void        ProcessMaterial(const void* material, const std::string& dir);
 
         void        ImportTexturesFromMaterial();
+        void        StoreTexturePath(const void* mesh, EMapIndex index, const std::string& dir);
 
-        MeshMaterial            m_material;
         const class Texture*    m_maps[5]{ nullptr };
         std::string*            m_texturePaths = nullptr;
         std::vector<f32>		m_vertices;
         std::vector<f32>        m_vertexAttributes;
         std::vector<uint32>		m_indices;
+
+        MeshMaterial            m_material;
 
         uint32					m_indexCount;
         uint32					m_vao;
@@ -115,6 +121,9 @@ namespace engine
         Buffer                  m_positionVBO = 0;
         Buffer                  m_attributesVBO = 0;
         Buffer                  m_ebo = 0;
+        Buffer                  m_materialSSBO = 0;
+
+    protected:
 
         MeshMetaData			m_metaData;
 

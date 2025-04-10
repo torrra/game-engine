@@ -44,6 +44,8 @@ void engine::Mesh::ProcessMesh(const void* mesh)
             m_indices.push_back(face.mIndices[j]);
         }
     }
+
+    m_indexCount = static_cast<uint32>(m_indices.size());
 }
 
 uint64 engine::Mesh::GetVertexStride(void)
@@ -56,6 +58,7 @@ void engine::Mesh::DeleteMesh(void)
     m_positionVBO.DeleteData();
     m_attributesVBO.DeleteData();
     m_ebo.DeleteData();
+    m_materialSSBO.DeleteData();
     glDeleteVertexArrays(1, &m_vao);
 }
 
@@ -72,6 +75,8 @@ void engine::Mesh::SetupGraphics(void)
     glVertexArrayVertexBuffer(m_vao, 1, m_attributesVBO.GetBufferID(), 0, stride);
 
     ImportTexturesFromMaterial();
+    CreateMaterialBuffer();
+
     PostLoad();
 }
 
@@ -153,10 +158,14 @@ void engine::Mesh::CreateEBO(void)
     m_ebo.SetData(m_indices.data(), size);
 }
 
+void engine::Mesh::CreateMaterialBuffer(void)
+{
+    m_materialSSBO.Init();
+    m_materialSSBO.SetData(&m_material, sizeof(MeshMaterial));
+}
+
 void engine::Mesh::PostLoad(void)
 {
-    m_indexCount = static_cast<uint32>(m_indices.size());
-
     m_vertexAttributes.clear();
     m_vertexAttributes.shrink_to_fit();
 }
@@ -201,7 +210,7 @@ void engine::Mesh::ProcessVertices(const aiMesh* mesh)
     }
 }
 
-void engine::Mesh::ProcessMaterial(const void* material, const std::string&/* name*/)
+void engine::Mesh::ProcessMaterial(const void* material, const std::string& dir)
 {
      const aiMaterial* matImpl = reinterpret_cast<const aiMaterial*>(material);
 
@@ -209,47 +218,28 @@ void engine::Mesh::ProcessMaterial(const void* material, const std::string&/* na
                   *reinterpret_cast<aiColor3D*>(&m_material.m_diffuse));
 
      matImpl->Get(AI_MATKEY_COLOR_AMBIENT,
-                           *reinterpret_cast<aiColor3D*>(&m_material.m_ambient));
+                  *reinterpret_cast<aiColor3D*>(&m_material.m_ambient));
 
      matImpl->Get(AI_MATKEY_COLOR_SPECULAR,
-                           *reinterpret_cast<aiColor3D*>(&m_material.m_specular));
-     aiString texturePath;
+                  *reinterpret_cast<aiColor3D*>(&m_material.m_specular));
+
+     matImpl->Get(AI_MATKEY_SHININESS, m_material.m_shininess);
+     matImpl->Get(AI_MATKEY_REFRACTI, m_material.m_refractionIndex);
 
      if (matImpl->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-     {
-         matImpl->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
-         m_texturePaths[DIFFUSE] = texturePath.C_Str();
-         texturePath.Clear();
-     }
+         StoreTexturePath(material, DIFFUSE, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_NORMALS) > 0)
-     {
-         matImpl->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-         m_texturePaths[NORMAL] = texturePath.C_Str();
-         texturePath.Clear();
-     }
+         StoreTexturePath(material, NORMAL, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_SPECULAR) > 0)
-     {
-         matImpl->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-         m_texturePaths[SPECULAR] = texturePath.C_Str();
-         texturePath.Clear();
-     }
+         StoreTexturePath(material, SPECULAR, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0)
-     {
-         matImpl->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
-         m_texturePaths[ROUGHNESS] = texturePath.C_Str();
-         texturePath.Clear();
-     }
+         StoreTexturePath(material, ROUGHNESS, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION) > 0)
-     {
-         matImpl->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath);
-         m_texturePaths[AMBIENT_OCCLUSION] = texturePath.C_Str();
-         texturePath.Clear();
-     }
-
+         StoreTexturePath(material, AMBIENT_OCCLUSION, dir);
 }
 
 void engine::Mesh::ImportTexturesFromMaterial()
@@ -269,6 +259,41 @@ void engine::Mesh::ImportTexturesFromMaterial()
     delete[] m_texturePaths;
     m_texturePaths = nullptr;
 
+}
+
+void engine::Mesh::StoreTexturePath(const void* material, EMapIndex index, const std::string& dir)
+{
+    const aiMaterial* matImpl = reinterpret_cast<const aiMaterial*>(material);
+    aiTextureType type;
+    aiString path;
+
+    switch (index)
+    {
+    case DIFFUSE:
+        type = aiTextureType_DIFFUSE;
+        break;
+
+    case NORMAL:
+        type = aiTextureType_NORMALS;
+        break;
+
+    case SPECULAR:
+        type = aiTextureType_SPECULAR;
+        break;
+
+    case ROUGHNESS:
+        type = aiTextureType_DIFFUSE_ROUGHNESS;
+        break;
+
+    case AMBIENT_OCCLUSION:
+        type = aiTextureType_AMBIENT_OCCLUSION;
+        break;
+    default:
+        return;
+    }
+
+    matImpl->GetTexture(type, 0, &path);
+    m_texturePaths[index] = dir + path.C_Str();
 }
 
 uint32 engine::Mesh::GetVertexArrayID(void) const
@@ -307,7 +332,10 @@ const uint32* engine::Mesh::GetIndices(void) const
 void engine::Mesh::Draw(void) const
 {
     UseTextureMaps();
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_materialSSBO.GetBufferID());
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
 }
