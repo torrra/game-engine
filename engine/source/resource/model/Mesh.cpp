@@ -46,9 +46,15 @@ void engine::Mesh::ProcessMesh(const void* mesh)
     }
 }
 
+uint64 engine::Mesh::GetVertexStride(void)
+{
+    return sizeof(aiVector3D);
+}
+
 void engine::Mesh::DeleteMesh(void)
 {
-    m_vbo.DeleteData();
+    m_positionVBO.DeleteData();
+    m_attributesVBO.DeleteData();
     m_ebo.DeleteData();
     glDeleteVertexArrays(1, &m_vao);
 }
@@ -62,7 +68,8 @@ void engine::Mesh::SetupGraphics(void)
     uint32 stride = SetAttributes();
 
     glVertexArrayElementBuffer(m_vao, m_ebo.GetBufferID());
-    glVertexArrayVertexBuffer(m_vao, 0, m_vbo.GetBufferID(), 0, stride);
+    glVertexArrayVertexBuffer(m_vao, 0, m_positionVBO.GetBufferID(), 0, sizeof(aiVector3D));
+    glVertexArrayVertexBuffer(m_vao, 1, m_attributesVBO.GetBufferID(), 0, stride);
 
     ImportTexturesFromMaterial();
     PostLoad();
@@ -73,8 +80,9 @@ uint32 engine::Mesh::SetAttributes(void)
     uint32 relativeOffset = 0;
 
     // Position
-    SetAttribute(0, 3, relativeOffset);
-    relativeOffset += sizeof(aiVector3D);
+    glEnableVertexArrayAttrib(m_vao, 0);
+    glVertexArrayAttribFormat(m_vao, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(m_vao, 0, 0);
 
     // Normal
     if (m_metaData.m_hasNormals)
@@ -112,18 +120,25 @@ void engine::Mesh::SetAttribute(uint32 index, int32 size, uint32 relativeOffset)
 {
     glEnableVertexArrayAttrib(m_vao, index);
     glVertexArrayAttribFormat(m_vao, index, size, GL_FLOAT, GL_FALSE, relativeOffset);
-    glVertexArrayAttribBinding(m_vao, index, 0);
+    glVertexArrayAttribBinding(m_vao, index, 1);
 }
 
 void engine::Mesh::CreateVBO(void)
 {
-    m_vbo.Init();
+    m_positionVBO.Init();
 
     // Size
-    uint64 size = m_vertices.size() * sizeof(f32)/* * sizeof(Vertex)*/;
+    uint64 posSize = m_vertices.size() * sizeof(f32);
+    uint64 attribsSize = m_vertexAttributes.size() * sizeof(f32);
 
     // Set data
-    m_vbo.SetData(m_vertices.data(), size);
+    m_positionVBO.SetData(m_vertices.data(), posSize);
+
+    if (attribsSize)
+    {
+        m_attributesVBO.Init();
+        m_attributesVBO.SetData(m_vertexAttributes.data(), attribsSize);
+    }
 
 }
 
@@ -142,11 +157,8 @@ void engine::Mesh::PostLoad(void)
 {
     m_indexCount = static_cast<uint32>(m_indices.size());
 
-    m_indices.clear();
-    m_vertices.clear();
-
-    m_indices.shrink_to_fit();
-    m_vertices.shrink_to_fit();
+    m_vertexAttributes.clear();
+    m_vertexAttributes.shrink_to_fit();
 }
 
 void engine::Mesh::ProcessVertices(const aiMesh* mesh)
@@ -165,26 +177,26 @@ void engine::Mesh::ProcessVertices(const aiMesh* mesh)
         if (m_metaData.m_hasNormals)
         {
             aiVector3D& normal = mesh->mNormals[i];
-            m_vertices.insert(m_vertices.end(), &normal.x, &normal.x + sizeVec3);
+            m_vertexAttributes.insert(m_vertexAttributes.end(), &normal.x, &normal.x + sizeVec3);
         }
         // Tangent / biTangents
         if (m_metaData.m_hasTangents)
         {
             aiVector3D& tangent = mesh->mTangents[i];
             aiVector3D& biTangent = mesh->mBitangents[i];
-            m_vertices.insert(m_vertices.end(), &tangent.x, &tangent.x + sizeVec3);
-            m_vertices.insert(m_vertices.end(), &biTangent.x, &biTangent.x + sizeVec3);
+            m_vertexAttributes.insert(m_vertexAttributes.end(), &tangent.x, &tangent.x + sizeVec3);
+            m_vertexAttributes.insert(m_vertexAttributes.end(), &biTangent.x, &biTangent.x + sizeVec3);
         }
         // TexCoords
         if (mesh->mTextureCoords[0])
         {
             aiVector3D& uv = mesh->mTextureCoords[0][i];
-            m_vertices.insert(m_vertices.end(), &uv.x, &uv.x + sizeVec2);
+            m_vertexAttributes.insert(m_vertexAttributes.end(), &uv.x, &uv.x + sizeVec2);
         }
         if (mesh->mColors[0])
         {
             aiColor4D& color = mesh->mColors[0][i];
-            m_vertices.insert(m_vertices.end(), &color.r, &color.r + sizeColor);
+            m_vertexAttributes.insert(m_vertexAttributes.end(), &color.r, &color.r + sizeColor);
         }
     }
 }
@@ -280,6 +292,16 @@ void engine::Mesh::UseTextureMaps(void) const
         else
             Texture::RemoveTexture(textureID);
     }
+}
+
+const f32* engine::Mesh::GetVertices(void) const
+{
+    return m_vertices.data();
+}
+
+const uint32* engine::Mesh::GetIndices(void) const
+{
+    return m_indices.data();
 }
 
 void engine::Mesh::Draw(void) const

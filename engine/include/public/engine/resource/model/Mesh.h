@@ -77,6 +77,10 @@ namespace engine
         uint32      GetVertexArrayID(void) const;
         uint32      GetIndexCount(void) const;
 
+        const f32*      GetVertices(void) const;
+        const uint32*   GetIndices(void) const;
+        uint64          GetVertexStride(void);
+
         void        UseTextureMaps(void) const;
 
        virtual void        Draw(void) const;
@@ -102,11 +106,14 @@ namespace engine
         const class Texture*    m_maps[5]{ nullptr };
         std::string*            m_texturePaths = nullptr;
         std::vector<f32>		m_vertices;
-        std::vector<int32>		m_indices;
+        std::vector<f32>        m_vertexAttributes;
+        std::vector<uint32>		m_indices;
 
         uint32					m_indexCount;
         uint32					m_vao;
-        Buffer                  m_vbo = 0;
+
+        Buffer                  m_positionVBO = 0;
+        Buffer                  m_attributesVBO = 0;
         Buffer                  m_ebo = 0;
 
         MeshMetaData			m_metaData;
