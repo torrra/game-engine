@@ -79,7 +79,7 @@ namespace engine
 
         void        UseTextureMaps(void) const;
 
-        void        Draw(void) const;
+       virtual void        Draw(void) const;
 
     protected:
 
