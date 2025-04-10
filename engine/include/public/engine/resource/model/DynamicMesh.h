@@ -56,17 +56,10 @@ namespace engine
         void ProcessBone(Bone& newBone, void* bonePtr, const BoneIndexMap& nodes);
         void PopulateBoneNameMap(void);
 
-        void SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
-                                        void* weightBuffer, uint64 weightBufSize);
-
         BoneNameMap                 m_boneMap;
         std::vector<Bone>           m_skeleton;
         std::vector<BoneWeight>     m_weights;
         Buffer                      m_skeletonSSBO = 0;
-
-
-        Buffer                      m_boneIndexVBO = 0;
-        Buffer                      m_boneWeightVBO = 0;
     };
 
     std::ostream& operator<<(std::ostream& lhs, const Bone& rhs);

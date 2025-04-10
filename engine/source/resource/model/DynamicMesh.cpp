@@ -21,8 +21,7 @@ namespace engine
 
     void DynamicMesh::DeleteMesh(void)
     {
-        m_boneIndexVBO.DeleteData();
-        m_boneWeightVBO.DeleteData();
+        m_skeletonSSBO.DeleteData();
         Mesh::DeleteMesh();
     }
 
@@ -56,25 +55,6 @@ namespace engine
             return indexIt->second;
 
         return -1;
-    }
-
-    void DynamicMesh::SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
-                                                 void* weightBuffer, uint64 weightBufSize)
-    {
-        m_boneIndexVBO.Init();
-        m_boneWeightVBO.Init();
-
-        m_boneIndexVBO.SetData(indexBuffer, indexBufSize);
-        m_boneWeightVBO.SetData(weightBuffer, weightBufSize);
-
-        //SetBoneIndexAttribute();
-        //SetBoneWeightAttribute();
-
-        glVertexArrayVertexBuffer(m_vao, 1, m_boneIndexVBO.GetBufferID(), 0,
-            sizeof(math::Vector4<uint32>));
-
-        glVertexArrayVertexBuffer(m_vao, 2, m_boneWeightVBO.GetBufferID(), 0,
-            sizeof(math::Vector4f));
     }
 
     void DynamicMesh::ProcessWeights(const void* bone, uint32 boneIndex)
