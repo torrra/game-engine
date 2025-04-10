@@ -17,6 +17,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
+#include <cstring>
 
 engine::Model::~Model(void)
 {
@@ -29,6 +30,9 @@ engine::Model::~Model(void)
 
 bool engine::Model::LoadResource(const char* fileName)
 {
+    if (!fileName || !strcmp(fileName, ""))
+        return false;
+
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
 }
@@ -126,6 +130,26 @@ void engine::Model::ProcessTextures(const void* scene)
     }
 }
 
+std::string engine::Model::GetDirectory(const std::string& modelPath)
+{
+    char separator;
+    uint64 len = modelPath.size() - 1;
+
+    if (modelPath.find('\\') != std::string::npos)
+        separator = '\\';
+
+    else if (modelPath.find('/') != std::string::npos)
+        separator = '/';
+
+    else
+        return {};
+
+    // find mesh dir
+    while (modelPath[--len] != separator);
+
+    return modelPath.substr(0, len + 1);
+}
+
 void engine::Model::ProcessMeshes(const void* scene, const void* node, const std::string& name)
 {
     const aiScene*  sceneImpl = reinterpret_cast<const aiScene*>(scene);
@@ -176,8 +200,10 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
         }
     }
 
+    std::string dir = GetDirectory(name);
+
     ProcessTextures(scene); 
-    ProcessMeshes(scene, scene->mRootNode, name);
+    ProcessMeshes(scene, scene->mRootNode, dir);
     m_loadStatus |= LOADED;
 
     // Send OpenGL setup to render thread

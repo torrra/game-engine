@@ -36,7 +36,7 @@ namespace engine
     private:
 
         void ProcessTextures(const void* scene);
-        //vo   ProcessMaterials(const void* scene);
+        std::string GetDirectory(const std::string& modelPath);
              
         void ProcessMeshes(const void* scene, const void* node, const std::string& name);
         void WorkerThreadLoad(const std::string& name);
