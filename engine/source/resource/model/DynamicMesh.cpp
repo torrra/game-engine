@@ -38,8 +38,9 @@ namespace engine
 
     void DynamicMesh::Draw(void) const
     {
-       // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_skeletonSSBO.GetBufferID());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_skeletonSSBO.GetBufferID());
         Mesh::Draw();
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
     }
 
     const Bone& DynamicMesh::GetBone(int32 index) const
@@ -96,7 +97,7 @@ namespace engine
             nodes[bone->mNode] = boneIndex;
         }
 
-        m_weights.resize(m_indices.size());
+        m_weights.resize(GetIndexCount());
         m_skeleton.resize(meshImpl->mNumBones);
 
         for (uint32 boneIndex = 0; boneIndex < meshImpl->mNumBones; ++boneIndex)
