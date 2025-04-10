@@ -28,46 +28,34 @@ namespace engine
 
     void DynamicMesh::RenderThreadSkeletonSetup(void)
     {
-        uint64 indexSize = m_weights.size() * sizeof(math::Vector4<uint32>);
-        uint64 weightSize = m_weights.size() * sizeof(math::Vector4f);
-
-        if (indexSize < sizeof(math::Vector4<uint32>) || weightSize < sizeof(math::Vector4f))
-            return;
-
-        math::Vector4f* weightBuffer = (math::Vector4f*)malloc(weightSize);
-        math::Vector4<uint32>* indexBuffer = (math::Vector4<uint32>*)malloc(indexSize);
-
-        if (weightBuffer && indexBuffer)
-        {
-            for (const BoneWeight& weight : m_weights)
-            {
-                new(weightBuffer) math::Vector4f(weight.m_weights);
-                new(indexBuffer) math::Vector4<uint32>(weight.m_boneIndices);
-            }
-            m_weights.clear();
-            m_weights.shrink_to_fit();
-        }
-
-        if (weightBuffer)
-            free(weightBuffer);
-
-        if (indexBuffer)
-            free(indexBuffer);
+        m_skeletonSSBO.Init();
+        m_skeletonSSBO.SetData(m_weights.data(), m_weights.size() * sizeof(m_weights[0]));
     }
 
-    void engine::DynamicMesh::SetBoneIndexAttribute()
+    void DynamicMesh::Draw(void) const
     {
-        glEnableVertexArrayAttrib(m_vao, 6);
-        glVertexArrayAttribFormat(m_vao, 6, 4, GL_UNSIGNED_INT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(m_vao, 6, 1);
+       // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_skeletonSSBO.GetBufferID());
+        Mesh::Draw();
     }
 
-    void DynamicMesh::SetBoneWeightAttribute()
+    const Bone& DynamicMesh::GetBone(int32 index) const
     {
-        glEnableVertexArrayAttrib(m_vao, 7);
-        glVertexArrayAttribFormat(m_vao, 7, 4, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(m_vao, 7, 2);
+        return m_skeleton.at(index);
+    }
 
+    const Bone& DynamicMesh::GetBone(const std::string& name) const
+    {
+        return m_skeleton.at(GetBoneIndex(name));
+    }
+
+    int32 DynamicMesh::GetBoneIndex(const std::string& name) const
+    {
+        auto indexIt = m_boneMap.find(std::hash<std::string>{}(name));
+
+        if (indexIt != m_boneMap.end())
+            return indexIt->second;
+
+        return -1;
     }
 
     void DynamicMesh::SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
@@ -79,8 +67,8 @@ namespace engine
         m_boneIndexVBO.SetData(indexBuffer, indexBufSize);
         m_boneWeightVBO.SetData(weightBuffer, weightBufSize);
 
-        SetBoneIndexAttribute();
-        SetBoneWeightAttribute();
+        //SetBoneIndexAttribute();
+        //SetBoneWeightAttribute();
 
         glVertexArrayVertexBuffer(m_vao, 1, m_boneIndexVBO.GetBufferID(), 0,
             sizeof(math::Vector4<uint32>));
@@ -161,6 +149,18 @@ namespace engine
             }
             if (parentIterator != nodes.end())
                 newBone.m_parent = parentIterator->second;
+        }
+    }
+
+    void DynamicMesh::PopulateBoneNameMap(void)
+    {
+        int32 boneIndex = 0;
+        std::hash<std::string> hashFunctor;
+
+        for (const Bone& bone : m_skeleton)
+        {
+            uint64 hashedName = hashFunctor(bone.m_name);
+            m_boneMap[hashedName] = boneIndex++;
         }
     }
 
