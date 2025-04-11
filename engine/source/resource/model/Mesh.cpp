@@ -170,41 +170,43 @@ void engine::Mesh::PostLoad(void)
     m_vertexAttributes.shrink_to_fit();
 }
 
-void engine::Mesh::ProcessVertices(const aiMesh* mesh)
+void engine::Mesh::ProcessVertices(const void* mesh)
 {
+    const aiMesh* meshImpl = reinterpret_cast<const aiMesh*>(mesh);
     constexpr uint64 sizeVec3 = sizeof(aiVector3D) / sizeof(f32);
     constexpr uint64 sizeVec2 = sizeof(aiVector2D) / sizeof(f32);
     constexpr uint64 sizeColor = sizeof(aiColor4D) / sizeof(f32);
 
-    for (uint32 i = 0; i < mesh->mNumVertices; ++i)
+    for (uint32 i = 0; i < meshImpl->mNumVertices; ++i)
     {
         // Position
-        aiVector3D& vertex = mesh->mVertices[i];
+        aiVector3D& vertex = meshImpl->mVertices[i];
         m_vertices.insert(m_vertices.end(), &vertex.x, &vertex.x + sizeVec3);
 
         // Normal
         if (m_metaData.m_hasNormals)
         {
-            aiVector3D& normal = mesh->mNormals[i];
+            aiVector3D& normal = meshImpl->mNormals[i];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &normal.x, &normal.x + sizeVec3);
         }
         // Tangent / biTangents
         if (m_metaData.m_hasTangents)
         {
-            aiVector3D& tangent = mesh->mTangents[i];
-            aiVector3D& biTangent = mesh->mBitangents[i];
+            aiVector3D& tangent = meshImpl->mTangents[i];
+            aiVector3D& biTangent = meshImpl->mBitangents[i];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &tangent.x, &tangent.x + sizeVec3);
-            m_vertexAttributes.insert(m_vertexAttributes.end(), &biTangent.x, &biTangent.x + sizeVec3);
+            m_vertexAttributes.insert(m_vertexAttributes.end(), 
+                                      &biTangent.x, &biTangent.x + sizeVec3);
         }
         // TexCoords
-        if (mesh->mTextureCoords[0])
+        if (meshImpl->mTextureCoords[0])
         {
-            aiVector3D& uv = mesh->mTextureCoords[0][i];
+            aiVector3D& uv = meshImpl->mTextureCoords[0][i];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &uv.x, &uv.x + sizeVec2);
         }
-        if (mesh->mColors[0])
+        if (meshImpl->mColors[0])
         {
-            aiColor4D& color = mesh->mColors[0][i];
+            aiColor4D& color = meshImpl->mColors[0][i];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &color.r, &color.r + sizeColor);
         }
     }
@@ -292,6 +294,7 @@ void engine::Mesh::StoreTexturePath(const void* material, EMapIndex index, const
         return;
     }
 
+    // Store path to load later from render thread
     matImpl->GetTexture(type, 0, &path);
     m_texturePaths[index] = dir + path.C_Str();
 }

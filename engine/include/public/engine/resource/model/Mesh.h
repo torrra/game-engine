@@ -9,9 +9,6 @@
 #include <vector>
 #include <string>
 
-struct aiMesh;
-
-
 namespace engine
 {
     struct MeshMaterial
@@ -23,6 +20,8 @@ namespace engine
 
         f32             m_refractionIndex = 1.f;
         f32             m_opacity = 1.f;
+
+        // Specular exponent
         f32             m_shininess = 1.f;
     };
 
@@ -101,7 +100,7 @@ namespace engine
         void        CreateMaterialBuffer(void);
         void		PostLoad(void);
 
-        void		ProcessVertices(const aiMesh* mesh);
+        void		ProcessVertices(const void* mesh);
         void        ProcessMaterial(const void* material, const std::string& dir);
 
         void        ImportTexturesFromMaterial();
