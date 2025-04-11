@@ -103,7 +103,7 @@ namespace engine
         void		ProcessVertices(const void* mesh);
         void        ProcessMaterial(const void* material, const std::string& dir);
 
-        void        ImportTexturesFromMaterial();
+        void        ImportTexturesFromMaterial(void);
         void        StoreTexturePath(const void* mesh, EMapIndex index, const std::string& dir);
 
         const class Texture*    m_maps[5]{ nullptr };

@@ -7,8 +7,6 @@
 
 namespace engine
 {
-	struct Vertex;
-
 	class Buffer
 	{
 	public:
