@@ -6,31 +6,12 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-//#define MODEL_FILE "C:\\Users\\noahd\\Bureau\\Mustang\\2024_moteur_gpm_2027_gpm_2027\
-//_projet_moteur-mustang\\workspace\\assets\\fred\
-//dy\\source\\FNAF_SB_Glamrock_Freddy_DONE_v10_Backup3_.fbx"
-
-//#define MODEL_FILE "C:\\Users\\noahd\\Bureau\\Mustang\\2024_moteur_gpm_2027_gpm_\
-//2027_projet_moteur-mustang\\workspace\\assets\\manny\\SKM_Manny.FBX"
-
-//#define MODEL_FILE "C:\\Users\\noahd\\Bureau\\Mustang\\2024_moteur_gpm_2027_gpm_2027\
-//_projet_moteur-mustang\\workspace\\assets\\banana-dancing-fortnite\\source\\BananaDancing.fbx"
-
-//#define MODEL_FILE "C:\\Users\\noahd\\Bureau\\Mustang\\2024_moteur_gpm_2027_gpm_2027\
-//_projet_moteur-mustang\\workspace\\assets\\hilda\\source\\Hilda_Regular_00\\Hilda_Regular_00.fbx"
-
-//#define MODEL_FILE "C:\\Users\\noahd\\Bureau\\Mustang\\2024_moteur_gpm_2027\
-//_gpm_2027_projet_moteur-mustang\\workspace\\assets\\garf\\source\\GARFY.fbx"
-
-//#define MODEL_FILE ".\\assets\\padoru.obj"
-
-#define MODEL_FILE ".\\assets\\alien\\character.fbx"
-
+#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
 #define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 
 #define SHADER_PROGRAM_NAME		"ModelTextured"
-#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vs"
+#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vert"
 #define SHADER_PROGRAM_FRAGMENT ".\\shaders\\ModelTextured.frag"
 
 ExampleProject::ExampleProject(void)
