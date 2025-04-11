@@ -19,6 +19,16 @@
 #include <filesystem>
 #include <cstring>
 
+
+namespace engine::importer
+{
+    // global variable to avoid exposing assimp to
+    // Model.h by having it as a class member.
+    // Creating an importer is an expensive operation,
+    // so we keep one per thread
+    thread_local Assimp::Importer g_importer;
+}
+
 engine::Model::~Model(void)
 {
     for (DynamicMesh& mesh : m_dynamicMeshes)
@@ -178,8 +188,7 @@ void engine::Model::ProcessMeshes(const void* scene, const void* node, const std
 void engine::Model::WorkerThreadLoad(const std::string& name)
 {
     // Read file
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(name,
+    const aiScene* scene = importer::g_importer.ReadFile(name,
         aiProcess_Triangulate | aiProcess_GenSmoothNormals |
         aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData 
     );
@@ -187,7 +196,7 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     // Error management
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::printf("Failed to load model '%s'. Error: %s\n", name.c_str(), importer.GetErrorString());
+        std::printf("Failed to load model '%s'. Error: %s\n", name.c_str(), importer::g_importer.GetErrorString());
         return;
     }
 
@@ -208,6 +217,7 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
 
     // Send OpenGL setup to render thread
     ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(&Model::RenderThreadSetup, this);
+    importer::g_importer.FreeScene();
 }
 
 void engine::Model::RenderThreadSetup(void)
