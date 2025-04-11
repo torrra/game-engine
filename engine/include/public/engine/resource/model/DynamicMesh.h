@@ -30,7 +30,7 @@ namespace engine
     private:
 
         using BoneIndexMap = std::unordered_map<void*, int64>;
-         using BoneNameMap = std::unordered_map<uint64, int32>;
+        using BoneNameMap = std::unordered_map<uint64, int32>;
 
     public:
 
@@ -43,7 +43,6 @@ namespace engine
         void ProcessMesh(const void* mesh) override;
         void DeleteMesh(void) override;
         void RenderThreadSkeletonSetup(void);
-        void Draw(void) const override;
 
         const Bone& GetBone(int32 index) const;
         int32 GetBoneIndex(const std::string& name) const;
@@ -59,11 +58,16 @@ namespace engine
         void SortChildrenBones(int32 oldParentIndex, int32 newIndex,
                                std::vector<Bone>& boneArray,   
                                std::vector<int32>& indexArray);
+        void SetBoneIndexAttribute();
+        void SetBoneWeightAttribute();
+        void SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
+                                        void* weightBuffer, uint64 weightBufSize);
 
         BoneNameMap                 m_boneMap;
         std::vector<Bone>           m_skeleton;
         std::vector<BoneWeight>     m_weights;
-        Buffer                      m_skeletonSSBO = 0;
+        Buffer                      m_boneIndexVBO = 0;
+        Buffer                      m_boneWeightVBO = 0;
     };
 
     std::ostream& operator<<(std::ostream& lhs, const Bone& rhs);

@@ -21,26 +21,9 @@ namespace engine
 
     void DynamicMesh::DeleteMesh(void)
     {
-        m_skeletonSSBO.DeleteData();
+        m_boneIndexVBO.DeleteData();
+        m_boneWeightVBO.DeleteData();
         Mesh::DeleteMesh();
-    }
-
-    void DynamicMesh::RenderThreadSkeletonSetup(void)
-    {
-        if (!m_metaData.m_hasBones)
-            return;
-
-        m_skeletonSSBO.Init();
-        m_skeletonSSBO.SetData(m_weights.data(), m_weights.size() * sizeof(m_weights[0]));
-        m_weights.clear();
-        m_weights.shrink_to_fit();
-    }
-
-    void DynamicMesh::Draw(void) const
-    {
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_skeletonSSBO.GetBufferID());
-        Mesh::Draw();
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
     }
 
     const Bone& DynamicMesh::GetBone(int32 index) const
@@ -56,6 +39,70 @@ namespace engine
             return indexIt->second;
 
         return -1;
+    }
+
+    void DynamicMesh::RenderThreadSkeletonSetup(void)
+    {
+        uint64 indexSize = m_weights.size() * sizeof(math::Vector4<uint32>);
+        uint64 weightSize = m_weights.size() * sizeof(math::Vector4f);
+
+        if (indexSize < sizeof(math::Vector4<uint32>) || weightSize < sizeof(math::Vector4f))
+            return;
+
+        math::Vector4f* weightBuffer = (math::Vector4f*)malloc(weightSize);
+        math::Vector4<uint32>* indexBuffer = (math::Vector4<uint32>*)malloc(indexSize);
+
+        if (weightBuffer && indexBuffer)
+        {
+            for (const BoneWeight& weight : m_weights)
+            {
+                new(weightBuffer) math::Vector4f(weight.m_weights);
+                new(indexBuffer) math::Vector4<uint32>(weight.m_boneIndices);
+            }
+            m_weights.clear();
+            m_weights.shrink_to_fit();
+            SetupSkeletonVertexBuffers(indexBuffer, indexSize, weightBuffer, weightSize);
+        }
+
+        if (weightBuffer)
+            free(weightBuffer);
+
+        if (indexBuffer)
+            free(indexBuffer);
+    }
+
+    void engine::DynamicMesh::SetBoneIndexAttribute()
+    {
+        glEnableVertexArrayAttrib(m_vao, 6);
+        glVertexArrayAttribFormat(m_vao, 6, 4, GL_UNSIGNED_INT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(m_vao, 6, 1);
+    }
+
+    void DynamicMesh::SetBoneWeightAttribute()
+    {
+        glEnableVertexArrayAttrib(m_vao, 7);
+        glVertexArrayAttribFormat(m_vao, 7, 4, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(m_vao, 7, 2);
+
+    }
+
+    void DynamicMesh::SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
+                                                 void* weightBuffer, uint64 weightBufSize)
+    {
+        m_boneIndexVBO.Init();
+        m_boneWeightVBO.Init();
+
+        m_boneIndexVBO.SetData(indexBuffer, indexBufSize);
+        m_boneWeightVBO.SetData(weightBuffer, weightBufSize);
+
+        SetBoneIndexAttribute();
+        SetBoneWeightAttribute();
+
+        glVertexArrayVertexBuffer(m_vao, 2, m_boneIndexVBO.GetBufferID(), 0,
+            sizeof(math::Vector4<uint32>));
+
+        glVertexArrayVertexBuffer(m_vao, 3, m_boneWeightVBO.GetBufferID(), 0,
+            sizeof(math::Vector4f));
     }
 
     void DynamicMesh::ProcessWeights(const void* bone, uint32 boneIndex)
@@ -165,6 +212,10 @@ namespace engine
     
         for (int32 arrayIndex = 0; arrayIndex < static_cast<int32>(arraySize); ++arrayIndex)
            SortChildrenBones(indexArray[arrayIndex], arrayIndex, boneArray, indexArray);
+
+        for (const Bone& bone : m_skeleton)
+            std::cout << bone;
+
 
     }
 

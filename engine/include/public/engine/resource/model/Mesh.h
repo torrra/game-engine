@@ -115,7 +115,6 @@ namespace engine
         MeshMaterial            m_material;
 
         uint32					m_indexCount;
-        uint32					m_vao;
 
         Buffer                  m_positionVBO = 0;
         Buffer                  m_attributesVBO = 0;
@@ -124,6 +123,7 @@ namespace engine
 
     protected:
 
+        uint32					m_vao;
         MeshMetaData			m_metaData;
 
         friend class Model;
