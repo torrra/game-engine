@@ -46,7 +46,6 @@ namespace engine
         void Draw(void) const override;
 
         const Bone& GetBone(int32 index) const;
-        const Bone& GetBone(const std::string& name) const;
         int32 GetBoneIndex(const std::string& name) const;
 
     private:
@@ -55,6 +54,11 @@ namespace engine
         bool ProcessSkeleton(const void* mesh);
         void ProcessBone(Bone& newBone, void* bonePtr, const BoneIndexMap& nodes);
         void PopulateBoneNameMap(void);
+        void SortSkeleton(std::vector<Bone>& boneArray);
+
+        void SortChildrenBones(int32 oldParentIndex, int32 newIndex,
+                               std::vector<Bone>& boneArray,   
+                               std::vector<int32>& indexArray);
 
         BoneNameMap                 m_boneMap;
         std::vector<Bone>           m_skeleton;

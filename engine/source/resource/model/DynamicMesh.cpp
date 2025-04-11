@@ -48,11 +48,6 @@ namespace engine
         return m_skeleton.at(index);
     }
 
-    const Bone& DynamicMesh::GetBone(const std::string& name) const
-    {
-        return m_skeleton.at(GetBoneIndex(name));
-    }
-
     int32 DynamicMesh::GetBoneIndex(const std::string& name) const
     {
         auto indexIt = m_boneMap.find(std::hash<std::string>{}(name));
@@ -84,6 +79,7 @@ namespace engine
     bool DynamicMesh::ProcessSkeleton(const void* mesh)
     {
         const aiMesh* meshImpl = reinterpret_cast<const aiMesh*>(mesh);
+        std::vector<Bone> unorderedSkeleton(meshImpl->mNumBones);
 
         if (!meshImpl->HasBones())
             return false;
@@ -98,17 +94,18 @@ namespace engine
         }
 
         m_weights.resize(GetIndexCount());
-        m_skeleton.resize(meshImpl->mNumBones);
 
         for (uint32 boneIndex = 0; boneIndex < meshImpl->mNumBones; ++boneIndex)
         {
             aiBone* bone = meshImpl->mBones[boneIndex];
-            Bone& newBone = m_skeleton[nodes.at(bone->mNode)];
+            Bone& newBone = unorderedSkeleton[nodes.at(bone->mNode)];
 
             ProcessWeights(bone, boneIndex);
             ProcessBone(newBone, bone, nodes);
         }
 
+        SortSkeleton(unorderedSkeleton);
+        PopulateBoneNameMap();
         return true;
     }
 
@@ -147,6 +144,47 @@ namespace engine
         {
             uint64 hashedName = hashFunctor(bone.m_name);
             m_boneMap[hashedName] = boneIndex++;
+        }
+    }
+
+    void DynamicMesh::SortSkeleton(std::vector<Bone>& boneArray)
+    {
+        // This vector maps old unordered indices to
+        // new positions that guarantee they will be updated
+        // after their parents. Old indices are the values
+        // contained and the new indices are their positions
+        // within the vector
+        std::vector<int32> indexArray;
+
+        uint64 arraySize = boneArray.size();
+
+        indexArray.reserve(arraySize);
+        m_skeleton.reserve(arraySize);
+
+        SortChildrenBones(-1, -1, boneArray, indexArray);
+    
+        for (int32 arrayIndex = 0; arrayIndex < static_cast<int32>(arraySize); ++arrayIndex)
+           SortChildrenBones(indexArray[arrayIndex], arrayIndex, boneArray, indexArray);
+
+    }
+
+    void DynamicMesh::SortChildrenBones(int32 oldParentIndex, int32 newIndex,
+                                        std::vector<Bone>& boneArray,
+                                        std::vector<int32>& indexArray)
+    {
+        for (int32 index = 0; index < static_cast<int32>(boneArray.size()); ++index)
+        {
+            if (boneArray[index].m_parent == oldParentIndex)
+            {
+                Bone& movedBone = m_skeleton.emplace_back(std::move(boneArray[index]));
+                movedBone.m_parent = newIndex;
+
+                indexArray.push_back(index);
+
+                // There should be only one bone at the root, so we can exit this function
+                if (newIndex == -1)
+                    return;
+            }
         }
     }
 
