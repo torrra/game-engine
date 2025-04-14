@@ -55,6 +55,9 @@ void engine::DebugDraw::InitDebugDraw(void)
 
     // Load the debug draw shader
     ResourceManager::LoadShader("DebugDrawShader", ".\\shaders\\DebugShader.vs", ".\\shaders\\DebugShader.frag");
+
+    // Store the debug draw program
+    m_debugDrawProgram = ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader");
 }
 
 void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
@@ -80,7 +83,7 @@ void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
 void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount)
 {
     // Use the debug draw program
-    ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader")->Use();
+    m_debugDrawProgram->Use();
     // Set the projection view matrix uniform
     ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader")->Set("projViewMatrix", inProjViewMatrix);
     // Bind the VAO
