@@ -35,7 +35,7 @@ bool ui::InputBox(const char* id, const char* hint, std::string& outStr)
 
 bool ui::InputBox(const char* id, f32* value, f32 increment)
 {
-    return ImGui::DragFloat(id, value, increment, 0.0f, 0.0f, "%.3f", ImGuiSliderFlags_WrapAround);
+    return ImGui::DragFloat(id, value, increment);
 }
 
 bool ui::StartMenuBar(void)
@@ -85,7 +85,10 @@ void ui::ItemWidth(f32 widthPx)
 
 void ui::StartSection(const char* name)
 {
-    constexpr int32 flags = ImGuiChildFlags_Borders | ImGuiChildFlags_AlwaysUseWindowPadding;
+    constexpr int32 flags = 
+        ImGuiChildFlags_Borders | 
+        ImGuiChildFlags_AlwaysUseWindowPadding | 
+        ImGuiChildFlags_AutoResizeY;
 
     ImGui::BeginChild(name, ImVec2(0, 0), flags);
 }
@@ -107,7 +110,7 @@ void ui::EndDisabledSection(void)
 
 bool ui::CollapseSection(const char* name)
 {
-    return ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_DefaultOpen);
+    return ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_None);
 }
 
 void ui::SetID(std::string const& id)
