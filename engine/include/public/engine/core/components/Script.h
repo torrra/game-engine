@@ -32,6 +32,9 @@ namespace engine
         ENGINE_API
         void Register(void) override;
 
+        ENGINE_API
+        void Unregister(void) override;
+
         // Add a new lua script object to this component, and register it
         // in lua
         ENGINE_API

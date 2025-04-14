@@ -27,6 +27,11 @@ namespace engine
             object.Register();
     }
 
+    void Script::Unregister(void)
+    {
+        ScriptSystem::UnregisterComponent("_RemoveScriptComponent", m_owner);
+    }
+
     void Script::AddScriptObject(const std::string& type)
     {
         std::string formattedType = type;

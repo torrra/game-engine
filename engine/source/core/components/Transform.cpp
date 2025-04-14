@@ -88,6 +88,11 @@ void engine::Transform::Register(void)
     engine::ScriptSystem::RegisterNewComponent("_NewTransformComponent", m_owner);
 }
 
+void engine::Transform::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveTransformComponent", m_owner);
+}
+
 math::Vector3f engine::Transform::GetPosition(void) const
 {
     return m_position;

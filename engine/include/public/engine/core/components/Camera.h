@@ -35,7 +35,8 @@ namespace engine
         ENGINE_API void Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed);
         ENGINE_API math::Matrix4f ViewProjection(void);
 
-        ENGINE_API void Register(void);
+        ENGINE_API void Register(void) override;
+        ENGINE_API void Unregister(void) override;
 
         ENGINE_API math::Vector3f GetPosition(void) const noexcept;
         ENGINE_API math::Vector3f GetRotation(void) const noexcept;

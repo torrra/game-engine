@@ -50,6 +50,11 @@ void engine::Camera::Register(void)
     engine::ScriptSystem::RegisterNewComponent("_NewCameraComponent", m_owner);
 }
 
+void engine::Camera::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveCameraComponent", m_owner);
+}
+
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
 {
     return m_position;
