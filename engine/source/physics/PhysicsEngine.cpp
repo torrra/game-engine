@@ -201,7 +201,7 @@ void engine::PhysicsEngine::InitScene(void)
         sceneDesc.cpuDispatcher = m_impl->m_dispatcher;
         /*
             Decide how to manage the interaction between physics objects as
-                - how the will collides
+                - how they will collides
                 - Have they to generate contact events
                 - Have they to generate trigger events
             We use it to personalize the collision logic between objects
