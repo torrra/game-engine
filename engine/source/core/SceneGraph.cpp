@@ -156,6 +156,7 @@ namespace engine
             m_sceneDynamicRigidBodies.InvalidateComponent(entity);
             m_sceneStaticRigidBodies.InvalidateComponent(entity);
 
+            ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
 
             std::vector<EntityHandle> children = GetChildren(entity);
