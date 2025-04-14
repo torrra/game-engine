@@ -1,7 +1,7 @@
 #include "resource/ResourceManager.h"
 #include "resource/shader/Shader.h"
 
-std::mutex engine::ResourceManager::m_mutex;
+std::mutex               engine::ResourceManager::m_mutex;
 engine::ResourceManager* engine::ResourceManager::m_instance = nullptr;
 
 void engine::ResourceManager::LoadShader(
@@ -11,7 +11,7 @@ void engine::ResourceManager::LoadShader(
 {
 	if (HasResource(shaderProgramName))
 	{
-		std::printf("Shader UID already exists. Failed to create new shader program '%s'\n", 
+		std::printf("Shader name already exists. Failed to create new shader program '%s'\n", 
 			shaderProgramName);
 		
 		return;
@@ -34,9 +34,8 @@ void engine::ResourceManager::Unload(std::string const& fileName)
 	if (!HasResource(fileName))
 		return;
 
-    m_mutex.lock();
 	delete GetInstance()->m_resources[fileName];
-    m_mutex.unlock();
+    GetInstance()->m_resources.erase(fileName);
 }
 
 void engine::ResourceManager::UnloadAll(void)
@@ -54,9 +53,8 @@ void engine::ResourceManager::ShutDown(void)
 	if (!GetInstance()->m_resources.empty())
 		GetInstance()->UnloadAll();
 
-    m_mutex.lock();
 	delete m_instance;
-    m_mutex.unlock();
+    m_instance = nullptr;
 }
 
 const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resource)
@@ -73,12 +71,7 @@ const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resour
 engine::ResourceManager* engine::ResourceManager::GetInstance(void)
 {
 	if (!m_instance)
-	{
-		std::unique_lock<std::mutex> lock(m_mutex);
-
-		if (!m_instance)
-			m_instance = new ResourceManager();
-	}
+		m_instance = new ResourceManager();
 
 	return m_instance;
 }
