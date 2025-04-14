@@ -28,6 +28,9 @@ namespace engine
 
         virtual void Register(void) = 0;
 
+        // TODO: make pure virtual
+        virtual void Unregister(void) {};
+
         // Is this component a valid object?
         // true: this object is a valid component instance
         // false: this object is 'dead' and subject to overwrite
