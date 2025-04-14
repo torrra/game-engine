@@ -1,8 +1,7 @@
 #include "ui/Properties.h"
-#include "ui/components/Transform.h"
 
-#include <engine/ui/UIComponent.h>
 #include <engine/core/SceneGraph.h>
+#include <engine/utility/MemoryCheck.h>
 
 #define WINDOW_NAME "Properties"
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
@@ -11,24 +10,34 @@ editor::PropertyWnd::PropertyWnd(void)
 {
     SetName(WINDOW_NAME);
 
-    m_transform = new TransformProperty();
     m_handle = INVALID_HANDLE;
     m_graph = nullptr;
+
+    m_transform = new TransformComponent;
+    m_camera = new CameraComponent;
+    m_renderer = new RendererComponent;
+    m_script = new ScriptComponent;
 }
 
 editor::PropertyWnd::PropertyWnd(engine::SceneGraph* graph)
 {
     SetName(WINDOW_NAME);
 
-    m_transform = new TransformProperty();
     m_handle = INVALID_HANDLE;
     m_graph = graph;
+
+    m_transform = new TransformComponent;
+    m_camera = new CameraComponent;
+    m_renderer = new RendererComponent;
+    m_script = new ScriptComponent;
 }
 
 editor::PropertyWnd::~PropertyWnd(void)
 {
-    if (m_transform)
-        delete m_transform;
+    delete m_transform;
+    delete m_camera;
+    delete m_renderer;
+    delete m_script;
 
     m_handle = INVALID_HANDLE;
     m_graph = nullptr;
@@ -46,19 +55,37 @@ void editor::PropertyWnd::RenderContents(void)
     if (m_handle == INVALID_HANDLE)
         return;
 
-    if (m_hasTransform)
-        m_transform->RenderSection();
+    // Render all components
+    for (BaseComponent* component : m_components)
+        component->RenderSection();
+
 }
 
 void editor::PropertyWnd::InitComponents(void)
 {
+    m_components.clear();
+    
     if (m_handle == INVALID_HANDLE)
-    {
-        m_hasTransform = false;
         return;
-    }
+
     engine::Entity* entity = m_graph->GetEntity(m_handle);
 
-    if (m_hasTransform = entity->HasComponent<engine::Transform>())
+    // Transform
+    if (entity->HasComponent<engine::Transform>())
+    {
         m_transform->SetTransform(m_graph->GetComponent<engine::Transform>(m_handle));
+        m_components.emplace_back(m_transform);
+    }
+
+    // Renderer
+    if (entity->HasComponent<engine::Renderer>())
+        m_components.emplace_back(m_renderer);
+    
+    // Camera
+    if (entity->HasComponent<engine::Camera>())
+        m_components.emplace_back(m_camera);
+    
+    // Script
+    if (entity->HasComponent<engine::Script>())
+        m_components.emplace_back(m_script);
 }
