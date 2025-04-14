@@ -16,7 +16,14 @@ namespace engine
             INVALID_OBJECT = 1,
 
             // Object will not be updated
-            INACTIVE_OBJECT = (uint64)(1 << 1)
+            INACTIVE_OBJECT = (uint64)(1 << 1),
+
+            // Object persists through scenes and must be serialized
+            // manually into the desired scene
+            MULTI_SCENE_OBJECT = (uint64)(1 << 2),
+
+            // Object will never be sezialized
+            NON_SERIALIZABLE_OBJECT = (uint64)(1 << 3),
         };
     }
 
@@ -28,7 +35,7 @@ namespace engine
     using EntityHandle = int64;
 
     // Component abstract class. All component types must inherit from it to be
-    // considerred valid components
+    // considered valid components
     class Component;
 
     // Entity class. Represent game objects
