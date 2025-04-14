@@ -1,4 +1,5 @@
 #include "ui/UIComponent.h"
+#include "CoreTypes.h"
 
 #undef new
 #include <imgui/imgui.h>
@@ -18,18 +19,23 @@ bool ui::Button(const char* text, math::Vector2f size)
     return ImGui::Button(text, size);
 }
 
-bool ui::InputTextBox(const char* hint, std::string& outStr)
+bool ui::InputBox(const char* id, const char* hint, std::string& outStr)
 {
     constexpr size_t size = 128;
     char buffer[size] = "";
 
-    if (ImGui::InputTextWithHint("##Rename", hint, buffer, size, ImGuiInputTextFlags_EnterReturnsTrue))
+    if (ImGui::InputTextWithHint(id, hint, buffer, size, ImGuiInputTextFlags_EnterReturnsTrue))
     {
         outStr = buffer;
         return true;
     }
 
     return false;
+}
+
+bool ui::InputBox(const char* id, f32* value, f32 increment)
+{
+    return ImGui::DragFloat(id, value, increment, 0.0f, 0.0f, "%.3f", ImGuiSliderFlags_WrapAround);
 }
 
 bool ui::StartMenuBar(void)
@@ -72,6 +78,23 @@ void ui::SameLine(void)
     ImGui::SameLine(0.0F, -1.0F);
 }
 
+void ui::ItemWidth(f32 widthPx)
+{
+    ImGui::SetNextItemWidth(widthPx);
+}
+
+void ui::StartSection(const char* name)
+{
+    constexpr int32 flags = ImGuiChildFlags_Borders | ImGuiChildFlags_AlwaysUseWindowPadding;
+
+    ImGui::BeginChild(name, ImVec2(0, 0), flags);
+}
+
+void ui::EndSection(void)
+{
+    ImGui::EndChild();
+}
+
 void ui::StartDisabledSection(bool disabled)
 {
     ImGui::BeginDisabled(disabled);
@@ -80,6 +103,11 @@ void ui::StartDisabledSection(bool disabled)
 void ui::EndDisabledSection(void)
 {
     ImGui::EndDisabled();
+}
+
+bool ui::CollapseSection(const char* name)
+{
+    return ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_DefaultOpen);
 }
 
 void ui::SetID(std::string const& id)
@@ -95,4 +123,14 @@ void ui::UnsetID(void)
 void ui::SetKeyboardFocus(void)
 {
     ImGui::SetKeyboardFocusHere();
+}
+
+bool ui::IsItemSelected(void)
+{
+    return ImGui::IsItemClicked(ImGuiMouseButton_Left);
+}
+
+bool ui::IsItemHovered(void)
+{
+    return ImGui::IsItemHovered();
 }

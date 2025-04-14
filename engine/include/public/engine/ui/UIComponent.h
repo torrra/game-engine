@@ -10,7 +10,8 @@ namespace ui
     // Components
     ENGINE_API void Text(const char* text, ...);
     ENGINE_API bool Button(const char* text, math::Vector2f size = {0.0F, 0.0F});
-    ENGINE_API bool InputTextBox(const char* hint, std::string& outStr);
+    ENGINE_API bool InputBox(const char* id, const char* hint, std::string& outStr);
+    ENGINE_API bool InputBox(const char* id, f32* value, f32 increment);
 
     // Menus
     ENGINE_API bool StartMenuBar(void);
@@ -25,10 +26,14 @@ namespace ui
 
     // Layout
     ENGINE_API void SameLine(void);
+    ENGINE_API void ItemWidth(f32 widthPx);
 
     // Sections
+    ENGINE_API void StartSection(const char* name);
+    ENGINE_API void EndSection(void);
     ENGINE_API void StartDisabledSection(bool disabled = true);
     ENGINE_API void EndDisabledSection(void);
+    ENGINE_API bool CollapseSection(const char* name);
 
     // IDs
     ENGINE_API void SetID(std::string const& id);
@@ -36,4 +41,6 @@ namespace ui
 
     // Misc...
     ENGINE_API void SetKeyboardFocus(void);
+    ENGINE_API bool IsItemSelected(void);
+    ENGINE_API bool IsItemHovered(void);
 }
