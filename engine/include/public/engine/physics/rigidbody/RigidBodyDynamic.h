@@ -55,7 +55,7 @@ namespace engine
             Get the gravity status of the rigid body
             <return> [out] the gravity status : true = disabled, false = enabled
         */
-        ENGINE_API  bool            GetIsGravityDisabled(void) const;
+        ENGINE_API  bool            IsGravityDisabled(void) const;
         /*
             Get the half extents of the box
             <return> [out] the half extents

@@ -194,7 +194,7 @@ engine::RigidBodyDynamic::~RigidBodyDynamic(void)
     PrintLog(SuccessPreset(), "Cleaned up dynamic rigid body.");
 }
 
-bool engine::RigidBodyDynamic::GetIsGravityDisabled(void) const
+bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
 {
     // Retrieve the gravity state
     return m_rigidBodyImpl->m_rigidBodyDynamic->getActorFlags().isSet(
