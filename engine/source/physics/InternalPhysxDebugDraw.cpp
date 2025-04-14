@@ -75,7 +75,6 @@ void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
     }
 
     // Update the VBO with the data to draw
-    glBindVertexArray(m_debugDrawVAO);
     glNamedBufferData(m_debugDrawVBO, lineVertices.size() * sizeof(math::Vector3f), lineVertices.data(), GL_STATIC_DRAW);
     glBindVertexArray(0);
 }
