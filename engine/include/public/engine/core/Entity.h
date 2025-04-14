@@ -38,6 +38,7 @@ namespace engine
 
     public:
 
+        Entity(void) = default;
         ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
         ENGINE_API Entity(const Entity&) = default;
 
@@ -74,22 +75,25 @@ namespace engine
         EntityHandle GetParent(void) const;
 
         ENGINE_API
-        std::string  GetName(void) const;
+        const std::string&  GetName(void) const;
 
         ENGINE_API
         void         SetName(const std::string& name);
 
         ENGINE_API
-        Entity& operator=(const Entity& rhs);
+        void        SerializeText(std::ofstream& file) const;
+
+        ENGINE_API
+        const char* DeserializeText(const char* text, const char* end);
 
         // Permanently set object up for destruction
         ENGINE_API
         void Invalidate(void);
 
+        ENGINE_API
+        Entity& operator=(const Entity& rhs);
+
     private:
-
-        Entity(void) = default;
-
 
         // Get EComponentFlag corresponding to the component type
         // NO_COMPONENT by default, must be manually instantiated for
@@ -104,7 +108,7 @@ namespace engine
         // status modifiers that affect behavior (inactive, invalid)
         uint64              m_statusFlags = ecs::NONE;
 
-        // what component this entity hass
+        // what component this entity has
         uint64              m_components = NO_COMPONENTS;
 
     };
