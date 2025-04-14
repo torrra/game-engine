@@ -6,10 +6,16 @@
 
 #pragma endregion
 
+#pragma region Engine
+
+#include "engine/CoreTypes.h"
+
+#pragma endregion
+
 namespace engine
 {
     // Text background color
-    enum EBGColor : uint8_t
+    enum EBGColor : uint8
     {
         BG_BLACK = 40,
         BG_RED,
@@ -31,7 +37,7 @@ namespace engine
     }; // !Enum EBGColor
 
     // Text foreground color
-    enum EFGColor : uint8_t
+    enum EFGColor : uint8
     {
         FG_BLACK = 30,
         FG_RED,
