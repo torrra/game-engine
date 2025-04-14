@@ -80,6 +80,11 @@ namespace engine
                                                          const math::Vector3f& inScalein =
                                                          math::Vector3f(1.0f, 1.0f, 1.0f));
 
+        ENGINE_API math::Vector3f&           SetPosition(void);
+        ENGINE_API void                      SetRotation(f32 angleX, f32 angleY, f32 angleZ);
+        ENGINE_API math::Vector3f            GetEulerRotation(void) const noexcept;
+        ENGINE_API math::Vector3f&           SetScale(void);
+
         // Add translation to the current translation value
         ENGINE_API void					AddTranslation(const math::Vector3f& inTranslation);
 

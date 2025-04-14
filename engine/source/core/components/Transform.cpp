@@ -114,10 +114,55 @@ void engine::Transform::SetPosition(const math::Vector3f& inPosition)
     m_dirty = true;
 }
 
+math::Vector3f& engine::Transform::SetPosition(void)
+{
+    m_dirty = true;
+
+    return m_position;
+}
+
+void engine::Transform::SetRotation(f32 angleX, f32 angleY, f32 angleZ)
+{
+    math::Vector3f axisX(1.0f, 0.0f, 0.0f);
+    math::Vector3f axisY(0.0f, 1.0f, 0.0f);
+    math::Vector3f axisZ(0.0f, 0.0f, 1.0f);
+
+    math::Quatf rotX(
+        axisX,
+        math::Degree(angleX)
+    );
+
+    math::Quatf rotY(
+        axisY,
+        math::Degree(angleY)
+    );
+
+    math::Quatf rotZ(
+        axisZ,
+        math::Degree(angleZ)
+    );
+
+    m_rotation = rotZ * rotX * rotY;
+
+    m_dirty = true;
+}
+
+math::Vector3f engine::Transform::GetEulerRotation(void) const noexcept
+{
+    return m_rotation.EulerAngles() * RAD2DEG;
+}
+
 void engine::Transform::SetRotation(const math::Quatf& inRotation)
 {
     m_rotation = inRotation;
     m_dirty = true;
+}
+
+math::Vector3f& engine::Transform::SetScale(void)
+{
+    m_dirty = true;
+
+    return m_scale;
 }
 
 void engine::Transform::SetScale(const math::Vector3f& inScale)
