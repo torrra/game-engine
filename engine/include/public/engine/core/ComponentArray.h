@@ -81,26 +81,29 @@ namespace engine
             return false;
         }
 
-        if ((!m_entityIndexMap.contains(owner)))
-            return false;
-
-        if (!m_entityIndexMap.contains(parent) ||
-            m_entityIndexMap[parent] < m_entityIndexMap[owner])
+        else
         {
-            printf("parent is already before child\n");
-            return false;
+            if ((!m_entityIndexMap.contains(owner)))
+                return false;
+
+            if (!m_entityIndexMap.contains(parent) ||
+                m_entityIndexMap[parent] < m_entityIndexMap[owner])
+            {
+                printf("parent is already before child\n");
+                return false;
+            }
+
+            uint64                newIndex = m_components.size();
+            TComponentType& toMove = m_components[m_entityIndexMap[owner]];
+
+            m_components.emplace_back(toMove);
+
+            toMove.Invalidate();
+            m_entityIndexMap[owner] = newIndex;
+
+            printf("yea we moving the component\n");
+            return true;
         }
-
-        uint64                newIndex = m_components.size();
-        TComponentType&        toMove = m_components[m_entityIndexMap[owner]];
-
-        m_components.emplace_back(toMove);
-
-        toMove.Invalidate();
-        m_entityIndexMap[owner] = newIndex;
-
-        printf("yea we moving the component\n");
-        return true;
 
     }
 
