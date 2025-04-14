@@ -1,27 +1,24 @@
-#include "ui/components/Transform.h"
-
+#include "ui/components/TransformComponent.h"
 #include <engine/ui/UIComponent.h>
-
 #include <math/Vector3.hpp>
 
-editor::TransformProperty::TransformProperty(void)
+editor::TransformComponent::TransformComponent(void)
 {
     SetName("Transform");
-
 }
 
-editor::TransformProperty::~TransformProperty(void)
+editor::TransformComponent::~TransformComponent(void)
 {
     m_transformData = nullptr;
 }
 
-void editor::TransformProperty::SetTransform(engine::Transform* transform)
+void editor::TransformComponent::SetTransform(engine::Transform* transform)
 {
     m_transformData = transform;
     m_rotation = m_transformData->GetEulerRotation();
 }
 
-void editor::TransformProperty::SectionContent(void)
+void editor::TransformComponent::SectionContent(void)
 {
     math::Vector3f& position = m_transformData->SetPosition();
     math::Vector3f& size = m_transformData->SetScale();
@@ -50,9 +47,3 @@ void editor::TransformProperty::SectionContent(void)
 
 }
 
-bool editor::TransformProperty::InputField(const char* uid, f32* value, f32 increment)
-{
-    ui::SameLine();
-    ui::ItemWidth(60.0f);
-    return ui::InputBox(uid, value, increment);
-}

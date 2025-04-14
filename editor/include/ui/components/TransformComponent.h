@@ -9,11 +9,11 @@
 
 namespace editor
 {
-    class TransformProperty : public ComponentProperty
+    class TransformComponent : public BaseComponent
     {
     public:
-        TransformProperty(void);
-        ~TransformProperty(void);
+        TransformComponent(void);
+        ~TransformComponent(void);
 
         void SetTransform(engine::Transform* transform);
     
@@ -21,8 +21,6 @@ namespace editor
         virtual void SectionContent(void) override;
 
     private:
-        bool InputField(const char* uid, f32* value, f32 increment);
-
         engine::Transform* m_transformData;
         math::Vector3f m_rotation;
     };
