@@ -24,7 +24,7 @@ engine::DebugDraw::DebugDraw()
 engine::DebugDraw::~DebugDraw(void)
 {
     // Unbind VBO and VAO
-    glBindBuffer(0, 0);
+    glDeleteBuffers(1, &m_debugDrawVBO);
     glBindVertexArray(0);
 
     // Delete the debug draw implementation structure pointer
