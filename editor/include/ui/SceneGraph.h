@@ -34,6 +34,9 @@ namespace editor
         ~SceneGraphUI(void);
 
         void SetGraph(class engine::SceneGraph* graph);
+
+        engine::EntityHandle GetSelectedEntity(void) const noexcept;
+        bool IsNewEntitySelected(void) const noexcept;
     
     protected:
         virtual void RenderContents(void) override;
@@ -60,6 +63,8 @@ namespace editor
         class engine::SceneGraph* m_graph;
         TreeNode* m_root;
         int64 m_renamingHandle;
+        int64 m_selectedHandle;
         bool m_reset = false;
+        bool m_newEntitySelected = false;
     };
 }

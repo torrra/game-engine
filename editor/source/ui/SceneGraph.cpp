@@ -33,7 +33,7 @@ void editor::TreeNode::Init(TreeNode* parent, engine::EntityHandle handle)
 
 // Graph Window Functions
 editor::SceneGraphUI::SceneGraphUI(const char* title)
-    : m_graph(nullptr), m_reset(false), m_renamingHandle(0)
+    : m_graph(nullptr), m_reset(false), m_renamingHandle(0), m_selectedHandle(engine::Entity::EHandleUtils::INVALID_HANDLE)
 {
     SetName(title);
     SetFlags(::ui::EWndFlags::HORIZONTAL_SCROLL_BAR | ::ui::EWndFlags::NO_COLLAPSE | ::ui::EWndFlags::MENU_BAR);
@@ -45,7 +45,7 @@ editor::SceneGraphUI::SceneGraphUI(const char* title)
 }
 
 editor::SceneGraphUI::SceneGraphUI(const char* title, engine::SceneGraph* graph)
-    : m_graph(graph), m_reset(false), m_renamingHandle(0)
+    : m_graph(graph), m_reset(false), m_renamingHandle(0), m_selectedHandle(engine::Entity::EHandleUtils::INVALID_HANDLE)
 {
     SetName(title);
     SetFlags(::ui::EWndFlags::HORIZONTAL_SCROLL_BAR | ::ui::EWndFlags::NO_COLLAPSE | ::ui::EWndFlags::MENU_BAR);
@@ -82,12 +82,25 @@ void editor::SceneGraphUI::SetGraph(engine::SceneGraph* graph)
     CreateGraph();
 }
 
+engine::EntityHandle editor::SceneGraphUI::GetSelectedEntity(void) const noexcept
+{
+    return m_selectedHandle;
+}
+
+bool editor::SceneGraphUI::IsNewEntitySelected(void) const noexcept
+{
+    return m_newEntitySelected;
+}
+
 void editor::SceneGraphUI::RenderContents(void)
 {
     RenderMenuBar();
 
     if (!m_graph)
         return;
+    
+    if (m_newEntitySelected)
+        m_newEntitySelected = false;
     
     for (TreeNode* node : m_root->m_children)
     {
@@ -230,7 +243,7 @@ void editor::SceneGraphUI::CheckRenameNode(TreeNode* node, std::string const& or
     // Prevent placing input text box on following line
     ::ui::SameLine();
     ::ui::SetKeyboardFocus();
-    if (::ui::InputTextBox(originalName.c_str(), resultStr) ||
+    if (::ui::InputBox("##rename", originalName.c_str(), resultStr) ||
         engine::Input::IsInputDown(MOUSE_BUTTON_LEFT) || engine::Input::IsInputDown(MOUSE_BUTTON_RIGHT))
     {
         if (resultStr[0] != '\0' && !m_graph->GetEntity(resultStr))
@@ -248,9 +261,17 @@ void editor::SceneGraphUI::DrawNodeAndChildren(TreeNode* node)
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
     std::string nodeName = (node->m_handle == m_renamingHandle) ? ("###" + entityName) : entityName;
 
-    // Set ID to prevent duplicate menu items
     ::ui::SetID(nodeName);
+    // Set ID to prevent duplicate menu items
+
     bool isOpen = ::ui::TreeNode(nodeName, GetNodeFlags(node));
+
+    if (ui::IsItemSelected())
+    {
+        m_selectedHandle = node->m_handle;
+        m_newEntitySelected = true;
+    }
+
     RenderPopupMenu(node);
     CheckRenameNode(node, entityName);
     ::ui::UnsetID();
@@ -362,6 +383,9 @@ int32 editor::SceneGraphUI::GetNodeFlags(TreeNode* node) const
     // Only add 'open / close' icon if node contains children
     if (node->m_children.empty())
         nodeFlags |= ::ui::NO_ICON;
+
+    if (m_selectedHandle == node->m_handle)
+        nodeFlags |= ui::SELECTED;
 
     return nodeFlags;
 }
