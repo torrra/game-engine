@@ -12,9 +12,14 @@ function Transform:_RegisterTransformComponent(handle)
 end
 
 function _NewTransformComponent(handle)
+
 	Transform:_RegisterTransformComponent(handle)
 end
 
+function _RemoveTransformComponent(handle)
+
+	ExistingTransformComponents[handle] = nil
+end
 
 function GetTransformComponent(handle)
 

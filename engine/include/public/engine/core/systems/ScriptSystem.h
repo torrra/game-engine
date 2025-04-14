@@ -55,14 +55,19 @@ namespace engine
         ENGINE_API
         static void RegisterNewComponent(const char* function, EntityHandle owner);
 
+        // Remove an existing component
+        // function: lua global function that handles the component's deletion
+        // owner: owning entity 
+        ENGINE_API
+        static void UnregisterComponent(const char* function, EntityHandle owner);
 
         // Add an entity to the scripting system's lua entity table
         ENGINE_API
         static void RegisterNewEntity(EntityHandle newEntity, const std::string& name);
 
-        // Add an entity's script component to the scripting system's lua script component table
+        // Remove an entity from the system's entity table
         ENGINE_API
-        static void RegisterNewScriptComponent(EntityHandle owner);
+        static void UnregisterEntity(EntityHandle toRemove);
 
         // Add a script object to an existing script component in script
         ENGINE_API

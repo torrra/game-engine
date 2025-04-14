@@ -97,6 +97,15 @@ namespace engine
             LogLuaError();
     }
 
+    void ScriptSystem::UnregisterComponent(const char* function, EntityHandle owner)
+    {
+        lua_getglobal(GetInstance()->m_luaState, function);
+        lua_pushinteger(GetInstance()->m_luaState, owner);
+
+        if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
+            LogLuaError();
+    }
+
     void ScriptSystem::RegisterNewEntity(EntityHandle newEntity, const std::string& name)
     {
         if (name.empty())
@@ -110,11 +119,13 @@ namespace engine
             LogLuaError();
     }
 
-    void ScriptSystem::RegisterNewScriptComponent(EntityHandle owner)
+    void ScriptSystem::UnregisterEntity(EntityHandle toRemove)
     {
-        lua_getglobal(GetInstance()->m_luaState, "_NewScriptComponent");
-        lua_pushinteger(GetInstance()->m_luaState, owner);
-          
+        std::string fullName = GetInstance()->m_currentScene->GetFullEntityName(toRemove);
+
+        lua_getglobal(GetInstance()->m_luaState, "_UnregisterEntity");
+        lua_pushstring(GetInstance()->m_luaState, fullName.c_str());
+
         if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
             LogLuaError();
     }
@@ -195,7 +206,7 @@ namespace engine
 
         std::string formattedName = FormatLuaClassName(className);
 
-        if (formattedName.empty())
+        if (formattedName.empty() || formattedName.size() >= 64)
             return;
 
         std::ofstream newFile(fullPath,
