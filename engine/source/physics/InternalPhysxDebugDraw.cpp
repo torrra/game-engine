@@ -51,7 +51,9 @@ void engine::DebugDraw::InitDebugDraw(void)
     glVertexArrayAttribBinding(m_debugDrawVAO, 0, 0);
 
     // Bind VBO and VAO
-    glVertexArrayVertexBuffer(m_debugDrawVAO, 0, m_debugDrawVBO, 0, sizeof(math::Vector3f));
+    constexpr int32 lineVertexSize = sizeof(physx::PxDebugLine) / 2;
+    glVertexArrayVertexBuffer(m_debugDrawVAO, 0, m_debugDrawVBO, 0, lineVertexSize);
+
 
     // Load the debug draw shader
     ResourceManager::LoadShader("DebugDrawShader", ".\\shaders\\DebugShader.vs", ".\\shaders\\DebugShader.frag");
@@ -62,22 +64,14 @@ void engine::DebugDraw::InitDebugDraw(void)
 
 void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
 {
-    std::vector<math::Vector3f> lineVertices;
+    uint64 bufferSize = inDebugDrawImpl.m_renderBuffer->getNbLines() * sizeof(physx::PxDebugLine);
 
-    // For each line in the render buffer
-    for (physx::PxU32 lineNum = 0; lineNum < inDebugDrawImpl.m_renderBuffer->getNbLines();
-         ++lineNum)
-    {
-        // Retrieve the start and end points of the line and store them in the vector
-        const physx::PxDebugLine& line = inDebugDrawImpl.m_renderBuffer->getLines()[lineNum];
-        lineVertices.push_back(ToVector3f(line.pos0));
-        lineVertices.push_back(ToVector3f(line.pos1));
-    }
+    glNamedBufferData(m_debugDrawVBO, bufferSize, inDebugDrawImpl.m_renderBuffer->getLines(), GL_STATIC_DRAW);
 
-    // Update the VBO with the data to draw
-    glNamedBufferData(m_debugDrawVBO, lineVertices.size() * sizeof(math::Vector3f), lineVertices.data(), GL_STATIC_DRAW);
-    glBindVertexArray(0);
+    // Check for openGL error
+    OpenGLError();
 }
+
 
 void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount)
 {
