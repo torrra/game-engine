@@ -116,6 +116,7 @@ namespace engine
         // copy component to move in the back of the array and invalidate old version
         m_components.emplace_back(toMove);
 
+        toMove.Unregister();
         toMove.Invalidate();
         m_entityIndexMap[owner] = newIndex;
 
@@ -130,7 +131,9 @@ namespace engine
             return;
 
         // set component to be written over
-        m_components[m_entityIndexMap[owner]].Invalidate();
+        TComponentType& component = m_components[m_entityIndexMap[owner]];
+        component.Unregister();
+        component.Invalidate();
 
         // erase mapping to owner entity
         m_entityIndexMap.erase(owner);
