@@ -16,7 +16,7 @@
 namespace engine
 {
     void OpenGLError(void);
-    void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
+    void MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
 
 } // !Namespace engine
 
@@ -27,13 +27,13 @@ inline void engine::OpenGLError(void)
     if (error)
     {
         glEnable(GL_DEBUG_OUTPUT);
-        glDebugMessageCallback(message_callback, nullptr);
+        glDebugMessageCallback(MessageCallback, nullptr);
         __debugbreak();
     }
 }
 
 // Debug message callback
-inline void engine::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param)
+inline void engine::MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param)
 {
     user_param;
     length;
