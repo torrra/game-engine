@@ -74,7 +74,7 @@ void engine::PhysicsEngine::SetDebugActorAxes(f32 inScale)
 void engine::PhysicsEngine::Init(void)
 {
     /*
-        Founction to create the base of physX, everything of physx is based on foundation
+        Function to create the base of physX, everything of physx is based on foundation
         Foundation manage the initialization of the memory management, prepare error
         management, and make sure physx has all what it needs to work properly.
         It prepares the environment for future objects.
