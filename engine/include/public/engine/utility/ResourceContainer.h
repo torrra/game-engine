@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/CoreTypes.h"
-
+#include <string>
 
 namespace engine
 {
@@ -23,7 +23,7 @@ namespace engine
 
         void*               m_resource;
         const std::string*  m_key;
-        uint32              m_refCount = 0;
+        int32               m_refCount = 0;
 
     };
 }
