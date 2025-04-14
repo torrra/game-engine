@@ -16,6 +16,9 @@
 #include "components/Camera.h"
 #include "components/Renderer.h"
 
+#include "physics/rigidbody/RigidBodyDynamic.h"
+#include "physics/rigidbody/RigidBodyStatic.h"
+
 namespace engine
 {
     class SceneGraph
@@ -48,6 +51,9 @@ namespace engine
             ComponentArray<Transform>			m_transformRenderCache;
             ComponentArray<Camera>				m_cameraRenderCache;
         };
+
+
+        using EntityNameMap = std::unordered_map<uint64, EntityHandle>;
         
 
     public:
@@ -138,6 +144,9 @@ namespace engine
         ENGINE_API
         void RegisterAllComponents(void);
 
+        ENGINE_API
+        void RegisterAllEntities(void);
+
         // Render all active renderers with all active cameras.
         // This function will use the arrays populated with CacheComponents(),
         // and not the active transform array
@@ -150,9 +159,15 @@ namespace engine
         ENGINE_API
         void CacheComponents(void);
 
+        // Serialize all valid entities and recalculate their handles
+        // The handles are recalculated as invalid entities are filtered out,
+        // potentially leaving empty spots to be filled by valid entities.
+        // These new handles are only applied upon next deserialization to avoid breaking
+        // existing references
         ENGINE_API
         void SerializeText(std::ofstream& file);
 
+        // Read from a scene file
         ENGINE_API
         void DeserializeText(std::ifstream& file);
 
@@ -174,9 +189,9 @@ namespace engine
         const ComponentArray<TComponentType>& GetComponentArray(void) const;
 
         // Group the index and uid bits together in a 64-bit handle
-        EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
-        EntityHandle GetHandleUID(EntityHandle handle);
-        EntityHandle GetHandleIndex(EntityHandle handle);
+        EntityHandle MakeHandle(int32 index, int32 uid);
+        int32 GetHandleVersion(EntityHandle handle);
+        int32 GetHandleIndex(EntityHandle handle);
 
         // Internal ReparentEntity overload. Directly uses an entity's pointer
         void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
@@ -189,16 +204,6 @@ namespace engine
         template <CValidComponent TComponentType>
         void RegisterComponents(void);
 
-        // Serialize all valid entities and recalculate their handles
-        // The handles are recalculated as invalid entities are filtered out,
-        // potentially leaving empty spots to be filled by valid entities.
-        // These new handles are only applied upon next deserialization to avoid breaking
-        // existing references
-        HandleMap SerializeValidEntitiesText(std::ostream& text);
-
-        // Serialize a single entity
-        void SerializeEntityText(std::ostream& file, const Entity& entity);
-
         // Serialize all components of a type
         template <CValidComponent TComponentType>
         void SerializeComponents(std::ostream& file, HandleMap& handles);
@@ -207,8 +212,6 @@ namespace engine
         void SerializeSingleComponent(std::ostream& file,
                                       const Entity& entity,
                                       HandleMap& handles) const;
-
-        void DeserializeTextV1(std::ifstream& file);
 
         const char* DeserializeEntityText(const char* text, const char* end);
 
@@ -231,7 +234,13 @@ namespace engine
         // All renderer components in the scene
         ComponentArray<Renderer>			m_sceneRenderers;
 
-        // All entities in tge scene
+        ComponentArray<RigidBodyDynamic>    m_sceneDynamicRigidBodies;
+
+        ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
+
+         
+
+        // All entities in the scene
         std::vector<Entity>					m_sceneEntities;
 
         ComponentCache						m_renderCache;
@@ -277,6 +286,18 @@ namespace engine
         return m_sceneRenderers;
     }
 
+    template<>
+    inline ComponentArray<RigidBodyDynamic>& SceneGraph::GetComponentArray<RigidBodyDynamic>(void)
+    {
+        return m_sceneDynamicRigidBodies;
+    }
+
+    template<>
+    inline ComponentArray<RigidBodyStatic>& SceneGraph::GetComponentArray<RigidBodyStatic>(void)
+    {
+        return m_sceneStaticRigidBodies;
+    }
+
 
     template<> inline
     const ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void) const
@@ -297,6 +318,17 @@ namespace engine
         return m_sceneRenderers;
     }
 
+    template<> inline
+    const ComponentArray<RigidBodyDynamic>& SceneGraph::GetComponentArray<RigidBodyDynamic>(void) const
+    {
+        return m_sceneDynamicRigidBodies;
+    }
+    
+    template<> inline
+    const ComponentArray<RigidBodyStatic>& SceneGraph::GetComponentArray<RigidBodyStatic>(void) const
+    {
+        return m_sceneStaticRigidBodies;
+    }
 
     template<CValidComponent TComponentType>
     inline void SceneGraph::RegisterComponents(void)
@@ -408,6 +440,3 @@ namespace engine
     }
 
 }
-
-// short, convenient namespace alias
-namespace mustang_2024_moteur_gpm_2027_gpm_2027_projet_moteur = engine;
