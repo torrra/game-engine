@@ -27,13 +27,13 @@
 
 #include <iostream>
 
-engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle owner, SceneGraph* scene)
+engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene)
 {
     // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
     // Set the owner and the current scene
-    m_owner			= owner;
-    m_currentScene	= scene;
+    m_owner			= inOwner;
+    m_currentScene	= inScene;
 }
 
 engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
@@ -141,35 +141,19 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     PrintLog(SuccessPreset(), "Created dynamic capsule rigid body.");
 }
 
-void engine::RigidBodyDynamic::UpdateEntity(EntityHandle inEntityHandle)
+void engine::RigidBodyDynamic::UpdateEntity()
 {
     // Update the entity transform in regard to the rigid body for exemple,
     // if the rigid body is under gravity then the rigid body fall so the entity fall
-    *m_currentScene->GetComponent<Transform>(inEntityHandle) = 
+    *m_currentScene->GetComponent<Transform>(m_owner) = 
                             ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
-
-    //std::cout << "Entity rotation : " << m_currentScene->GetComponent<Transform>(inEntityHandle)->GetRotation() << std::endl;
-    //std::cout << "Rigid body rotation : " << m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.w << " " <<
-    //                                         m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.x << " " <<
-    //                                         m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.y << " " <<
-    //                                         m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose().q.z << "\n" << std::endl;
-
-    //physx::PxShape* shapes = nullptr;
-    //m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    //if (shapes)
-    //{
-    //    std::cout << "Rigid body rotation : " << shapes->getLocalPose().q.w << " " <<
-    //                                             shapes->getLocalPose().q.x << " " <<
-    //                                             shapes->getLocalPose().q.y << " " <<
-    //                                             shapes->getLocalPose().q.z << "\n" << std::endl;
-    //}
 }
 
-void engine::RigidBodyDynamic::UpdateRigidBody(EntityHandle inEntityHandle)
+void engine::RigidBodyDynamic::UpdateRigidBody()
 {
     // Update the transform of the rigid body in regard to the entity
     m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(
-        *m_currentScene->GetComponent<Transform>(inEntityHandle)));
+        *m_currentScene->GetComponent<Transform>(m_owner)));
 }
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
@@ -349,12 +333,13 @@ void engine::RigidBodyDynamic::SetDebugVisualization(bool inIsDebugVisualization
                                                       inIsDebugVisualization);
 }
 
-engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGraph* scene, 
-                                                                         EntityHandle owner,
+engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGraph* inScene, 
+                                                                         EntityHandle inOwner,
                                                                          const EGeometryType& inGeometry)
 {
     // Create dynamic rigid body in regard to the geometry and give it an owner and a scene
-    if (RigidBodyDynamic* temp = new RigidBodyDynamic(owner, scene))
+    //if (RigidBodyDynamic* temp = new RigidBodyDynamic(owner, scene))
+    if (RigidBodyDynamic* temp = new RigidBodyDynamic(inOwner, inScene))
     {
         switch (inGeometry)
         {

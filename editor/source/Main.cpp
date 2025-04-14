@@ -73,13 +73,13 @@ int main(void)
             // Update physics
             engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
             // Update the entity in regard to the rigid body (gravity for example)
-            rb->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
+            rb->UpdateEntity();
 			project.Update(engine);
 			engine.Update();
             // Update the debug draw
             engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
             // Update the rigid body in regard to the entity (movement by keyboard input for example)
-            rb->UpdateRigidBody(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
+            rb->UpdateRigidBody();
 
             engine.GetWindow()->Update();
 		}
