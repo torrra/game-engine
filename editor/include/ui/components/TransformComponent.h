@@ -5,7 +5,7 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/components/Transform.h>
 
-// TODO: fix local? or global? space transform... (i still cant tell which space it is in)
+// TODO: fix rotation
 
 namespace editor
 {
