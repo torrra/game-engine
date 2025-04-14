@@ -81,7 +81,6 @@ void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32
     ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader")->Set("projViewMatrix", inProjViewMatrix);
     // Bind the VAO
     glBindVertexArray(m_debugDrawVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_debugDrawVBO);
     // Draw the lines in regard of the number of lines
     glDrawArrays(GL_LINES, 0, inLineCount);
     // Unbind the VAO
