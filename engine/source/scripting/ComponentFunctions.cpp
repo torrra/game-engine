@@ -7,7 +7,7 @@ extern "C"
 
 #include "core/SceneGraph.h"
 #include "core/systems/ScriptSystem.h"
-#include "engine/scripting/ComponentFunctions.h"
+#include "scripting/ComponentFunctions.h"
 
 int script_IsComponentValid(lua_State* luaState)
 {
