@@ -8,20 +8,22 @@
 
 #pragma region Engine
 
-#include "CoreTypes.h"
-#include "EngineExport.h"
+#include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 #pragma endregion
 
 namespace engine
 {
+    struct RaycastImpl;
+
     class Raycast
     {
     public :
 
         /// Constructor
         // Default constructor
-        ENGINE_API                  Raycast(void) = default;
+        ENGINE_API                  Raycast(void);
         // Delete copy constructor
                                     Raycast(const Raycast& inRaycast) = delete;
         // Delete move constructor
@@ -37,7 +39,7 @@ namespace engine
                                             const f32& inDistance = 10.f);
 
         /// Destructor
-        ENGINE_API                  ~Raycast(void) = default;
+        ENGINE_API                  ~Raycast(void);
 
         /// Getter
         /*
@@ -82,9 +84,20 @@ namespace engine
                                            const math::Vector3f& inDirection, 
                                            const f32& inDistance = 10.f);
 
+        /// Functions
+        /*
+            Perform a check to see if the raycast hit an object
+            <param> [in] inOutHit   : Used to report raycast hit : PxHitCallback<PxRaycastHit>
+            <param> [out] status    : Return                     : true     : If there is a hit
+                                                                            : false If there is no hit
+        */
+        ENGINE_API  bool            Hit(/*bool inStatus*/);
+        ENGINE_API  void            DrawRay(void);
+
     private :
 
         /// Private members
+        RaycastImpl*    m_raycastImpl   = nullptr;
         // The origin of the ray
         math::Vector3f  m_origin        = math::Vector3f::Zero();
         // The direction of the ray

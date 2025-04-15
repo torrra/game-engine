@@ -4,6 +4,7 @@
 #include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
+#include "engine/physics/Raycast.h"
 
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
@@ -20,6 +21,8 @@
 #include "engine/resource/model/Model.h"
 
 #include "engine/ConsoleLog.hpp"
+
+#include "engine/input/Input.h"
 
 #define MODEL_FILE "..\\assets\\bunny.obj"
 
@@ -67,8 +70,27 @@ int main(void)
 
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
+        math::Vector2f mousePos = engine::Input::GetCursorPosition<f32>();
+        math::Vector3f mouse = math::Vector3f(mousePos.GetX(), mousePos.GetY(), 0.f);
+        //math::Vector3f mouse = math::Vector3f(0.f);
+        math::Vector3f direction = (mouse - camera->GetPosition());
+        engine::Raycast* ray = new engine::Raycast(mouse, direction, 10.f);
+
+        engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
+
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
+            math::Vector3f camPos = camera->GetPosition();
+            math::Vector3f camDir = camera->GetRotationQuat().Rotate(-camera->GetPosition().Front());
+
+            if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT))
+            {
+                ray->Hit(/*status*/);
+                ray->SetRay(camPos, camDir, 100.f);
+            }
+
+            ray->DrawRay();
+
             math::Matrix4f projViewMatrix = camera->ViewProjection();
             // Update physics
             engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
@@ -81,12 +103,14 @@ int main(void)
             // Update the rigid body in regard to the entity (movement by keyboard input for example)
             rb->UpdateRigidBody(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 
+
             engine.GetWindow()->Update();
 		}
 
         /// ---------------- Clean ---------------- 
         delete rb;
         delete floorRb;
+        delete ray;
         engine::PhysicsEngine::Get().CleanUp();
 
 		engine.ShutDown();

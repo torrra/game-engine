@@ -41,7 +41,14 @@ namespace engine
     struct DebugDrawImpl
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
+
     }; // !Struct DebugDrawImpl
+
+    struct RaycastImpl
+    {
+        physx::PxRaycastBuffer*         m_hit               = nullptr;
+
+    }; // !Struct RaycastImpl
 
     /// PhysX using
     using PxVisualParam = physx::PxVisualizationParameter;
