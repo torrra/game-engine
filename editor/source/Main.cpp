@@ -19,7 +19,15 @@
 #include "engine/resource/ResourceManager.h"
 #include "engine/resource/model/Model.h"
 
+
+// UI includes
+#include "ui/MenuBar.h"
+#include "ui/Properties.h"
+#include "ui/SceneGraph.h"
+
+
 #define MODEL_FILE "..\\assets\\bunny.obj"
+
 
 // Use dedicated graphics card
 extern "C" 
@@ -28,6 +36,8 @@ extern "C"
 	_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
+#define TESTING 0
+#if TESTING == 1
 int main(void)
 {
 	// Memory check
@@ -73,6 +83,8 @@ int main(void)
             engine::PhysicsEngine::Get().StepSimulation(1.f / 60.f);
             rigidBody->UpdateEntity(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
             rigidBody->UpdateRigidBody(*engine.GetGraph()->GetComponent<engine::Transform>(engine.GetGraph()->GetEntity("Padoru")->GetHandle()));
+            
+            engine.PostUpdate();
         }
 
         /// ---------------- Clean ---------------- 
@@ -91,3 +103,46 @@ int main(void)
 
 	return 0;
 }
+#else
+int main(void)
+{
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    {
+        engine::Engine engine;
+
+        if (engine.Startup("Editor", nullptr))
+            return -1;
+
+        editor::MenuBar menuBar;
+        editor::SceneGraphUI sceneGraph("Scene Graph", engine.GetGraph());
+        editor::PropertyWnd propertyWnd(engine.GetGraph());
+
+        while (!engine.GetWindow()->ShouldWindowClose())
+        {
+            engine.Update();
+
+            // Main menu bar ui
+            menuBar.Render(engine);
+
+            // Scene graph window ui
+            sceneGraph.Render();
+
+            // Property window ui
+            if (sceneGraph.IsNewEntitySelected())
+                propertyWnd.SetHandle(sceneGraph.GetSelectedEntity());
+
+            propertyWnd.Render();
+
+            engine.PostUpdate();
+        }
+
+        engine.ShutDown();
+    }
+
+    // Memory leak check
+    if (!_CrtDumpMemoryLeaks())
+        std::printf("No memory leaks found\n");
+
+    return 0;
+}
+#endif
