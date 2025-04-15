@@ -11,7 +11,7 @@ namespace engine
 
 
         ComponentArray(void) = default;
-        ComponentArray(const ComponentArray&) = default;
+        ComponentArray(ComponentArray&&) noexcept = default;
         ~ComponentArray(void) = default;
 
         // Check if a component should be moved to the back of the array. The component will
@@ -45,7 +45,7 @@ namespace engine
         uint64 GetComponentIndex(EntityHandle owner) const;
 
 
-        void AddDeserializedComponent(const TComponentType& component);
+        void AddDeserializedComponent(TComponentType&& component);
 
 
         // Standard functions necessary to use ranged for loops.
@@ -56,16 +56,28 @@ namespace engine
         auto begin(void);
         auto end(void);
 
-        ComponentArray& operator=(const ComponentArray&) = default;
+        ComponentArray& operator=(ComponentArray&&) noexcept = default;
 
-    private:
+    protected:
 
         // Create a component without checking if the object's parent is
         // before its new memory location
         TComponentType* ForceCreateComponent(EntityHandle owner, class SceneGraph* scene);
 
+
         std::unordered_map<EntityHandle, uint64>    m_entityIndexMap;
-        std::vector<TComponentType>                    m_components;
+        std::vector<TComponentType>                 m_components;
+    };
+
+    template <CValidComponent TComponentType>
+    class CopyableComponentArray : public ComponentArray<TComponentType>
+    {
+    public:
+
+        using ComponentArray<TComponentType>::ComponentArray;
+
+        CopyableComponentArray(const CopyableComponentArray& rhs);
+        CopyableComponentArray& operator=(const CopyableComponentArray& rhs);
     };
 
 
@@ -96,7 +108,7 @@ namespace engine
             uint64                newIndex = m_components.size();
             TComponentType& toMove = m_components[m_entityIndexMap[owner]];
 
-            m_components.emplace_back(toMove);
+            m_components.emplace_back(std::move(toMove));
 
             toMove.Invalidate();
             m_entityIndexMap[owner] = newIndex;
@@ -117,7 +129,7 @@ namespace engine
         TComponentType& toMove = m_components[m_entityIndexMap[owner]];
 
         // copy component to move in the back of the array and invalidate old version
-        m_components.emplace_back(toMove);
+        m_components.emplace_back(std::move(toMove));
 
         toMove.Unregister();
         toMove.Invalidate();
@@ -219,10 +231,10 @@ namespace engine
     }
 
     template<CValidComponent TComponentType>
-    inline void ComponentArray<TComponentType>::AddDeserializedComponent(const TComponentType& component)
+    inline void ComponentArray<TComponentType>::AddDeserializedComponent(TComponentType&& component)
     {
         m_entityIndexMap[component.GetOwner()] = m_components.size();
-        m_components.push_back(component);
+        m_components.emplace_back(std::forward<TComponentType>(component));
     }
 
     template<CValidComponent TComponentType>
@@ -263,5 +275,23 @@ namespace engine
         // create new component if no invalid component was found
         m_entityIndexMap[owner] = m_components.size();
         return &m_components.emplace_back(owner, scene);
+    }
+
+    template<CValidComponent TComponentType>
+    inline CopyableComponentArray<TComponentType>&
+    CopyableComponentArray<TComponentType>::operator=(const CopyableComponentArray& rhs)
+    {
+        ComponentArray<TComponentType>::m_components = rhs.m_components;
+        ComponentArray<TComponentType>::m_entityIndexMap = rhs.m_entityIndexMap;
+
+        return *this;
+    }
+
+
+    template<CValidComponent TComponentType>
+    inline CopyableComponentArray<TComponentType>::CopyableComponentArray(const CopyableComponentArray& rhs)
+    {
+        ComponentArray<TComponentType>::m_components = rhs.m_components;
+        ComponentArray<TComponentType>::m_entityIndexMap = rhs.m_entityIndexMap;
     }
 }
