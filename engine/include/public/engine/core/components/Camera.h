@@ -26,8 +26,11 @@ namespace engine
     class Camera : public Component
     {
     public:
-        
+       
+
         ENGINE_API Camera(EntityHandle, class SceneGraph*);
+        ENGINE_API Camera(Camera&&) noexcept = default;
+        ENGINE_API Camera(const Camera&) = default;
 
         ENGINE_API ~Camera(void) = default;
 
@@ -58,6 +61,11 @@ namespace engine
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
 
+        ENGINE_API
+        Camera& operator=(const Camera&) = default;
+
+        ENGINE_API
+        Camera& operator=(Camera&&) noexcept = default;
 
     private:
         math::Matrix4f GetViewMatrix(void);
