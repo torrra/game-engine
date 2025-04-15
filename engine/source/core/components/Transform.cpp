@@ -108,40 +108,50 @@ engine::Transform engine::Transform::GetTransform(void) const
     return *this;
 }
 
-void engine::Transform::SetPosition(const math::Vector3f& inPosition)
+engine::Transform& engine::Transform::SetPosition(const math::Vector3f& inPosition)
 {
     m_position = inPosition;
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetRotation(const math::Quatf& inRotation)
+engine::Transform& engine::Transform::SetRotation(const math::Quatf& inRotation)
 {
-    m_rotation = inRotation;
+    m_rotation = inRotation.Normalized();
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetScale(const math::Vector3f& inScale)
+engine::Transform& engine::Transform::SetScale(const math::Vector3f& inScale)
 {
     m_scale = inScale;
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetTransform(const Transform& inTransform)
+engine::Transform& engine::Transform::SetTransform(const Transform& inTransform)
 {
     m_position = inTransform.m_position;
     m_rotation = inTransform.m_rotation;
     m_scale = inTransform.m_scale;
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetTransform(const math::Vector3f& inPosition,
-                                     const math::Quatf& inRotation,
-                                     const math::Vector3f& inScale)
+engine::Transform& engine::Transform::SetTransform(const math::Vector3f& inPosition,
+                                                   const math::Quatf& inRotation,
+                                                   const math::Vector3f& inScale)
 {
     m_position = inPosition;
     m_rotation = inRotation;
     m_scale = inScale;
     m_dirty = true;
+
+    return *this;
 }
 
 

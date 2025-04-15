@@ -8,6 +8,6 @@ uniform mat4 projViewMatrix;
 
 void main()
 {
-	fragColor = vec3(0.0, 1.0, 0.0);
+	fragColor = aColor;
 	gl_Position = projViewMatrix * vec4(aPosition, 1.0);
 }

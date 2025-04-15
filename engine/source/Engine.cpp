@@ -97,7 +97,7 @@ void engine::Engine::Update(void)
 
     // Render
     Input::ResetKeys();
-    m_window->Update();
+    //m_window->Update();
     m_time.Update();
 }
 
