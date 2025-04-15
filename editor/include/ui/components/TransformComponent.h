@@ -5,8 +5,6 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/components/Transform.h>
 
-// TODO: fix rotation
-
 namespace editor
 {
     class TransformComponent : public BaseComponent
@@ -22,6 +20,7 @@ namespace editor
 
     private:
         engine::Transform* m_transformData;
+        math::Vector3f m_lastRot;
         math::Vector3f m_rotation;
     };
 }

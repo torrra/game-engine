@@ -81,7 +81,6 @@ namespace engine
                                                          math::Vector3f(1.0f, 1.0f, 1.0f));
 
         ENGINE_API math::Vector3f&           SetPosition(void);
-        ENGINE_API void                      SetRotation(f32 angleX, f32 angleY, f32 angleZ);
         ENGINE_API math::Vector3f            GetEulerRotation(void) const noexcept;
         ENGINE_API math::Vector3f&           SetScale(void);
 
