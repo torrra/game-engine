@@ -33,9 +33,14 @@ bool ui::InputBox(const char* id, const char* hint, std::string& outStr)
     return false;
 }
 
-bool ui::InputBox(const char* id, f32* value, f32 increment)
+bool ui::InputBox(const char* id, f32* value, f32 increment, bool returnOnComplete)
 {
-    return ImGui::DragFloat(id, value, increment);
+    bool result = ImGui::DragFloat(id, value, increment);
+
+    if (returnOnComplete)
+        result = ImGui::IsItemDeactivatedAfterEdit();
+
+    return result;
 }
 
 bool ui::StartMenuBar(void)
@@ -81,6 +86,11 @@ void ui::SameLine(void)
 void ui::ItemWidth(f32 widthPx)
 {
     ImGui::SetNextItemWidth(widthPx);
+}
+
+void ui::VerticalSpacing(void)
+{
+    ImGui::Spacing();
 }
 
 void ui::StartSection(const char* name)
