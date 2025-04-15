@@ -69,15 +69,15 @@ namespace engine
 
         /// Setters
         // Set the position of the transform
-        ENGINE_API	void					SetPosition(const math::Vector3f& inPosition);
+        ENGINE_API	Transform&				SetPosition(const math::Vector3f& inPosition);
         // Set the rotation of the transform
-        ENGINE_API	void					SetRotation(const math::Quatf& inRotation);
+        ENGINE_API	Transform&              SetRotation(const math::Quatf& inRotation);
         // Set the scale of the transform
-        ENGINE_API	void					SetScale(const math::Vector3f& inScale);
+        ENGINE_API	Transform&              SetScale(const math::Vector3f& inScale);
         // Set the transform
-        ENGINE_API  void                    SetTransform(const Transform& inTransform);
+        ENGINE_API  Transform&              SetTransform(const Transform& inTransform);
         // Set all parameters of the transform
-        ENGINE_API	void 					SetTransform(const math::Vector3f& inPosition,
+        ENGINE_API	Transform&              SetTransform(const math::Vector3f& inPosition,
                                                          const math::Quatf& inRotation,
                                                          const math::Vector3f& inScalein =
                                                          math::Vector3f(1.0f, 1.0f, 1.0f));

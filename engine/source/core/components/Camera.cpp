@@ -175,7 +175,7 @@ math::Matrix4f engine::Camera::GetViewMatrix(void)
     matrix[3][1] = -m_position.Y();
     matrix[3][2] = -m_position.Z();
 
-    return m_rotQuat.RotationMatrix() * matrix;
+    return m_rotQuat.Inverse().RotationMatrix() * matrix;
 }
 
 void engine::Camera::GetProjectionMatrix(void)
