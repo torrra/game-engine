@@ -9,7 +9,7 @@
 namespace engine
 {
     // Text background color
-    enum EBGColor : uint8_t
+    enum class EBGColor : uint8_t
     {
         BG_BLACK = 40,
         BG_RED,
@@ -31,7 +31,7 @@ namespace engine
     }; // !Enum EBGColor
 
     // Text foreground color
-    enum EFGColor : uint8_t
+    enum class EFGColor : uint8_t
     {
         FG_BLACK = 30,
         FG_RED,
@@ -53,7 +53,7 @@ namespace engine
     }; // !Enum EFGColor
 
     // Text format
-    enum EGRP
+    enum class EGRP
     {
         NORMAL,
         BOLD, 
@@ -68,7 +68,7 @@ namespace engine
     {
         EBGColor    m_bgColor       = EBGColor::BG_BLACK;
         EFGColor    m_fgColor       = EFGColor::FG_WHITE;
-        EGRP        m_textFormat;
+        EGRP        m_textFormat    = EGRP::NORMAL;
         std::string m_prefix        = "[]";
 
     }; // !Struct ConsoleLog
