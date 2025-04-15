@@ -302,8 +302,7 @@ void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
                                point is the start and the end of a line)
     */
     m_debugDraw->RenderDebugDraw(inProjViewMatrix,
-        m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() *
-        2);
+        m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2);
 }
 
 void engine::PhysicsEngine::CleanUp(void)

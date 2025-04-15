@@ -85,13 +85,15 @@ int main(void)
 
             if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT))
             {
-                ray->Hit(/*status*/);
+                ray->HasHit();
                 ray->SetRay(camPos, camDir, 100.f);
             }
 
-            ray->DrawRay();
+            ray->DrawRayInPvd();
+
 
             math::Matrix4f projViewMatrix = camera->ViewProjection();
+
             // Update physics
             engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
             // Update the entity in regard to the rigid body (gravity for example)

@@ -40,8 +40,6 @@ engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& i
     m_origin                = inOrigin;
     m_direction             = inDirection;
     m_distance              = inDistance;
-
-    m_pvdClient             = PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient();;
 }
 
 engine::Raycast::~Raycast(void)
@@ -91,12 +89,14 @@ void engine::Raycast::SetRay(const math::Vector3f& inOrigin, const math::Vector3
     m_distance  = inDistance;
 }
 
-bool engine::Raycast::Hit(/*bool inStatus*/)
+bool engine::Raycast::HasHit(void)
 {
+    physx::PxHitFlags hitFlags = physx::PxHitFlag::ePOSITION | physx::PxHitFlag::eNORMAL | 
+                                 physx::PxHitFlag::eUV;
     bool status = PhysicsEngine::Get().GetImpl().m_scene->raycast(ToPxVec3(m_origin),
                                                                   ToPxVec3(m_direction.Normalized()),
                                                                   m_distance, *m_raycastImpl->m_hit,
-                                                                  physx::PxHitFlag::ePOSITION | physx::PxHitFlag::eNORMAL, 
+                                                                  hitFlags, 
                                                                   physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC));
 
     if (status && m_raycastImpl->m_hit->hasBlock)
@@ -109,7 +109,7 @@ bool engine::Raycast::Hit(/*bool inStatus*/)
     return false;
 }
 
-void engine::Raycast::DrawRay(void)
+void engine::Raycast::DrawRayInPvd(void)
 {
     physx::PxVec3 end = ToPxVec3(m_origin) + ToPxVec3(m_direction.Normalized()) * m_distance;
 
@@ -119,11 +119,13 @@ void engine::Raycast::DrawRay(void)
     if (m_raycastImpl->m_hit->hasBlock)
     {
         end = m_raycastImpl->m_hit->block.position;
-        static_cast<physx::PxPvdSceneClient*>(m_pvdClient)->drawLines(success, 1);
+        PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient()->drawLines(success, 1);
+        m_raycastLines.push_back(success);
     }
     else
     {
-        static_cast<physx::PxPvdSceneClient*>(m_pvdClient)->drawLines(failure, 1);
+        PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient()->drawLines(failure, 1);
+        m_raycastLines.push_back(failure);
     }
 
     delete success;

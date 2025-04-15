@@ -13,6 +13,11 @@
 
 #pragma endregion
 
+
+#include <vector>
+
+#pragma endregion
+
 namespace engine
 {
     struct RaycastImpl;
@@ -92,19 +97,21 @@ namespace engine
                                                                             : false If there is no hit
         */
         ENGINE_API  bool            Hit(/*bool inStatus*/);
-        ENGINE_API  void            DrawRay(void);
+        ENGINE_API  bool            HasHit(void);
+        ENGINE_API  void            DrawRayInPvd(void);
+        /// Public members
+        std::vector<void*> m_raycastLines;
 
     private :
 
         /// Private members
-        RaycastImpl*    m_raycastImpl   = nullptr;
-        void*           m_pvdClient     = nullptr;
+        RaycastImpl*    m_raycastImpl       = nullptr;
         // The origin of the ray
-        math::Vector3f  m_origin        = math::Vector3f::Zero();
         // The direction of the ray
         math::Vector3f  m_direction     = math::Vector3f::Zero();
+        math::Vector3f  m_direction         = math::Vector3f::Zero();
         // The distance of the ray
-        f32             m_distance      = 0.f;   
+        uint32          m_raycastVBO        = 0;
 
     }; // !Class Raycast
 } // !Namespace engine
