@@ -6,12 +6,12 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-#define MODEL_FILE ".\\assets\\padoru.obj"
+#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
 #define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 
 #define SHADER_PROGRAM_NAME		"ModelTextured"
-#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vs"
+#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vert"
 #define SHADER_PROGRAM_FRAGMENT ".\\shaders\\ModelTextured.frag"
 
 ExampleProject::ExampleProject(void)
@@ -35,7 +35,6 @@ void ExampleProject::StartUp(engine::Engine& engine)
 	controllerScript->Start();
 
 	entityRenderer->SetModel(MODEL_FILE);
-	entityRenderer->SetTexture(TEXTURE_FILE);
 	entityRenderer->SetShader(SHADER_PROGRAM_NAME);
 
 	// Add component to camera entity

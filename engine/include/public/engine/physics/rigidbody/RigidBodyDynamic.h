@@ -55,7 +55,7 @@ namespace engine
             Get the gravity status of the rigid body
             <return> [out] the gravity status : true = disabled, false = enabled
         */
-        ENGINE_API  bool            GetIsGravityDisabled(void) const;
+        ENGINE_API  bool            IsGravityDisabled(void) const;
         /*
             Get the half extents of the box
             <return> [out] the half extents
@@ -105,12 +105,12 @@ namespace engine
             Update the entity transform in reference to the dynamic rigid body
             <param> [in] inEntityHandle : the entity
         */
-        ENGINE_API	void		    UpdateEntity(EntityHandle inEntityHandle);
+        ENGINE_API	void		    UpdateEntity();
         /*
             Update the dynamic rigid body transform in reference to the entity
             <param> [in] inEntityTransform : the entity
         */
-        ENGINE_API	void		    UpdateRigidBody(EntityHandle inEntityHandle);
+        ENGINE_API	void		    UpdateRigidBody();
 
         // Delete the dynamic rigid body
         ENGINE_API	void		    RigidBodyDynamicCleanUp(void);

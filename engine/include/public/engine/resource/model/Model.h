@@ -1,40 +1,58 @@
 #pragma once
 
-#include "engine/resource/Resource.h"
 #include "engine/EngineExport.h"
-#include "Mesh.h"
+#include "engine/resource/Resource.h"
+#include "engine/resource/model/DynamicMesh.h"
+#include "engine/resource/model/Mesh.h"
 
 #include <vector>
 
-struct aiNode;
-struct aiScene;
-struct aiMesh;
-
 namespace engine
 {
-	struct Vertex;
-	class Buffer;
+    class Model final : public IResource
+    {
+        
+    public:
+        ENGINE_API		Model(void) = default;
+        ENGINE_API      ~Model(void);
 
-	class Model final : public IResource
-	{
+        ENGINE_API bool LoadResource(const char* fileName) override;
 
-	public:
-		ENGINE_API				Model(void) = default;
-		ENGINE_API virtual		~Model(void) = default;
+        ENGINE_API bool CanRender(void) const;
+        ENGINE_API bool HasFailedToLoad(void) const;
 
-		ENGINE_API virtual void	LoadResource(const char* fileName) override;
+        ENGINE_API bool IsDynamic(void) const;
 
-	private:
-		void					ProcessNodes(aiNode* node, const aiScene* scene);
-		
-		// This function is meant to be used by renderer components, and ONLY from the
-		// render thread.
-		ENGINE_API
-		const std::vector<Mesh>& GetMeshes(void) const;
+        ENGINE_API void Draw(void) const;
 
-		mutable std::vector<Mesh>			m_meshes;
-		mutable uint8						m_loadStatus = 0;
+        // This function is meant to be used by renderer components, and ONLY from the
+        // render thread.
+        ENGINE_API
+        const std::vector<Mesh>& GetStaticMeshes(void) const;
 
-		friend class Renderer;
-	};
+        ENGINE_API
+        const std::vector<DynamicMesh>& GetDynamicMeshes(void) const;
+
+    private:
+
+        void ProcessTextures(const void* scene);
+        std::string GetDirectory(const std::string& modelPath);
+             
+        void ProcessMeshes(const void* scene, const void* node, const std::string& name);
+        void WorkerThreadLoad(const std::string& name);
+        void RenderThreadSetup(void);
+
+        std::vector<DynamicMesh>      m_dynamicMeshes;
+        std::vector<Mesh>			  m_staticMeshes;
+        uint8						  m_loadStatus = 0;
+        bool                          m_isDynamic = false;
+    };
+
+
+    template <>
+    struct IsLoadedAsync<Model>
+    {
+        static constexpr bool m_value = true;
+    };
+
 }

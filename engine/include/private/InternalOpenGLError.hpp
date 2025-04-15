@@ -16,7 +16,7 @@
 namespace engine
 {
     void OpenGLError(void);
-    void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
+    void MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param);
 
 } // !Namespace engine
 
@@ -27,17 +27,17 @@ inline void engine::OpenGLError(void)
     if (error)
     {
         glEnable(GL_DEBUG_OUTPUT);
-        glDebugMessageCallback(message_callback, nullptr);
+        glDebugMessageCallback(MessageCallback, nullptr);
         __debugbreak();
     }
 }
 
 // Debug message callback
-inline void engine::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param)
+inline void engine::MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param)
 {
     user_param;
     length;
-    auto const src_str = [source]() {
+    const char* srcStr = [source]() {
         switch (source)
         {
         case GL_DEBUG_SOURCE_API: return "API";
@@ -50,7 +50,7 @@ inline void engine::message_callback(GLenum source, GLenum type, GLuint id, GLen
         }
         }();
 
-    auto const type_str = [type]() {
+    auto const typeStr = [type]() {
         switch (type)
         {
         case GL_DEBUG_TYPE_ERROR: return "ERROR";
@@ -64,7 +64,7 @@ inline void engine::message_callback(GLenum source, GLenum type, GLuint id, GLen
         }
         }();
 
-    auto const severity_str = [severity]() {
+    auto const severityStr = [severity]() {
         switch (severity)
         {
         case GL_DEBUG_SEVERITY_NOTIFICATION: return "NOTIFICATION";
@@ -74,5 +74,5 @@ inline void engine::message_callback(GLenum source, GLenum type, GLuint id, GLen
         default: return "NONE";
         }
         }();
-    printf("%s, %s, %s, %d, %s\n", src_str, type_str, severity_str, (int)id, message);
+    printf("%s, %s, %s, %d, %s\n", srcStr, typeStr, severityStr, (int)id, message);
 }

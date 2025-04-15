@@ -15,14 +15,14 @@
 
 namespace engine
 {
-	class ShaderProgram : public IResource
+	class ShaderProgram final : public IResource
 	{
 	public:
-		ENGINE_API ShaderProgram(void) = delete;
+		ENGINE_API ShaderProgram(void) = default;
 		ENGINE_API ShaderProgram(const char* vertexShader, const char* fragShader);
 		ENGINE_API virtual ~ShaderProgram(void) override = default;
 
-		virtual void LoadResource(const char* filePath) override;
+		bool LoadResource(const char* filePath) override;
 
 		ENGINE_API void Use(void) const;
 
@@ -61,6 +61,8 @@ namespace engine
 		std::string m_vertexShader;
 		std::string m_fragShader;
 		
-		uint32 m_programID;
+		uint32 m_programID = 0;
+
+        friend class ResourceManager;
 	};
 }

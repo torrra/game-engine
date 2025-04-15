@@ -43,9 +43,10 @@ namespace engine
         // Render the debug draw
         void            RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount);
 
-        DebugDrawImpl* m_debugDrawImpl      = nullptr;
-        uint32         m_debugDrawVAO       = 0;
-        uint32         m_debugDrawVBO       = 0;
+        const   ShaderProgram* m_debugDrawProgram   = nullptr;
+                DebugDrawImpl* m_debugDrawImpl      = nullptr;
+                uint32         m_debugDrawVAO       = 0;
+                uint32         m_debugDrawVBO       = 0;
 
     }; // !Class DebugDraw
 } // !Namespace engine
