@@ -15,13 +15,24 @@ namespace engine
 			LOADED = 1,
 
 			// Necessary graphics API calls were made
-			GRAPHICS_CALLS_COMPLETE = (uint8) (1 << 1)
+			GRAPHICS_CALLS_COMPLETE = (uint8) (1 << 1),
+
+            // Something horrible is happening inside of me, and I don't know why
+            FAILED = (uint8) (1 << 2)
 		};
 
 	public:
 						IResource(void) = default;
 		virtual			~IResource(void) = default;
 
-		virtual void	LoadResource(const char* filePath) = 0;
+		virtual bool	LoadResource(const char* filePath) = 0;
 	};
+
+
+    template <typename TResourceType>
+    struct IsLoadedAsync
+    {
+        static constexpr bool m_value = false;
+    };
+
 }
