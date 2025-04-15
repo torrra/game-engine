@@ -27,8 +27,6 @@ engine::Raycast::Raycast(void)
     m_origin                = math::Vector3f::Zero();
     m_direction             = math::Vector3f::Zero();
     m_distance              = 0.f;
-
-    m_pvdClient             = PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient();;
 }
 
 engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& inDirection,

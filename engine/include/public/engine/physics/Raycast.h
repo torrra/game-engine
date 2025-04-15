@@ -96,7 +96,6 @@ namespace engine
             <param> [out] status    : Return                     : true     : If there is a hit
                                                                             : false If there is no hit
         */
-        ENGINE_API  bool            Hit(/*bool inStatus*/);
         ENGINE_API  bool            HasHit(void);
         ENGINE_API  void            DrawRayInPvd(void);
         /// Public members
@@ -105,13 +104,13 @@ namespace engine
     private :
 
         /// Private members
-        RaycastImpl*    m_raycastImpl       = nullptr;
+        RaycastImpl*    m_raycastImpl   = nullptr;
         // The origin of the ray
+        math::Vector3f  m_origin        = math::Vector3f::Zero();
         // The direction of the ray
         math::Vector3f  m_direction     = math::Vector3f::Zero();
-        math::Vector3f  m_direction         = math::Vector3f::Zero();
         // The distance of the ray
-        uint32          m_raycastVBO        = 0;
+        f32             m_distance      = 0.f;
 
     }; // !Class Raycast
 } // !Namespace engine
