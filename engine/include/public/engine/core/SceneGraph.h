@@ -48,8 +48,8 @@ namespace engine
         // game logic tick
         struct ComponentCache
         {
-            ComponentArray<Transform>			m_transformRenderCache;
-            ComponentArray<Camera>				m_cameraRenderCache;
+            CopyableComponentArray<Transform>			m_transformRenderCache;
+            CopyableComponentArray<Camera>				m_cameraRenderCache;
         };
 
 
@@ -59,7 +59,8 @@ namespace engine
     public:
 
         ENGINE_API SceneGraph(void) = default;
-        ENGINE_API SceneGraph(const SceneGraph&) = default;
+        ENGINE_API SceneGraph(const SceneGraph&) = delete;
+        ENGINE_API SceneGraph(SceneGraph&&) noexcept = default;
         ENGINE_API ~SceneGraph(void) = default;
 
         // Create a new entity in the current scene.
@@ -140,6 +141,10 @@ namespace engine
         template <CValidComponent TComponentType, typename... TVariadicArgs>
         void UpdateComponents(TVariadicArgs&&... args);
 
+        void StartAllScripts(void);
+        void SyncTransformsPostPhysics(void);
+        void SyncRigidbodiesPrePhysics(void);
+
         // Re-register all existing components after a lua state reset
         ENGINE_API
         void RegisterAllComponents(void);
@@ -173,6 +178,9 @@ namespace engine
 
         ENGINE_API
         SceneGraph& operator=(const SceneGraph&) = default;
+
+        ENGINE_API
+        SceneGraph& operator=(SceneGraph&&) noexcept = default;
 
         // Output a int64 between LONG_MIN and LONG_MAX
         ENGINE_API
@@ -223,13 +231,13 @@ namespace engine
 
 
         // All transform components in the scene
-        ComponentArray<Transform>			m_sceneTransforms;
+        CopyableComponentArray<Transform>			m_sceneTransforms;
 
         // All script components in the scene
         ComponentArray<Script>				m_sceneScripts;
 
         // All cameras components in the scene
-        ComponentArray<Camera>				m_sceneCameras;
+        CopyableComponentArray<Camera>				m_sceneCameras;
 
         // All renderer components in the scene
         ComponentArray<Renderer>			m_sceneRenderers;
@@ -412,8 +420,8 @@ namespace engine
 
         ComponentArray<TComponentType>& compArray = GetComponentArray<TComponentType>();
 
-        for (const CompIndex& component : array)
-            compArray.AddDeserializedComponent(component.second);
+        for (CompIndex& component : array)
+            compArray.AddDeserializedComponent(std::move(component.second));
     }
 
     template<CValidComponent TComponentType>

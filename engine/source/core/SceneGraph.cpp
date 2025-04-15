@@ -13,6 +13,45 @@ namespace engine
 {
     SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
 
+    void SceneGraph::StartAllScripts(void)
+    {
+        for (Script& script : m_sceneScripts)
+        {
+            if (script.IsValid())
+                script.Start();
+        }
+    }
+
+    void SceneGraph::SyncTransformsPostPhysics(void)
+    {
+        for (RigidBodyDynamic& rigidbody : m_sceneDynamicRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateEntity();
+        }
+    }
+
+    void SceneGraph::SyncRigidbodiesPrePhysics(void)
+    {
+        for (RigidBodyDynamic& rigidbody : m_sceneDynamicRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateRigidBody();
+        }
+
+        /*for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateRigidBody();
+        }*/
+    }
+
     void SceneGraph::RegisterAllComponents(void)
     {
         RegisterComponents<Transform>();
@@ -20,6 +59,15 @@ namespace engine
         RegisterComponents<Camera>();
         RegisterComponents<RigidBodyDynamic>();
         RegisterComponents<RigidBodyStatic>();
+    }
+
+    void SceneGraph::RegisterAllEntities(void)
+    {
+        for (Entity& entity : m_sceneEntities)
+        {
+            if (entity.IsValid())
+                ScriptSystem::RegisterNewEntity(entity.m_handle, GetFullEntityName(entity.m_handle));
+        }
     }
 
     int64 SceneGraph::RandomNumber(void)
