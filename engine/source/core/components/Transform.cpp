@@ -121,6 +121,25 @@ engine::Transform& engine::Transform::SetPosition(const math::Vector3f& inPositi
     return *this;
 }
 
+math::Vector3f& engine::Transform::SetPosition(void)
+{
+    m_dirty = true;
+
+    return m_position;
+}
+
+math::Vector3f engine::Transform::GetEulerRotation(void) const noexcept
+{
+    return m_rotation.EulerAngles() * RAD2DEG;
+}
+
+math::Vector3f& engine::Transform::SetScale(void)
+{
+    m_dirty = true;
+
+    return m_scale;
+}
+
 engine::Transform& engine::Transform::SetRotation(const math::Quatf& inRotation)
 {
     m_rotation = inRotation.Normalized();
