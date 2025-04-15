@@ -243,6 +243,8 @@ void engine::PhysicsEngine::InitScene(void)
         m_impl->m_scene->setVisualizationParameter(PxVisualParam::eSCALE, 1.0f);
         // Set the debug draw of the collision shapes active with their own scale to 1 by default
         m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_SHAPES, 1.0f);
+        m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCULL_BOX, 1.0f);
+        m_impl->m_scene->setVisualizationParameter(PxVisualParam::eBODY_LIN_VELOCITY, 1.0f);
     }
 }
 
