@@ -99,6 +99,11 @@ bool engine::Window::ShouldWindowClose(void) const noexcept
     return wnd::ShouldWindowClose(m_windowPtr);
 }
 
+void engine::Window::Viewport(math::Vector2i position, math::Vector2i size)
+{
+    wnd::Viewport(position, size);
+}
+
 f32 engine::Window::GetAspectRatio(void) const noexcept
 {
     return m_aspectRatio;

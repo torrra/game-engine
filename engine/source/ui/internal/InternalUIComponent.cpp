@@ -14,6 +14,11 @@ void ui::Text(const char* text, ...)
     va_end(args);
 }
 
+void ui::Image(uint64 textureID, math::Vector2f const& size)
+{
+    ImGui::Image(textureID, size, {0.0f, 1.0f}, {1.0f, 0.0f});
+}
+
 bool ui::Button(const char* text, math::Vector2f size)
 {
     return ImGui::Button(text, size);
@@ -91,6 +96,16 @@ void ui::ItemWidth(f32 widthPx)
 void ui::VerticalSpacing(void)
 {
     ImGui::Spacing();
+}
+
+math::Vector2f ui::GetPos(void)
+{
+    return ImGui::GetCursorPos();
+}
+
+math::Vector2f ui::GetAvailSpace(void)
+{
+    return ImGui::GetContentRegionAvail();
 }
 
 void ui::StartSection(const char* name)

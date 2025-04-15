@@ -49,8 +49,6 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     Input::SetCursorMode(ECursorMode::NORMAL);
 
     m_uiManager = UIManager(m_window->GetPtr());
-    m_viewport = new Viewport("Viewport");
-
 
     // Initialize engine time
     m_time = Time();
@@ -73,9 +71,6 @@ void engine::Engine::ShutDown(void)
 
     // TODO: call shutdown for ui manager
     m_uiManager.ShutDown();
-
-    if (m_viewport)
-        delete m_viewport;
 
     if (m_window)
         delete m_window;
@@ -102,21 +97,19 @@ void engine::Engine::Update(void)
         FixedUpdate();
     }
 
-
-    
     m_window->ClearWindow(0.1f, 0.1f, 0.1f);
-    
-    m_uiManager.NewFrame();
-    m_viewport->DrawViewport(); // DRAW VIEWPORT
-    // Render
 
+    m_uiManager.NewFrame();
 }
 
-void engine::Engine::PostUpdate(void)
+void engine::Engine::PostUpdate(::ui::UIWindow* viewport)
 {
-    m_uiManager.UpdateUI();
-    m_viewport->RenderToViewport(m_graph);
     Input::ResetKeys();
+
+    if (viewport)
+        viewport->Render();
+
+    m_uiManager.UpdateUI();
     m_window->Update();
     m_time.Update();
 }
@@ -157,6 +150,11 @@ engine::Time& engine::Engine::GetTime(void) noexcept
 engine::SceneGraph* engine::Engine::GetGraph(void)
 {
     return m_graph;
+}
+
+engine::UIManager engine::Engine::GetUI(void) const noexcept
+{
+    return m_uiManager;
 }
 
 void engine::Engine::RunGame()

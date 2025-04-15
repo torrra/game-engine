@@ -7,7 +7,6 @@
 #include "engine/Window.h"
 #include "engine/core/SceneGraph.h"
 #include "engine/ui/UIManager.h"
-#include "engine/viewport/Viewport.h"
 #include "engine/ui/UIWindow.h"
 
 #include <string>
@@ -24,7 +23,7 @@ namespace engine
                                     uint32 threadCount = DEFAULT_NUM_THREADS);
         ENGINE_API void		ShutDown(void);
         ENGINE_API void		Update(void);
-        ENGINE_API void		PostUpdate(void);
+        ENGINE_API void		PostUpdate(::ui::UIWindow* viewport = nullptr);
         ENGINE_API void		RunTimeUpdate(void);
                    void		FixedUpdate(void);
         ENGINE_API void         SetGameState(bool run);
@@ -32,6 +31,7 @@ namespace engine
         ENGINE_API Window*		GetWindow(void) const noexcept;
         ENGINE_API Time&		GetTime(void) noexcept;
         ENGINE_API SceneGraph*	GetGraph(void);
+        ENGINE_API UIManager    GetUI(void) const noexcept;
     private:
         void                RunGame();
         inline int16		InitScriptSystem(const char* projectDir);
@@ -42,7 +42,6 @@ namespace engine
         Window*			m_window;
         SceneGraph*		m_graph;
         UIManager		m_uiManager;
-        Viewport*		m_viewport;
         Time			m_time;
         f32				m_timeScale;
         std::atomic<bool> m_gameState;

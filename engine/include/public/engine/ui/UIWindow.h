@@ -68,6 +68,8 @@ namespace ui
     
         ENGINE_API engine::ui::UIWindowRect GetWindowRect(void);
 
+        ENGINE_API void SetViewportBg(f32 red, f32 green, f32 blue, f32 alpha);
+        ENGINE_API void SetViewportTransform(math::Vector2i position, math::Vector2i size);
         ENGINE_API void SetName(const char* title);
         ENGINE_API void SetFlags(int32 flags);
         ENGINE_API void SetWindowPos(math::Vector2f const& position, EActive activeFlag);

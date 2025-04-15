@@ -11,23 +11,24 @@
 #include "engine/core/SceneGraph.h"
 #include "engine/core/Entity.h"
 #include "engine/core/components/Transform.h"
-
-#include "engine/core/systems/ScriptSystem.h"
+#include <engine/input/Input.h>
+#include "engine/resource/ResourceManager.h"
+#include <engine/resource/texture/Texture.h>
+#include <engine/core/systems/ScriptSystem.h>
+#include "engine/resource/model/Model.h"
 
 #include "Example.h"
 
-#include "engine/resource/ResourceManager.h"
-#include "engine/resource/model/Model.h"
 
 
 // UI includes
 #include "ui/MenuBar.h"
 #include "ui/Properties.h"
 #include "ui/SceneGraph.h"
+#include "ui/Viewport.h"
 
-
-#define MODEL_FILE "..\\assets\\bunny.obj"
-
+// HACK: ductape style solution to re-purpose main
+#define TESTING_PHYSX 0
 
 // Use dedicated graphics card
 extern "C" 
@@ -36,8 +37,7 @@ extern "C"
 	_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-#define TESTING 0
-#if TESTING == 1
+#if TESTING_PHYSX == 1
 int main(void)
 {
 	// Memory check
@@ -104,22 +104,72 @@ int main(void)
 	return 0;
 }
 #else
+
+#define MODEL_FILE ".\\assets\\padoru.obj"
+#define TEXTURE_FILE ".\\assets\\padoru.png"
+#define CONTROLLER_SCRIPT_FILE "ControllerScript"
+
+#define SHADER_PROGRAM_NAME		"ModelTextured"
+#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vs"
+#define SHADER_PROGRAM_FRAGMENT ".\\shaders\\ModelTextured.frag"
+
+
 int main(void)
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     {
         engine::Engine engine;
-
         if (engine.Startup("Editor", nullptr))
             return -1;
 
+        // All the stuff in the following region is temporary & for testing only
+#pragma region LoadTemporaryStuff
+        // Enable the following keys
+        int32 keys[] =
+        {KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_W, KEY_S, KEY_A, KEY_D, KEY_ESCAPE};
+
+        for (int32 key : keys)
+            engine::Input::RegisterInput(key);
+        engine::ResourceManager::Load<engine::Model>(MODEL_FILE);
+        engine::ResourceManager::Load<engine::Texture>(TEXTURE_FILE);
+
+        engine::ResourceManager::LoadShader(
+            SHADER_PROGRAM_NAME,
+            SHADER_PROGRAM_VERTEX,
+            SHADER_PROGRAM_FRAGMENT
+        );
+
+        engine::ScriptSystem::CreateUserScript(".\\userScripts\\", CONTROLLER_SCRIPT_FILE);
+        engine::EntityHandle padoruHandle = engine.GetGraph()->CreateEntity("Padoru");
+        engine.GetGraph()->CreateComponent<engine::Transform>(padoruHandle)->SetPosition(math::Vector3f(1.5f, 3.0f, 3.2f));
+        engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(padoruHandle);
+        engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(padoruHandle);
+
+        controllerScript->AddScriptObject(CONTROLLER_SCRIPT_FILE);
+        controllerScript->Start();
+
+        entityRenderer->SetModel(MODEL_FILE);
+        entityRenderer->SetTexture(TEXTURE_FILE);
+        entityRenderer->SetShader(SHADER_PROGRAM_NAME);
+
+        engine::EntityHandle cameraHandle = engine.GetGraph()->CreateEntity("Camera");
+        engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(cameraHandle);
+        engine.GetGraph()->CreateComponent<engine::Transform>(cameraHandle);
+        camera->Rotation() = {-10.5f, 26.5f, 0.0f};
+        camera->Position() = {1.5f, 3.0f, 3.2f};
+#pragma endregion
+
         editor::MenuBar menuBar;
         editor::SceneGraphUI sceneGraph("Scene Graph", engine.GetGraph());
-        editor::PropertyWnd propertyWnd(engine.GetGraph());
+        editor::PropertyWnd properties(engine.GetGraph());
+        editor::Viewport* viewport = new editor::Viewport("Viewport", {0.1f, 0.1f, 0.1f, 1.0f});
 
         while (!engine.GetWindow()->ShouldWindowClose())
         {
             engine.Update();
+
+            // Viewport
+            viewport->RenderToViewport(engine.GetGraph());
 
             // Main menu bar ui
             menuBar.Render(engine);
@@ -129,12 +179,16 @@ int main(void)
 
             // Property window ui
             if (sceneGraph.IsNewEntitySelected())
-                propertyWnd.SetHandle(sceneGraph.GetSelectedEntity());
+                properties.SetHandle(sceneGraph.GetSelectedEntity());
 
-            propertyWnd.Render();
+            properties.Render();
 
-            engine.PostUpdate();
+
+            engine.PostUpdate(viewport);
         }
+
+        if (viewport)
+            delete viewport;
 
         engine.ShutDown();
     }

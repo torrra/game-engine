@@ -2,9 +2,7 @@
 
 #include <engine/core/SceneGraph.h>
 #include <engine/ui/InternalUIWindow.h>
-#include <engine/ui/UIWindow.h>
 #include <engine/ui/UIDraw.h>
-#include <engine/ui/UIWindow.h>
 #include <engine/ui/UIDragDrop.h>
 #include <engine/ui/UITree.h>
 #include <engine/ui/UIComponent.h>
