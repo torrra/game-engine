@@ -66,7 +66,7 @@ void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
 {
     uint64 bufferSize = inDebugDrawImpl.m_renderBuffer->getNbLines() * sizeof(physx::PxDebugLine);
 
-    glNamedBufferData(m_debugDrawVBO, bufferSize, inDebugDrawImpl.m_renderBuffer->getLines(), GL_STATIC_DRAW);
+    glNamedBufferData(m_debugDrawVBO, bufferSize, inDebugDrawImpl.m_renderBuffer->getLines(), GL_DYNAMIC_DRAW);
 
     // Check for openGL error
     OpenGLError();
