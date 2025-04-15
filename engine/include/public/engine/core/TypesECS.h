@@ -22,7 +22,7 @@ namespace engine
             // manually into the desired scene
             MULTI_SCENE_OBJECT = (uint64)(1 << 2),
 
-            // Object will never be sezialized
+            // Object will never be serialized
             NON_SERIALIZABLE_OBJECT = (uint64)(1 << 3),
         };
     }
