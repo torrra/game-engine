@@ -44,12 +44,6 @@ namespace engine
         void SetShader(const char* key);
 
         ENGINE_API
-        void SetTexture(const class Texture* texture);
-
-        ENGINE_API
-        void SetTexture(const char* key);
-
-        ENGINE_API
         void SerializeText(std::ostream& output,
                            EntityHandle owner,
                            uint64 index) const;
@@ -59,12 +53,8 @@ namespace engine
 
     private:
 
-        void DrawModel(void) const;
-
         const class Model* m_model = nullptr;
         const class ShaderProgram* m_shader = nullptr;
-        const class Texture* m_texture = nullptr;
-
     };
 
 

@@ -11,9 +11,10 @@ engine::ShaderProgram::ShaderProgram(const char* vertexShader, const char* fragS
 	CreateProgram();
 }
 
-void engine::ShaderProgram::LoadResource(const char* filePath)
+bool engine::ShaderProgram::LoadResource(const char* filePath)
 {
 	(void) filePath;
+    return true;
 }
 
 void engine::ShaderProgram::Use(void) const
@@ -141,6 +142,10 @@ void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4d* matrix)
 
 void engine::ShaderProgram::CreateProgram(void)
 {
+    // Don't create OpenGL program twice
+    if (m_programID)
+        return;
+     
 	// Resource manager will only load if resource does not exist
 	ResourceManager::Load<Shader>(m_vertexShader);
 	ResourceManager::Load<Shader>(m_fragShader);

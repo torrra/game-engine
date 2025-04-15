@@ -46,7 +46,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     if (Input::StartUp() != SUCCESS)
         return ERROR;
 
-    Input::SetCursorMode(ECursorMode::NORMAL);
+    Input::SetCursorMode(ECursorMode::MODE_NORMAL);
 
     m_uiManager = UIManager(m_window->GetPtr());
 
@@ -199,7 +199,7 @@ inline int16 engine::Engine::InitWindow(const char* projectName)
 
     m_window = new Window((projectName) ? projectName : DEFAULT_NAME);
     // TODO: change dimensions however keep for debugging
-    if (m_window->CreateWindow(800, 600))
+    if (m_window->CreateWindow(1920, 1080))
         return ERROR;
 
     return SUCCESS;

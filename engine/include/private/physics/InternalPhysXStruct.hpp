@@ -38,9 +38,14 @@ namespace engine
 
 	}; // !Struct MaterialImpl
 
-	struct GeometryImpl
-	{
-		physx::PxGeometry*				m_geometry			= nullptr;
+    struct DebugDrawImpl
+    {
+        const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
+    }; // !Struct DebugDrawImpl
 
-	}; // !Struct GeometryImpl
+    /// PhysX using
+    using PxVisualParam = physx::PxVisualizationParameter;
+    using PxInstruFlag  = physx::PxPvdInstrumentationFlag;
+    using PxTolerances  = physx::PxTolerancesScale;
+
 } // !Namespace engine
