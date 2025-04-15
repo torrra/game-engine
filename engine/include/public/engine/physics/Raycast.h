@@ -98,6 +98,7 @@ namespace engine
 
         /// Private members
         RaycastImpl*    m_raycastImpl   = nullptr;
+        void*           m_pvdClient     = nullptr;
         // The origin of the ray
         math::Vector3f  m_origin        = math::Vector3f::Zero();
         // The direction of the ray
