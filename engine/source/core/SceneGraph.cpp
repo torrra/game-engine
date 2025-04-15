@@ -243,16 +243,16 @@ namespace engine
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
     }
 
-    EntityHandle SceneGraph::MakeHandle(int32 index, int32 version)
+    EntityHandle SceneGraph::MakeHandle(int32 index, int32 uid)
     {
         // if either half is over 32 bits, the handle is invalid
-        if (index >= LONG_MAX || version >= LONG_MAX)
+        if (index >= LONG_MAX || uid >= LONG_MAX)
             return Entity::INVALID_HANDLE;
 
-        if (index <= LONG_MIN || version <= LONG_MIN)
+        if (index <= LONG_MIN || uid <= LONG_MIN)
             return Entity::INVALID_HANDLE;
 
-        return static_cast<EntityHandle>(index) | (static_cast<EntityHandle>(version) << 32);
+        return static_cast<EntityHandle>(index) | (static_cast<EntityHandle>(uid) << 32);
     }
 
     int32 SceneGraph::GetHandleVersion(EntityHandle handle)
