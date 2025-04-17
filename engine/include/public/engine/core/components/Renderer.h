@@ -4,7 +4,7 @@
 #include "engine/core/Component.h"
 #include "engine/core/ComponentArray.h"
 #include "engine/core/components/Transform.h"
-
+#include <math/Matrix4.hpp>
 #include <fstream>
 
 namespace engine
@@ -32,6 +32,9 @@ namespace engine
         const class Texture* GetTexture(void) const;
 
         ENGINE_API
+        math::Matrix4f GetMVP(void) const;
+        
+        ENGINE_API
         void SetModel(const class Model* model);
 
         ENGINE_API
@@ -53,6 +56,7 @@ namespace engine
 
     private:
 
+        math::Matrix4f m_mvp = math::Matrix4f(1.0f);
         const class Model* m_model = nullptr;
         const class ShaderProgram* m_shader = nullptr;
     };

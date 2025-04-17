@@ -5,6 +5,8 @@
 #include "core/systems/ScriptSystem.h"
 #include "Window.h"
 #include "ui/UIWindow.h"
+#include "ui/UIComponent.h"
+#include "engine/utility/GraphicsHelperFunctions.h"
 
 #include <math/Vector2.hpp>
 
@@ -48,7 +50,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
 
     Input::SetCursorMode(ECursorMode::MODE_NORMAL);
 
-    m_uiManager = UIManager(m_window->GetPtr());
+    m_uiManager = new UIManager(m_window->GetPtr());
 
     // Initialize engine time
     m_time = Time();
@@ -70,7 +72,10 @@ void engine::Engine::ShutDown(void)
     Window::ShutDown();
 
     // TODO: call shutdown for ui manager
-    m_uiManager.ShutDown();
+    m_uiManager->ShutDown();
+
+    if (m_uiManager)
+        delete m_uiManager;
 
     if (m_window)
         delete m_window;
@@ -97,19 +102,15 @@ void engine::Engine::Update(void)
         FixedUpdate();
     }
 
-    m_window->ClearWindow(0.1f, 0.1f, 0.1f);
+    ThreadManager::UpdateGameLogic(m_graph, m_time.GetDeltaTime());
 
-    m_uiManager.NewFrame();
+    m_window->ClearWindow(1.f, 1.f, 1.f);
 }
 
-void engine::Engine::PostUpdate(::ui::UIWindow* viewport)
+void engine::Engine::PostUpdate()
 {
     Input::ResetKeys();
 
-    if (viewport)
-        viewport->Render();
-
-    m_uiManager.UpdateUI();
     m_window->Update();
     m_time.Update();
 }
@@ -152,7 +153,7 @@ engine::SceneGraph* engine::Engine::GetGraph(void)
     return m_graph;
 }
 
-engine::UIManager engine::Engine::GetUI(void) const noexcept
+engine::UIManager* engine::Engine::GetUI(void) const noexcept
 {
     return m_uiManager;
 }

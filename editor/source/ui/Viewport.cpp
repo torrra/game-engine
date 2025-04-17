@@ -1,4 +1,5 @@
 #include "ui/Viewport.h"
+#include "Picking.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/thread/ThreadManager.h>
@@ -7,28 +8,49 @@
 
 #include <math/Vector2.hpp>
 
-editor::Viewport::Viewport(const char* title)
-    : Viewport(title, {0.0f, 0.0f, 0.0f, 1.0f})
-{
-}
-
-editor::Viewport::Viewport(const char* title, math::Vector4f const& bgColor)
+editor::Viewport::Viewport(const char* title, engine::SceneGraph* graph, math::Vector4f const& bgColor)
     : m_bgColor(bgColor)
 {
     SetName(title);
     SetFlags(
-    ::ui::EWndFlags::NO_COLLAPSE |
-    ::ui::EWndFlags::NO_SCROLL_BAR |
-    ::ui::EWndFlags::NO_MOUSE_SCROLL
+        ui::EWndFlags::NO_COLLAPSE |
+        ui::EWndFlags::NO_SCROLL_BAR |
+        ui::EWndFlags::NO_MOUSE_SCROLL
     );
+    SetGraph(graph);
+
+    if (m_graph)
+    {
+        m_picking = new Picking(m_graph);
+        m_enablePicking = true;
+    }
 }
 
-void editor::Viewport::RenderToViewport(engine::SceneGraph* sceneGraph)
+editor::Viewport::~Viewport(void)
+{
+    if (m_picking)
+        delete m_picking;
+
+    m_picking = nullptr;
+    m_graph = nullptr;
+}
+
+void editor::Viewport::RenderToViewport(void)
 {
     m_fbo.Bind();
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
-    engine::ThreadManager::RenderScene(sceneGraph);
+    engine::ThreadManager::RenderScene(m_graph);
     m_fbo.Unbind();
+    
+}
+
+void editor::Viewport::RenderPickingPass(void)
+{
+    if (!m_enablePicking)
+        return;
+
+    SetViewportBg(0.0f, 0.0f, 0.0f, 1.0f);
+    m_picking->RenderSceneColored(m_graph);
 }
 
 void editor::Viewport::SetBgColor(math::Vector4f const& bgColor)
@@ -36,13 +58,31 @@ void editor::Viewport::SetBgColor(math::Vector4f const& bgColor)
     m_bgColor = bgColor;
 }
 
+editor::Picking* editor::Viewport::GetPicking(void)
+{
+    return m_picking;
+}
+
+void editor::Viewport::SetEnablePicking(bool value)
+{
+    m_enablePicking = value;
+
+    if (m_enablePicking && m_graph && !m_picking)
+        m_picking = new Picking(m_graph);
+}
+
+void editor::Viewport::SetGraph(engine::SceneGraph* graph)
+{
+    m_graph = graph;
+
+    SetEnablePicking(m_enablePicking);
+}
+
 void editor::Viewport::RenderContents(void)
 {
     // Transform
-    //math::Vector2f position = ui::GetPos();
     math::Vector2f regionAvail = ::ui::GetAvailSpace();
-    math::Vector2i sizePx
-    (
+    math::Vector2i sizePx(
         static_cast<int32>(regionAvail.GetX()),
         static_cast<int32>(regionAvail.GetY())
     );
