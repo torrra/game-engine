@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 namespace engine
 {
     class Engine;
@@ -15,6 +13,5 @@ namespace editor
         MenuBar(void) = default;
 
         void Render(class ::engine::Engine& engine);
-    private:
     };
 }
