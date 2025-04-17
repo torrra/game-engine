@@ -71,7 +71,7 @@ int main(void)
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
         engine::Raycast* ray = new engine::Raycast();
-        ray->SetFlags(engine::ERaycastFlags::NONE);
+        ray->SetFlags(engine::ERaycastFlags::DYNAMIC);
 
         engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
 

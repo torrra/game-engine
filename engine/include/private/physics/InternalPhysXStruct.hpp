@@ -47,7 +47,7 @@ namespace engine
     struct DebugDrawImpl
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
-        std::vector<physx::PxDebugLine> m_customLines;
+        std::vector<physx::PxDebugLine> m_customLines       = {};
 
     }; // !Struct DebugDrawImpl
 
@@ -55,6 +55,8 @@ namespace engine
     {
         physx::PxRaycastBuffer*         m_hit               = nullptr;
         physx::PxQueryFilterData        m_queryFilterData;
+        physx::PxDebugLine*             m_successLine       = nullptr;
+        physx::PxDebugLine*             m_failureLine       = nullptr;
 
     }; // !Struct RaycastImpl
 
