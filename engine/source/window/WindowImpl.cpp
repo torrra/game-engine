@@ -95,7 +95,7 @@ void engine::wnd::ClearWindow(f32 red, f32 green, f32 blue, f32 alpha)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void engine::wnd::Viewport(math::Vector2i position, math::Vector2i size)
+void engine::wnd::SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size)
 {
     glViewport(position.GetX(), position.GetY(), size.GetX(), size.GetY());
 }

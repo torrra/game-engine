@@ -35,7 +35,7 @@ namespace engine
         ENGINE_API void ClearWindow(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
         ENGINE_API void Update(void);
         ENGINE_API bool ShouldWindowClose(void) const noexcept;
-        ENGINE_API void Viewport(math::Vector2i position, math::Vector2i size);
+        ENGINE_API void SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size);
 
         template<math::CScalarType TValueType = uint32>
         TValueType GetWidth(void) const noexcept;

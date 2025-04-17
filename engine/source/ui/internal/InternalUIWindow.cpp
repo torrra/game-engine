@@ -4,7 +4,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
-engine::ui::UIWindowRect::UIWindowRect(math::Vector2f min, math::Vector2f max)
+engine::ui::UIWindowRect::UIWindowRect(math::Vector2f const& min, math::Vector2f const& max)
     : m_min(min), m_max(max)
 {}
 
@@ -29,12 +29,12 @@ void engine::ui::EndWindowRenderer(void)
     ImGui::End();
 }
 
-void engine::ui::SetWindowPos(math::Vector2f position, int32 flag)
+void engine::ui::SetWindowPos(math::Vector2f const& position, int32 flag)
 {
     ImGui::SetNextWindowPos(position, flag);
 }
 
-void engine::ui::SetWindowSize(math::Vector2f size, int32 flag)
+void engine::ui::SetWindowSize(math::Vector2f const& size, int32 flag)
 {
     ImGui::SetNextWindowSize(size, flag);
 }

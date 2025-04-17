@@ -10,7 +10,6 @@ namespace engine
     namespace ui
     {
         struct UIWindowRect;
-
     }
 }
 
@@ -70,8 +69,3 @@ namespace ui
     ENGINE_API Payload AcceptPayload(const char* payloadID, ::int32 flags);
 }
 
-//template<typename TDataType>
-//inline TDataType engine::ui::Payload::GetData(void) const
-//{
-//    return reinterpret_cast<TDataType>(m_payload->Data);
-//}

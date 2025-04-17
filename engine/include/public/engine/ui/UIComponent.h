@@ -10,7 +10,7 @@ namespace ui
     // Components
     ENGINE_API void Text(const char* text, ...);
     ENGINE_API void Image(uint64 textureID, math::Vector2f const& size);
-    ENGINE_API bool Button(const char* text, math::Vector2f size = {0.0F, 0.0F});
+    ENGINE_API bool Button(const char* text, math::Vector2f const& size = {0.0F, 0.0F});
     ENGINE_API bool InputBox(const char* id, const char* hint, std::string& outStr);
     ENGINE_API bool InputBox(const char* id, f32* value, f32 increment, bool returnOnComplete = false);
 

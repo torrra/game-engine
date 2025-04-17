@@ -11,7 +11,7 @@ namespace engine::ui
     struct UIWindowRect
     {
         UIWindowRect(void) = default;
-        UIWindowRect(math::Vector2f min, math::Vector2f max);
+        UIWindowRect(math::Vector2f const& min, math::Vector2f const& max);
 
         operator ImRect(void);
         operator ImRect(void) const;
@@ -23,7 +23,7 @@ namespace engine::ui
     void StartWindowRenderer(const char* title, int32 flags);
     void EndWindowRenderer(void);
     
-    void SetWindowPos(math::Vector2f position, int32 flag);
-    void SetWindowSize(math::Vector2f size, int32 flag);
+    void SetWindowPos(math::Vector2f const& position, int32 flag);
+    void SetWindowSize(math::Vector2f const& size, int32 flag);
     const UIWindowRect GetCurrentWindowRect(void);
 }
