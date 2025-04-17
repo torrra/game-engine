@@ -6,6 +6,12 @@
 
 #pragma endregion
 
+#pragma region Standard
+
+#include <vector>
+
+#pragma endregion
+
 namespace engine
 {
 	// Create a structure of physX elements to store them
@@ -41,6 +47,7 @@ namespace engine
     struct DebugDrawImpl
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
+        std::vector<physx::PxDebugLine> m_customLines;
 
     }; // !Struct DebugDrawImpl
 
