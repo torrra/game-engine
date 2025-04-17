@@ -16,8 +16,8 @@
 #include "components/Camera.h"
 #include "components/Renderer.h"
 
-#include "physics/rigidbody/RigidBodyDynamic.h"
-#include "physics/rigidbody/RigidBodyStatic.h"
+#include "engine/physics/rigidbody/RigidBodyDynamic.h"
+#include "engine/physics/rigidbody/RigidBodyStatic.h"
 
 namespace engine
 {
