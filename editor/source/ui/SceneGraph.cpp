@@ -8,7 +8,6 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIStyle.h>
 #include <engine/input/Input.h>
-
 #include <engine/utility/MemoryCheck.h>
 
 // Node Functions
@@ -259,8 +258,8 @@ void editor::SceneGraphUI::DrawNodeAndChildren(TreeNode* node)
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
     std::string nodeName = (node->m_handle == m_renamingHandle) ? ("###" + entityName) : entityName;
 
-    ::ui::SetID(nodeName);
     // Set ID to prevent duplicate menu items
+    ::ui::SetID(nodeName);
 
     bool isOpen = ::ui::TreeNode(nodeName, GetNodeFlags(node));
 
