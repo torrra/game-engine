@@ -75,6 +75,7 @@ namespace engine
         ENGINE_API void     UpdateDebugDraw(math::Matrix4f* inProjViewMatrix);
         // Release all physx resources
         ENGINE_API void		CleanUp(void);
+        ENGINE_API void AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, uint32 inColor);
 
     private :
 
@@ -98,7 +99,7 @@ namespace engine
         void 				InitPhysics(bool inIsPvdConnected);
         // Initialize the scene/material/dispatcher
         void				InitScene(void);
-
+        math::Vector4f ConvertPhysxColorToVector4f(uint32 inColor);
 
         /// Members
         // Pointer to the implementation of the physx structure

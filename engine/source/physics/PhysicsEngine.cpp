@@ -243,9 +243,17 @@ void engine::PhysicsEngine::InitScene(void)
         m_impl->m_scene->setVisualizationParameter(PxVisualParam::eSCALE, 1.0f);
         // Set the debug draw of the collision shapes active with their own scale to 1 by default
         m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCOLLISION_SHAPES, 1.0f);
-        m_impl->m_scene->setVisualizationParameter(PxVisualParam::eCULL_BOX, 1.0f);
-        m_impl->m_scene->setVisualizationParameter(PxVisualParam::eBODY_LIN_VELOCITY, 1.0f);
     }
+}
+
+math::Vector4f engine::PhysicsEngine::ConvertPhysxColorToVector4f(uint32 inColor)
+{
+    float r = (inColor & 0xFF) / 255.0f;
+    float g = ((inColor >> 8) & 0xFF) / 255.0f;
+    float b = ((inColor >> 16) & 0xFF) / 255.0f;
+    float a = ((inColor >> 24) & 0xFF) / 255.0f;
+
+    return math::Vector4f(r, g, b, a);
 }
 
 void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
@@ -301,8 +309,15 @@ void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
                                point and the end point of each line (multiply by 2 because each
                                point is the start and the end of a line)
     */
+
+    math::Vector4f color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
+    math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
+    math::Vector4f color3 = math::Vector4f(0.f, 0.f, 1.f, 1.f);
+
     m_debugDraw->RenderDebugDraw(inProjViewMatrix,
-        m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2);
+        (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
+            sizeof(m_debugDraw->GetDebugDrawImpl()->m_customLines.size())) * 2,
+        color2);
 }
 
 void engine::PhysicsEngine::CleanUp(void)
@@ -328,4 +343,12 @@ void engine::PhysicsEngine::CleanUp(void)
 
     /// TODO : Delete debug cout
     std::cout << "Physics engine cleaned up" << std::endl;
+}
+
+void engine::PhysicsEngine::AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, uint32 inColor)
+{
+    if (m_debugDraw)
+    {
+        m_debugDraw->AddDebugLine(inStart, inEnd, inColor);
+    }
 }
