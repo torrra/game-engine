@@ -54,6 +54,7 @@ namespace engine
     struct RaycastImpl
     {
         physx::PxRaycastBuffer*         m_hit               = nullptr;
+        physx::PxQueryFilterData        m_queryFilterData;
 
     }; // !Struct RaycastImpl
 

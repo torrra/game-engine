@@ -13,26 +13,34 @@
 
 #pragma endregion
 
-
-#include <vector>
-
-#pragma endregion
-
 namespace engine
 {
     struct RaycastImpl;
+
+    enum class ERaycastFlags
+    {
+        DYNAMIC = 0,
+        STATIC  = 1,
+        ALL     = 2,
+        NONE    = 3
+    };
 
     class Raycast
     {
     public :
 
         /// Constructor
-        // Default constructor
+        /*
+            Default constructor
+            m_origin = math::Vector3f(0.f, 0.f, 0.f)
+            m_direction = math::Vector3f(0.f, 0.f, 1.f)
+            m_distance = 10.f
+        */
         ENGINE_API                  Raycast(void);
         // Delete copy constructor
-                                    Raycast(const Raycast& inRaycast) = delete;
+                                    Raycast(const Raycast& inRaycast)   = delete;
         // Delete move constructor
-                                    Raycast(Raycast&& inRaycast) = delete;
+                                    Raycast(Raycast&& inRaycast)        = delete;
         /*
             Constructor with given parameters
             <param> [in] inOrigin       : The origin of the ray     : math::Vector3f
@@ -41,9 +49,13 @@ namespace engine
         */
         ENGINE_API                  Raycast(const math::Vector3f& inOrigin, 
                                             const math::Vector3f& inDirection, 
-                                            const f32& inDistance = 10.f);
+                                            f32 inDistance = 10.f);
 
         /// Destructor
+        /*
+            Delete the PxRaycastBuffer pointer
+            Delete the RaycastImpl pointer
+        */
         ENGINE_API                  ~Raycast(void);
 
         /// Getter
@@ -78,7 +90,7 @@ namespace engine
             Set the distance of the ray
             <param> [in] inDistance : The distance of the ray : f32
         */
-        ENGINE_API  void            SetDistance(const f32& inDistance);
+        ENGINE_API  void            SetDistance(f32 inDistance);
         /*
             Set the ray
             <param> [in] inOrigin       : The origin of the ray     : math::Vector3f
@@ -87,8 +99,12 @@ namespace engine
         */
         ENGINE_API  void            SetRay(const math::Vector3f& inOrigin, 
                                            const math::Vector3f& inDirection, 
-                                           const f32& inDistance = 10.f);
-
+                                           f32 inDistance = 10.f);
+        /*
+            Set the raycast's flag to use one or multiple or no collision detection
+            <param> [in] inFlags : The flags to use : ERaycastFlags
+        */
+        ENGINE_API  void            SetFlags(ERaycastFlags inFlags);
         /// Functions
         /*
             Perform a check to see if the raycast hit an object
@@ -97,16 +113,18 @@ namespace engine
                                                                             : false If there is no hit
         */
         ENGINE_API  bool            HasHit(void);
+        // Draw the raycast into the pvd and the openGL scene
         ENGINE_API  void            DrawRay(void);
 
     private :
 
         /// Private members
-        RaycastImpl*    m_raycastImpl   = nullptr;
         // The origin of the ray
         math::Vector3f  m_origin        = math::Vector3f::Zero();
         // The direction of the ray
         math::Vector3f  m_direction     = math::Vector3f::Zero();
+        // The raycast implementation
+        RaycastImpl*    m_raycastImpl   = nullptr;
         // The distance of the ray
         f32             m_distance      = 0.f;
 

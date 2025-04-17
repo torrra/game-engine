@@ -71,6 +71,7 @@ int main(void)
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
         engine::Raycast* ray = new engine::Raycast();
+        ray->SetFlags(engine::ERaycastFlags::NONE);
 
         engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
 
@@ -83,7 +84,7 @@ int main(void)
 
             if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT))
             {
-                ray->SetRay(camPos, camDir, 1000000.f);
+                ray->SetRay(camPos, camDir, 1000.f);
                 ray->HasHit();
             }
 

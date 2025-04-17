@@ -21,23 +21,25 @@
 
 engine::Raycast::Raycast(void)
 {
-    m_raycastImpl           = new RaycastImpl();
-    m_raycastImpl->m_hit    = new physx::PxRaycastBuffer();
+    m_raycastImpl                       = new RaycastImpl();
+    m_raycastImpl->m_hit                = new physx::PxRaycastBuffer();
+    m_raycastImpl->m_queryFilterData    = physx::PxQueryFilterData(physx::PxQueryFlag::eNO_BLOCK);
 
-    m_origin                = math::Vector3f::Zero();
-    m_direction             = math::Vector3f(0.f, 0.f, 1.f);
-    m_distance              = 10.f;
+    m_origin                            = math::Vector3f::Zero();
+    m_direction                         = math::Vector3f(0.f, 0.f, 1.f);
+    m_distance                          = 10.f;
 }
 
 engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& inDirection,
-                         const f32& inDistance)
+                         f32 inDistance)
 {
-    m_raycastImpl           = new RaycastImpl();
-    m_raycastImpl->m_hit    = new physx::PxRaycastBuffer();
+    m_raycastImpl                       = new RaycastImpl();
+    m_raycastImpl->m_hit                = new physx::PxRaycastBuffer();
+    m_raycastImpl->m_queryFilterData    = physx::PxQueryFilterData(physx::PxQueryFlag::eNO_BLOCK);
 
-    m_origin                = inOrigin;
-    m_direction             = inDirection;
-    m_distance              = inDistance;
+    m_origin                            = inOrigin;
+    m_direction                         = inDirection;
+    m_distance                          = inDistance;
 }
 
 engine::Raycast::~Raycast(void)
@@ -74,17 +76,40 @@ void engine::Raycast::SetDirection(const math::Vector3f& inDirection)
     m_direction = inDirection;
 }
 
-void engine::Raycast::SetDistance(const f32& inDistance)
+void engine::Raycast::SetDistance(f32 inDistance)
 {
     m_distance = inDistance;
 }
 
 void engine::Raycast::SetRay(const math::Vector3f& inOrigin, const math::Vector3f& inDirection,
-                             const f32& inDistance)
+                             f32 inDistance)
 {
     m_origin    = inOrigin;
     m_direction = inDirection;
     m_distance  = inDistance;
+}
+
+void engine::Raycast::SetFlags(ERaycastFlags inFlags)
+{
+    switch (inFlags)
+    {
+    case engine::ERaycastFlags::DYNAMIC :
+        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC);
+        break;
+    case engine::ERaycastFlags::STATIC :
+        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eSTATIC);
+        break;
+    case engine::ERaycastFlags::ALL :
+        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC |
+                                                                    physx::PxQueryFlag::eSTATIC);
+        break;
+    case engine::ERaycastFlags::NONE :
+        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eNO_BLOCK);
+        break;
+    default:
+        PrintLog(ErrorPreset(), "Invalid raycast flags.");
+        break;
+    }
 }
 
 bool engine::Raycast::HasHit(void)
@@ -95,7 +120,7 @@ bool engine::Raycast::HasHit(void)
                                                                   ToPxVec3(m_direction.Normalized()),
                                                                   m_distance, *m_raycastImpl->m_hit,
                                                                   hitFlags, 
-                                                                  physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC));
+                                                                  m_raycastImpl->m_queryFilterData);
 
     if (status && m_raycastImpl->m_hit->hasBlock)
     {
