@@ -25,8 +25,8 @@ engine::Raycast::Raycast(void)
     m_raycastImpl->m_hit    = new physx::PxRaycastBuffer();
 
     m_origin                = math::Vector3f::Zero();
-    m_direction             = math::Vector3f::Zero();
-    m_distance              = 0.f;
+    m_direction             = math::Vector3f(0.f, 0.f, 1.f);
+    m_distance              = 10.f;
 }
 
 engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& inDirection,
@@ -107,7 +107,7 @@ bool engine::Raycast::HasHit(void)
     return false;
 }
 
-void engine::Raycast::DrawRayInPvd(void)
+void engine::Raycast::DrawRay(void)
 {
     physx::PxVec3 end = ToPxVec3(m_origin) + ToPxVec3(m_direction.Normalized()) * m_distance;
 
@@ -118,12 +118,12 @@ void engine::Raycast::DrawRayInPvd(void)
     {
         end = m_raycastImpl->m_hit->block.position;
         PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient()->drawLines(success, 1);
-        m_raycastLines.push_back(success);
+        PhysicsEngine::Get().AddDebugLine(m_origin, ToVector3f(end), 0xff008800);
     }
     else
     {
         PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient()->drawLines(failure, 1);
-        m_raycastLines.push_back(failure);
+        PhysicsEngine::Get().AddDebugLine(m_origin, ToVector3f(end), 0xff880000);
     }
 
     delete success;

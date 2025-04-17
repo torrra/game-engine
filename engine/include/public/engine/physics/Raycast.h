@@ -97,9 +97,7 @@ namespace engine
                                                                             : false If there is no hit
         */
         ENGINE_API  bool            HasHit(void);
-        ENGINE_API  void            DrawRayInPvd(void);
-        /// Public members
-        std::vector<void*> m_raycastLines;
+        ENGINE_API  void            DrawRay(void);
 
     private :
 

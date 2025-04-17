@@ -59,7 +59,7 @@ int main(void)
                                             engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
         rb->SetDebugVisualization(true);
         //rb->SetGravityDisabled(true);
-
+        
         /// ---------------- Create rigidbody static ----------------
         std::cout << "\t" << std::endl;
         
@@ -70,11 +70,7 @@ int main(void)
 
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
-        math::Vector2f mousePos = engine::Input::GetCursorPosition<f32>();
-        math::Vector3f mouse = math::Vector3f(mousePos.GetX(), mousePos.GetY(), 0.f);
-        //math::Vector3f mouse = math::Vector3f(0.f);
-        math::Vector3f direction = (mouse - camera->GetPosition());
-        engine::Raycast* ray = new engine::Raycast(mouse, direction, 10.f);
+        engine::Raycast* ray = new engine::Raycast();
 
         engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
 
@@ -83,14 +79,16 @@ int main(void)
             math::Vector3f camPos = camera->GetPosition();
             math::Vector3f camDir = camera->GetRotationQuat().Rotate(-camera->GetPosition().Front());
 
+            camPos.Y() -= 0.5f;
+
             if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT))
             {
+                ray->SetRay(camPos, camDir, 1000000.f);
                 ray->HasHit();
-                ray->SetRay(camPos, camDir, 100.f);
             }
 
-            ray->DrawRayInPvd();
 
+            ray->DrawRay();
 
             math::Matrix4f projViewMatrix = camera->ViewProjection();
 
