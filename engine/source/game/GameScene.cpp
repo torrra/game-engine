@@ -37,7 +37,7 @@ namespace engine
         m_name = newName;
     }
 
-    void GameScene::LoadNewScene(const std::string& name)
+    void GameScene::LoadNewScene(const std::string& /*name*/)
     {
     }
 
