@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui/components/Component.h"
-
+#include <engine/core/components/Renderer.h>
 #include <engine/CoreTypes.h>
 
 namespace editor
@@ -12,9 +12,11 @@ namespace editor
         RendererComponent(void);
         ~RendererComponent(void);
 
+        void SetRenderer(engine::Renderer* renderer);
     protected:
         virtual void SectionContent(void) override;
 
     private:
+        engine::Renderer* m_renderer;
     };
 }
