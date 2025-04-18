@@ -21,9 +21,9 @@ void editor::BaseComponent::SetName(const char* name)
     m_componentName = name;
 }
 
-bool editor::BaseComponent::InputField(const char* uid, f32* value, f32 increment)
+bool editor::BaseComponent::InputField(const char* uid, f32* value, f32 increment, f32 width, f32 xOffset)
 {
-    ui::SameLine();
-    ui::ItemWidth(60.0f);
+    ui::SameLine(xOffset);
+    ui::ItemWidth(width);
     return ui::InputBox(uid, value, increment);
 }

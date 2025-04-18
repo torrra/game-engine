@@ -78,11 +78,20 @@ void editor::PropertyWnd::InitComponents(void)
 
     // Renderer
     if (entity->HasComponent<engine::Renderer>())
-        m_components.emplace_back(new RendererComponent);
+    {
+        RendererComponent* renderComponent = new RendererComponent;
+        renderComponent->SetRenderer(m_graph->GetComponent<engine::Renderer>(m_handle));
+        m_components.emplace_back(renderComponent);
+        
+    }
     
     // Camera
     if (entity->HasComponent<engine::Camera>())
-        m_components.emplace_back(new CameraComponent);
+    {
+        CameraComponent* cameraComponent = new CameraComponent;
+        cameraComponent->SetCamera(m_graph->GetComponent<engine::Camera>(m_handle));
+        m_components.emplace_back(cameraComponent);
+    }
     
     // Script
     if (entity->HasComponent<engine::Script>())

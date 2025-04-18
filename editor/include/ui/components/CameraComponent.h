@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/components/Component.h"
+#include <engine/core/components/Camera.h>
 
 namespace editor
 {
@@ -8,9 +9,18 @@ namespace editor
     {
     public:
         CameraComponent(void);
-        ~CameraComponent(void) = default;
+        ~CameraComponent(void);
+
+        void SetCamera(engine::Camera* camera);
 
     protected:
         virtual void SectionContent(void) override;
+
+    private:
+        engine::Camera* m_camera;
+
+        f32 m_fov;
+        f32 m_near;
+        f32 m_far;
     };
 }
