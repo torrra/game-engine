@@ -84,9 +84,9 @@ void ui::EndPopUp(void)
     ImGui::EndPopup();
 }
 
-void ui::SameLine(void)
+void ui::SameLine(f32 xOffset)
 {
-    ImGui::SameLine(0.0F, -1.0F);
+    ImGui::SameLine(xOffset, -1.0F);
 }
 
 void ui::ItemWidth(f32 widthPx)

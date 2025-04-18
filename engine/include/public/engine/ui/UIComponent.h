@@ -26,7 +26,7 @@ namespace ui
     ENGINE_API void EndPopUp(void);
 
     // Layout
-    ENGINE_API void SameLine(void);
+    ENGINE_API void SameLine(f32 xOffset = -1.0f);
     ENGINE_API void ItemWidth(f32 widthPx);
     ENGINE_API void VerticalSpacing(void);
     ENGINE_API math::Vector2f GetPos(void);
