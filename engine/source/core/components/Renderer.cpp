@@ -34,14 +34,14 @@ namespace engine
         if (Transform* transform = transforms.GetComponent(m_owner))
         {
             math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
-            math::Matrix4f mvp = viewProjection * transformMat;
+            m_mvp = viewProjection * transformMat;
 
             math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
             math::Matrix3f normalMat3x3 = math::Matrix3f(normalMat4x4);
 
             m_shader->Set("model", &transformMat);
-            m_shader->Set("mvp", &mvp);
-            m_shader->Set("normalMat", &normalMat3x3);		
+            m_shader->Set("mvp", &m_mvp);
+            m_shader->Set("normalMat", &normalMat3x3);
         }
         else
         {
@@ -62,6 +62,11 @@ namespace engine
     const ShaderProgram* Renderer::GetShader(void) const
     {
         return m_shader;
+    }
+
+    math::Matrix4f Renderer::GetMVP(void) const
+    {
+        return m_mvp;
     }
 
     void Renderer::SetModel(const Model* model)

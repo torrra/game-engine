@@ -34,6 +34,7 @@ namespace editor
         ~SceneGraphUI(void);
 
         void SetGraph(class engine::SceneGraph* graph);
+        void SelectEntity(engine::EntityHandle const& handle);
 
         engine::EntityHandle GetSelectedEntity(void) const noexcept;
         bool IsNewEntitySelected(void) const noexcept;

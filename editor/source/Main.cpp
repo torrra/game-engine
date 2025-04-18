@@ -27,6 +27,8 @@
 #include "ui/SceneGraph.h"
 #include "ui/Viewport.h"
 
+#include "Picking.h"
+
 // HACK: ductape style solution to re-purpose main
 #define TESTING_PHYSX 0
 
@@ -129,7 +131,7 @@ int main(void)
 #pragma region LoadTemporaryStuff
         // Enable the following keys
         int32 keys[] =
-        {KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_W, KEY_S, KEY_A, KEY_D, KEY_ESCAPE};
+        {KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_W, KEY_S, KEY_A, KEY_D, KEY_ESCAPE, MOUSE_BUTTON_LEFT};
 
         for (int32 key : keys)
             engine::Input::RegisterInput(key);
@@ -164,29 +166,41 @@ int main(void)
         editor::MenuBar menuBar;
         editor::SceneGraphUI sceneGraph("Scene Graph", engine.GetGraph());
         editor::PropertyWnd properties(engine.GetGraph());
-        editor::Viewport* viewport = new editor::Viewport("Viewport", {0.1f, 0.1f, 0.1f, 1.0f});
+        editor::Viewport* viewport = new editor::Viewport("Viewport", engine.GetGraph(), {0.1f, 0.1f, 0.1f, 1.0f});
 
         while (!engine.GetWindow()->ShouldWindowClose())
         {
             engine.Update();
 
-            // Viewport
-            viewport->RenderToViewport(engine.GetGraph());
+            engine.GetUI()->NewFrame();
 
             // Main menu bar ui
             menuBar.Render(engine);
-
+            
             // Scene graph window ui
             sceneGraph.Render();
-
-            // Property window ui
             if (sceneGraph.IsNewEntitySelected())
                 properties.SetHandle(sceneGraph.GetSelectedEntity());
 
+            // Property window ui
             properties.Render();
 
-
-            engine.PostUpdate(viewport);
+            // Viewport
+            viewport->Render();
+            viewport->RenderToViewport();
+            viewport->RenderPickingPass();
+            
+            // Picking
+            if (engine::Input::IsInputReleased(MOUSE_BUTTON_LEFT) && 
+                engine.GetUI()->IsWindowFocused("Viewport"))
+            {
+                engine::EntityHandle handle = viewport->GetPicking()->FindSelectedEntity();
+                sceneGraph.SelectEntity(handle);
+                properties.SetHandle(handle);
+            }
+            
+            engine.GetUI()->UpdateUI();
+            engine.PostUpdate();
         }
 
         if (viewport)

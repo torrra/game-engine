@@ -2,6 +2,8 @@
 
 #include "engine/EngineExport.h"
 
+#include <string>
+
 struct ImGuiIO;
 namespace engine::wnd
 {
@@ -26,6 +28,8 @@ namespace engine
 
 		// Clear memory call at end of program
 		ENGINE_API void	ShutDown(void);
+
+        ENGINE_API bool IsWindowFocused(std::string const& name);
 	
 	private:
 		void			InitUI(wnd::Wnd* window);

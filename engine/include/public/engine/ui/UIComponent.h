@@ -31,7 +31,10 @@ namespace ui
     ENGINE_API void VerticalSpacing(void);
     ENGINE_API math::Vector2f GetPos(void);
     ENGINE_API math::Vector2f GetAvailSpace(void);
-
+    ENGINE_API math::Vector2i GetViewportPos(std::string const& windowName);
+    ENGINE_API math::Vector2i GetWindowPos(std::string const& windowName);
+    ENGINE_API math::Vector2i GetOuterRectMinPos(std::string const& windowName);
+    ENGINE_API math::Vector2i GetInnerRectMinPos(std::string const& windowName);
 
     // Sections
     ENGINE_API void StartSection(const char* name);
@@ -48,4 +51,6 @@ namespace ui
     ENGINE_API void SetKeyboardFocus(void);
     ENGINE_API bool IsItemSelected(void);
     ENGINE_API bool IsItemHovered(void);
+    ENGINE_API bool IsWindowSelected(std::string const& name);
+    ENGINE_API bool IsWindowDocked(std::string const& windowName);
 }

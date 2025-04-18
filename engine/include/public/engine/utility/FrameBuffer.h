@@ -19,6 +19,8 @@ namespace engine
         ENGINE_API void Bind(void) const;
         ENGINE_API void Unbind(void) const;
 
+        ENGINE_API uint32 GetFBO(void) const;
+
     private:
         void DeleteFrameBuffer(void);
 

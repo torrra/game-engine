@@ -3,6 +3,7 @@
 
 #undef new
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 #include <cstdarg>
 
@@ -108,6 +109,64 @@ math::Vector2f ui::GetAvailSpace(void)
     return ImGui::GetContentRegionAvail();
 }
 
+math::Vector2i ui::GetViewportPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+    
+    if (window)
+        return math::Vector2i(
+                static_cast<int32>(window->ViewportPos.x),
+                static_cast<int32>(window->ViewportPos.y)
+        );
+
+    return math::Vector2i::Zero();
+}
+
+math::Vector2i ui::GetWindowPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+        return math::Vector2i(
+                static_cast<int32>(window->Pos.x),
+                static_cast<int32>(window->Pos.y)
+        );
+
+    return math::Vector2i::Zero();
+}
+
+math::Vector2i ui::GetOuterRectMinPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+    {
+        ImVec2 position = window->OuterRectClipped.Min;
+        return math::Vector2i(
+            static_cast<int32>(position[0]),
+            static_cast<int32>(position[1])
+        );
+    }
+
+    return math::Vector2i::Zero();
+}
+
+math::Vector2i ui::GetInnerRectMinPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+    {
+        const ImVec2& position = window->ContentRegionRect.Min;
+        return math::Vector2i(
+            static_cast<int32>(position[0]),
+            static_cast<int32>(position[1])
+        );
+    }
+
+    return math::Vector2i::Zero();
+}
+
 void ui::StartSection(const char* name)
 {
     constexpr int32 flags = 
@@ -161,4 +220,21 @@ bool ui::IsItemSelected(void)
 bool ui::IsItemHovered(void)
 {
     return ImGui::IsItemHovered();
+}
+
+bool ui::IsWindowSelected(std::string const& name)
+{
+    ImGuiContext* context = ImGui::GetCurrentContext();
+
+    return ImGui::FindWindowByName(name.c_str()) == context->NavWindow;
+}
+
+bool ui::IsWindowDocked(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+        return window->DockIsActive;
+
+    return false;
 }
