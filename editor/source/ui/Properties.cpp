@@ -10,11 +10,6 @@
 #define WINDOW_NAME "Properties"
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
 
-editor::PropertyWnd::PropertyWnd(void)
-    : PropertyWnd(nullptr)
-{
-}
-
 editor::PropertyWnd::PropertyWnd(engine::SceneGraph* graph)
 {
     SetName(WINDOW_NAME);
@@ -57,10 +52,7 @@ void editor::PropertyWnd::RenderContents(void)
 void editor::PropertyWnd::InitComponents(void)
 {
     for (BaseComponent* component : m_components)
-    {
         delete component;
-    }
-
     m_components.clear();
     
     if (m_handle == INVALID_HANDLE)
@@ -70,30 +62,22 @@ void editor::PropertyWnd::InitComponents(void)
 
     // Transform
     if (entity->HasComponent<engine::Transform>())
-    {
-        TransformComponent* transformComponent = new TransformComponent;
-        transformComponent->SetTransform(m_graph->GetComponent<engine::Transform>(m_handle));
-        m_components.emplace_back(transformComponent);
-    }
+        InitComponent<TransformComponent, engine::Transform>();
 
     // Renderer
     if (entity->HasComponent<engine::Renderer>())
-    {
-        RendererComponent* renderComponent = new RendererComponent;
-        renderComponent->SetRenderer(m_graph->GetComponent<engine::Renderer>(m_handle));
-        m_components.emplace_back(renderComponent);
-        
-    }
+        InitComponent<RendererComponent, engine::Renderer>();
     
     // Camera
     if (entity->HasComponent<engine::Camera>())
-    {
-        CameraComponent* cameraComponent = new CameraComponent;
-        cameraComponent->SetCamera(m_graph->GetComponent<engine::Camera>(m_handle));
-        m_components.emplace_back(cameraComponent);
-    }
+        InitComponent<CameraComponent, engine::Camera>();
     
     // Script
     if (entity->HasComponent<engine::Script>())
-        m_components.emplace_back(new ScriptComponent);
+    {
+        engine::Script* scriptComponent = m_graph->GetComponent<engine::Script>(m_handle);
+
+        for (engine::ScriptObject script : scriptComponent->GetScripts())
+            m_components.emplace_back(new ScriptComponent(script.GetType()));
+    }
 }

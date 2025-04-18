@@ -87,4 +87,9 @@ namespace engine
         MOVE_TEXT_CURSOR(text, end);
         return text::DeserializeInteger(text, m_flags);
     }
+
+    const std::vector<ScriptObject>& Script::GetScripts(void) const
+    {
+        return m_scriptObjects;
+    }
 }

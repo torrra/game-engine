@@ -3,27 +3,28 @@
 #include <math/Vector3.hpp>
 
 editor::TransformComponent::TransformComponent(void)
-    : m_transformData(nullptr)
+    : m_isRotationSynced(false)
 {
     SetName("Transform");
 }
 
 editor::TransformComponent::~TransformComponent(void)
 {
-    m_transformData = nullptr;
-}
-
-void editor::TransformComponent::SetTransform(engine::Transform* transform)
-{
-    m_transformData = transform;
-    m_rotation = m_transformData->GetEulerRotation();
-    m_lastRot = m_rotation;
+    SetData<engine::Transform>(nullptr);
 }
 
 void editor::TransformComponent::SectionContent(void)
 {
-    math::Vector3f& position = m_transformData->SetPosition();
-    math::Vector3f& size = m_transformData->SetScale();
+    engine::Transform* transform = GetData<engine::Transform>();
+    math::Vector3f& position = transform->SetPosition();
+    math::Vector3f& size = transform->SetScale();
+    
+    if (!m_isRotationSynced)
+    {
+        // Synchronise rotation
+        SyncRotation(transform);
+        m_isRotationSynced = true;
+    }
 
     // Position
     ui::Text("Position: ");
@@ -34,26 +35,9 @@ void editor::TransformComponent::SectionContent(void)
 
     // Rotation
     ui::Text("Rotation: ");
-    if (InputField("##X Rotation", &m_rotation[0], 0.5f))
-    {
-        m_transformData->AddRotation(m_rotation[0] - m_lastRot[0], 0.0f, 0.0f);
-        m_lastRot[0] = m_rotation[0];
-        m_rotation[0] = math::Wrap<f32>(m_rotation[0], 0.0f, 359.0f);
-    }
-
-    if (InputField("##Y Rotation", &m_rotation[1], 0.5f))
-    {
-        m_transformData->AddRotation(0.0f, m_rotation[1] - m_lastRot[1], 0.0f);
-        m_lastRot[1] = m_rotation[1];
-        m_rotation[1] = math::Wrap<f32>(m_rotation[1], 0.0f, 359.0f);
-    }
-
-    if (InputField("##Z Rotation", &m_rotation[2], 0.5f))
-    {
-        m_transformData->AddRotation(0.0f, 0.0f, m_rotation[2] - m_lastRot[2]);
-        m_lastRot[2] = m_rotation[2];
-        m_rotation[2] = math::Wrap<f32>(m_rotation[2], 0.0f, 359.0f);
-    }
+    InputRotation(transform, "##X Rotation", 0);
+    InputRotation(transform, "##Y Rotation", 1);
+    InputRotation(transform, "##Z Rotation", 2);
     ui::VerticalSpacing();
 
     // Size
@@ -68,3 +52,40 @@ void editor::TransformComponent::SectionContent(void)
 
 }
 
+void editor::TransformComponent::SyncRotation(engine::Transform* transform)
+{
+    // Rotation
+    m_rotation = transform->GetEulerRotation();
+
+    m_rotation[0] = math::Wrap(m_rotation[0], 0.0f, 360.0f);
+    m_rotation[1] = math::Wrap(m_rotation[1], 0.0f, 360.0f);
+    m_rotation[2] = math::Wrap(m_rotation[2], 0.0f, 360.0f);
+
+    m_lastRot = m_rotation;
+
+
+}
+
+void editor::TransformComponent::InputRotation(engine::Transform* transform, const char* uid, uint8 index)
+{
+    if (InputField(uid, &m_rotation[index], 0.5f))
+    {
+        switch (index)
+        {
+        case 0:
+            transform->AddRotation(m_rotation[index] - m_lastRot[index], 0.0f, 0.0f);
+            break;
+        case 1:
+            transform->AddRotation(0.0f, m_rotation[index] - m_lastRot[index], 0.0f);
+            break;
+        case 2:
+            transform->AddRotation(0.0f, 0.0f, m_rotation[index] - m_lastRot[index]);
+            break;
+        default:
+            break;
+        }
+        
+        m_lastRot[index] = m_rotation[index];
+        m_rotation[index] = math::Wrap(m_rotation[index], 0.0f, 360.0f);
+    }
+}

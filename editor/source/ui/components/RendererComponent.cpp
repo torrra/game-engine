@@ -1,21 +1,15 @@
 #include "ui/components/RendererComponent.h"
-
+#include <engine/core/components/Renderer.h>
 #include <engine/ui/UIComponent.h>
 
 editor::RendererComponent::RendererComponent(void)
-    : m_renderer(nullptr)
 {
     SetName("Renderer");
 }
 
 editor::RendererComponent::~RendererComponent(void)
 {
-    m_renderer = nullptr;
-}
-
-void editor::RendererComponent::SetRenderer(engine::Renderer* renderer)
-{
-    m_renderer = renderer;
+    SetData<engine::Renderer>(nullptr);
 }
 
 void editor::RendererComponent::SectionContent(void)

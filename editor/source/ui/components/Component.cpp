@@ -16,14 +16,14 @@ void editor::BaseComponent::RenderSection(void)
 void editor::BaseComponent::SectionContent(void)
 {}
 
-void editor::BaseComponent::SetName(const char* name)
-{
-    m_componentName = name;
-}
-
 bool editor::BaseComponent::InputField(const char* uid, f32* value, f32 increment, f32 width, f32 xOffset)
 {
     ui::SameLine(xOffset);
     ui::ItemWidth(width);
     return ui::InputBox(uid, value, increment);
+}
+
+void editor::BaseComponent::SetName(const char* name)
+{
+    m_componentName = name;
 }
