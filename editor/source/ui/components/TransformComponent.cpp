@@ -3,6 +3,7 @@
 #include <math/Vector3.hpp>
 
 editor::TransformComponent::TransformComponent(void)
+    : m_transformData(nullptr)
 {
     SetName("Transform");
 }
