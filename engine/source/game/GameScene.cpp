@@ -10,30 +10,37 @@
 namespace engine
 {
     GameScene::GameScene(const std::filesystem::path& path, const std::string& name)
-        : m_name(name), m_path(path)
+        : m_path(path)
     {      
-            DeserializeText();
+        Rename(name);
+        DeserializeText();
     }
 
-    void GameScene::Start(bool withEditor)
+    void GameScene::Start(void)
     {
+
+        m_time.Reset();
         SerializeText();
         ScriptSystem::ResetState(&m_graph);
-        m_graph.RegisterAllEntities();
-        m_graph.RegisterAllComponents();
         m_graph.StartAllScripts();
+        m_state = EGameState::RUNNING;
+    }
 
-        if (withEditor)
-            ThreadManager::AddTask(&GameScene::EditorUpdateLoop, this);
+    void GameScene::Stop(void)
+    {
+        m_state = EGameState::STOPPED;
+    }
 
-        else
-            ThreadManager::AddTask(&GameScene::StandaloneLoop, this);
+    void GameScene::Reset(void)
+    {
+        DeserializeText();
+        ScriptSystem::ResetState();
     }
 
     void GameScene::Rename(const std::string& newName)
     {
         m_path.remove_filename();
-        m_path.append(newName);
+        m_path.append(newName + ".mscn");
         m_name = newName;
     }
 
@@ -43,7 +50,7 @@ namespace engine
 
     void GameScene::SerializeText(void)
     {
-        std::ofstream output(m_path, std::ios::out);
+        std::ofstream output(m_path, std::ios::out | std::ios::trunc);
         m_graph.SerializeText(output);
     }
 
@@ -53,45 +60,49 @@ namespace engine
             return false;
 
         std::ifstream input(m_path, std::ios::in | std::ios::binary);
-        SceneGraph tempOldState;
 
-        tempOldState.DeserializeText(input);
-        m_graph = std::move(tempOldState);
+        if (!input)
+            return false;
 
+        m_graph = SceneGraph();
+        m_graph.DeserializeText(input);
         return true;
-
     }
 
-    void GameScene::EditorUpdateLoop(void)
+    void GameScene::Tick(void)
     {
-        // Copy data from last frame into render caches
-        ThreadManager::SynchronizeGameThread(&m_graph);
-
-        PhysicsUpdate();
-        ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
+        if (m_state == EGameState::RUNNING)
+        {
+            PhysicsUpdate();
+            ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
+            m_time.Update();
+        }
     }
 
-    void GameScene::StepGameplayUpdate(void)
+    SceneGraph* GameScene::GetGraph(void)
     {
-        //m_graph.UpdateComponents<Transform>()
+        return &m_graph;
     }
+
 
     void GameScene::PhysicsUpdate(void)
     {
         constexpr f32 physicsUpdateInterval = 1.f / 0.2f;
 
-        int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick += m_time.GetDeltaTime() * physicsUpdateInterval);
+        m_timeSincePhysicsTick += m_time.GetDeltaTime();
+        int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick * physicsUpdateInterval);
+
+        if (numPhysicsUpdate < 1)
+            return;
+
+        f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
+
+        m_graph.SyncRigidbodiesPrePhysics();
 
         for (int32 updateNum = 0; updateNum < numPhysicsUpdate; ++updateNum)
-        {
-            m_graph.SyncRigidbodiesPrePhysics();
-            PhysicsEngine::Get().StepSimulation(m_time.GetDeltaTime());
-            m_graph.SyncTransformsPostPhysics();
-            m_timeSincePhysicsTick = 0.f;
-        }
-    }
+            PhysicsEngine::Get().StepSimulation(interval);
 
-    void GameScene::StandaloneLoop(void)
-    {
+         m_graph.SyncTransformsPostPhysics();
+         m_timeSincePhysicsTick = 0.f;
     }
 }
