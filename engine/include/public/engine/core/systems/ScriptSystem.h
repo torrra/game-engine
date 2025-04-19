@@ -32,7 +32,7 @@ namespace engine
         // Close lua state. Do not call any script-related
         // functions after this
         ENGINE_API
-        static void Shutdown(void);
+        static void Shutdown(bool deleteInstance = true);
 
         // Set the scripting system's active scene. This function needs to be
         // called every time a scene is loaded, so that the scripting system
