@@ -50,10 +50,10 @@ void engine::ThreadManager::UpdateGameLogic(SceneGraph* scene, f32 deltaTime)
 }
 
 void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
-{
+{ 
     // Wait until the logic update is finished (unless no update was sent to a thread)
     if (GetInstance()->m_gameUpdateFinished.valid())
-        GetInstance()->m_gameUpdateFinished.wait();
+        GetInstance()->m_gameUpdateFinished.get();
 
     // Copy updated transforms into separate array for rendering
     if (scene)
