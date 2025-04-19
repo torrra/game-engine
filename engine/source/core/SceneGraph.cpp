@@ -11,7 +11,7 @@
 
 namespace engine
 {
-    SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
+    thread_local SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
 
     void SceneGraph::StartAllScripts(void)
     {
@@ -291,6 +291,12 @@ namespace engine
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
     }
 
+    void SceneGraph::ClearCache(void)
+    {
+        m_renderCache.m_cameraRenderCache = CopyableComponentArray<Camera>();
+        m_renderCache.m_transformRenderCache = CopyableComponentArray<Transform>();
+    }
+
     EntityHandle SceneGraph::MakeHandle(int32 index, int32 uid)
     {
         // if either half is over 32 bits, the handle is invalid
@@ -391,7 +397,13 @@ namespace engine
         for (Entity& entity : validEntities)
         {
             entity.m_handle = handles[entity.m_handle];
-            entity.m_parent = handles[entity.m_parent];
+
+            auto parentHandle = handles.find(entity.m_parent);
+
+            if (parentHandle != handles.end())
+                entity.m_parent = parentHandle->second;
+            else
+                entity.m_parent = -1;
 
             entity.SerializeText(file);
             SerializeSingleComponent<Transform>(file, entity, handles);

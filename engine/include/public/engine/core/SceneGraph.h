@@ -164,6 +164,10 @@ namespace engine
         ENGINE_API
         void CacheComponents(void);
 
+        // Clear transforms and cameras in render cache
+        ENGINE_API
+        void ClearCache(void);
+
         // Serialize all valid entities and recalculate their handles
         // The handles are recalculated as invalid entities are filtered out,
         // potentially leaving empty spots to be filled by valid entities.
@@ -254,7 +258,7 @@ namespace engine
         ComponentCache						m_renderCache;
 
         // Random uint64 generator. We only need a unique instance
-        static Random						m_randomNumGen;
+        static thread_local Random			m_randomNumGen;
     };
 
 
@@ -421,7 +425,10 @@ namespace engine
         ComponentArray<TComponentType>& compArray = GetComponentArray<TComponentType>();
 
         for (CompIndex& component : array)
+        {
+            component.second.m_currentScene = this;
             compArray.AddDeserializedComponent(std::move(component.second));
+        }
     }
 
     template<CValidComponent TComponentType>
