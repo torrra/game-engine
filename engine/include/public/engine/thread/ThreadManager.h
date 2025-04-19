@@ -47,7 +47,8 @@ namespace engine
         // Returns a std::future that contains the return type of the function
         // passed as 1st argument, which will be deduced at compile time:
         // std::future<std::invoke_result_t<TFunctionType, TVariadicArgs...>>
-        template <typename TFunctionType, typename... TVariadicArgs> [[nodiscard]]
+        template <ThreadManager::ETaskType TTaskEnum = ETaskType::GENERAL,
+                  typename TFunctionType, typename... TVariadicArgs> [[nodiscard]]
         static auto AddTaskWithResult(TFunctionType&& function, TVariadicArgs&&... args);
         
         // Create threads
@@ -138,7 +139,7 @@ namespace engine
             GetInstance()->m_conditionVariable.notify_one();
     }
 
-    template<typename TFunctionType, typename ...TVariadicArgs>
+    template<ThreadManager::ETaskType TTaskEnum, typename TFunctionType, typename ...TVariadicArgs>
     inline auto ThreadManager::AddTaskWithResult(TFunctionType&& function, TVariadicArgs&& ...args)
     {
         // std::bind will fail to compile if function is not invocable, but
@@ -167,9 +168,11 @@ namespace engine
         GetInstance()->m_poolMutex.lock();
 
         // use lambda so that the task is stored as a void() function
-        GetInstance()->m_tasks.push([task]() -> void {(*task)(); delete task; });
+        GetInstance()->GetQueue<TTaskEnum>().push([task]() -> void {(*task)(); delete task; });
         GetInstance()->m_poolMutex.unlock();
-        GetInstance()->m_conditionVariable.notify_one();
+
+        if constexpr (TTaskEnum != ETaskType::GRAPHICS)
+            GetInstance()->m_conditionVariable.notify_one();
 
         return future;
     }
