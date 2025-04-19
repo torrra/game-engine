@@ -33,6 +33,7 @@ namespace editor
         SceneGraphUI(const char* title, class engine::SceneGraph* graph);
         ~SceneGraphUI(void);
 
+        void ClearGraph(void);
         void SetGraph(class engine::SceneGraph* graph);
 
         engine::EntityHandle GetSelectedEntity(void) const noexcept;
