@@ -63,7 +63,7 @@ namespace engine::wnd
     // Create window in full screen mode
     Wnd CreateWindow(const char* title);
     void ClearWindow(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
-    void Viewport(math::Vector2i position, math::Vector2i size);
+    void SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size);
     void Update(Wnd* window);
 
     // Callback functions

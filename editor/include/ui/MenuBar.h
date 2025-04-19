@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 namespace engine
 {
     class Engine;
@@ -17,6 +15,5 @@ namespace editor
 
         void Render(class ::engine::Engine& engine);
         void UpdateStartButton(class ::engine::GameScene& scene, class SceneGraphUI& graph);
-    private:
     };
 }

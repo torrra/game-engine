@@ -1,5 +1,4 @@
 #include "ui/MenuBar.h"
-
 #include <engine/Engine.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/game/GameScene.h>
@@ -17,6 +16,8 @@ void editor::MenuBar::Render(::engine::Engine& engine)
     {
         gameState = !gameState;
         engine.SetGameState(gameState);
+
+        // TODO: remove print after implementing play / reset button logic
         printf("Game running: %s\n", gameState ? "true" : "false");
     }
 

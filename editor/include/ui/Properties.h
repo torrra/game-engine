@@ -1,10 +1,6 @@
 #pragma once
 
-#include "ui/components/CameraComponent.h"
-#include "ui/components/RendererComponent.h"
-#include "ui/components/ScriptComponent.h"
-#include "ui/components/TransformComponent.h"
-
+#include "ui/components/Component.h"
 #include <engine/ui/UIWindow.h>
 #include <engine/core/SceneGraph.h>
 
@@ -30,9 +26,5 @@ namespace editor
         std::vector<BaseComponent*> m_components;
         engine::SceneGraph* m_graph;
         engine::EntityHandle m_handle;
-        CameraComponent* m_camera;
-        TransformComponent* m_transform;
-        RendererComponent* m_renderer;
-        ScriptComponent* m_script;
     };
 }

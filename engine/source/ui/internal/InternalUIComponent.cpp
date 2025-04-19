@@ -19,7 +19,7 @@ void ui::Image(uint64 textureID, math::Vector2f const& size)
     ImGui::Image(textureID, size, {0.0f, 1.0f}, {1.0f, 0.0f});
 }
 
-bool ui::Button(const char* text, math::Vector2f size)
+bool ui::Button(const char* text, math::Vector2f const& size)
 {
     return ImGui::Button(text, size);
 }

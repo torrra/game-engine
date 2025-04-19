@@ -27,9 +27,9 @@ void ui::UIWindow::SetViewportBg(f32 red, f32 green, f32 blue, f32 alpha)
     engine::wnd::ClearWindow(red, green, blue, alpha);
 }
 
-void ui::UIWindow::SetViewportTransform(math::Vector2i position, math::Vector2i size)
+void ui::UIWindow::SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size)
 {
-    engine::wnd::Viewport(position, size);
+    engine::wnd::SetViewportTransform(position, size);
 }
 
 void ui::UIWindow::SetName(const char* title)

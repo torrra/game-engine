@@ -2,19 +2,15 @@
 
 #include "ui/components/Component.h"
 
-#include <engine/CoreTypes.h>
-
 namespace editor
 {
     class CameraComponent : public BaseComponent
     {
     public:
         CameraComponent(void);
-        ~CameraComponent(void);
+        ~CameraComponent(void) = default;
 
     protected:
         virtual void SectionContent(void) override;
-
-    private:
     };
 }

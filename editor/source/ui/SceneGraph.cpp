@@ -8,8 +8,9 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIStyle.h>
 #include <engine/input/Input.h>
-
 #include <engine/utility/MemoryCheck.h>
+
+#define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
 
 // Node Functions
 editor::TreeNode::~TreeNode(void)
@@ -31,19 +32,12 @@ void editor::TreeNode::Init(TreeNode* parent, engine::EntityHandle handle)
 
 // Graph Window Functions
 editor::SceneGraphUI::SceneGraphUI(const char* title)
-    : m_graph(nullptr), m_reset(false), m_renamingHandle(0), m_selectedHandle(engine::Entity::EHandleUtils::INVALID_HANDLE)
+    : SceneGraphUI(title, nullptr)
 {
-    SetName(title);
-    SetFlags(::ui::EWndFlags::HORIZONTAL_SCROLL_BAR | ::ui::EWndFlags::NO_COLLAPSE | ::ui::EWndFlags::MENU_BAR);
-    InitRootNode();
-
-    // TODO: register keys somewhere else
-    engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
-    engine::Input::RegisterInput(MOUSE_BUTTON_RIGHT);
 }
 
 editor::SceneGraphUI::SceneGraphUI(const char* title, engine::SceneGraph* graph)
-    : m_graph(graph), m_reset(false), m_renamingHandle(0), m_selectedHandle(engine::Entity::EHandleUtils::INVALID_HANDLE)
+    : m_graph(graph), m_reset(false), m_renamingHandle(INVALID_HANDLE), m_selectedHandle(INVALID_HANDLE)
 {
     SetName(title);
     SetFlags(::ui::EWndFlags::HORIZONTAL_SCROLL_BAR | ::ui::EWndFlags::NO_COLLAPSE | ::ui::EWndFlags::MENU_BAR);
@@ -126,7 +120,7 @@ void editor::SceneGraphUI::RenderContents(void)
 void editor::SceneGraphUI::InitRootNode(void)
 {
     m_root = new TreeNode();
-    m_root->Init(nullptr, engine::Entity::EHandleUtils::INVALID_HANDLE);
+    m_root->Init(nullptr, INVALID_HANDLE);
 }
 
 void editor::SceneGraphUI::AddNode(TreeNode* parentNode)
@@ -139,6 +133,7 @@ void editor::SceneGraphUI::AddNode(TreeNode* parentNode)
     while (1)
     {
         _itoa_s(id++, idStr, 10);
+        idStr[4] = '\0';
 
         if (!m_graph->GetEntity(newEntityName + std::string(idStr)))
             break;
@@ -164,7 +159,7 @@ void editor::SceneGraphUI::CreateGraph(void)
         engine::EntityHandle parentHandle = m_graph->GetEntity(handles[handleIndex])->GetParent();
 
         // Find parent node
-        if (parentHandle != engine::Entity::EHandleUtils::INVALID_HANDLE)
+        if (parentHandle != INVALID_HANDLE)
         {
             for (TreeNode* parentNode : nodes)
             {
@@ -197,9 +192,6 @@ void editor::SceneGraphUI::DeleteAllChildren(TreeNode* node)
         return;
 
     TreeNode* parentNode = node->m_parent;
-    
-    // Delete node & children
-    delete node;
 
     // Delete node from parent's children array
     for (uint64 index = 0; index < parentNode->m_children.size(); ++index)
@@ -210,6 +202,9 @@ void editor::SceneGraphUI::DeleteAllChildren(TreeNode* node)
             break;
         }
     }
+    
+    // Delete node & children
+    delete node;
 }
 
 void editor::SceneGraphUI::DeleteGraph(void)
@@ -258,7 +253,7 @@ void editor::SceneGraphUI::CheckRenameNode(TreeNode* node, std::string const& or
         if (resultStr[0] != '\0' && !m_graph->GetEntity(resultStr))
             m_graph->GetEntity(m_renamingHandle)->SetName(resultStr);
 
-        m_renamingHandle = 0;
+        m_renamingHandle = INVALID_HANDLE;
     }
     else
         m_renamingHandle = node->m_handle;
@@ -270,8 +265,8 @@ void editor::SceneGraphUI::DrawNodeAndChildren(TreeNode* node)
     std::string entityName = m_graph->GetEntity(node->m_handle)->GetName();
     std::string nodeName = (node->m_handle == m_renamingHandle) ? ("###" + entityName) : entityName;
 
-    ::ui::SetID(nodeName);
     // Set ID to prevent duplicate menu items
+    ::ui::SetID(nodeName);
 
     bool isOpen = ::ui::TreeNode(nodeName, GetNodeFlags(node));
 
@@ -332,7 +327,7 @@ const ::ui::Payload editor::SceneGraphUI::DragDropNode(const char* payloadID, Tr
                 bool blockAction = false;
 
                 TreeNode* prevParent = node->m_parent;
-                while (prevParent->m_handle != engine::Entity::EHandleUtils::INVALID_HANDLE)
+                while (prevParent->m_handle != INVALID_HANDLE)
                 {
                     if (prevParent->m_handle == selectedNode->m_handle)
                     {
@@ -371,7 +366,7 @@ const ::ui::Payload editor::SceneGraphUI::DragDropBackground(const char* payload
             }
 
             TreeNode* selectedNode = reinterpret_cast<TreeNode*>(payload.GetData());
-            if (payload.IsDelivery() && selectedNode->m_parent->m_handle != engine::Entity::EHandleUtils::INVALID_HANDLE)
+            if (payload.IsDelivery() && selectedNode->m_parent->m_handle != INVALID_HANDLE)
             {
                 ReparentNode(selectedNode, m_root);
 
@@ -442,6 +437,14 @@ void editor::SceneGraphUI::RenderPopupMenu(TreeNode* node)
             TreeNode* parentNode = node->m_parent;
             for (TreeNode* childNode : node->m_children)
                 ReparentNode(childNode, parentNode);
+
+            if (m_selectedHandle == node->m_handle)
+            {
+                // TODO: replace with SetSelect function call once picking branch merged
+                m_selectedHandle = INVALID_HANDLE;
+                m_newEntitySelected = true;
+                m_reset = true;
+            }
 
             DeleteAllChildren(node);
         }

@@ -8,12 +8,12 @@ ui::DrawList::DrawList(ImDrawList* drawList)
     m_drawList = drawList;
 }
 
-void ui::DrawList::AddRectFilled(math::Vector2f min, math::Vector2f max, int32 color, f32 rounding)
+void ui::DrawList::AddRectFilled(math::Vector2f const& min, math::Vector2f const& max, int32 color, f32 rounding)
 {
     m_drawList->AddRectFilled(min, max, color, rounding);
 }
 
-void ui::DrawList::AddRectFilled(math::Vector2f min, math::Vector2f max, math::Vector4f color, f32 rounding)
+void ui::DrawList::AddRectFilled(math::Vector2f const& min, math::Vector2f const& max, math::Vector4f const& color, f32 rounding)
 {
     int32 colorI32 = ImGui::ColorConvertFloat4ToU32(color);
     m_drawList->AddRectFilled(min, max, colorI32, rounding);
