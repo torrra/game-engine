@@ -1,4 +1,5 @@
 #include "core/components/Camera.h"
+#include "core/SceneGraph.h"
 #include "core/systems/ScriptSystem.h"
 #include "utility/Timer.h"
 
@@ -13,12 +14,19 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
     m_owner = owner;
     m_currentScene = scene;
     GetProjectionMatrix();
+    
+    
+    // Get or add transform
+    m_transform = scene->GetComponent<Transform>(owner);
+    
+    if (!m_transform)
+        m_transform = scene->CreateComponent<Transform>(m_owner);
 }
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
     math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
-    m_position += camSpaceDir.Normalized() * speed * deltaTime;
+    m_transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
 }
 
 void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
@@ -52,7 +60,7 @@ void engine::Camera::Register(void)
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
 {
-    return m_position;
+    return m_transform->SetPosition();
 }
 
 math::Vector3f engine::Camera::GetRotation(void) const noexcept
@@ -77,7 +85,7 @@ f32 engine::Camera::GetFarPlane(void) const noexcept
 
 math::Vector3f& engine::Camera::Position(void)
 {
-    return m_position;
+    return m_transform->SetPosition();
 }
 
 math::Vector3f& engine::Camera::Rotation(void)
@@ -129,7 +137,7 @@ void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
 	output << "\n    ";
 	text::Serialize(output, "rotationEuler", m_rotation);
 	output << "\n    ";
-	text::Serialize(output, "position", m_position);
+	text::Serialize(output, "position", m_transform->SetPosition());
 	output << "\n    ";
 	text::Serialize(output, "flags", m_flags);
 	output << '\n';
@@ -156,7 +164,7 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 	text = text::DeserializeVector(text, m_rotation);
 
 	MOVE_TEXT_CURSOR(text, end);
-	text = text::DeserializeVector(text, m_position);
+	text = text::DeserializeVector(text, m_transform->SetPosition());
 
 	MOVE_TEXT_CURSOR(text, end);
 	return text::DeserializeInteger(text, m_flags);
@@ -165,10 +173,11 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 math::Matrix4f engine::Camera::GetViewMatrix(void)
 {
     math::Matrix4f matrix(1.0f);
+    math::Vector3f position = GetPosition();
 
-    matrix[3][0] = -m_position.X();
-    matrix[3][1] = -m_position.Y();
-    matrix[3][2] = -m_position.Z();
+    matrix[3][0] = -position.X();
+    matrix[3][1] = -position.Y();
+    matrix[3][2] = -position.Z();
 
     return m_rotQuat.Inverse().RotationMatrix() * matrix;
 }

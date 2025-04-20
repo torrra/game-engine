@@ -7,6 +7,7 @@
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 #include "engine/core/Component.h"
+#include "engine/core/components/Transform.h"
 
 namespace engine
 {
@@ -57,17 +58,17 @@ namespace engine
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
 
-
+        
     private:
         math::Matrix4f GetViewMatrix(void);
         void GetProjectionMatrix(void);
 
         f32 RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed);
 
-        Frustum		   m_frustum;
+        Transform*     m_transform;
+        Frustum        m_frustum;
         math::Quatf    m_rotQuat = math::Quatf(1.f, 0.f, 0.f, 0.f);
         math::Matrix4f m_projectionMatrix{1.f};
-        math::Vector3f m_position{ 0.f };
         math::Vector3f m_rotation{ 0.f };
     };
 
