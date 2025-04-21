@@ -48,6 +48,16 @@ bool engine::MeshMaterial::LoadResource(const char* filename)
 
 void engine::MeshMaterial::Use(uint32 index) const
 {
+    constexpr uint32 mapArraySize = sizeof(m_textureMaps) / sizeof(m_textureMaps[0]);
+
+    for (uint32 textureID = 0; textureID < mapArraySize; ++textureID)
+    {
+        if (m_textureMaps[textureID])
+            m_textureMaps[textureID]->UseTexture(textureID);
+        else
+            Texture::RemoveTexture(textureID);
+    }
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, m_materialSSBO.GetBufferID());
 }
 
@@ -178,6 +188,7 @@ void engine::MeshMaterial::SerializeText(void) const
 {
     std::ofstream output(m_filePath, std::ios::out | std::ios::trunc);
 
+    output << "[" << m_filePath.filename() << "]\n    ";
     text::Serialize(output, "ambient", m_data.m_ambient);
     output << "\n    ";
     text::Serialize(output, "diffuse", m_data.m_diffuse);
@@ -227,7 +238,7 @@ void engine::MeshMaterial::DeserializeText(std::ifstream& input)
 
 void engine::MeshMaterial::MoveFile(const std::filesystem::path& newPath)
 {
-    std::filesystem::path name = m_filePath.filename().replace_extension(g_materialExtension);
+    std::filesystem::path name = m_filePath.filename();
     m_filePath = newPath;
     m_filePath += name;
 }
