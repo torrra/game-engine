@@ -3,6 +3,7 @@
 #include "resource/texture/Texture.h"
 #include "resource/ResourceManager.h"
 #include "thread/ThreadManager.h"
+#include "serialization/TextSerializer.h"
 
 #include <assimp/mesh.h>
 #include <assimp/vector3.h>
@@ -12,7 +13,7 @@
 
 engine::Mesh::Mesh(void)
 {
-    constexpr uint64 pathNum = sizeof(m_maps) / sizeof(m_maps[0]);
+    constexpr uint64 pathNum = sizeof(m_material.m_textureMaps) / sizeof(m_material.m_textureMaps[0]);
     m_texturePaths = new std::string[pathNum];
 }
 
@@ -58,7 +59,7 @@ void engine::Mesh::DeleteMesh(void)
     m_positionVBO.DeleteData();
     m_attributesVBO.DeleteData();
     m_ebo.DeleteData();
-    m_materialSSBO.DeleteData();
+    m_material.m_materialSSBO.DeleteData();
     glDeleteVertexArrays(1, &m_vao);
 }
 
@@ -75,7 +76,7 @@ void engine::Mesh::SetupGraphics(void)
     glVertexArrayVertexBuffer(m_vao, 1, m_attributesVBO.GetBufferID(), 0, stride);
 
     ImportTexturesFromMaterial();
-    CreateMaterialBuffer();
+    m_material.InitBuffer();
 
     PostLoad();
 }
@@ -158,12 +159,6 @@ void engine::Mesh::CreateEBO(void)
     m_ebo.SetData(m_indices.data(), size);
 }
 
-void engine::Mesh::CreateMaterialBuffer(void)
-{
-    m_materialSSBO.Init();
-    m_materialSSBO.SetData(&m_material, sizeof(MeshMaterial));
-}
-
 void engine::Mesh::PostLoad(void)
 {
     m_vertexAttributes.clear();
@@ -177,23 +172,23 @@ void engine::Mesh::ProcessVertices(const void* mesh)
     constexpr uint64 sizeVec2 = sizeof(aiVector2D) / sizeof(f32);
     constexpr uint64 sizeColor = sizeof(aiColor4D) / sizeof(f32);
 
-    for (uint32 i = 0; i < meshImpl->mNumVertices; ++i)
+    for (uint32 vertexNum = 0; vertexNum < meshImpl->mNumVertices; ++vertexNum)
     {
         // Position
-        aiVector3D& vertex = meshImpl->mVertices[i];
+        aiVector3D& vertex = meshImpl->mVertices[vertexNum];
         m_vertices.insert(m_vertices.end(), &vertex.x, &vertex.x + sizeVec3);
 
         // Normal
         if (m_metaData.m_hasNormals)
         {
-            aiVector3D& normal = meshImpl->mNormals[i];
+            aiVector3D& normal = meshImpl->mNormals[vertexNum];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &normal.x, &normal.x + sizeVec3);
         }
         // Tangent / biTangents
         if (m_metaData.m_hasTangents)
         {
-            aiVector3D& tangent = meshImpl->mTangents[i];
-            aiVector3D& biTangent = meshImpl->mBitangents[i];
+            aiVector3D& tangent = meshImpl->mTangents[vertexNum];
+            aiVector3D& biTangent = meshImpl->mBitangents[vertexNum];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &tangent.x, &tangent.x + sizeVec3);
             m_vertexAttributes.insert(m_vertexAttributes.end(), 
                                       &biTangent.x, &biTangent.x + sizeVec3);
@@ -201,12 +196,12 @@ void engine::Mesh::ProcessVertices(const void* mesh)
         // TexCoords
         if (meshImpl->mTextureCoords[0])
         {
-            aiVector3D& uv = meshImpl->mTextureCoords[0][i];
+            aiVector3D& uv = meshImpl->mTextureCoords[0][vertexNum];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &uv.x, &uv.x + sizeVec2);
         }
         if (meshImpl->mColors[0])
         {
-            aiColor4D& color = meshImpl->mColors[0][i];
+            aiColor4D& color = meshImpl->mColors[0][vertexNum];
             m_vertexAttributes.insert(m_vertexAttributes.end(), &color.r, &color.r + sizeColor);
         }
     }
@@ -217,36 +212,37 @@ void engine::Mesh::ProcessMaterial(const void* material, const std::string& dir)
      const aiMaterial* matImpl = reinterpret_cast<const aiMaterial*>(material);
 
      matImpl->Get(AI_MATKEY_COLOR_DIFFUSE,
-                  *reinterpret_cast<aiColor3D*>(&m_material.m_diffuse));
+                  *reinterpret_cast<aiColor3D*>(&m_material.m_data.m_diffuse));
 
      matImpl->Get(AI_MATKEY_COLOR_AMBIENT,
-                  *reinterpret_cast<aiColor3D*>(&m_material.m_ambient));
+                  *reinterpret_cast<aiColor3D*>(&m_material.m_data.m_ambient));
 
      matImpl->Get(AI_MATKEY_COLOR_SPECULAR,
-                  *reinterpret_cast<aiColor3D*>(&m_material.m_specular));
+                  *reinterpret_cast<aiColor3D*>(&m_material.m_data.m_specular));
 
-     matImpl->Get(AI_MATKEY_SHININESS, m_material.m_shininess);
-     matImpl->Get(AI_MATKEY_REFRACTI, m_material.m_refractionIndex);
+     matImpl->Get(AI_MATKEY_SHININESS, m_material.m_data.m_shininess);
+     matImpl->Get(AI_MATKEY_REFRACTI, m_material.m_data.m_refractionIndex);
 
      if (matImpl->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-         StoreTexturePath(material, DIFFUSE, dir);
+         StoreTexturePath(material, MeshMaterial::DIFFUSE, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_NORMALS) > 0)
-         StoreTexturePath(material, NORMAL, dir);
+         StoreTexturePath(material, MeshMaterial::NORMAL, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_SPECULAR) > 0)
-         StoreTexturePath(material, SPECULAR, dir);
+         StoreTexturePath(material, MeshMaterial::SPECULAR, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0)
-         StoreTexturePath(material, ROUGHNESS, dir);
+         StoreTexturePath(material, MeshMaterial::ROUGHNESS, dir);
 
      if (matImpl->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION) > 0)
-         StoreTexturePath(material, AMBIENT_OCCLUSION, dir);
+         StoreTexturePath(material, MeshMaterial::AMBIENT_OCCLUSION, dir);
 }
 
 void engine::Mesh::ImportTexturesFromMaterial()
 {
-    constexpr uint32 pathNum = static_cast<uint32>(sizeof(m_maps) / sizeof(m_maps[0]));
+    constexpr uint32 pathNum = static_cast<uint32>(sizeof(m_material.m_textureMaps) /
+                                                   sizeof(m_material.m_textureMaps[0]));
 
     for (uint64 pathIndex = 0; pathIndex < pathNum; ++pathIndex)
     {
@@ -254,7 +250,9 @@ void engine::Mesh::ImportTexturesFromMaterial()
             continue;
 
         ResourceManager::Load<Texture>(m_texturePaths[pathIndex]);
-        m_maps[pathIndex] = ResourceManager::GetResource<Texture>(m_texturePaths[pathIndex]);
+
+        m_material.m_textureMaps[pathIndex] =
+        ResourceManager::GetResource<Texture>(m_texturePaths[pathIndex]);
 
     }
 
@@ -263,7 +261,7 @@ void engine::Mesh::ImportTexturesFromMaterial()
 
 }
 
-void engine::Mesh::StoreTexturePath(const void* material, EMapIndex index, const std::string& dir)
+void engine::Mesh::StoreTexturePath(const void* material, MeshMaterial::EMapIndex index, const std::string& dir)
 {
     const aiMaterial* matImpl = reinterpret_cast<const aiMaterial*>(material);
     aiTextureType type;
@@ -271,23 +269,23 @@ void engine::Mesh::StoreTexturePath(const void* material, EMapIndex index, const
 
     switch (index)
     {
-    case DIFFUSE:
+    case MeshMaterial::DIFFUSE:
         type = aiTextureType_DIFFUSE;
         break;
 
-    case NORMAL:
+    case MeshMaterial::NORMAL:
         type = aiTextureType_NORMALS;
         break;
 
-    case SPECULAR:
+    case MeshMaterial::SPECULAR:
         type = aiTextureType_SPECULAR;
         break;
 
-    case ROUGHNESS:
+    case MeshMaterial::ROUGHNESS:
         type = aiTextureType_DIFFUSE_ROUGHNESS;
         break;
 
-    case AMBIENT_OCCLUSION:
+    case MeshMaterial::AMBIENT_OCCLUSION:
         type = aiTextureType_AMBIENT_OCCLUSION;
         break;
     default:
@@ -309,14 +307,24 @@ uint32 engine::Mesh::GetIndexCount(void) const
     return m_indexCount;
 }
 
+engine::MeshMaterial& engine::Mesh::Material(void)
+{
+    return m_material;
+}
+
+const engine::MeshMaterial& engine::Mesh::GetMaterial(void) const
+{
+    return m_material;
+}
+
 void engine::Mesh::UseTextureMaps(void) const
 {
-    constexpr uint32 mapArraySize = sizeof(m_maps) / sizeof(Texture*);
+    constexpr uint32 mapArraySize = sizeof(m_material.m_textureMaps) / sizeof(Texture*);
 
     for (uint32 textureID = 0; textureID < mapArraySize; ++textureID)
     {
-        if (m_maps[textureID])
-            m_maps[textureID]->UseTexture(textureID);
+        if (m_material.m_textureMaps[textureID])
+            m_material.m_textureMaps[textureID]->UseTexture(textureID);
         else
             Texture::RemoveTexture(textureID);
     }
@@ -332,11 +340,13 @@ const uint32* engine::Mesh::GetIndices(void) const
     return m_indices.data();
 }
 
-void engine::Mesh::Draw(void) const
+void engine::Mesh::Draw(bool useMaterial) const
 {
     UseTextureMaps();
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_materialSSBO.GetBufferID());
+    if (useMaterial)
+        m_material.Use(0);
+
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

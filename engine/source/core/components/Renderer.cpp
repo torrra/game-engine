@@ -51,7 +51,10 @@ namespace engine
             m_shader->Set("normalMat", &identityMat);
         }
 
-        m_model->Draw();
+        if (m_materials.empty())
+            m_materials.resize(m_model->GetMeshCount());
+
+        m_model->Draw(m_materials);
     }
 
     const Model* Renderer::GetModel(void) const
@@ -64,15 +67,37 @@ namespace engine
         return m_shader;
     }
 
+    const MeshMaterial* Renderer::GetMaterial(uint32 index) const
+    {
+        if (index < m_materials.size())
+            return m_materials.at(index);
+
+        else
+            return nullptr;
+    }
+
+    void Renderer::SetMaterial(uint32 index, const MeshMaterial* material)
+    {
+        if (index < m_materials.size())
+            m_materials[index] = material;
+    }
+
+    void Renderer::SetMaterial(uint32 index, const char* key)
+    {
+        if (const MeshMaterial* mat = ResourceManager::GetResource<MeshMaterial>(key))
+            SetMaterial(index, mat);
+    }
+
     void Renderer::SetModel(const Model* model)
     {
         m_model = model;
+        m_materials.resize(model->GetMeshCount()); 
     }
 
     void Renderer::SetModel(const char* key)
     {
         if (const Model* model = ResourceManager::GetResource<Model>(key))
-            m_model = model;
+            SetModel(model);
     }
 
     void Renderer::SetShader(const ShaderProgram* shader)

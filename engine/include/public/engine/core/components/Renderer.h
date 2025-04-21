@@ -11,6 +11,10 @@ namespace engine
 {
     class Renderer final : public Component
     {
+    private:
+
+        using MaterialArray = std::vector<const class MeshMaterial*>;
+
     public:
 
         using Component::Component;
@@ -29,7 +33,13 @@ namespace engine
         const class ShaderProgram* GetShader(void) const;
 
         ENGINE_API
-        const class Texture* GetTexture(void) const;
+        const class MeshMaterial* GetMaterial(uint32 index) const;
+
+        ENGINE_API
+        void SetMaterial(uint32 index, const class MeshMaterial* material);
+
+        ENGINE_API
+        void SetMaterial(uint32 index, const char* key);
 
         ENGINE_API
         void SetModel(const class Model* model);
@@ -53,8 +63,9 @@ namespace engine
 
     private:
 
-        const class Model* m_model = nullptr;
-        const class ShaderProgram* m_shader = nullptr;
+        MaterialArray                m_materials;
+        const class Model*           m_model = nullptr;
+        const class ShaderProgram*   m_shader = nullptr;
     };
 
 

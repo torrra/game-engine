@@ -1,29 +1,20 @@
 #pragma once
 
+#include "engine/EngineExport.h"
 #include "engine/CoreTypes.h"
 #include "engine/resource/model/Buffer.h"
+#include "engine/resource/material/MeshMaterial.h"
 
 #include <math/Vector3.hpp>
 #include <math/Vector2.hpp>
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace engine
 {
-    struct MeshMaterial
-    {
-        math::Vector3f m_ambient{0.f};
-        math::Vector3f m_diffuse{0.f};
-        math::Vector3f m_specular{0.f};
-        math::Vector3f m_emissive{0.f};
-
-        f32             m_refractionIndex = 1.f;
-        f32             m_opacity = 1.f;
-
-        // Specular exponent
-        f32             m_shininess = 1.f;
-    };
+   
 
     class Mesh
     {
@@ -57,33 +48,30 @@ namespace engine
             bool m_hasVertexColors = false;
         };
 
-        enum EMapIndex
-        {
-            DIFFUSE,
-            NORMAL,
-            SPECULAR,
-            ROUGHNESS,
-            AMBIENT_OCCLUSION 
-        };
 
     public:
 
-                    Mesh(void);
-                    Mesh(Mesh&&) noexcept = default;
-                    Mesh(const Mesh&) = delete;
-        virtual     ~Mesh(void) = default;
-                
 
-        uint32      GetVertexArrayID(void) const;
-        uint32      GetIndexCount(void) const;
+       ENGINE_API   Mesh(void);
+       ENGINE_API   Mesh(Mesh&&) noexcept = default;
+       ENGINE_API   Mesh(const Mesh&) = delete;
 
-        const f32*      GetVertices(void) const;
-        const uint32*   GetIndices(void) const;
-        uint64          GetVertexStride(void);
+       ENGINE_API
+       virtual     ~Mesh(void) = default;
 
-        void        UseTextureMaps(void) const;
+       ENGINE_API void        UseTextureMaps(void) const;
 
-       virtual void        Draw(void) const;
+       ENGINE_API MeshMaterial&        Material(void);
+       ENGINE_API const MeshMaterial&  GetMaterial(void) const;
+               
+       ENGINE_API uint32               GetVertexArrayID(void) const;
+       ENGINE_API uint32               GetIndexCount(void) const;
+       ENGINE_API const f32*           GetVertices(void) const;
+       ENGINE_API const uint32*        GetIndices(void) const;
+       ENGINE_API uint64               GetVertexStride(void);     
+
+       ENGINE_API virtual void          Draw(bool useMaterial) const;
+
 
     protected:
 
@@ -97,16 +85,17 @@ namespace engine
         void		SetAttribute(uint32 index, int32 size, uint32 relativeOffset) const;
         void		CreateVBO(void);
         void		CreateEBO(void);
-        void        CreateMaterialBuffer(void);
         void		PostLoad(void);
 
         void		ProcessVertices(const void* mesh);
         void        ProcessMaterial(const void* material, const std::string& dir);
 
         void        ImportTexturesFromMaterial(void);
-        void        StoreTexturePath(const void* mesh, EMapIndex index, const std::string& dir);
 
-        const class Texture*    m_maps[5]{ nullptr };
+        void        StoreTexturePath(const void* mesh, MeshMaterial::EMapIndex index,
+                                     const std::string& dir);
+
+       
         std::string*            m_texturePaths = nullptr;
         std::vector<f32>		m_vertices;
         std::vector<f32>        m_vertexAttributes;
@@ -114,16 +103,15 @@ namespace engine
 
         MeshMaterial            m_material;
 
-        uint32					m_indexCount;
+        uint32					m_indexCount = 0;
 
         Buffer                  m_positionVBO = 0;
         Buffer                  m_attributesVBO = 0;
-        Buffer                  m_ebo = 0;
-        Buffer                  m_materialSSBO = 0;
+        Buffer                  m_ebo = 0;       
 
     protected:
 
-        uint32					m_vao;
+        uint32					m_vao = 0;
         MeshMetaData			m_metaData;
 
         friend class Model;
