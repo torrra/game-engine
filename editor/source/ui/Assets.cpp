@@ -82,8 +82,11 @@ void editor::AssetsWnd::RenderDirectories(DirTreeNode* node)
     bool isOpen = ::ui::TreeNode(node->m_dirName, GetTreeNodeFlags(node));
 
     // Select node
-    if (ui::IsItemSelected())
+    if (ui::IsItemSelected() && (!m_selectedNode || m_selectedNode->m_dirName != node->m_dirName))
+    {
         m_selectedNode = node;
+        OnSelectDir();
+    }
 
     if (isOpen)
     {
@@ -123,5 +126,41 @@ int32 editor::AssetsWnd::GetTreeNodeFlags(DirTreeNode* node)
         result |= ui::ETreeNodeFlags::SELECTED;
 
     return result;
+}
+
+void editor::AssetsWnd::OnSelectDir(void)
+{
+    // Remove all files
+    m_files.clear();
+
+    // Append file to array
+    for (auto file : std::filesystem::directory_iterator(m_selectedNode->m_path))
+    {
+        const std::filesystem::path& filePath = file.path();
+
+        if (IsSupportedExtension(filePath.extension().string()))
+            m_files.emplace_back(filePath);
+        //printf("%s | %s\n", file.path().filename().string().c_str(), file.path().extension().string().c_str());
+    }
+}
+
+bool editor::AssetsWnd::IsSupportedExtension(std::string const& extension)
+{
+    constexpr const char* supportedExtensions[] =
+        {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag"};
+
+    // Skip loop if entry is a folder
+    if (extension[0] != '.')
+        return false;
+
+    // Check file has a valid extension
+    for (const char* supportedExtension : supportedExtensions)
+    {
+        if (extension == supportedExtension)
+            return true;
+    }
+
+    // Entry does not have a supported extension
+    return false;
 }
 

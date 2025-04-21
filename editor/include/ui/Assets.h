@@ -7,6 +7,35 @@
 #include <vector>
 #include <string>
 
+/*
+    -------- Supported extensions --------
+
+    The extension listed below will be visible 
+    inside the asset browser window.
+
+    Models
+    .OBJ
+    .FBX
+    .DAE
+
+    Textures
+    .PNG
+
+    Fonts
+    .TTF
+
+    Scripts
+    .LUA
+
+    Shaders
+    .VERT
+    .FRAG
+
+    Sound
+    TODO: allow sound extensions
+    --------------------------------------
+*/
+
 namespace editor
 {
     struct DirTreeNode
@@ -31,11 +60,17 @@ namespace editor
         virtual void RenderContents(void) override;
 
     private:
+        // Directory section
         void RenderDirectorySection(math::Vector2f const& windowSize);
         void RenderDirectories(DirTreeNode* node);
         DirTreeNode* InitDirectoryRecursively(std::filesystem::path const& path, DirTreeNode* parentNode = nullptr);
         int32 GetTreeNodeFlags(DirTreeNode* node);
 
+        // Files section
+        void OnSelectDir(void);
+        bool IsSupportedExtension(std::string const& extension);
+        
+        std::vector<std::filesystem::path> m_files;
         DirTreeNode* m_rootNode;
         DirTreeNode* m_selectedNode;
         ui::Table* m_layout;
