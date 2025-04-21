@@ -35,17 +35,17 @@ namespace engine
     public:
 
         
-        DynamicMesh(void) = default;
-        DynamicMesh(DynamicMesh&&) noexcept = default;
-        DynamicMesh(const DynamicMesh&) = delete;
-        ~DynamicMesh(void) = default;
+        ENGINE_API DynamicMesh(void) = default;
+        ENGINE_API DynamicMesh(DynamicMesh&&) noexcept = default;
+        ENGINE_API DynamicMesh(const DynamicMesh&) = delete;
+        ENGINE_API ~DynamicMesh(void) = default;
 
-        void ProcessMesh(const void* mesh) override;
-        void DeleteMesh(void) override;
-        void RenderThreadSkeletonSetup(void);
+        ENGINE_API void ProcessMesh(const void* mesh) override;
+        ENGINE_API void DeleteMesh(void) override;
+        ENGINE_API void RenderThreadSkeletonSetup(void);
 
-        const Bone& GetBone(int32 index) const;
-        int32 GetBoneIndex(const std::string& name) const;
+        ENGINE_API const Bone& GetBone(int32 index) const;
+        ENGINE_API int32 GetBoneIndex(const std::string& name) const;
 
     private:
 
@@ -58,8 +58,9 @@ namespace engine
         void SortChildrenBones(int32 oldParentIndex, int32 newIndex,
                                std::vector<Bone>& boneArray,   
                                std::vector<int32>& indexArray);
-        void SetBoneIndexAttribute();
-        void SetBoneWeightAttribute();
+
+        void SetBoneIndexAttribute(void);
+        void SetBoneWeightAttribute(void);
         void SetupSkeletonVertexBuffers(void* indexBuffer, uint64 indexBufSize,
                                         void* weightBuffer, uint64 weightBufSize);
 
