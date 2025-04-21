@@ -1,0 +1,110 @@
+#include "ui/Assets.h"
+#include "ui/components/Component.h"
+#include <engine/ui/UIComponent.h>
+#include <engine/ui/UITree.h>
+#include <engine/utility/MemoryCheck.h>
+#include <filesystem>
+
+editor::DirTreeNode::DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent)
+    : m_path(path), m_parentNode(parent)
+{
+    m_dirName = path.filename().string();
+}
+
+editor::DirTreeNode::~DirTreeNode(void)
+{
+    for (DirTreeNode* dirNode : m_children)
+        delete dirNode;
+
+    m_children.clear();
+    m_parentNode = nullptr;
+}
+
+editor::AssetsWnd::AssetsWnd(const char* name)
+{
+    SetName(name);
+
+    auto workingDir = std::filesystem::current_path();
+    m_rootNode = InitDirectoryRecursively(workingDir);
+    std::cout << "Working directory: " << workingDir << '\n';
+
+    m_layout = new ui::Table("AssetWnd", 2);
+    m_layout->SetFlags(ui::ETableFlags::TABLE_INNER_VERTICAL_BORDERS | ui::ETableFlags::TABLE_RESIZABLE);
+    //m_rootNode = new DirTreeNode(workingDir, workingDir.string(), nullptr);
+    //for (const auto& entry : std::filesystem::recursive_directory_iterator(workingDir))
+    //{
+    //    entry;
+    //    std::cout << entry.path().extension() << std::endl;
+    //}
+}
+
+editor::AssetsWnd::~AssetsWnd(void)
+{
+    if (m_rootNode)
+        delete m_rootNode;
+
+    delete m_layout;
+
+    m_layout = nullptr;
+    m_rootNode = nullptr;
+}
+
+void editor::AssetsWnd::RenderContents(void)
+{
+    math::Vector2f windowSize = ::ui::GetAvailSpace();
+    m_layout->SetSize(windowSize);
+
+    if (m_layout->StartTable())
+    {
+        if (m_layout->NextColumn(150.0f))
+            RenderDirectorySection(windowSize);
+
+        m_layout->EndTable();
+    }
+}
+
+void editor::AssetsWnd::RenderDirectorySection(math::Vector2f const& windowSize)
+{
+    RenderDirectories(m_rootNode);
+}
+
+void editor::AssetsWnd::RenderDirectories(DirTreeNode* node)
+{
+    if (::ui::TreeNode(node->m_dirName, GetTreeNodeFlags(node)))
+    {
+        for (DirTreeNode* childNode : node->m_children)
+        {
+            RenderDirectories(childNode);
+        }
+
+        ::ui::EndTreeNode();
+    }
+}
+
+editor::DirTreeNode* editor::AssetsWnd::InitDirectoryRecursively(std::filesystem::path const& path, DirTreeNode* parentNode)
+{
+    DirTreeNode* directory = new DirTreeNode(path, parentNode);
+
+    // Iterate through all entries in the current directory
+    for (const auto& entry : std::filesystem::directory_iterator(path))
+    {
+        // Ignore non directory entries
+        if (!entry.is_directory())
+            continue;
+
+        directory->m_children.emplace_back(InitDirectoryRecursively(entry.path(), directory));
+    }
+
+    return directory;
+}
+
+int32 editor::AssetsWnd::GetTreeNodeFlags(DirTreeNode* node)
+{
+    int32 result = ui::ETreeNodeFlags::SPAN_FULL_WIDTH | ui::ETreeNodeFlags::OPEN_ON_DOUBLE_CLICK | ui::ETreeNodeFlags::OPEN_WITH_ARROW;
+
+    if (node->m_children.empty())
+        result |= ui::ETreeNodeFlags::NO_ICON;
+
+    return result;
+}
+
