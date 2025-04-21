@@ -13,11 +13,23 @@
 
 #pragma endregion
 
-engine::RigidBodyStatic::RigidBodyStatic(EntityHandle owner, SceneGraph* scene)
+#pragma region engine
+
+#include "engine/ConsoleLog.hpp"
+
+#pragma endregion
+
+#pragma region Physics
+
+#include "engine/physics/PhysicsEngine.h"
+
+#pragma endregion
+
+engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
-	m_owner					= owner;
-	m_currentScene			= scene;
+	m_owner					= inOwner;
+	m_currentScene			= inScene;
 }
 
 engine::RigidBodyStatic::~RigidBodyStatic(void)
@@ -28,29 +40,278 @@ engine::RigidBodyStatic::~RigidBodyStatic(void)
 	m_rigidBodyStaticImpl = nullptr;
 }
 
-void engine::RigidBodyStatic::CreateStaticRigidBody(const PhysicsEngine& inPhysicsEngine, 
-	const Material& inMaterial, const Geometry& inGeometry)
+math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
 {
-	m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(*inPhysicsEngine.GetImpl().m_physics,
-		ToPxTransform(CheckEntityTransform()),
-		*inGeometry.GetGeometryImpl().m_geometry,
-		*inMaterial.GetImpl().m_material);
+    // Retrieve the box half extents by getting the shape of the rigid body to access
+    // the good geometry and retrive the good information about the box
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        {
+            const physx::PxGeometry* geometry = &shapes->getGeometry();
+            const physx::PxBoxGeometry& boxGeometry =
+                static_cast<const physx::PxBoxGeometry&>(*geometry);
 
-	// Add the rigid body to the physics scene
-	inPhysicsEngine.GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+            return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
+                                  boxGeometry.halfExtents.z);
+        }
+        PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
+        return math::Vector3f(0.f);
+    }
+    PrintLog(ErrorPreset(), "Invalid shapes");
+    return math::Vector3f(0.f);
+}
+
+f32 engine::RigidBodyStatic::GetSphereRadius(void) const
+{
+    // Retrieve the sphere radius by getting the shape of the rigid body to access
+    // the good geometry and retrive the good information about the sphere
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+        {
+            const physx::PxGeometry* geometry = &shapes->getGeometry();
+            const physx::PxSphereGeometry& sphereGeometry =
+                static_cast<const physx::PxSphereGeometry&>(*geometry);
+
+            return sphereGeometry.radius;
+        }
+        PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
+        return 0.f;
+    }
+    PrintLog(ErrorPreset(), ("Invalid shapes"));
+    return 0.f;
+}
+
+math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void) const
+{
+    // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
+    // access the good geometry and retrive the good information about the capsule
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+        {
+            const physx::PxGeometry* geometry = &shapes->getGeometry();
+            const physx::PxCapsuleGeometry capsuleGeometry =
+                static_cast<const physx::PxCapsuleGeometry&>(*geometry);
+
+            return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
+        }
+        PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
+        return math::Vector2f(0.f);
+    }
+    PrintLog(ErrorPreset(), "Invalid shape");
+    return math::Vector2f(0.f);
+}
+
+void engine::RigidBodyStatic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
+{
+    // Set the box half extents by using the shape of rigid body to access the good geometry
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        {
+            shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
+                inHalfExtents.GetZ()));
+            PrintLog(SuccessPreset(), "Successfully set box half extents.");
+            return;
+        }
+        PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
+        return;
+    }
+    PrintLog(ErrorPreset(), "Invalid shape");
+    return;
+}
+
+void engine::RigidBodyStatic::SetSphereRadius(f32 inRadius) const
+{
+    // Set the sphere radius by using the shape of rigid body to access the good geometry
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+        {
+            shapes->setGeometry(physx::PxSphereGeometry(inRadius));
+            PrintLog(SuccessPreset(), "Successfully set sphere radius.");
+            return;
+        }
+        PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
+        return;
+    }
+    PrintLog(ErrorPreset(), "Invalid shape");
+    return;
+}
+
+void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const
+{
+    // Set the capsule half height and radius by using the shape of rigid body to access the 
+    // good geometry
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+        {
+            shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
+            PrintLog(SuccessPreset(), "Successfully set capsule format.");
+            return;
+        }
+        PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
+        return;
+    }
+    PrintLog(ErrorPreset(), "Invalid shape");
+    return;
 }
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
+    // Release the material
+    PX_RELEASE(m_materialImpl->GetImpl().m_material);
+    // Delete the pointer to the implementation structure
+    delete m_materialImpl;
+    // Release the rigid body
 	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
 }
 
 engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
 {
+    // Check if the entity has a transform
 	if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
 	{
+        // If true take the entity transform
 		return *temp;
 	}
 
+    // If not create a new transform to the entity
 	return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
+}
+
+void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
+{
+    // Create a new material with default values
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+
+    // Create a new static rigid body with box geometry and default values
+    m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
+        *PhysicsEngine::Get().GetImpl().m_physics,
+        ToPxTransform(CheckEntityTransform()),
+        physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
+        *m_materialImpl->GetImpl().m_material);
+
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    // Add the rigid body to the physics scene
+    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+
+    PrintLog(SuccessPreset(), "Created static box rigid body.");
+}
+
+void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
+{
+    // Create a new material with default values
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+
+    // Create a new static rigid body with sphere geometry and default values
+    m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
+        *PhysicsEngine::Get().GetImpl().m_physics,
+        ToPxTransform(CheckEntityTransform()),
+        physx::PxSphereGeometry(0.5f), 
+        *m_materialImpl->GetImpl().m_material);
+
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    // Add the rigid body to the physics scene
+    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+
+    PrintLog(SuccessPreset(), "Created static sphere rigid body.");
+}
+
+void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
+{
+    // Create a new material with default values
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+
+    // Create a new static rigid body with capsule geometry and default values
+    m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
+        *PhysicsEngine::Get().GetImpl().m_physics,
+        ToPxTransform(CheckEntityTransform()),
+        physx::PxCapsuleGeometry(0.25f, 0.5f), 
+        *m_materialImpl->GetImpl().m_material);
+
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    // Add the rigid body to the physics scene
+    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+
+    PrintLog(SuccessPreset(), "Created static capsule rigid body.");
+}
+
+void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
+{
+    // Create a new material with default values
+    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+
+    // Create a new static rigid body with plane geometry and default values
+    m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreatePlane(
+        *PhysicsEngine::Get().GetImpl().m_physics,
+        physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 0.f),
+        *m_materialImpl->GetImpl().m_material);
+
+    // Set the visualization of the rigid body to false by default
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+
+    PrintLog(SuccessPreset(), "Created static plane rigid body.");
+}
+
+void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
+{
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
+                                                           inIsDebugVisualization);
+}
+engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph* inScene, 
+                                                                      EntityHandle inOwner, 
+                                                                      const EGeometryType& inGeometry)
+{
+    // Create static rigid body in regard to the geometry and give it an owner and a scene
+    if (RigidBodyStatic* temp = new RigidBodyStatic(inOwner, inScene))
+    {
+        switch (inGeometry)
+        {
+        case EGeometryType::BOX:
+            temp->CreateStaticBoxRigidBody();
+            return temp;
+            break;
+        case EGeometryType::SPHERE:
+            temp->CreateStaticSphereRigidBody();
+            return temp;
+            break;
+        case EGeometryType::CAPSULE:
+            temp->CreateStaticCapsuleRigidBody();
+            return temp;
+            break;
+        case EGeometryType::PLANE:
+            temp->CreateStaticPlaneRigidBody();
+            return temp;
+            break;
+        default:
+            PrintLog(ErrorPreset(), "Invalid geometry type");
+            break;
+        }
+    }
+    PrintLog(ErrorPreset(), "Failed to create static rigid body.");
+    return nullptr;
 }

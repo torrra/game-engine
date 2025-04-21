@@ -13,35 +13,53 @@
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 
-#define DEFAULT_NUM_THREADS ((std::thread::hardware_concurrency() / 4) * 3)
+/* 
+    Use 3 quarters of the current hardware's logical processors, minus one to account for the
+    render thread
+*/
+#define DEFAULT_NUM_THREADS (((std::thread::hardware_concurrency() / 4) * 3) - 1)
 
 namespace engine
 {
     class ThreadManager
     {
+    private:
+
+        using TaskQueue = std::queue<std::function<void()>>;
+
     public:
 
-        // Add a function to the task list, without getting a future for its return value
-        template <typename TFunctionType, typename... TVariadicArgs>
-        static void AddTask(TFunctionType&& function, TVariadicArgs&&... args);
+        enum class ETaskType
+        {
+            // Task that can be executed from any thread
+            GENERAL,
 
+            // Task that can only be executed from the render thread
+            GRAPHICS
+        };
+
+        // Add a function to the task list, without getting a future for its return value
+        template <ThreadManager::ETaskType TTaskEnum = ETaskType::GENERAL,
+                  typename TFunctionType, typename... TVariadicArgs>
+        static void AddTask(TFunctionType&& function, TVariadicArgs&&... args);
+        
         // Add a function to the task list, and get a future for its return value
         // Returns a std::future that contains the return type of the function
         // passed as 1st argument, which will be deduced at compile time:
         // std::future<std::invoke_result_t<TFunctionType, TVariadicArgs...>>
         template <typename TFunctionType, typename... TVariadicArgs> [[nodiscard]]
         static auto AddTaskWithResult(TFunctionType&& function, TVariadicArgs&&... args);
-
+        
         // Create threads
         // NOTE: Lua also uses its own thread, and the physics engine also uses threads,
-
+        
         ENGINE_API
         static void Startup(uint32 numThreads = DEFAULT_NUM_THREADS);
-
+        
         // Finish existing tasks and join all threads
         ENGINE_API
         static void Shutdown(void);
-
+        
         // Update game-related components on another thread
         // As of now, only scripts are directly updated, though scripts can
         // affect transform and camera components. 
@@ -60,12 +78,22 @@ namespace engine
         // UpdateGameLogic() as this function will begin rendering on this thread
         ENGINE_API
         static void RenderScene(class SceneGraph* scene);
+        
+        // Execute all functions stored in the render thread tasks queue
+        // NOTE: This function should only be called from the render thread
+        ENGINE_API
+        static void ExecuteRenderThreadTasks(void);
 
     private:
 
         ThreadManager(void) = default;
         ThreadManager(ThreadManager&&) = delete;
         ~ThreadManager(void) = default;
+
+
+        template <ETaskType TTaskEnum>
+        TaskQueue& GetQueue(void);
+
 
         // Loop executed wby worker threads to sleep until
         // work is available and execute tasks
@@ -75,38 +103,40 @@ namespace engine
         // Export this function as it will be called from inline functions
         ENGINE_API
         static ThreadManager* GetInstance(void);
-        
-        std::mutex							m_poolMutex;
-        std::condition_variable				m_conditionVariable;
-        std::queue<std::function<void()>>	m_tasks;
-        std::vector<std::thread>			m_workers;
-        std::future<void>					m_gameUpdateFinished;
-        bool								m_stopThreads = false;
 
-        static std::once_flag				m_instanceCreatedFlag;
-        static ThreadManager*				m_instance;
-          
+        std::mutex                          m_poolMutex;
+        std::condition_variable             m_conditionVariable;
+        TaskQueue                           m_tasks;
+        TaskQueue                           m_renderThreadTasks;
+        std::vector<std::thread>            m_workers;
+        std::future<void>                   m_gameUpdateFinished;
+        bool                                m_stopThreads = false;
+
+        static std::once_flag               m_instanceCreatedFlag;
+        static ThreadManager*               m_instance;
+
     };
 
 
-    template<typename TFunctionType, typename ...TVariadicArgs>
+    template<ThreadManager::ETaskType TTaskEnum, typename TFunctionType, typename ...TVariadicArgs>
     inline void ThreadManager::AddTask(TFunctionType&& function, TVariadicArgs && ...args)
     {
         // std::bind will fail to compile if function is not invocable, but
         // this assert will give a much clearer error message on failure
         static_assert(std::is_invocable_v<TFunctionType, TVariadicArgs...>,
-                     "Argument 'function' is not invocable");
+            "Argument 'function' is not invocable");
 
         std::function<void()> packagedFunc = std::bind(std::forward<TFunctionType>(function),
-                                                       std::forward<TVariadicArgs>(args)...);
+            std::forward<TVariadicArgs>(args)...);
 
         // We don't want another thread to touch the queue while we add a task
         GetInstance()->m_poolMutex.lock();
-        GetInstance()->m_tasks.push(packagedFunc);
+        GetInstance()->GetQueue<TTaskEnum>().push(packagedFunc);
         GetInstance()->m_poolMutex.unlock();
-        GetInstance()->m_conditionVariable.notify_one();
-    }
 
+        if constexpr (TTaskEnum != ETaskType::GRAPHICS)
+            GetInstance()->m_conditionVariable.notify_one();
+    }
 
     template<typename TFunctionType, typename ...TVariadicArgs>
     inline auto ThreadManager::AddTaskWithResult(TFunctionType&& function, TVariadicArgs&& ...args)
@@ -114,7 +144,7 @@ namespace engine
         // std::bind will fail to compile if function is not invocable, but
         // this assert will give a much clearer error message on failure
         static_assert(std::is_invocable_v<TFunctionType, TVariadicArgs...>,
-                      "Argument 'function' is not invocable");
+            "Argument 'function' is not invocable");
 
         // 'function' return type
         using TReturnType = std::invoke_result_t<TFunctionType, TVariadicArgs...>;
@@ -125,7 +155,7 @@ namespace engine
         // std::bind return value type is unspecified, see:
         // https://en.cppreference.com/w/cpp/utility/functional/bind
         auto packagedFunc = std::bind(std::forward<TFunctionType>(function),
-                                      std::forward<TVariadicArgs>(args)...);
+            std::forward<TVariadicArgs>(args)...);
 
         // Create pointer to packaged task so that a lambda can capture it
         // regardless of its return value and parameters
@@ -142,6 +172,18 @@ namespace engine
         GetInstance()->m_conditionVariable.notify_one();
 
         return future;
+    }
+
+    template<ThreadManager::ETaskType TTaskEnum>
+    inline ThreadManager::TaskQueue& ThreadManager::GetQueue(void)
+    {
+        return m_tasks;
+    }
+
+    template<>
+    inline ThreadManager::TaskQueue& ThreadManager::GetQueue<ThreadManager::ETaskType::GRAPHICS>(void)
+    {
+        return m_renderThreadTasks;
     }
 
 }

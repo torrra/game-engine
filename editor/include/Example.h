@@ -18,4 +18,8 @@ private:
 
 	engine::EntityHandle m_cameraHandle;
 	engine::EntityHandle m_modelHandle;
+    engine::EntityHandle m_test1;
+    engine::EntityHandle m_test2;
+    engine::EntityHandle m_test3;
+    engine::EntityHandle m_test4;
 };

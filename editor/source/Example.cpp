@@ -6,12 +6,12 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-#define MODEL_FILE ".\\assets\\padoru.obj"
+#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
 #define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 
 #define SHADER_PROGRAM_NAME		"ModelTextured"
-#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vs"
+#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vert"
 #define SHADER_PROGRAM_FRAGMENT ".\\shaders\\ModelTextured.frag"
 
 ExampleProject::ExampleProject(void)
@@ -26,7 +26,8 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	// Add component to model entity
 	m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
-    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 20.f, -10.f));
+    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
+    //engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetRotation(math::Quatf(1.f, 0.f, 1.f, 0.f));
 	engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
 	engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);
 
@@ -34,16 +35,24 @@ void ExampleProject::StartUp(engine::Engine& engine)
 	controllerScript->Start();
 
 	entityRenderer->SetModel(MODEL_FILE);
-	entityRenderer->SetTexture(TEXTURE_FILE);
 	entityRenderer->SetShader(SHADER_PROGRAM_NAME);
 
 	// Add component to camera entity
 	m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");
 	engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
 	engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
-
+    //engine.GetGraph()->ReparentEntity(m_cameraHandle, m_modelHandle);
 	camera->Rotation() = {-10.5f, 26.5f, 0.0f};
 	camera->Position() = {1.5f, 3.0f, 3.2f};
+
+    //m_test1 = engine.GetGraph()->CreateEntity("Test1");
+    //m_test2 = engine.GetGraph()->CreateEntity("Test2");
+    //m_test3 = engine.GetGraph()->CreateEntity("Test3");
+    //m_test4 = engine.GetGraph()->CreateEntity("Test4");
+    //
+    //engine.GetGraph()->ReparentEntity(m_test2, m_test1);
+    //engine.GetGraph()->ReparentEntity(m_test3, m_test1);
+    //engine.GetGraph()->ReparentEntity(m_test4, m_test1);
 }
 
 void ExampleProject::Update(engine::Engine& engine)
@@ -54,14 +63,17 @@ void ExampleProject::Update(engine::Engine& engine)
 	// Rotate camera
 	math::Vector2f cursorDelta = engine::Input::GetCursorDeltaPos<f32>();
 	camera->Rotate(cursorDelta.GetY(), cursorDelta.GetX(), 0.0f, 0.20F);
+	//engine.GetViewport()->GetFBO().Bind();
+	//engine.RunTimeUpdate();
+	//engine.GetViewport()->GetFBO().UnBind();
 
 	// Change cursor state (lock / unlock)
-	static bool cursorState = true;
-	if (engine::Input::IsInputReleased(KEY_ESCAPE))
-		cursorState = !cursorState;
+	//static bool cursorState = true;
+	//if (engine::Input::IsInputReleased(KEY_ESCAPE))
+	//	cursorState = !cursorState;
 
-	engine::Input::SetCursorMode((cursorState) ? 
-		engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
+	//engine::Input::SetCursorMode((cursorState) ? 
+	//	engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
 }
 
 void ExampleProject::RegisterInputs(void)
