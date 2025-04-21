@@ -317,18 +317,6 @@ const engine::MeshMaterial& engine::Mesh::GetMaterial(void) const
     return m_material;
 }
 
-void engine::Mesh::UseTextureMaps(void) const
-{
-    constexpr uint32 mapArraySize = sizeof(m_material.m_textureMaps) / sizeof(Texture*);
-
-    for (uint32 textureID = 0; textureID < mapArraySize; ++textureID)
-    {
-        if (m_material.m_textureMaps[textureID])
-            m_material.m_textureMaps[textureID]->UseTexture(textureID);
-        else
-            Texture::RemoveTexture(textureID);
-    }
-}
 
 const f32* engine::Mesh::GetVertices(void) const
 {
@@ -342,8 +330,6 @@ const uint32* engine::Mesh::GetIndices(void) const
 
 void engine::Mesh::Draw(bool useMaterial) const
 {
-    UseTextureMaps();
-
     if (useMaterial)
         m_material.Use(0);
 

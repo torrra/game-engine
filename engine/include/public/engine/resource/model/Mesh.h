@@ -59,8 +59,6 @@ namespace engine
        ENGINE_API
        virtual     ~Mesh(void) = default;
 
-       ENGINE_API void        UseTextureMaps(void) const;
-
        ENGINE_API MeshMaterial&        Material(void);
        ENGINE_API const MeshMaterial&  GetMaterial(void) const;
                
