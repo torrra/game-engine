@@ -3,6 +3,7 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UITree.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/input/Input.h>
 #include <filesystem>
 
 editor::DirTreeNode::DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent)
@@ -30,6 +31,10 @@ editor::AssetsWnd::AssetsWnd(const char* name)
 
     m_layout = new ui::Table("AssetWnd", 2);
     m_layout->SetFlags(ui::ETableFlags::TABLE_INNER_VERTICAL_BORDERS | ui::ETableFlags::TABLE_RESIZABLE);
+
+    m_selectedNode = nullptr;
+    m_newNodeSelected = false;
+
     //m_rootNode = new DirTreeNode(workingDir, workingDir.string(), nullptr);
     //for (const auto& entry : std::filesystem::recursive_directory_iterator(workingDir))
     //{
@@ -46,6 +51,7 @@ editor::AssetsWnd::~AssetsWnd(void)
     delete m_layout;
 
     m_layout = nullptr;
+    m_selectedNode = nullptr;
     m_rootNode = nullptr;
 }
 
@@ -59,6 +65,9 @@ void editor::AssetsWnd::RenderContents(void)
         if (m_layout->NextColumn(150.0f))
             RenderDirectorySection(windowSize);
 
+        if (m_selectedNode && m_layout->NextColumn())
+            ui::Text("%s", m_selectedNode->m_dirName.c_str());
+
         m_layout->EndTable();
     }
 }
@@ -70,7 +79,13 @@ void editor::AssetsWnd::RenderDirectorySection(math::Vector2f const& windowSize)
 
 void editor::AssetsWnd::RenderDirectories(DirTreeNode* node)
 {
-    if (::ui::TreeNode(node->m_dirName, GetTreeNodeFlags(node)))
+    bool isOpen = ::ui::TreeNode(node->m_dirName, GetTreeNodeFlags(node));
+
+    // Select node
+    if (ui::IsItemSelected())
+        m_selectedNode = node;
+
+    if (isOpen)
     {
         for (DirTreeNode* childNode : node->m_children)
         {
@@ -104,6 +119,8 @@ int32 editor::AssetsWnd::GetTreeNodeFlags(DirTreeNode* node)
 
     if (node->m_children.empty())
         result |= ui::ETreeNodeFlags::NO_ICON;
+    if (m_selectedNode && m_selectedNode->m_dirName == node->m_dirName)
+        result |= ui::ETreeNodeFlags::SELECTED;
 
     return result;
 }

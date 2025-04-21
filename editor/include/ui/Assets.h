@@ -37,6 +37,8 @@ namespace editor
         int32 GetTreeNodeFlags(DirTreeNode* node);
 
         DirTreeNode* m_rootNode;
+        DirTreeNode* m_selectedNode;
         ui::Table* m_layout;
+        bool m_newNodeSelected;
     };
 }
