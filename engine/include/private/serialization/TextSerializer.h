@@ -16,6 +16,9 @@
 #define MOVE_TEXT_CURSOR(text, end) text = text::GetValuePointer(text, end);\
 if (text == end) return text
 
+#define MOVE_TEXT_CURSOR_FREE(text, start, end) text = text::GetValuePointer(text, end);\
+if (text == end){ text::UnloadFileData(start); return;}
+
 namespace engine::text
 {
     // Basic type is a non-pointer type that has a formatted I/O operator implementation
