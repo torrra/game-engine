@@ -66,11 +66,15 @@ namespace engine
         RunAllUserScripts();
     }
 
-    void ScriptSystem::Shutdown(void)
+    void ScriptSystem::Shutdown(bool deleteInstance)
     {
         lua_close(GetInstance()->m_luaState);
-        delete m_instance;
-        m_instance = nullptr;
+        
+        if (deleteInstance)
+        {
+            delete m_instance;
+            m_instance = nullptr;
+        }
     }
 
     void ScriptSystem::SetCurrentScene(SceneGraph* graph)
@@ -177,17 +181,15 @@ namespace engine
 
     void ScriptSystem::ResetState(SceneGraph* newScene)
     {
-        SceneGraph* oldScenePtr = GetInstance()->m_currentScene;
-
-        Shutdown();
+        Shutdown(false);
         Startup();
 
         if (newScene)
+        {
             GetInstance()->m_currentScene = newScene;
-        else
-            GetInstance()->m_currentScene = oldScenePtr;
-
-        GetInstance()->m_currentScene->RegisterAllComponents();
+            GetInstance()->m_currentScene->RegisterAllEntities();
+            GetInstance()->m_currentScene->RegisterAllComponents();
+        }
     }
 
     void ScriptSystem::SetUserScriptLocation(const char* path)
@@ -287,11 +289,7 @@ ScriptObjectTypes.%s = %s\nreturn %s";
     {
         if (!m_instance)
         {
-            std::unique_lock lock(m_mutex);
-
-            if (!m_instance)
-                m_instance = new ScriptSystem();
-
+            m_instance = new ScriptSystem();
         }
 
         return m_instance;

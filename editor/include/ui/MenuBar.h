@@ -3,6 +3,7 @@
 namespace engine
 {
     class Engine;
+    class GameScene;
 }
 
 namespace editor
@@ -13,5 +14,6 @@ namespace editor
         MenuBar(void) = default;
 
         void Render(class ::engine::Engine& engine);
+        void UpdateStartButton(class ::engine::GameScene& scene, class SceneGraphUI& graph);
     };
 }

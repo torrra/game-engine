@@ -25,7 +25,7 @@ namespace engine
         // Copy constructor set to default
         ENGINE_API 							Transform(const Transform& inTransform) = default;
         // AddTranslation constructor set to default
-        ENGINE_API 							Transform(Transform&& inTransform) = default;
+        ENGINE_API 							Transform(Transform&& inTransform) noexcept = default;
 
         /// Destructors
         // Destructor set to default
@@ -110,7 +110,7 @@ namespace engine
         // Copy assignement set to default
                     Transform&				operator=(const Transform& inTransform) = default;
         // AddTranslation assignement set to default
-                    Transform&				operator=(Transform&& inTransform) = default;
+                    Transform&				operator=(Transform&& inTransform) noexcept = default;
         // Operator to print a transform
         std::ostream& operator<<(std::ostream& os);
     

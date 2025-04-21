@@ -36,6 +36,8 @@ namespace engine
     {
     public :
 
+        using Component::Component;
+
         /// Constructor
         // Delete the default constructor
                                     RigidBodyDynamic(void) = delete;
@@ -45,6 +47,7 @@ namespace engine
             <param> [in] scene : the scene openGL
         */
         ENGINE_API				    RigidBodyDynamic(EntityHandle inOwner, class SceneGraph* inScene);
+        ENGINE_API                  RigidBodyDynamic(RigidBodyDynamic&& inOther) noexcept = default;
 
         /// Destructor
         // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
@@ -116,6 +119,12 @@ namespace engine
         ENGINE_API	void		    RigidBodyDynamicCleanUp(void);
 
         ENGINE_API	void		    Register(void) override {}
+
+        ENGINE_API
+        RigidBodyDynamic& operator=(const RigidBodyDynamic&) = default;
+
+        ENGINE_API
+        RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
 
     private :
 

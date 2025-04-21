@@ -24,6 +24,8 @@ namespace engine
 
         ENGINE_API Component(void) = default;
         ENGINE_API Component(EntityHandle owner, class SceneGraph* scene);
+        ENGINE_API Component(const Component&) = default;
+        ENGINE_API Component(Component&&) noexcept = default;
         ENGINE_API virtual ~Component(void) = default;
 
         virtual void Register(void) = 0;
@@ -66,6 +68,9 @@ namespace engine
         template <CValidComponent TComponentType>
         static const char* DeserializeComponentText(DeserializedArray<TComponentType>& array,
                                                     const char* text, const char* end);
+
+        Component& operator=(const Component&) = default;
+        Component& operator=(Component&&) noexcept = default;
 
     protected:
 

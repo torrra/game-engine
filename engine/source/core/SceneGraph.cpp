@@ -11,7 +11,46 @@
 
 namespace engine
 {
-    SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
+    thread_local SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
+
+    void SceneGraph::StartAllScripts(void)
+    {
+        for (Script& script : m_sceneScripts)
+        {
+            if (script.IsValid())
+                script.Start();
+        }
+    }
+
+    void SceneGraph::SyncTransformsPostPhysics(void)
+    {
+        for (RigidBodyDynamic& rigidbody : m_sceneDynamicRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateEntity();
+        }
+    }
+
+    void SceneGraph::SyncRigidbodiesPrePhysics(void)
+    {
+        for (RigidBodyDynamic& rigidbody : m_sceneDynamicRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateRigidBody();
+        }
+
+        /*for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateRigidBody();
+        }*/
+    }
 
     void SceneGraph::RegisterAllComponents(void)
     {
@@ -20,6 +59,15 @@ namespace engine
         RegisterComponents<Camera>();
         RegisterComponents<RigidBodyDynamic>();
         RegisterComponents<RigidBodyStatic>();
+    }
+
+    void SceneGraph::RegisterAllEntities(void)
+    {
+        for (Entity& entity : m_sceneEntities)
+        {
+            if (entity.IsValid())
+                ScriptSystem::RegisterNewEntity(entity.m_handle, GetFullEntityName(entity.m_handle));
+        }
     }
 
     int64 SceneGraph::RandomNumber(void)
@@ -243,16 +291,22 @@ namespace engine
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
     }
 
-    EntityHandle SceneGraph::MakeHandle(int32 index, int32 version)
+    void SceneGraph::ClearCache(void)
+    {
+        m_renderCache.m_cameraRenderCache = CopyableComponentArray<Camera>();
+        m_renderCache.m_transformRenderCache = CopyableComponentArray<Transform>();
+    }
+
+    EntityHandle SceneGraph::MakeHandle(int32 index, int32 uid)
     {
         // if either half is over 32 bits, the handle is invalid
-        if (index >= LONG_MAX || version >= LONG_MAX)
+        if (index >= LONG_MAX || uid >= LONG_MAX)
             return Entity::INVALID_HANDLE;
 
-        if (index <= LONG_MIN || version <= LONG_MIN)
+        if (index <= LONG_MIN || uid <= LONG_MIN)
             return Entity::INVALID_HANDLE;
 
-        return static_cast<EntityHandle>(index) | (static_cast<EntityHandle>(version) << 32);
+        return static_cast<EntityHandle>(index) | (static_cast<EntityHandle>(uid) << 32);
     }
 
     int32 SceneGraph::GetHandleVersion(EntityHandle handle)
@@ -343,7 +397,13 @@ namespace engine
         for (Entity& entity : validEntities)
         {
             entity.m_handle = handles[entity.m_handle];
-            entity.m_parent = handles[entity.m_parent];
+
+            auto parentHandle = handles.find(entity.m_parent);
+
+            if (parentHandle != handles.end())
+                entity.m_parent = parentHandle->second;
+            else
+                entity.m_parent = -1;
 
             entity.SerializeText(file);
             SerializeSingleComponent<Transform>(file, entity, handles);
