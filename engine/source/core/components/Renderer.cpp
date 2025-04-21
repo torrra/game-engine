@@ -78,8 +78,10 @@ namespace engine
 
     void Renderer::SetMaterial(uint32 index, const MeshMaterial* material)
     {
-        if (index < m_materials.size())
-            m_materials[index] = material;
+        if (index >= m_materials.size())
+            m_materials.resize(static_cast<uint64>(index + 1));
+
+        m_materials[index] = material;
     }
 
     void Renderer::SetMaterial(uint32 index, const char* key)
