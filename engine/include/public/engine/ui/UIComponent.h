@@ -38,6 +38,7 @@ namespace ui
 
     // Sections
     ENGINE_API void StartSection(const char* name);
+    ENGINE_API void StartSection(const char* name, math::Vector2f const& size);
     ENGINE_API void EndSection(void);
     ENGINE_API void StartDisabledSection(bool disabled = true);
     ENGINE_API void EndDisabledSection(void);

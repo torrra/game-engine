@@ -177,6 +177,16 @@ void ui::StartSection(const char* name)
     ImGui::BeginChild(name, ImVec2(0, 0), flags);
 }
 
+ENGINE_API void ui::StartSection(const char* name, math::Vector2f const& size)
+{
+    constexpr int32 flags =
+        ImGuiChildFlags_Borders |
+        ImGuiChildFlags_AlwaysUseWindowPadding |
+        ImGuiChildFlags_AutoResizeY;
+
+    ImGui::BeginChild(name, size, flags);
+}
+
 void ui::EndSection(void)
 {
     ImGui::EndChild();
