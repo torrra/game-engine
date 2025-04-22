@@ -20,10 +20,10 @@ namespace engine
     // Enum to switch the raycast's flags
     enum class ERaycastFlags
     {
-        DYNAMIC = 0,
-        STATIC  = 1,
-        ALL     = 2,
-        NONE    = 3
+        DYNAMIC = 0,    // Collision between raycast and dynamic objects
+        STATIC  = 1,    // Collision between raycast and static objects
+        ALL     = 2,    // Collision between raycast and all objects
+        NONE    = 3     // No collision
     };
 
     class Raycast
