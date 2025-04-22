@@ -9,7 +9,7 @@
 namespace engine
 {
     // Text background color
-    enum class EBGColor : uint8_t
+    enum class EBGColor : uint8
     {
         BG_BLACK = 40,
         BG_RED,
@@ -31,7 +31,7 @@ namespace engine
     }; // !Enum EBGColor
 
     // Text foreground color
-    enum class EFGColor : uint8_t
+    enum class EFGColor : uint8
     {
         FG_BLACK = 30,
         FG_RED,
