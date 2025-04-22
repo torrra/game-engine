@@ -20,8 +20,7 @@
 #define FIX_UPDATE_FREQUENCY 20
 #define TO_MILLISECONDS 0.001f
 
-bool engine::Engine::m_hasEditor = false;
-
+engine::Engine* engine::g_defaultEngine;
 
 engine::Engine::Engine(bool withEditor)
     : m_projectDir("")
@@ -30,6 +29,9 @@ engine::Engine::Engine(bool withEditor)
         m_application = new Application();
 
    m_hasEditor = withEditor;
+
+   if (!g_defaultEngine)
+       g_defaultEngine = this;
 }
 
 int16 engine::Engine::Startup(const char* projectName, const char* projectDir, uint32 threadCount)
@@ -113,7 +115,17 @@ void engine::Engine::UpdateApplicationWindow(void)
 
 bool engine::Engine::HasEditor(void)
 {
-    return m_hasEditor;
+    return g_defaultEngine->m_hasEditor;
+}
+
+void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)
+{
+    ThreadManager::AddTask([this, path, serialize]
+        {
+            m_activeScene.LoadNewScene(serialize, path);
+            ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(
+                &Application::SetCurrentScene, m_application, &m_activeScene);
+        });
 }
 
 

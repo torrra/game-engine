@@ -30,7 +30,9 @@ namespace engine
 
         ENGINE_API static bool HasEditor(void);
 
-    //private:
+        ENGINE_API void LoadNewScene(bool serialize, const std::filesystem::path& path);
+
+    private:
 
         inline int16		InitScriptSystem(const char* projectDir);
         inline int16		InitWindow(const char* projectName);
@@ -41,6 +43,8 @@ namespace engine
         Application*    m_application = nullptr;
         UIManager       m_uiManager;
 
-        static bool     m_hasEditor;
+        bool            m_hasEditor;
     };
+
+    extern Engine* g_defaultEngine;
 }
