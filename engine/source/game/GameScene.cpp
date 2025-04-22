@@ -12,7 +12,7 @@ namespace engine
     GameScene::GameScene(const std::filesystem::path& path, const std::string& name)
         : m_path(path)
     {      
-        Rename(name);
+        UpdateNameAndPath(name);
         DeserializeText();
     }
 
@@ -39,13 +39,24 @@ namespace engine
 
     void GameScene::Rename(const std::string& newName)
     {
-        m_path.remove_filename();
-        m_path.append(newName + ".mscn");
-        m_name = newName;
+        if (std::filesystem::exists(m_path))
+            std::filesystem::remove(m_path);
+
+        UpdateNameAndPath(newName);
+        SerializeText();
     }
 
-    void GameScene::LoadNewScene(const std::string& /*name*/)
+    void GameScene::LoadNewScene(bool serialize, const std::filesystem::path& path)
     {
+        if (serialize)
+            SerializeText();
+
+        if (!std::filesystem::exists(path))
+            return;
+
+        m_path = path;
+        m_name = m_path.filename().replace_extension().string();
+        DeserializeText();
     }
 
     void GameScene::SerializeText(void)
@@ -56,9 +67,6 @@ namespace engine
 
     bool GameScene::DeserializeText(void)
     {
-        if (!std::filesystem::exists(m_path))
-            return false;
-
         std::ifstream input(m_path, std::ios::in | std::ios::binary);
 
         if (!input)
@@ -105,5 +113,11 @@ namespace engine
 
          m_graph.SyncTransformsPostPhysics();
          m_timeSincePhysicsTick = 0.f;
+    }
+
+    void GameScene::UpdateNameAndPath(const std::string& name)
+    {
+        m_path.replace_filename(name + ".mscn");
+        m_name = name;
     }
 }
