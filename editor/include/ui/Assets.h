@@ -49,6 +49,16 @@ namespace editor
         DirTreeNode* m_parentNode;
     };
 
+    struct Asset
+    {
+        Asset(void) = delete;
+        Asset(std::filesystem::path const& path, f32 width, f32 padding);
+
+        std::filesystem::path m_path;
+        f32 m_width;
+        f32 m_padding;
+    };
+
     class AssetsWnd : public ::ui::UIWindow
     {
     public:
@@ -67,13 +77,16 @@ namespace editor
         int32 GetTreeNodeFlags(DirTreeNode* node);
 
         // Files section
+        void RenderAssets(void);
         void OnSelectDir(void);
         bool IsSupportedExtension(std::string const& extension);
+        void RenderFile(std::filesystem::path const& file);
+
         
-        std::vector<std::filesystem::path> m_files;
+        std::vector<Asset> m_files;
         DirTreeNode* m_rootNode;
         DirTreeNode* m_selectedNode;
         ui::Table* m_layout;
-        bool m_newNodeSelected;
+        ui::Table* m_assets;
     };
 }
