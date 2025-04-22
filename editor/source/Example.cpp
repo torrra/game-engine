@@ -6,7 +6,8 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
+//#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
+#define MODEL_FILE ".\\assets\\padoru.obj"
 #define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 
@@ -26,7 +27,7 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	// Add component to model entity
 	m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
-    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
+    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 2.f, 2.f));
     //engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetRotation(math::Quatf(1.f, 0.f, 1.f, 0.f));
 	engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
 	engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);

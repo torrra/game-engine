@@ -4,6 +4,7 @@
 #include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
+#include "engine/physics/TriangleMesh.h"
 
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
@@ -52,9 +53,9 @@ int main(void)
         /// ---------------- Create rigidbody dynamic ----------------
         std::cout << "\t" << std::endl;
 
-        engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
-                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
-        rb->SetDebugVisualization(true);
+        //engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
+        //                                    engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
+        //rb->SetDebugVisualization(true);
         //rb->SetGravityDisabled(true);
 
         /// ---------------- Create rigidbody static ----------------
@@ -67,25 +68,36 @@ int main(void)
 
         engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
+        while (!engine.GetGraph()->GetComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->GetModel()->CanRender())
+            engine::ThreadManager::RenderScene(engine.GetGraph());
+
+        if (engine.GetGraph()->GetComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->GetModel()->CanRender())
+        {
+            engine::TriangleMesh* triangleMesh = new engine::TriangleMesh(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
+
+            triangleMesh->physicsTest();
+        }
+ 
+
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
             math::Matrix4f projViewMatrix = camera->ViewProjection();
             // Update physics
             engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
             // Update the entity in regard to the rigid body (gravity for example)
-            rb->UpdateEntity();
+            //rb->UpdateEntity();
 			project.Update(engine);
 			engine.Update();
             // Update the debug draw
             engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
             // Update the rigid body in regard to the entity (movement by keyboard input for example)
-            rb->UpdateRigidBody();
+            //rb->UpdateRigidBody();
 
             engine.GetWindow()->Update();
 		}
 
         /// ---------------- Clean ---------------- 
-        delete rb;
+        //delete rb;
         delete floorRb;
         engine::PhysicsEngine::Get().CleanUp();
 

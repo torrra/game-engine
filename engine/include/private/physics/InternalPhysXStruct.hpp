@@ -2,6 +2,7 @@
 
 #pragma region PhysX
 
+//#include <physx/cooking/PxCooking.h>
 #include <physx/PxPhysicsAPI.h>
 
 #pragma endregion
@@ -42,6 +43,11 @@ namespace engine
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
     }; // !Struct DebugDrawImpl
+
+    struct TriangleMeshImpl
+    {
+        physx::PxTriangleMesh*          m_triangleMesh      = nullptr;
+    };
 
     /// PhysX using
     using PxVisualParam = physx::PxVisualizationParameter;
