@@ -41,9 +41,18 @@ void ExampleProject::StartUp(engine::Engine& engine)
 	m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");
 	engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
 	engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
-
+    //engine.GetGraph()->ReparentEntity(m_cameraHandle, m_modelHandle);
 	camera->Rotation() = {-10.5f, 26.5f, 0.0f};
 	camera->Position() = {1.5f, 3.0f, 3.2f};
+
+    //m_test1 = engine.GetGraph()->CreateEntity("Test1");
+    //m_test2 = engine.GetGraph()->CreateEntity("Test2");
+    //m_test3 = engine.GetGraph()->CreateEntity("Test3");
+    //m_test4 = engine.GetGraph()->CreateEntity("Test4");
+    //
+    //engine.GetGraph()->ReparentEntity(m_test2, m_test1);
+    //engine.GetGraph()->ReparentEntity(m_test3, m_test1);
+    //engine.GetGraph()->ReparentEntity(m_test4, m_test1);
 }
 
 void ExampleProject::Update(engine::Engine& engine)
@@ -54,14 +63,17 @@ void ExampleProject::Update(engine::Engine& engine)
 	// Rotate camera
 	math::Vector2f cursorDelta = engine::Input::GetCursorDeltaPos<f32>();
 	camera->Rotate(cursorDelta.GetY(), cursorDelta.GetX(), 0.0f, 0.20F);
+	//engine.GetViewport()->GetFBO().Bind();
+	//engine.RunTimeUpdate();
+	//engine.GetViewport()->GetFBO().UnBind();
 
 	// Change cursor state (lock / unlock)
-	static bool cursorState = true;
-	if (engine::Input::IsInputReleased(KEY_ESCAPE))
-		cursorState = !cursorState;
+	//static bool cursorState = true;
+	//if (engine::Input::IsInputReleased(KEY_ESCAPE))
+	//	cursorState = !cursorState;
 
-	engine::Input::SetCursorMode((cursorState) ? 
-		engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
+	//engine::Input::SetCursorMode((cursorState) ? 
+	//	engine::ECursorMode::DISABLED : engine::ECursorMode::NORMAL);
 }
 
 void ExampleProject::RegisterInputs(void)

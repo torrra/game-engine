@@ -8,7 +8,7 @@
 #else
 #  ifndef ENGINE_API
 #    ifdef engine_EXPORTS
-        /* We are building this library */
+        /* We build this library and rock and roll... */
 #      define ENGINE_API __declspec(dllexport)
 #    else
         /* We are using this library */
