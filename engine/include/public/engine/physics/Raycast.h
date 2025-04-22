@@ -24,7 +24,7 @@ namespace engine
         STATIC  = 1,    // Collision between raycast and static objects
         ALL     = 2,    // Collision between raycast and all objects
         NONE    = 3     // No collision
-    };
+    }; // !Enum ERaycastFlags
 
     class Raycast
     {
