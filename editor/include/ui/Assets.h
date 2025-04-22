@@ -3,6 +3,7 @@
 #include <engine/CoreTypes.h>
 #include <engine/ui/UIWindow.h>
 #include <engine/ui/UITable.h>
+#include <engine/ui/UIList.h>
 #include <filesystem>
 #include <vector>
 #include <string>
@@ -52,11 +53,10 @@ namespace editor
     struct Asset
     {
         Asset(void) = delete;
-        Asset(std::filesystem::path const& path, f32 width, f32 padding);
+        Asset(std::filesystem::path const& path);
 
         std::filesystem::path m_path;
-        f32 m_width;
-        f32 m_padding;
+        std::string m_fileName;
     };
 
     class AssetsWnd : public ::ui::UIWindow
@@ -88,5 +88,6 @@ namespace editor
         DirTreeNode* m_selectedNode;
         ui::Table* m_layout;
         ui::Table* m_assets;
+        ui::ListClipper m_clipper;
     };
 }
