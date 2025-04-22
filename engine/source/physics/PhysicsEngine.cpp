@@ -246,6 +246,18 @@ void engine::PhysicsEngine::InitScene(void)
     }
 }
 
+math::Vector4f engine::PhysicsEngine::ConvertPhysxColorToVector4f(uint32 inColor)
+{
+    constexpr f32 denominator = 1 / 255.f;
+
+    f32 r = (inColor & 0xFF) * denominator;
+    f32 g = ((inColor >> 8) & 0xFF) * denominator;
+    f32 b = ((inColor >> 16) & 0xFF) * denominator;
+    f32 a = ((inColor >> 24) & 0xFF) * denominator;
+
+    return math::Vector4f(r, g, b, a);
+}
+
 void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
 {
     /*
@@ -299,9 +311,16 @@ void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
                                point and the end point of each line (multiply by 2 because each
                                point is the start and the end of a line)
     */
-    m_debugDraw->RenderDebugDraw(inProjViewMatrix,
-        m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() *
-        2);
+
+    //math::Vector4f color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
+    if (m_debugDraw->GetDebugDrawImpl()->m_customLines.size() > 0)
+    {
+        math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
+        m_debugDraw->RenderDebugDraw(inProjViewMatrix,
+            (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
+                sizeof(m_debugDraw->GetDebugDrawImpl()->m_customLines.size())) * 2,
+            color2);
+    }
 }
 
 void engine::PhysicsEngine::CleanUp(void)
@@ -327,4 +346,12 @@ void engine::PhysicsEngine::CleanUp(void)
 
     /// TODO : Delete debug cout
     std::cout << "Physics engine cleaned up" << std::endl;
+}
+
+void engine::PhysicsEngine::AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, uint32 inColor)
+{
+    if (m_debugDraw)
+    {
+        m_debugDraw->AddDebugLine(inStart, inEnd, inColor);
+    }
 }

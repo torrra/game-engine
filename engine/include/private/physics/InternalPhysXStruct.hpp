@@ -2,8 +2,13 @@
 
 #pragma region PhysX
 
-//#include <physx/cooking/PxCooking.h>
 #include <physx/PxPhysicsAPI.h>
+
+#pragma endregion
+
+#pragma region Standard
+
+#include <vector>
 
 #pragma endregion
 
@@ -42,13 +47,18 @@ namespace engine
     struct DebugDrawImpl
     {
         const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
+        std::vector<physx::PxDebugLine> m_customLines       = {};
+
     }; // !Struct DebugDrawImpl
 
-    struct TriangleMeshImpl
+    struct RaycastImpl
     {
-        physx::PxTriangleMesh*          m_triangleMesh      = nullptr;
-        physx::PxTriangleMeshDesc       m_triangleMeshDesc;
-    };
+        physx::PxRaycastBuffer*         m_hit               = nullptr;
+        physx::PxQueryFilterData        m_queryFilterData;
+        physx::PxDebugLine*             m_successLine       = nullptr;
+        physx::PxDebugLine*             m_failureLine       = nullptr;
+
+    }; // !Struct RaycastImpl
 
     /// PhysX using
     using PxVisualParam = physx::PxVisualizationParameter;

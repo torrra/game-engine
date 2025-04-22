@@ -39,6 +39,7 @@ namespace engine
 
         ENGINE_API math::Vector3f GetPosition(void) const noexcept;
         ENGINE_API math::Vector3f GetRotation(void) const noexcept;
+        ENGINE_API math::Quatf GetRotationQuat(void) const noexcept;
 
         ENGINE_API f32 GetFOV(void) const noexcept;
         ENGINE_API f32 GetNearPlane(void) const noexcept;
@@ -70,4 +71,11 @@ namespace engine
         math::Vector3f m_position{ 0.f };
         math::Vector3f m_rotation{ 0.f };
     };
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Camera>()
+    {
+        return CAMERA;
+    }
+
 }

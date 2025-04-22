@@ -9,8 +9,7 @@ namespace engine
 {
     class Entity
     {
-    private:
-
+    public:
         // Special handle values
         enum EHandleUtils : EntityHandle
         {
@@ -23,7 +22,7 @@ namespace engine
             UID_MASK = 0xFFFFFFFF00000000
         };
 
-
+    private:
         // Makes it easier to know which components an entity has
         enum EComponentFlags : uint64
         {
@@ -31,7 +30,9 @@ namespace engine
             TRANSFORM = 1,
             SCRIPT = (uint64) (1 << 1),
             RENDERER = (uint64) (1 << 2),
-            RIGIDBODYDYNAMIC = (uint64) (1 << 3)
+            RIGIDBODY_DYNAMIC = (uint64) (1 << 3),
+            RIGIDBODY_STATIC = (uint64) (1 << 4),
+            CAMERA = (uint64) (1 << 5)
         };
 
         friend class SceneGraph;
