@@ -18,6 +18,7 @@ void engine::ThreadManager::Startup(uint32 numThreads)
 void engine::ThreadManager::Shutdown(void)
 {
     SynchronizeGameThread(nullptr);
+    ExecuteRenderThreadTasks();
 
     // lock mutex here, we want
     // the bool to be assigned BEFORE
