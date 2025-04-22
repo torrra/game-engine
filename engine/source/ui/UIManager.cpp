@@ -10,7 +10,7 @@
 #include "utility/MemoryCheck.h"
 #include "Engine.h"
 
-#define ENABLE_UI_DEBUG 1
+#define ENABLE_UI_DEBUG 0
 
 engine::UIManager::UIManager(wnd::Wnd* window)
 {
@@ -23,7 +23,8 @@ void engine::UIManager::NewFrame(void)
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport();
+    if (Engine::HasEditor())
+        ImGui::DockSpaceOverViewport();
     
 #if ENABLE_UI_DEBUG == 1
     ImGui::ShowMetricsWindow();
