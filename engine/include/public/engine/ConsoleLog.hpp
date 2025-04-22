@@ -6,6 +6,12 @@
 
 #pragma endregion
 
+#pragma region Engine
+
+#include "engine/CoreTypes.h"
+
+#pragma endregion
+
 namespace engine
 {
     // Text background color
@@ -76,8 +82,8 @@ namespace engine
     // Function to print using escape sequence
     inline void PrintLog(ConsoleLog consoleLog, const std::string& message)
     {
-        printf("\033[%d;%d;%dm%s %s\033[0m\n", (int)consoleLog.m_textFormat, (int)consoleLog.m_bgColor,
-               (int)consoleLog.m_fgColor, consoleLog.m_prefix.c_str(), message.c_str());
+        printf("\033[%d;%d;%dm%s %s\033[0m\n", (int32)consoleLog.m_textFormat, (int32)consoleLog.m_bgColor,
+               (int32)consoleLog.m_fgColor, consoleLog.m_prefix.c_str(), message.c_str());
     }
 
     // Preset of an error log
