@@ -47,6 +47,7 @@ namespace engine
     struct TriangleMeshImpl
     {
         physx::PxTriangleMesh*          m_triangleMesh      = nullptr;
+        physx::PxTriangleMeshDesc       m_triangleMeshDesc;
     };
 
     /// PhysX using

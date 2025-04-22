@@ -21,54 +21,103 @@
 
 engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene)
 {
-    m_triangleMeshImpl = new TriangleMeshImpl();
+    // Initialize the triangle mesh implementation
+    m_triangleMeshImpl  = new TriangleMeshImpl();
 
-    m_owner = inOwner;
-    m_currentScene = inScene;
+    // Set the owner and the current scene
+    m_owner             = inOwner;
+    m_currentScene      = inScene;
 
+    // Get the model and return if failed
     m_model = m_currentScene->GetComponent<engine::Renderer>(m_owner)->GetModel();
     if (m_model == nullptr)
     {
         return;
     }
 }
-void engine::TriangleMesh::physicsTest(void)
+
+engine::TriangleMesh::~TriangleMesh(void)
 {
+    // Release the triangle mesh
+    PX_RELEASE(m_triangleMeshImpl->m_triangleMesh);
+
+    // Delete the triangle mesh implementation
+    delete m_triangleMeshImpl;
+    m_triangleMeshImpl = nullptr;
+}
+
+void engine::TriangleMesh::CreateTriangleMesh(void)
+{
+    /*
+        Create the triangle mesh description
+        points.count : The number of points
+        points.stride : The stride of the points
+        points.data : The data of the points
+    */
     physx::PxTriangleMeshDesc meshDesc;
-    meshDesc.points.count = static_cast<physx::PxU32>(
+    m_triangleMeshImpl->m_triangleMeshDesc.points.count = static_cast<physx::PxU32>(
                                 m_model->GetStaticMeshes()[0].GetIndexCount());
-    meshDesc.points.stride = sizeof(math::Vector3f);
-    meshDesc.points.data = m_model->GetStaticMeshes()[0].GetVertices();
+    m_triangleMeshImpl->m_triangleMeshDesc.points.stride = sizeof(math::Vector3f);
+    m_triangleMeshImpl->m_triangleMeshDesc.points.data = 
+                                m_model->GetStaticMeshes()[0].GetVertices();
 
-    meshDesc.triangles.count = static_cast<physx::PxU32>(
-                                    m_model->GetStaticMeshes()[0].GetIndexCount() / 3);
-    meshDesc.triangles.stride = 3 * sizeof(unsigned int);
-    meshDesc.triangles.data = m_model->GetStaticMeshes()[0].GetIndices();
+    /*
+        triangles.count : The number of triangles
+        triangles.stride : The stride of the triangles
+        triangles.data : The data of the triangles
+    */
+    m_triangleMeshImpl->m_triangleMeshDesc.triangles.count = static_cast<physx::PxU32>(
+                                m_model->GetStaticMeshes()[0].GetIndexCount() / 3);
+    m_triangleMeshImpl->m_triangleMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
+    m_triangleMeshImpl->m_triangleMeshDesc.triangles.data = 
+                                m_model->GetStaticMeshes()[0].GetIndices();
 
-    physx::PxTolerancesScale scale;
-    physx::PxCookingParams params(scale);
+    CookTriangleMesh();
+}
 
+void engine::TriangleMesh::CookTriangleMesh(void)
+{
+    /*
+        Set the cooking parameters
+        scale : The scale of the physics
+    */
+    physx::PxCookingParams params(PhysicsEngine::Get().GetImpl().m_physics->getTolerancesScale());
+
+    // Default implementation of a memory write stream
     physx::PxDefaultMemoryOutputStream writeBuffer;
+    // Result from triangle mesh cooking
     physx::PxTriangleMeshCookingResult::Enum result;
 
-    bool status = PxCookTriangleMesh(params, meshDesc, writeBuffer, &result);
+    // Cook the triangle mesh and return if failed
+    bool status = PxCookTriangleMesh(params, m_triangleMeshImpl->m_triangleMeshDesc, writeBuffer, 
+                                     &result);
     if (!status)
         return;
 
+    // Default implementation of a memory read stream
     physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
 
-    m_triangleMeshImpl->m_triangleMesh = 
+    // Create the triangle mesh
+    m_triangleMeshImpl->m_triangleMesh =
         PhysicsEngine::Get().GetImpl().m_physics->createTriangleMesh(readBuffer);
 
-    physx::PxMaterial* material = PhysicsEngine::Get().GetImpl().m_physics->createMaterial(0.5f, 
-                                                                                           0.5f, 
+    // Create the material
+    physx::PxMaterial* material = PhysicsEngine::Get().GetImpl().m_physics->createMaterial(0.5f,
+                                                                                           0.5f,
                                                                                            0.6f);
-
-    physx::PxRigidStatic* actor = 
+    // Create the static rigid body
+    physx::PxRigidStatic* actor =
         physx::PxCreateStatic(*PhysicsEngine::Get().GetImpl().m_physics,
-                ToPxTransform(m_currentScene->GetComponent<engine::Transform>(
-                    m_owner)->GetTransform()), physx::PxTriangleMeshGeometry(
-                        m_triangleMeshImpl->m_triangleMesh), *material);
+            ToPxTransform(m_currentScene->GetComponent<engine::Transform>(
+                m_owner)->GetTransform()), physx::PxTriangleMeshGeometry(
+                    m_triangleMeshImpl->m_triangleMesh), *material);
 
+    // Add the actor to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*actor);
 }
+
+engine::TriangleMeshImpl* engine::TriangleMesh::GetTriangleMeshImpl(void)
+{
+    return m_triangleMeshImpl;
+}
+

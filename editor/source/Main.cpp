@@ -71,11 +71,12 @@ int main(void)
         while (!engine.GetGraph()->GetComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->GetModel()->CanRender())
             engine::ThreadManager::RenderScene(engine.GetGraph());
 
+        engine::TriangleMesh* triangleMesh;
         if (engine.GetGraph()->GetComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->GetModel()->CanRender())
         {
-            engine::TriangleMesh* triangleMesh = new engine::TriangleMesh(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
+            triangleMesh = new engine::TriangleMesh(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
 
-            triangleMesh->physicsTest();
+            triangleMesh->CreateTriangleMesh();
         }
  
 
@@ -99,6 +100,7 @@ int main(void)
         /// ---------------- Clean ---------------- 
         //delete rb;
         delete floorRb;
+        delete triangleMesh;
         engine::PhysicsEngine::Get().CleanUp();
 
 		engine.ShutDown();

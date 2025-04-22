@@ -27,19 +27,34 @@ namespace engine
     {
     public :
 
-        TriangleMesh(void) = delete;
+        /// Constructor
+        // Default constructor deleted
+                                        TriangleMesh(void) = delete;
+        // Component constructor
+        ENGINE_API                      TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene);
 
-        ENGINE_API TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene);
-        ENGINE_API void physicsTest(void);
+        /// Destructor
+        ENGINE_API                      ~TriangleMesh(void);
 
-        ENGINE_API TriangleMeshImpl* GetTriangleMeshImpl(void) { return m_triangleMeshImpl; }
+        /// Getters
+        // Get the triangle mesh implementation pointer
+        ENGINE_API TriangleMeshImpl*    GetTriangleMeshImpl(void);
 
-        ENGINE_API void Register(void) override {}
+        /// Functions
+        // Create a triangle mesh in regard to the model of the entity
+        ENGINE_API void                 CreateTriangleMesh(void);
+        
+        ENGINE_API void                 Register(void) override {}
 
     private :
 
-        TriangleMeshImpl* m_triangleMeshImpl = nullptr;
-        const Model* m_model = nullptr;
+        /// Functions
+        // Cook the triangle mesh
+        void                            CookTriangleMesh(void);
+
+        /// Private members
+        const   Model*              m_model             = nullptr;
+                TriangleMeshImpl*   m_triangleMeshImpl  = nullptr;
 
     }; // !Class TriangleMesh
 } // !Namespace engine
