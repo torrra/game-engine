@@ -41,7 +41,6 @@ namespace engine
 
         math::Vector4f          m_bgColor;
         Window*                 m_window = nullptr;
-        UIManager		        m_uiManager;
         bool                    m_started = false;
 
     };

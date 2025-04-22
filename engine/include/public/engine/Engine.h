@@ -39,6 +39,7 @@ namespace engine
         GameScene       m_activeScene;
         std::string		m_projectDir;
         Application*    m_application = nullptr;
+        UIManager       m_uiManager;
 
         static bool     m_hasEditor;
     };

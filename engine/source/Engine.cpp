@@ -38,12 +38,10 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
         std::printf("No project opened\n");
 
     m_application->Startup(projectName);
+
     ThreadManager::Startup(threadCount);
 
     if (InitScriptSystem(projectDir) != SUCCESS)
-        return ERROR;
-
-    if (InitWindow(projectName) != SUCCESS)
         return ERROR;
 
     if (Input::StartUp() != SUCCESS)
@@ -56,6 +54,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
         return ERROR;
 
     
+    m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
     return SUCCESS;
 }
 
@@ -66,6 +65,7 @@ void engine::Engine::ShutDown(void)
     ResourceManager::ShutDown();
     m_application->Shutdown();
     Input::ShutDown();
+    m_uiManager.ShutDown();
 
     if (m_application)
         delete m_application;
@@ -101,7 +101,12 @@ void engine::Engine::UpdateGameplay(void)
 void engine::Engine::UpdateApplicationWindow(void)
 {
     m_application->BeginFrame();
+    m_uiManager.NewFrame();
+
     m_application->Render(m_activeScene.GetGraph());
+    m_uiManager.UpdateUI();
+
+    // swaps buffers 
     m_application->EndFrame();
     Input::ResetKeys();
 }
