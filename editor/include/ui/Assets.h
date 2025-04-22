@@ -82,12 +82,11 @@ namespace editor
         bool IsSupportedExtension(std::string const& extension);
         void RenderFile(std::filesystem::path const& file);
 
-        
-        std::vector<Asset> m_files;
+        std::vector<Asset> m_assets;
         DirTreeNode* m_rootNode;
-        DirTreeNode* m_selectedNode;
+        DirTreeNode* m_selectedDirectory;
         ui::Table* m_layout;
-        ui::Table* m_assets;
         ui::ListClipper m_clipper;
+        int16 m_selectedIndex;
     };
 }

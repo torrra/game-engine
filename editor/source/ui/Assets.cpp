@@ -10,7 +10,7 @@
 #include <filesystem>
 
 #define ASSET_WIDTH 120.0f
-#define ASSET_HEIGHT 160.0f
+#define ASSET_HEIGHT 130.0f
 #define ASSET_PADDING 15.0f
 #define MAX_LABEL_LINE_LENGTH 16
 
@@ -49,9 +49,8 @@ editor::AssetsWnd::AssetsWnd(const char* name)
     m_layout = new ui::Table("AssetWnd", 2);
     m_layout->SetFlags(ui::ETableFlags::TABLE_INNER_VERTICAL_BORDERS | ui::ETableFlags::TABLE_RESIZABLE);
 
-    m_assets = new ui::Table("AssetSection", 7); // TODO: remove?
-
-    m_selectedNode = nullptr;
+    m_selectedDirectory = nullptr;
+    m_selectedIndex = -1;
 }
 
 editor::AssetsWnd::~AssetsWnd(void)
@@ -60,11 +59,9 @@ editor::AssetsWnd::~AssetsWnd(void)
         delete m_rootNode;
 
     delete m_layout;
-    delete m_assets;
 
     m_layout = nullptr;
-    m_assets = nullptr;
-    m_selectedNode = nullptr;
+    m_selectedDirectory = nullptr;
     m_rootNode = nullptr;
 }
 
@@ -78,7 +75,7 @@ void editor::AssetsWnd::RenderContents(void)
         if (m_layout->NextColumn(150.0f))
             RenderDirectorySection(windowSize);
     
-        if (/*m_selectedNode && */m_layout->NextColumn())
+        if (m_layout->NextColumn())
         {
             RenderAssets();
         }
@@ -97,9 +94,9 @@ void editor::AssetsWnd::RenderDirectories(DirTreeNode* node)
     bool isOpen = ::ui::TreeNode(node->m_dirName, GetTreeNodeFlags(node));
 
     // Select node
-    if (ui::IsItemSelected() && (!m_selectedNode || m_selectedNode->m_dirName != node->m_dirName))
+    if (ui::IsItemSelected() && (!m_selectedDirectory || m_selectedDirectory->m_dirName != node->m_dirName))
     {
-        m_selectedNode = node;
+        m_selectedDirectory = node;
         OnSelectDir();
     }
 
@@ -137,7 +134,7 @@ int32 editor::AssetsWnd::GetTreeNodeFlags(DirTreeNode* node)
 
     if (node->m_children.empty())
         result |= ui::ETreeNodeFlags::NO_ICON;
-    if (m_selectedNode && m_selectedNode->m_dirName == node->m_dirName)
+    if (m_selectedDirectory && m_selectedDirectory->m_dirName == node->m_dirName)
         result |= ui::ETreeNodeFlags::SELECTED;
 
     return result;
@@ -145,91 +142,22 @@ int32 editor::AssetsWnd::GetTreeNodeFlags(DirTreeNode* node)
 
 void editor::AssetsWnd::RenderAssets(void)
 {
-    //ui::DrawList drawList = ui::GetWindowDrawList();
-    //drawList.AddRectFilled({1000.0f, 1000.0f}, ui::GetAvailSpace(), {0.0f, 1.0f, 0.0f, 1.0f}, 25.0f);
-    //m_assets->StartTable();
-    //uint16 index = 0;
-    //for (auto file : m_files)
-    //{
-    //    if (index == m_assets->GetMaxColumns())
-    //    {
-    //        m_assets->NextRow();
-    //        index = 0;
-    //    }
-    //
-    //    m_assets->NextColumn();
-    //    RenderFile(file);
-    //
-    //    ++index;
-    //}
-    //m_assets->EndTable();
+    const math::Vector2f& regionSize = ui::GetAvailSpace();
 
-    //if (ui::StartSection("AssetsSection", ui::GetAvailSpace()))
-    //{
-    //    ui::DrawList drawList = ui::GetWindowDrawList();
-    //    
-    //    // Content region
-    //    math::Vector2f min = drawList.GetMin(); min;
-    //    math::Vector2f max = drawList.GetMax(); max;
-    //    uint16 itemPerRow = static_cast<uint16>((max - min).GetX() / (ASSET_WIDTH + (2.0f * ASSET_PADDING)));
-    //
-    //    math::Vector2f position = min + math::Vector2f(ASSET_PADDING, ASSET_PADDING);
-    //
-    //    uint16 index = 0;
-    //    math::Vector2<uint16> gridIndex(0);
-    //    for (const Asset& asset : m_files)
-    //    {
-    //        ui::SetID(asset.m_path.string());
-    //        if (gridIndex.GetX() == itemPerRow)
-    //        {
-    //            // Next row
-    //            ++gridIndex.Y();
-    //            gridIndex.X() = 0;
-    //
-    //            position.Y() = (gridIndex.GetY() * ASSET_PADDING) + ((gridIndex.GetY() - 1) * ASSET_HEIGHT);
-    //
-    //        }
-    //       
-    //        position.X() = (gridIndex.GetX() * ASSET_PADDING) + ((gridIndex.GetX() - 1) * ASSET_WIDTH);
-    //
-    //        uint16 i = ((gridIndex.GetY()) * itemPerRow) + gridIndex.GetX();
-    //
-    //        bool selected = false;
-    //        if (gridIndex.GetX() != 0)
-    //            ui::SameLine(position.GetX());
-    //        
-    //        ui::SetAlignment(position);
-    //        bool isItemVisible = ui::IsRectVisible({ASSET_WIDTH, ASSET_HEIGHT});
-    //        ui::Selectable(m_files[i].m_path.filename().string().c_str(), &selected, {ASSET_WIDTH, ASSET_HEIGHT});
-    //        ui::UnsetAlignment();
-    //        
-    //        if (isItemVisible)
-    //            drawList.AddRectFilled(min + position, min + position + math::Vector2f(ASSET_WIDTH, ASSET_HEIGHT), {0.1f, 0.1f, 0.1f, 1.0f});
-    //
-    //        ++gridIndex.X();
-    //        ui::UnsetID();
-    //    }
-    //    
-    //    ui::EndSection();
-    //
-    //}
-    
-    math::Vector2f regionSize = ui::GetAvailSpace();
     if (ui::StartSection("AssetSection", regionSize))
     {
         // Asset variables
-        static const math::Vector2f padding(15.0f, 20.0f);
-        static const math::Vector2f assetSize(120.0f, 130.0f);
-        static const f32 sizeDenominator = 1.0f / (assetSize.GetX() + padding.GetX());
+        static const math::Vector2f assetSize(ASSET_WIDTH, ASSET_HEIGHT);
+        static const f32 sizeDenominator = 1.0f / (assetSize.GetX() + ASSET_PADDING);
         int32 index = 0;
 
         // Window variables
         const math::Vector2f& minPos = ui::GetWindowPos();
         const math::Vector2f& maxPos = minPos + regionSize;
-        const math::Vector2f& startPos = ui::GetScreenPos() + math::Vector2f(padding.GetX() + 0.0f);
+        const math::Vector2f& startPos = ui::GetScreenPos() + math::Vector2f(ASSET_PADDING);
         ui::DrawList drawList = ui::GetWindowDrawList();
         int32 itemPerRow = math::Max((int32) (regionSize.GetX() * sizeDenominator), 1);
-        int32 assetCount = static_cast<int32>(m_files.size());
+        int32 assetCount = static_cast<int32>(m_assets.size());
 
         ui::SetScreenPosition(startPos);
 
@@ -245,25 +173,23 @@ void editor::AssetsWnd::RenderAssets(void)
                 int32 maxIdCurrentRow = math::Min<int32>((lineNumber + 1) * itemPerRow, assetCount);
 
                 math::Vector2f position(
-                        startPos.GetX(),
-                        startPos.GetY() + lineNumber * (assetSize.GetY() + padding.GetY())
+                        0.0f,
+                        startPos.GetY() + lineNumber * (assetSize.GetY() + ASSET_PADDING)
                 );
 
                 // Iterate through items in current row
                 for (int32 item = minIdCurrentRow; item < maxIdCurrentRow; ++item)
                 {
-                    ui::SetID(index++);
+                    ui::SetID(index);
 
-                    position.X() += float(item % itemPerRow) * (assetSize.GetX() + padding.GetX());
+                    position.X() = startPos.GetX() + float(item % itemPerRow) * (assetSize.GetX() + ASSET_PADDING);
                     ui::SetScreenPosition(position);
 
                     bool isItemVisible = ui::IsRectVisible(minPos, maxPos);
-                    bool isSelected = false; // TODO: use index to get selected value from asset struct
+                    bool isSelected = index == m_selectedIndex; // TODO: use index to get selected value from asset struct
 
                     if (ui::Selectable("", &isSelected, assetSize))
-                    {
-                        printf("e\n"); // TODO: replace with actual impl
-                    }
+                        m_selectedIndex = index;
 
                     if (isItemVisible)
                     {
@@ -271,7 +197,7 @@ void editor::AssetsWnd::RenderAssets(void)
                         drawList.AddRectFilled(position, max, {0.1f, 0.1f, 0.1f, 1.0f}, 15.0f);
                         
                         // Label
-                        std::string text = m_files[index - 1].m_fileName;
+                        std::string text = m_assets[index].m_fileName;
 
                         if (text.length() > MAX_LABEL_LINE_LENGTH)
                             text.insert(MAX_LABEL_LINE_LENGTH, "\n");
@@ -279,12 +205,13 @@ void editor::AssetsWnd::RenderAssets(void)
                         // Calculate text position
                         math::Vector2f textPosition(
                             position.GetX() + ((assetSize.GetX() - ui::GetTextSize(text.c_str()).GetX()) * 0.5f), // Center aligned
-                            max.GetY() - (0.5f * padding.GetY() + ui::GetFontSize())                              // Bottom aligned
+                            max.GetY() - (ASSET_PADDING + ui::GetFontSize())                                      // Bottom aligned
                         );
 
                         drawList.AddText(text.c_str(), textPosition, isSelected);
                     }
                     ui::UnsetID();
+                    index++;
                 }
             }
         }
@@ -298,16 +225,18 @@ void editor::AssetsWnd::RenderAssets(void)
 void editor::AssetsWnd::OnSelectDir(void)
 {
     // Remove all files
-    m_files.clear();
+    m_assets.clear();
+
+    // Invalidate selected asset
+    m_selectedIndex = -1;
 
     // Append file to array
-    for (auto file : std::filesystem::directory_iterator(m_selectedNode->m_path))
+    for (auto file : std::filesystem::directory_iterator(m_selectedDirectory->m_path))
     {
         const std::filesystem::path& filePath = file.path();
 
         if (IsSupportedExtension(filePath.extension().string()))
-            m_files.emplace_back(Asset(filePath, ASSET_WIDTH, ASSET_PADDING));
-        //printf("%s | %s\n", file.path().filename().string().c_str(), file.path().extension().string().c_str());
+            m_assets.emplace_back(Asset(filePath));
     }
 }
 
