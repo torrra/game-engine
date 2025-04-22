@@ -6,7 +6,7 @@
 namespace editor
 {
     EditorApplication::EditorApplication(const char* title)
-        : m_graphView("meow")
+        : m_graphView("Scene Graph")
     {
         Startup(title);
         m_gameSimulationView = new Viewport("Simulation view", { 0.1f, 0.1f, 0.1f, 1.0f });
