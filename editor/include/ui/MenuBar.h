@@ -12,8 +12,6 @@ namespace editor
     {
     public:
         MenuBar(void) = default;
-
-        void Render(class ::engine::Engine& engine);
         void UpdateStartButton(class ::engine::GameScene& scene, class SceneGraphUI& graph);
     };
 }
