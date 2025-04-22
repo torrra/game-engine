@@ -42,3 +42,8 @@ void ui::Table::SetSize(math::Vector2f const& size)
 {
     m_size = size;
 }
+
+uint16 ui::Table::GetMaxColumns(void) const noexcept
+{
+    return m_columnCount;
+}

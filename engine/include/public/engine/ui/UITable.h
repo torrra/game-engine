@@ -45,6 +45,7 @@ namespace ui
 
         ENGINE_API void SetFlags(uint32 flags);
         ENGINE_API void SetSize(math::Vector2f const& size);
+        ENGINE_API uint16 GetMaxColumns(void) const noexcept;
     private:
         std::string m_name;
         math::Vector2f m_size;
