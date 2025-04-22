@@ -19,6 +19,16 @@ void ui::DrawList::AddRectFilled(math::Vector2f const& min, math::Vector2f const
     m_drawList->AddRectFilled(min, max, colorI32, rounding);
 }
 
+math::Vector2f ui::DrawList::GetMin(void) const noexcept
+{
+    return m_drawList->GetClipRectMin();
+}
+
+math::Vector2f ui::DrawList::GetMax(void) const noexcept
+{
+    return m_drawList->GetClipRectMax();
+}
+
 ui::DrawList::operator ImDrawList*(void)
 {
     return m_drawList;
