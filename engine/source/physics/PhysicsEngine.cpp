@@ -312,14 +312,15 @@ void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
                                point is the start and the end of a line)
     */
 
-    math::Vector4f color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
-    math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
-    math::Vector4f color3 = math::Vector4f(0.f, 0.f, 1.f, 1.f);
-
-    m_debugDraw->RenderDebugDraw(inProjViewMatrix,
-        (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
-            sizeof(m_debugDraw->GetDebugDrawImpl()->m_customLines.size())) * 2,
-        color2);
+    //math::Vector4f color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
+    if (m_debugDraw->GetDebugDrawImpl()->m_customLines.size() > 0)
+    {
+        math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
+        m_debugDraw->RenderDebugDraw(inProjViewMatrix,
+            (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
+                sizeof(m_debugDraw->GetDebugDrawImpl()->m_customLines.size())) * 2,
+            color2);
+    }
 }
 
 void engine::PhysicsEngine::CleanUp(void)

@@ -35,9 +35,9 @@ engine::Raycast::Raycast(void)
 
     // Initialize the raycast lines for the pvd
     m_raycastImpl->m_successLine = new physx::PxDebugLine(ToPxVec3(m_origin), physx::PxVec3(0.f), 
-                                                          physx::PxDebugColor::eARGB_GREEN);
+                                                   physx::PxU32(physx::PxDebugColor::eARGB_GREEN));
     m_raycastImpl->m_failureLine = new physx::PxDebugLine(ToPxVec3(m_origin), physx::PxVec3(0.f), 
-                                                          physx::PxDebugColor::eARGB_RED);
+                                                   physx::PxU32(physx::PxDebugColor::eARGB_RED));
 }
 
 engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& inDirection,
@@ -57,9 +57,9 @@ engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& i
 
     // Initialize the raycast lines for the pvd
     m_raycastImpl->m_successLine = new physx::PxDebugLine(ToPxVec3(m_origin), physx::PxVec3(0.f), 
-                                                          physx::PxDebugColor::eARGB_GREEN);
+                                                   physx::PxU32(physx::PxDebugColor::eARGB_GREEN));
     m_raycastImpl->m_failureLine = new physx::PxDebugLine(ToPxVec3(m_origin), physx::PxVec3(0.f), 
-                                                          physx::PxDebugColor::eARGB_RED);
+                                                   physx::PxU32(physx::PxDebugColor::eARGB_RED));
 }
 
 engine::Raycast::~Raycast(void)
@@ -225,7 +225,8 @@ void engine::Raycast::DrawRay(void)
         PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient()->drawLines(
                 m_raycastImpl->m_successLine, 1);
         // Add the line into the debug drawer to draw into opengl scene
-        PhysicsEngine::Get().AddDebugLine(m_origin, ToVector3f(end), physx::PxDebugColor::eARGB_GREEN);
+        PhysicsEngine::Get().AddDebugLine(m_origin, ToVector3f(end), 
+            physx::PxU32(physx::PxDebugColor::eARGB_GREEN));
     }
     else
     {
@@ -233,6 +234,7 @@ void engine::Raycast::DrawRay(void)
         PhysicsEngine::Get().GetImpl().m_scene->getScenePvdClient()->drawLines(
             m_raycastImpl->m_failureLine, 1);
         // Add the line into the debug drawer to draw into opengl scene
-        PhysicsEngine::Get().AddDebugLine(m_origin, ToVector3f(end), physx::PxDebugColor::eARGB_RED);
+        PhysicsEngine::Get().AddDebugLine(m_origin, ToVector3f(end), 
+            physx::PxU32(physx::PxDebugColor::eARGB_RED));
     }
 }
