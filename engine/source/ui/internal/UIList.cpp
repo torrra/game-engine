@@ -11,6 +11,9 @@ ui::ListClipper::ListClipper(void)
 ui::ListClipper::~ListClipper(void)
 {
     delete m_clipper;
+
+    m_clipper = nullptr;
+    m_isInit = false;
 }
 
 void ui::ListClipper::Begin(int32 itemCount, f32 itemHeight)
