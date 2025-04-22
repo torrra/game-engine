@@ -17,6 +17,7 @@ namespace editor
     {
         m_currentScene = scene;
         m_properties = PropertyWnd(scene->GetGraph());
+        m_graphView.SetGraph(scene->GetGraph());
     }
 
 
