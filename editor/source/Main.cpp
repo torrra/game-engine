@@ -89,7 +89,7 @@ int main(void)
             // Update the rigid body in regard to the entity (movement by keyboard input for example)
             rb->UpdateRigidBody();
 
-            engine.GetWindow()->Update();
+            engine.PostUpdate();
 		}
 
         /// ---------------- Clean ---------------- 

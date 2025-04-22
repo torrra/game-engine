@@ -81,25 +81,15 @@ void engine::Engine::ShutDown(void)
 
 void engine::Engine::Update(void)
 {
-    static const f32 updateFrequency = (FIX_UPDATE_FREQUENCY * m_timeScale) * TO_MILLISECONDS;
-    static f32 runTime = 0.0f;
-    static f32 nextUpdateTime = runTime + updateFrequency;
 
     // Sync game logic
     ThreadManager::SynchronizeGameThread(m_graph);
-    
-    // Update physics (fixed update)
-    runTime = m_time.GetTotalTime();
-    if (runTime >= nextUpdateTime)
-    {
-        nextUpdateTime = runTime + updateFrequency;
-
-        FixedUpdate();
-    }
+    ThreadManager::UpdateGameLogic(m_graph, m_time.GetDeltaTime());
 
     m_window->ClearWindow(0.1f, 0.1f, 0.1f);
+    ThreadManager::RenderScene(m_graph);
 
-    m_uiManager.NewFrame();
+   // m_uiManager.NewFrame();
 }
 
 void engine::Engine::PostUpdate(::ui::UIWindow* viewport)
@@ -109,7 +99,7 @@ void engine::Engine::PostUpdate(::ui::UIWindow* viewport)
     if (viewport)
         viewport->Render();
 
-    m_uiManager.UpdateUI();
+    //m_uiManager.UpdateUI();
     m_window->Update();
     m_time.Update();
 }

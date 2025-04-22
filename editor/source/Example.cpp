@@ -6,7 +6,8 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
+#define MODEL_FILE ".\\assets\\padoru.obj"
+//#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
 #define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 
@@ -36,6 +37,12 @@ void ExampleProject::StartUp(engine::Engine& engine)
 
 	entityRenderer->SetModel(MODEL_FILE);
 	entityRenderer->SetShader(SHADER_PROGRAM_NAME);
+
+    engine::MeshMaterial* newMat = engine::MeshMaterial::CreateMaterial("Padoru.mmat");
+
+    newMat->SetDiffuseMap(engine::ResourceManager::GetResource<engine::Texture>(TEXTURE_FILE));
+
+    entityRenderer->SetMaterial(0, newMat);
 
 	// Add component to camera entity
 	m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");

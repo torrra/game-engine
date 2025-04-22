@@ -32,7 +32,7 @@ namespace engine
         ENGINE_API Time&		GetTime(void) noexcept;
         ENGINE_API SceneGraph*	GetGraph(void);
         ENGINE_API UIManager    GetUI(void) const noexcept;
-    private:
+    //private:
         void                RunGame();
         inline int16		InitScriptSystem(const char* projectDir);
         inline int16		InitWindow(const char* projectName);
