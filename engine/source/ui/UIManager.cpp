@@ -8,8 +8,9 @@
 
 
 #include "utility/MemoryCheck.h"
+#include "Engine.h"
 
-#define ENABLE_UI_DEBUG 0
+#define ENABLE_UI_DEBUG 1
 
 engine::UIManager::UIManager(wnd::Wnd* window)
 {
@@ -57,9 +58,13 @@ void engine::UIManager::InitUI(wnd::Wnd* window)
     
     // Set flags
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    if (Engine::HasEditor())
+    {
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    }
 
     
     // Set UI theme
