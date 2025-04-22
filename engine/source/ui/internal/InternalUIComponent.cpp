@@ -49,6 +49,11 @@ bool ui::InputBox(const char* id, f32* value, f32 increment, bool returnOnComple
     return result;
 }
 
+bool ui::Selectable(const char* text, bool* selected, math::Vector2f const& size)
+{
+    return ImGui::Selectable(text, selected, ImGuiMultiSelectFlags_SingleSelect, size);
+}
+
 bool ui::StartMenuBar(void)
 {
     return ImGui::BeginMenuBar();
@@ -167,24 +172,34 @@ math::Vector2i ui::GetInnerRectMinPos(std::string const& windowName)
     return math::Vector2i::Zero();
 }
 
-void ui::StartSection(const char* name)
+void ui::SetAlignment(math::Vector2f const& gridIndex)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, gridIndex);
+}
+
+void ui::UnsetAlignment(void)
+{
+    return ImGui::PopStyleVar();
+}
+
+bool ui::StartSection(const char* name)
 {
     constexpr int32 flags = 
         ImGuiChildFlags_Borders | 
         ImGuiChildFlags_AlwaysUseWindowPadding | 
         ImGuiChildFlags_AutoResizeY;
 
-    ImGui::BeginChild(name, ImVec2(0, 0), flags);
+    return ImGui::BeginChild(name, ImVec2(0, 0), flags);
 }
 
-ENGINE_API void ui::StartSection(const char* name, math::Vector2f const& size)
+ENGINE_API bool ui::StartSection(const char* name, math::Vector2f const& size)
 {
     constexpr int32 flags =
         ImGuiChildFlags_Borders |
         ImGuiChildFlags_AlwaysUseWindowPadding |
         ImGuiChildFlags_AutoResizeY;
 
-    ImGui::BeginChild(name, size, flags);
+    return ImGui::BeginChild(name, size, flags);
 }
 
 void ui::EndSection(void)
@@ -247,4 +262,9 @@ bool ui::IsWindowDocked(std::string const& windowName)
         return window->DockIsActive;
 
     return false;
+}
+
+ENGINE_API bool ui::IsRectVisible(math::Vector2f const& size)
+{
+    return ImGui::IsRectVisible(size);
 }

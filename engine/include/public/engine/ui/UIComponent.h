@@ -13,6 +13,7 @@ namespace ui
     ENGINE_API bool Button(const char* text, math::Vector2f const& size = {0.0F, 0.0F});
     ENGINE_API bool InputBox(const char* id, const char* hint, std::string& outStr);
     ENGINE_API bool InputBox(const char* id, f32* value, f32 increment, bool returnOnComplete = false);
+    ENGINE_API bool Selectable(const char* text, bool* selected, math::Vector2f const& size);
 
     // Menus
     ENGINE_API bool StartMenuBar(void);
@@ -35,10 +36,12 @@ namespace ui
     ENGINE_API math::Vector2i GetWindowPos(std::string const& windowName);
     ENGINE_API math::Vector2i GetOuterRectMinPos(std::string const& windowName);
     ENGINE_API math::Vector2i GetInnerRectMinPos(std::string const& windowName);
+    ENGINE_API void SetAlignment(math::Vector2f const& gridIndex);
+    ENGINE_API void UnsetAlignment(void);
 
     // Sections
-    ENGINE_API void StartSection(const char* name);
-    ENGINE_API void StartSection(const char* name, math::Vector2f const& size);
+    ENGINE_API bool StartSection(const char* name);
+    ENGINE_API bool StartSection(const char* name, math::Vector2f const& size);
     ENGINE_API void EndSection(void);
     ENGINE_API void StartDisabledSection(bool disabled = true);
     ENGINE_API void EndDisabledSection(void);
@@ -54,4 +57,5 @@ namespace ui
     ENGINE_API bool IsItemHovered(void);
     ENGINE_API bool IsWindowSelected(std::string const& name);
     ENGINE_API bool IsWindowDocked(std::string const& windowName);
+    ENGINE_API bool IsRectVisible(math::Vector2f const& size);
 }
