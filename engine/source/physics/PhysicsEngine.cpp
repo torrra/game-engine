@@ -248,10 +248,12 @@ void engine::PhysicsEngine::InitScene(void)
 
 math::Vector4f engine::PhysicsEngine::ConvertPhysxColorToVector4f(uint32 inColor)
 {
-    float r = (inColor & 0xFF) / 255.0f;
-    float g = ((inColor >> 8) & 0xFF) / 255.0f;
-    float b = ((inColor >> 16) & 0xFF) / 255.0f;
-    float a = ((inColor >> 24) & 0xFF) / 255.0f;
+    constexpr f32 denominator = 1 / 255.f;
+
+    f32 r = (inColor & 0xFF) * denominator;
+    f32 g = ((inColor >> 8) & 0xFF) * denominator;
+    f32 b = ((inColor >> 16) & 0xFF) * denominator;
+    f32 a = ((inColor >> 24) & 0xFF) * denominator;
 
     return math::Vector4f(r, g, b, a);
 }
