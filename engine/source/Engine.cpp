@@ -106,8 +106,7 @@ void engine::Engine::UpdateApplicationWindow(void)
     m_uiManager.NewFrame();
 
     m_application->Render(m_activeScene.GetGraph());
-    m_uiManager.UpdateUI();
-
+    m_uiManager.EndFrame();
     // swaps buffers 
     m_application->EndFrame();
     Input::ResetKeys();
