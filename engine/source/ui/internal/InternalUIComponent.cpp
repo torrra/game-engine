@@ -109,6 +109,11 @@ math::Vector2f ui::GetPos(void)
     return ImGui::GetCursorPos();
 }
 
+math::Vector2f ui::GetScreenPos(void)
+{
+    return ImGui::GetCursorScreenPos();
+}
+
 math::Vector2f ui::GetAvailSpace(void)
 {
     return ImGui::GetContentRegionAvail();
@@ -138,6 +143,11 @@ math::Vector2i ui::GetWindowPos(std::string const& windowName)
         );
 
     return math::Vector2i::Zero();
+}
+
+math::Vector2f ui::GetWindowPos(void)
+{
+    return ImGui::GetWindowPos();
 }
 
 math::Vector2i ui::GetOuterRectMinPos(std::string const& windowName)
@@ -175,6 +185,11 @@ math::Vector2i ui::GetInnerRectMinPos(std::string const& windowName)
 void ui::SetAlignment(math::Vector2f const& gridIndex)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, gridIndex);
+}
+
+void ui::SetScreenPosition(math::Vector2f const& position)
+{
+    ImGui::SetCursorScreenPos(position);
 }
 
 void ui::UnsetAlignment(void)
@@ -227,6 +242,11 @@ void ui::SetID(std::string const& id)
     ImGui::PushID(id.c_str());
 }
 
+void ui::SetID(int32 id)
+{
+    ImGui::PushID(id);
+}
+
 void ui::UnsetID(void)
 {
     ImGui::PopID();
@@ -264,7 +284,12 @@ bool ui::IsWindowDocked(std::string const& windowName)
     return false;
 }
 
-ENGINE_API bool ui::IsRectVisible(math::Vector2f const& size)
+bool ui::IsRectVisible(math::Vector2f const& size)
 {
     return ImGui::IsRectVisible(size);
+}
+
+bool ui::IsRectVisible(math::Vector2f const& min, math::Vector2f const& max)
+{
+    return ImGui::IsRectVisible(min, max);
 }

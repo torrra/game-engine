@@ -4,8 +4,8 @@
 
 
 ui::ListClipper::ListClipper(void)
+    : m_isInit(false), m_clipper(nullptr)
 {
-    m_clipper = new ImGuiListClipper;
 }
 
 ui::ListClipper::~ListClipper(void)
@@ -15,6 +15,12 @@ ui::ListClipper::~ListClipper(void)
 
 void ui::ListClipper::Begin(int32 itemCount, f32 itemHeight)
 {
+    if (!m_isInit)
+    {
+        m_clipper = new ImGuiListClipper;
+        m_isInit = true;
+    }
+
     m_clipper->Begin(itemCount, itemHeight);
 }
 
@@ -26,4 +32,14 @@ bool ui::ListClipper::Step(void)
 void ui::ListClipper::End(void)
 {
     m_clipper->End();
+}
+
+int32 ui::ListClipper::GetStart(void)
+{
+    return m_clipper->DisplayStart;
+}
+
+int32 ui::ListClipper::GetEnd(void)
+{
+    return m_clipper->DisplayEnd;
 }

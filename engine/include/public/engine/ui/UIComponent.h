@@ -31,12 +31,15 @@ namespace ui
     ENGINE_API void ItemWidth(f32 widthPx);
     ENGINE_API void VerticalSpacing(void);
     ENGINE_API math::Vector2f GetPos(void);
+    ENGINE_API math::Vector2f GetScreenPos(void);
     ENGINE_API math::Vector2f GetAvailSpace(void);
     ENGINE_API math::Vector2i GetViewportPos(std::string const& windowName);
     ENGINE_API math::Vector2i GetWindowPos(std::string const& windowName);
+    ENGINE_API math::Vector2f GetWindowPos(void);
     ENGINE_API math::Vector2i GetOuterRectMinPos(std::string const& windowName);
     ENGINE_API math::Vector2i GetInnerRectMinPos(std::string const& windowName);
     ENGINE_API void SetAlignment(math::Vector2f const& gridIndex);
+    ENGINE_API void SetScreenPosition(math::Vector2f const& position);
     ENGINE_API void UnsetAlignment(void);
 
     // Sections
@@ -49,6 +52,7 @@ namespace ui
 
     // IDs
     ENGINE_API void SetID(std::string const& id);
+    ENGINE_API void SetID(int32 id);
     ENGINE_API void UnsetID(void);
 
     // Misc...
@@ -58,4 +62,5 @@ namespace ui
     ENGINE_API bool IsWindowSelected(std::string const& name);
     ENGINE_API bool IsWindowDocked(std::string const& windowName);
     ENGINE_API bool IsRectVisible(math::Vector2f const& size);
+    ENGINE_API bool IsRectVisible(math::Vector2f const& min, math::Vector2f const& max);
 }
