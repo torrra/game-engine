@@ -101,7 +101,6 @@ void engine::Engine::UpdateGameplay(void)
 void engine::Engine::UpdateApplicationWindow(void)
 {
     m_application->BeginFrame();
-    m_uiManager.NewFrame();
 
     m_application->Render(m_activeScene.GetGraph());
     m_uiManager.UpdateUI();
@@ -162,4 +161,14 @@ inline int16 engine::Engine::LoadEngineResources(void)
     );
 
     return SUCCESS;
+}
+
+void engine::Engine::FreezeUI(void)
+{
+    m_frozenUI = true;
+}
+
+inline void engine::Engine::UnfreezeUI(void)
+{
+    m_frozenUI = false;
 }
