@@ -6,6 +6,8 @@
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
 #include "engine/physics/Raycast.h"
 
+#include "engine/sounds/SoundsEngine.h"
+
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
 
@@ -186,8 +188,37 @@ int main(void)
         editor::PropertyWnd properties(engine.GetGraph());
         editor::Viewport* viewport = new editor::Viewport("Viewport", {0.1f, 0.1f, 0.1f, 1.0f});
 
+        engine::SoundsEngine* sounds = new engine::SoundsEngine();
+        sounds->InitSoundsEngine();
+        sounds->LoadSound("Test", ".\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3");
+
+        engine::Input::RegisterInput(KEY_SPACE);
+        engine::Input::RegisterInput(KEY_BACKSPACE);
+        engine::Input::RegisterInput(KEY_P);
+        engine::Input::RegisterInput(KEY_O);
+
         while (!engine.GetWindow()->ShouldWindowClose())
         {
+            if (engine::Input::IsInputPressed(KEY_SPACE) && !sounds->m_isPlaying)
+            {
+                sounds->PlaySound("Test");
+                sounds->m_isPlaying = true;
+            }
+            if (engine::Input::IsInputPressed(KEY_BACKSPACE) && sounds->m_isPlaying)
+            {
+                sounds->StopSound("Test");
+                sounds->m_isPlaying = false;
+            }
+            if (engine::Input::IsInputPressed(KEY_P) && !sounds->m_isPaused)
+            {
+                sounds->PauseSound("Test", true);
+                sounds->m_isPaused = true;
+            }
+            if (engine::Input::IsInputPressed(KEY_O) && sounds->m_isPaused)
+            {
+                sounds->PauseSound("Test", false);
+                sounds->m_isPaused = false;
+            }
             engine.Update();
 
             // Viewport
@@ -207,10 +238,15 @@ int main(void)
 
 
             engine.PostUpdate(viewport);
+
         }
 
         if (viewport)
             delete viewport;
+
+        sounds->CloseSoundsEngine();
+
+        delete sounds;
 
         engine.ShutDown();
     }
