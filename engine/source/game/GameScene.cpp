@@ -73,6 +73,7 @@ namespace engine
     {
         if (m_state == EGameState::RUNNING)
         {
+            ThreadManager::SynchronizeGameThread(&m_graph);
             PhysicsUpdate();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
             m_time.Update();

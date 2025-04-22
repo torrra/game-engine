@@ -20,7 +20,8 @@ namespace engine
     {
     public:
 
-        GameScene(void) = delete;
+        ENGINE_API
+        GameScene(void) = default;
 
         ENGINE_API
         GameScene(const std::filesystem::path& path, const std::string& name);
@@ -59,7 +60,7 @@ namespace engine
         SceneGraph* GetGraph(void);
 
 
-    //private:
+    private:
 
         void PhysicsUpdate(void);
 
