@@ -19,9 +19,6 @@
 
 #pragma endregion
 
-#include <physx/PxPhysicsAPI.h>
-
-#include <assert.h>
 engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene)
 {
     m_triangleMeshImpl = new TriangleMeshImpl();
