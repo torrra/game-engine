@@ -10,6 +10,8 @@
 #include "engine/resource/ResourceManager.h"
 #include "engine/resource/texture/Texture.h"
 
+#include "serialization/TextSerializer.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
@@ -17,7 +19,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-#include <cstring>
+#include <fstream>
 
 
 namespace engine::importer
@@ -40,9 +42,11 @@ engine::Model::~Model(void)
 
 bool engine::Model::LoadResource(const char* fileName)
 {
-    if (!fileName || !strcmp(fileName, ""))
+    if (!fileName || *fileName == '\0')
         return false;
 
+    m_metaFilePath = fileName;
+    m_metaFilePath.replace_extension(".mres");
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
 }
@@ -62,18 +66,57 @@ bool engine::Model::IsDynamic(void) const
     return m_isDynamic;
 }
 
-void engine::Model::Draw(void) const
+void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) const
 {
     if (m_isDynamic)
     {
-        for (const Mesh& mesh : m_dynamicMeshes)
-            mesh.Draw();
+        for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
+        {
+            const MeshMaterial* currentMaterial = materials[meshIndex];
+
+            if (currentMaterial)
+                currentMaterial->Use(0);
+
+            m_dynamicMeshes[meshIndex].Draw(!currentMaterial);
+        }
     }
     else
     {
-        for (const Mesh& mesh : m_staticMeshes)
-            mesh.Draw();
+        for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
+        {
+            const MeshMaterial* currentMaterial = materials[meshIndex];
+
+            if (currentMaterial)
+                currentMaterial->Use(0);
+
+            m_staticMeshes[meshIndex].Draw(!currentMaterial);
+        }
     } 
+}
+
+void engine::Model::SerializeText(void)
+{
+    std::ofstream metaFile(m_metaFilePath, std::ios::out | std::ios::trunc);
+
+    metaFile << "[Model]\n";
+    text::Serialize(metaFile, "isDynamic", m_isDynamic);
+
+    if (m_isDynamic)
+    {
+        text::Serialize(metaFile, "isDynamic", true);
+        text::Serialize(metaFile, "meshCount", m_dynamicMeshes.size());
+    }
+
+
+}
+
+uint32 engine::Model::GetMeshCount(void) const
+{
+    if (m_isDynamic)
+        return static_cast<uint32>(m_dynamicMeshes.size());
+
+    else
+        return static_cast<uint32>(m_staticMeshes.size());
 }
 
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const
