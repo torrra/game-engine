@@ -30,7 +30,10 @@ namespace engine
 
         ENGINE_API static bool HasEditor(void);
 
-    //private:
+        ENGINE_API void CreateProject(const std::string& dir, const std::string& name);
+        ENGINE_API void OpenProject(const std::filesystem::path& projFile);
+
+    private:
 
         inline int16		InitScriptSystem(const char* projectDir);
         inline int16		InitWindow(const char* projectName);
