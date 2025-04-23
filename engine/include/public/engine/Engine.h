@@ -31,11 +31,12 @@ namespace engine
         ENGINE_API void UpdateGameplay(void);
         ENGINE_API void UpdateApplicationWindow(void);
 
-        ENGINE_API static bool HasEditor(void);
         ENGINE_API void LoadNewScene(bool serialize, const std::filesystem::path& path);
 
         ENGINE_API void CreateProject(const std::string& dir, const std::string& name);
         ENGINE_API void OpenProject(const std::filesystem::path& projFile);
+
+        ENGINE_API static bool HasEditor(void);
 
     private:
 
@@ -55,4 +56,6 @@ namespace engine
         bool              m_hasEditor;
         std::atomic<bool> m_frozenUI = false;
     };
+
+    extern Engine* g_defaultEngine;
 }
