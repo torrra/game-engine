@@ -1,11 +1,13 @@
 #include "Engine.h"
 
+#include "ConsoleLog.hpp"
+#include "core/systems/ScriptSystem.h"
 #include "input/Input.h"
 #include "resource/ResourceManager.h"
-#include "core/systems/ScriptSystem.h"
-#include "Window.h"
+#include "serialization/TextSerializer.h"
 #include "ui/UIWindow.h"
 #include "ui/Application.h"
+#include "Window.h"
 
 #include <math/Vector2.hpp>
 
@@ -113,6 +115,90 @@ void engine::Engine::UpdateApplicationWindow(void)
 bool engine::Engine::HasEditor(void)
 {
     return m_hasEditor;
+}
+
+void engine::Engine::CreateProject(const std::string & dir, const std::string& name)
+{
+    if (name.length() > 64)
+    {
+        PrintLog(ErrorPreset(), "Unable to create project: name is too long! (over 64 characters)");
+        return;
+    }
+    std::filesystem::path pathObj = dir;
+
+    if (!pathObj.is_absolute())
+        pathObj = std::filesystem::absolute(pathObj);
+
+    if (!std::filesystem::exists(pathObj))
+    {
+        PrintLog(ErrorPreset(), "Unable to create project: target location does not exist or path is not absolute.");
+        return;
+    }
+
+    pathObj.append(name);
+
+    if (std::filesystem::exists(pathObj))
+    {
+        PrintLog(ErrorPreset(), "Unable to create project: directory already exists.");
+        return;
+    }
+
+    std::filesystem::create_directory(pathObj);
+
+    pathObj.append(name);
+    pathObj.replace_extension(".mustang");
+
+    std::filesystem::path projectFilePath = pathObj;
+    std::ofstream projFile(pathObj, std::ios::out);
+
+    pathObj.remove_filename().append("assets");
+    std::filesystem::create_directory(pathObj);
+
+    if (projFile)
+    {
+        text::Serialize(projFile, "defaultGameScene", "0", 1);
+        projFile << '\n';
+        text::Serialize(projFile, "defaultEditorScene", "0", 1);
+        projFile.close();
+
+        OpenProject(projectFilePath);
+    }
+}
+
+void engine::Engine::OpenProject(const std::filesystem::path& projFile)
+{
+    wchar_t extension[] = L".mustang";
+
+    if (memcmp(projFile.extension().c_str(), extension, sizeof(extension)) != 0)
+    {
+        PrintLog(ErrorPreset(), "Invalid project file");
+        return;
+    }
+
+    std::ifstream input(projFile, std::ios::in | std::ios::binary);
+
+    const char* cursor;
+    const char* end;
+    const char* fileData = text::LoadFileData(input, cursor, end);
+
+    if (m_hasEditor)
+        cursor = text::GetNewLine(cursor, end);
+
+    m_projectDir = projFile.parent_path().string();
+
+    std::string scenePath;
+    cursor = text::DeserializeString(cursor, end, scenePath);
+
+    if (memcmp(scenePath.c_str(), "0", 1) == 0)
+    {
+        PrintLog(WarningPreset(), "No default scene set in this mode");
+        return;
+    }
+
+    text::UnloadFileData(fileData);
+
+    //m_activeScene.Rename()
+
 }
 
 

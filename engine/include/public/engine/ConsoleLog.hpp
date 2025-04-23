@@ -74,7 +74,7 @@ namespace engine
     {
         EBGColor    m_bgColor       = EBGColor::BG_BLACK;
         EFGColor    m_fgColor       = EFGColor::FG_WHITE;
-        EGRP        m_textFormat;
+        EGRP        m_textFormat    = EGRP::NORMAL;
         std::string m_prefix        = "[]";
 
     }; // !Struct ConsoleLog

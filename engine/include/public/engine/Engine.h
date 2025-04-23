@@ -34,6 +34,9 @@ namespace engine
         ENGINE_API static bool HasEditor(void);
         ENGINE_API void LoadNewScene(bool serialize, const std::filesystem::path& path);
 
+        ENGINE_API void CreateProject(const std::string& dir, const std::string& name);
+        ENGINE_API void OpenProject(const std::filesystem::path& projFile);
+
     private:
 
         inline int16		InitScriptSystem(const char* projectDir);
