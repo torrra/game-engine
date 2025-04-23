@@ -196,6 +196,10 @@ int main(void)
         engine::Input::RegisterInput(KEY_BACKSPACE);
         engine::Input::RegisterInput(KEY_P);
         engine::Input::RegisterInput(KEY_O);
+        engine::Input::RegisterInput(KEY_1);
+        engine::Input::RegisterInput(KEY_2);
+
+        float volume = 1;
 
         while (!engine.GetWindow()->ShouldWindowClose())
         {
@@ -219,6 +223,30 @@ int main(void)
                 sounds->PauseSound("Test", false);
                 sounds->m_isPaused = false;
             }
+            if (engine::Input::IsInputPressed(KEY_1) && !sounds->m_isPressed)
+            {
+                sounds->m_isPressed = true;
+                sounds->SetVolumeSound("Test", volume);
+                volume -= 0.01f;
+                sounds->m_isPressed = false;
+            }
+            if (engine::Input::IsInputPressed(KEY_2) && !sounds->m_isPressed)
+            {
+                sounds->m_isPressed = true;
+                sounds->SetVolumeSound("Test", volume);
+                volume += 0.01f;
+                sounds->m_isPressed = false;
+            }
+
+            if (volume < 0.f)
+            {
+                volume = 0.f;
+            }
+            else if (volume > 1.f)
+            {
+                volume = 1.f;
+            }
+
             engine.Update();
 
             // Viewport

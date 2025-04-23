@@ -36,6 +36,7 @@ namespace engine
 
         bool m_isPlaying = false;
         bool m_isPaused = false;
+        bool m_isPressed = false;
 
         /// Constructor
         ENGINE_API      SoundsEngine(void);

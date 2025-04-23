@@ -102,11 +102,35 @@ void engine::SoundsEngine::PlaySound(const std::string& inID)
     }
 
     FMOD::Channel* channel = nullptr;
-    m_system->playSound(it->second, nullptr, true, &channel);
+    FMOD_RESULT result = m_system->playSound(it->second, nullptr, true, &channel);
+
+    if (result != FMOD_OK)
+    {
+        m_log = &SoundsEngineErrorLog();
+        PrintLog(*m_log, "Unable to play sound " + inID);
+        return;
+    }
+
     if (channel)
     {
-        channel->setVolume(1.0f);
-        channel->setPaused(false);
+        FMOD_RESULT result1 = channel->setVolume(1.0f);
+
+        if (result1 != FMOD_OK)
+        {
+            m_log = &SoundsEngineErrorLog();
+            PrintLog(*m_log, "Unable to set volume for sound " + inID);
+            return;
+        }
+
+        FMOD_RESULT result2 = channel->setPaused(false);
+
+        if (result2 != FMOD_OK)
+        {
+            m_log = &SoundsEngineErrorLog();
+            PrintLog(*m_log, "Unable to play sound " + inID);
+            return;
+        }
+
         m_channels[inID] = channel;
 
         m_log = &SoundsEngineSuccessLog();
@@ -141,7 +165,14 @@ void engine::SoundsEngine::PauseSound(const std::string& inID, bool inIsPaused)
 
     if (it != m_channels.end() && it->second)
     {
-        it->second->setPaused(inIsPaused);
+        FMOD_RESULT result = it->second->setPaused(inIsPaused);
+
+        if (result != FMOD_OK)
+        {
+            m_log = &SoundsEngineErrorLog();
+            PrintLog(*m_log, "Unable to pause sound " + inID);
+            return;
+        }
 
         m_log = &SoundsEngineSuccessLog();
         PrintLog(*m_log, "Sound " + inID + " paused");
@@ -152,9 +183,25 @@ void engine::SoundsEngine::SetVolumeSound(const std::string& inID, float inVolum
 {
     auto it = m_channels.find(inID);
 
+    if (inVolume < 0.f)
+    {
+        inVolume = 0.f;
+    }
+    else if (inVolume > 1.f)
+    {
+        inVolume = 1.f;
+    }
+
     if (it != m_channels.end() && it->second)
     {
-        it->second->setVolume(inVolume);
+        FMOD_RESULT result = it->second->setVolume(inVolume);
+
+        if (result != FMOD_OK)
+        {
+            m_log = &SoundsEngineErrorLog();
+            PrintLog(*m_log, "Unable to set volume for sound " + inID);
+            return;
+        }
 
         m_log = &SoundsEngineSuccessLog();
         PrintLog(*m_log, "Sound " + inID + " volume set to " + std::to_string(inVolume));
@@ -167,7 +214,14 @@ void engine::SoundsEngine::CloseSoundsEngine(void)
     {
         if (sound)
         {
-            sound->release();
+            FMOD_RESULT result = sound->release();
+
+            if (result != FMOD_OK)
+            {
+                m_log = &SoundsEngineErrorLog();
+                PrintLog(*m_log, "Unable to close sound " + id);
+                continue;
+            }
 
             m_log = &SoundsEngineSuccessLog();
             PrintLog(*m_log, "Sound " + id + " closed");
@@ -178,7 +232,15 @@ void engine::SoundsEngine::CloseSoundsEngine(void)
 
     if (m_system)
     {
-        m_system->close();
+        FMOD_RESULT result = m_system->close();
+
+        if (result != FMOD_OK)
+        {
+            m_log = &SoundsEngineErrorLog();
+            PrintLog(*m_log, "Unable to close FMOD");
+            return;
+        }
+
         m_log = &SoundsEngineSuccessLog();
         PrintLog(*m_log, "FMOD closed");
     }
