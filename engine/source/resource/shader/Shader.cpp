@@ -140,6 +140,16 @@ void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4d* matrix)
 	glUniformMatrix4dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
 }
 
+const std::string& engine::ShaderProgram::GetVertexShaderName(void) const
+{
+    return m_vertexShader;
+}
+
+const std::string& engine::ShaderProgram::GetFragmentShaderName(void) const
+{
+    return m_fragShader;
+}
+
 void engine::ShaderProgram::CreateProgram(void)
 {
     // Don't create OpenGL program twice
