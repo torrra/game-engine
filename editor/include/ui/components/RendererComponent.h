@@ -18,5 +18,8 @@ namespace editor
     private:
         void ModelInput(engine::Renderer* renderer);
         void ShaderInput(engine::Renderer* renderer);
+
+        std::string m_modelName;
+        std::string m_fragName;
     };
 }

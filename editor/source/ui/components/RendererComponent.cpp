@@ -11,6 +11,9 @@ editor::RendererComponent::RendererComponent(void)
 {
     SetName("Renderer");
     SetType(RENDERER);
+
+    m_modelName = "None##model";
+    m_fragName = "None##shader";
 }
 
 editor::RendererComponent::~RendererComponent(void)
@@ -30,7 +33,7 @@ void editor::RendererComponent::SectionContent(void)
 void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 {
     // Get file name
-    std::string modelName("None");
+    std::string modelName("None##model");
 
     if (const engine::Model* model = renderer->GetModel())
     {
@@ -44,7 +47,7 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 
     // Model input
     ui::Text("Model: ");
-    ui::SameLine(110.0f);
+    ui::SameLine(150.0f);
     ui::Button(modelName.c_str());
 
     // Drag / drop
@@ -67,17 +70,37 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 
 void editor::RendererComponent::ShaderInput(engine::Renderer* renderer)
 {
-    // Get shader program name
-    std::string shaderName("None");
+    ui::Text("Fragment Shader: ");
+    ui::SameLine(150.0f);
+    ui::Button(m_fragName.c_str());
 
-    if (const engine::ShaderProgram* shader = renderer->GetShader())
-        shaderName = shader->GetName();
-    else
-        renderer->SetShader("ModelTextured");
+    // Drag / drop
+    if (ui::StartDragDropTarget())
+    {
+        // Check asset type
+        if (const ui::Payload payload = ui::AcceptPayload(FRAGMENT_SHADER_PAYLOAD, 0))
+        {
+            constexpr const char* defaultVertexShader = ".\\shaders\\ModelTextured.vert";
 
-    ui::Text("Shader: ");
-    ui::SameLine(110.0f);
-    ui::Button(shaderName.c_str());
+            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+            
+            // Create shader name
+            uint64 startOffset = payloadData->m_fileName.rfind('\\') + 1;
+            uint64 endOffset = payloadData->m_fileName.rfind('.');
+
+            if (startOffset < endOffset)
+            {
+                m_fragName = payloadData->m_fileName.substr(startOffset);
+                std::string programName = "program" + m_fragName.substr(0, endOffset);
+
+                engine::ResourceManager::LoadShader(programName.c_str(), defaultVertexShader, payloadData->m_path.string().c_str());
+                renderer->SetShader(programName.c_str());
+            }
+        }
+
+        ui::EndDragDropTarget();
+    }
+
     ui::VerticalSpacing();
 
 }

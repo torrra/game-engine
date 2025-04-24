@@ -8,8 +8,13 @@
 
 namespace editor
 {
+    class BaseComponent;
+
     template<class TComponentType>
-    concept CValidComponentType = std::derived_from<TComponentType, engine::Component>;
+    concept CComponentType = std::derived_from<TComponentType, engine::Component>;
+
+    template<typename TDerrivedType>
+    concept CComponentUIType = std::derived_from<TDerrivedType, BaseComponent>;
 
     enum EComponentType
     {
@@ -26,11 +31,13 @@ namespace editor
     {
     public:
         void RenderSection(engine::SceneGraph* graph, engine::EntityHandle const& handle);
-    
-        template<CValidComponentType ComponentType>
-        void SetData(ComponentType* component);
-
         bool IsRemoved(void) const noexcept;
+    
+        template<CComponentType CType>
+        void SetData(CType* component);
+
+        EComponentType GetType(void) const noexcept;
+
 
     protected:
         virtual void SectionContent(void);
@@ -38,9 +45,10 @@ namespace editor
         void SetName(const char* name);
         void SetType(EComponentType type);
 
-        template <CValidComponentType ComponentType>
-        ComponentType* GetData(void); 
-        
+        template <CComponentType CType>
+        CType* GetData(void);
+
+
     private:
         void* m_component = nullptr;
         std::string m_componentName;
@@ -50,15 +58,15 @@ namespace editor
         bool m_isClosed = false;
     };
 
-    template<CValidComponentType ComponentType>
-    inline void BaseComponent::SetData(ComponentType* component)
+    template<CComponentType CType>
+    inline void BaseComponent::SetData(CType* component)
     {
         m_component = component;
     }
 
-    template<CValidComponentType ComponentType>
-    inline ComponentType* BaseComponent::GetData(void)
+    template<CComponentType CType>
+    inline CType* BaseComponent::GetData(void)
     {
-        return reinterpret_cast<ComponentType*>(m_component);
+        return reinterpret_cast<CType*>(m_component);
     }
 }

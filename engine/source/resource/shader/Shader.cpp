@@ -17,14 +17,14 @@ bool engine::ShaderProgram::LoadResource(const char* filePath)
     return true;
 }
 
-void engine::ShaderProgram::SetName(std::string const& name)
+std::string engine::ShaderProgram::GetVertName(void) const noexcept
 {
-    m_programName = name;
+    return m_vertexShader;
 }
 
-std::string engine::ShaderProgram::GetName(void) const noexcept
+std::string engine::ShaderProgram::GetFragName(void) const noexcept
 {
-    return m_programName;
+    return m_fragShader;
 }
 
 void engine::ShaderProgram::Use(void) const

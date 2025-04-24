@@ -48,6 +48,11 @@ bool editor::BaseComponent::IsRemoved(void) const noexcept
     return m_isClosed;
 }
 
+editor::EComponentType editor::BaseComponent::GetType(void) const noexcept
+{
+    return m_componentType;
+}
+
 void editor::BaseComponent::SectionContent(void)
 {}
 
