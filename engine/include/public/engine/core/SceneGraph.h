@@ -3,13 +3,13 @@
 #include <random>
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <unordered_map>
 
 #include "engine/EngineExport.h"
 #include "TypesECS.h"
 #include "Component.h"
 #include "Entity.h"
-#include "ComponentArray.h"
+#include "ComponentArray.hpp"
 
 #include "components/Script.h"
 #include "components/Transform.h"
@@ -59,7 +59,7 @@ namespace engine
     public:
 
         ENGINE_API SceneGraph(void) = default;
-        ENGINE_API SceneGraph(const SceneGraph&) = delete;
+        SceneGraph(const SceneGraph&) = delete;
         ENGINE_API SceneGraph(SceneGraph&&) noexcept = default;
         ENGINE_API ~SceneGraph(void) = default;
 
@@ -87,6 +87,10 @@ namespace engine
         // ensure the reference is up-to-date
         template <CValidComponent TComponentType>
         TComponentType* GetComponent(EntityHandle ownerEntity);
+
+        // Permamently flag an entity's component for destruction / overwrite
+        template <CValidComponent TComponentType>
+        void DestroyComponent(EntityHandle ownerEntity);
 
         // Get a raw pointer to the entity from its handle.
         // Returns nullptr if:
@@ -375,6 +379,16 @@ namespace engine
         ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
         return array.GetComponent(ownerEntity);
+    }
+
+    template<CValidComponent TComponentType>
+    inline void SceneGraph::DestroyComponent(EntityHandle ownerEntity)
+    {
+        GetComponentArray<TComponentType>().InvalidateComponent(ownerEntity);
+
+        // Remove component flag
+        if (Entity* ownerPtr = GetEntity(ownerEntity))
+            ownerPtr->m_components &= ~Entity::GetComponentFlag<TComponentType>();
     }
 
 

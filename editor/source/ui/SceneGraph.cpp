@@ -68,7 +68,7 @@ void editor::SceneGraphUI::ClearGraph(void)
         DeleteGraph();
 
     m_root = new TreeNode();
-    m_root->Init(nullptr, -1);
+    m_root->Init(nullptr, INVALID_HANDLE);
 }
 
 void editor::SceneGraphUI::SetGraph(engine::SceneGraph* graph)

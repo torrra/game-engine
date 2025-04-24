@@ -4,6 +4,7 @@
 #include "engine/physics/PhysicsEngine.h"
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
+#include "engine/physics/Raycast.h"
 
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
@@ -77,23 +78,14 @@ int main(void)
         floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
         floorRb->SetDebugVisualization(true);
 
-        engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
-
-        engine.m_activeScene.Start();
-
 		while (!engine.GetWindow()->ShouldWindowClose())
-		{
-            math::Matrix4f projViewMatrix = camera->ViewProjection();
-            // Update physics
-            engine::PhysicsEngine::Get().StepSimulation(1 / 600.f);
-            // Update the entity in regard to the rigid body (gravity for example)
-            rb->UpdateEntity();
-			project.Update(engine);
+		{       
+            project.Update(engine);
             engine.UpdateGameplay();
             // Update the debug draw
            // engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
             // Update the rigid body in regard to the entity (movement by keyboard input for example)
-            rb->UpdateRigidBody();
+            //rb->UpdateRigidBody();
 
             engine.UpdateApplicationWindow();
 		}

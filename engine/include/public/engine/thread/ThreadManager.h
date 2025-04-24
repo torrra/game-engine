@@ -4,7 +4,6 @@
 #include <functional>
 #include <future>
 #include <mutex>
-#include <memory>
 #include <queue>
 #include <type_traits>
 #include <utility>

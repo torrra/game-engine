@@ -12,15 +12,11 @@ namespace engine
 {
     struct Frustum
     {
-        f32 m_near;
-        f32 m_far;
-        f32 m_fovRad;
-        f32 m_ratio;
+        f32 m_near = 0.005f;
+        f32 m_far = 250.0f;
+        f32 m_fovRad = 1.0471976f;
+        f32 m_ratio = 1.77777777778f;
 
-        ENGINE_API Frustum(f32 near = 0.005f, f32 far = 250.0f, f32 fovDeg = 60.0f, f32 ratio = 1.77777777778f)
-            : m_near(near), m_far(far), m_fovRad(fovDeg* DEG2RAD), m_ratio(ratio)
-        {
-        }
     };
 
     class Camera : public Component
@@ -43,6 +39,7 @@ namespace engine
 
         ENGINE_API math::Vector3f GetPosition(void) const noexcept;
         ENGINE_API math::Vector3f GetRotation(void) const noexcept;
+        ENGINE_API math::Quatf GetRotationQuat(void) const noexcept;
 
         ENGINE_API f32 GetFOV(void) const noexcept;
         ENGINE_API f32 GetNearPlane(void) const noexcept;

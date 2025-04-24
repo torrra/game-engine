@@ -2,7 +2,7 @@
 
 #include "engine/EngineExport.h"
 #include "engine/core/Component.h"
-#include "engine/core/ComponentArray.h"
+#include "engine/core/ComponentArray.hpp"
 #include "engine/core/components/Transform.h"
 
 #include <fstream>

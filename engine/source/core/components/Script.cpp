@@ -5,8 +5,6 @@
 
 #include "serialization/TextSerializer.h"
 
-#include <iostream>
-
 namespace engine
 {
     void Script::Start(void)

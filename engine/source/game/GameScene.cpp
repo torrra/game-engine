@@ -1,5 +1,4 @@
 #include "game/GameScene.h"
-#include "resource/ResourceManager.h"
 #include "thread/ThreadManager.h"
 #include "core/systems/ScriptSystem.h"
 
