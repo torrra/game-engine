@@ -14,6 +14,7 @@
 #define ASSET_HEIGHT 130.0f
 #define ASSET_PADDING 15.0f
 #define MAX_LABEL_LINE_LENGTH 16
+#define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag"}
 
 // Node implementation
 editor::DirTreeNode::DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent)
@@ -32,8 +33,8 @@ editor::DirTreeNode::~DirTreeNode(void)
 }
 
 // Asset implementation
-editor::Asset::Asset(std::filesystem::path const& path)
-    : m_path(path)
+editor::Asset::Asset(std::filesystem::path const& path, std::string const& payloadType)
+    : m_path(path), m_payloadType(payloadType)
 {
     m_fileName = path.filename().string();
 }
@@ -195,7 +196,7 @@ void editor::AssetsWnd::RenderAssets(void)
                     // Create drag & drop payload 
                     if (::ui::StartDragDropSource(0))
                     {
-                        ::ui::CreatePayload("Asset", &m_assets[index], sizeof(Asset));
+                        ::ui::CreatePayload(m_assets[index].m_payloadType.c_str(), &m_assets[index], sizeof(Asset));
                         ::ui::Text("%s", m_assets[index].m_fileName.c_str());
                         ::ui::EndDragDropSource();
                     }
@@ -243,16 +244,16 @@ void editor::AssetsWnd::OnSelectDir(void)
     for (auto file : std::filesystem::directory_iterator(m_selectedDirectory->m_path))
     {
         const std::filesystem::path& filePath = file.path();
+        std::string payloadType;
 
-        if (IsSupportedExtension(filePath.extension().string()))
-            m_assets.emplace_back(Asset(filePath));
+        if (IsSupportedExtension(filePath.extension().string(), payloadType))
+            m_assets.emplace_back(Asset(filePath, payloadType));
     }
 }
 
-bool editor::AssetsWnd::IsSupportedExtension(std::string const& extension)
+bool editor::AssetsWnd::IsSupportedExtension(std::string const& extension, std::string& payloadType)
 {
-    constexpr const char* supportedExtensions[] =
-        {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag"};
+    constexpr const char* supportedExtensions[] = SUPPORTED_EXTENSIONS;
 
     // Skip loop if entry is a folder
     if (extension[0] != '.')
@@ -262,11 +263,37 @@ bool editor::AssetsWnd::IsSupportedExtension(std::string const& extension)
     for (const char* supportedExtension : supportedExtensions)
     {
         if (extension == supportedExtension)
+        {
+            payloadType = GetPayloadType(extension);
             return true;
+        }
     }
 
     // Entry does not have a supported extension
     return false;
+}
+
+std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) const
+{
+    constexpr const char* supportedExtensions[] = SUPPORTED_EXTENSIONS;
+    std::string payloadType;
+
+    if (extension == supportedExtensions[0] ||
+        extension == supportedExtensions[1] ||
+        extension == supportedExtensions[2])
+        payloadType = MODEL_PAYLOAD;
+    else if (extension == supportedExtensions[3])
+        payloadType = TEXTURE_PAYLOAD;
+    else if (extension == supportedExtensions[4])
+        payloadType = FONT_PAYLOAD;
+    else if (extension == supportedExtensions[5])
+        payloadType = SCRIPT_PAYLOAD;
+    else if (extension == supportedExtensions[6])
+        payloadType = VERTEX_SHADER_PAYLOAD;
+    else if (extension == supportedExtensions[7])
+        payloadType = FRAGMENT_SHADER_PAYLOAD;
+
+    return payloadType;
 }
 
 void editor::AssetsWnd::RenderFile(std::filesystem::path const& file)

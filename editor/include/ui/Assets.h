@@ -37,11 +37,16 @@
     --------------------------------------
 */
 
+#define MODEL_PAYLOAD "model"
+#define AUDIO_PAYLOAD "audio"
+#define SCRIPT_PAYLOAD "script"
+#define TEXTURE_PAYLOAD "texture"
+#define FONT_PAYLOAD "font"
+#define VERTEX_SHADER_PAYLOAD "vertexShader"
+#define FRAGMENT_SHADER_PAYLOAD "fragmentShader"
+
 namespace editor
 {
-    class BaseComponent;
-    class RendererComponent;
-
     struct DirTreeNode
     {
         DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent);
@@ -56,10 +61,11 @@ namespace editor
     struct Asset
     {
         Asset(void) = delete;
-        Asset(std::filesystem::path const& path);
+        Asset(std::filesystem::path const& path, std::string const& payloadType);
 
         std::filesystem::path m_path;
         std::string m_fileName;
+        const std::string m_payloadType;
     };
 
     class AssetsWnd : public ::ui::UIWindow
@@ -82,7 +88,8 @@ namespace editor
         // Files section
         void RenderAssets(void);
         void OnSelectDir(void);
-        bool IsSupportedExtension(std::string const& extension);
+        bool IsSupportedExtension(std::string const& extension, std::string& payloadType);
+        std::string GetPayloadType(std::string const& extension) const;
         void RenderFile(std::filesystem::path const& file);
 
         std::vector<Asset> m_assets;
