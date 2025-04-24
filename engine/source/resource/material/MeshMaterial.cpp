@@ -243,6 +243,11 @@ void engine::MeshMaterial::MoveFile(const std::filesystem::path& newPath)
     m_filePath += name;
 }
 
+const std::filesystem::path& engine::MeshMaterial::GetFilePath(void) const
+{
+    return m_filePath;
+}
+
 engine::MeshMaterial* engine::MeshMaterial::CreateMaterial(const char* path)
 {
     std::string pathStr = path;
@@ -320,7 +325,7 @@ const char* engine::MeshMaterial::DeserializeTextureMaps(const char* text, const
         text = DeserializePath(text, end, paths[pathIndex]);
 
 
-    ThreadManager::AddTask([this, paths]()
+    ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>([this, paths]()
         {
             for (uint64 pathIndex = 0; pathIndex < pathCount; ++pathIndex)
             {
@@ -333,6 +338,7 @@ const char* engine::MeshMaterial::DeserializeTextureMaps(const char* text, const
             }
 
             delete[] paths;
+            InitBuffer();
         });
 
     return text;
@@ -341,15 +347,13 @@ const char* engine::MeshMaterial::DeserializeTextureMaps(const char* text, const
 const char* engine::MeshMaterial::DeserializePath(const char* text, const char* end, std::string& path)
 {
     uint8 hasMap = false;
-    MOVE_TEXT_CURSOR(text, end);
 
     text = text::DeserializeInteger(text, hasMap);
 
     if (hasMap)
-    {
-        MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeString(text, end, path);
-    }
+
+    MOVE_TEXT_CURSOR(text, end);
 
     return text;
 }
