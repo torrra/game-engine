@@ -1,6 +1,9 @@
 #include "core/components/Camera.h"
 #include "core/systems/ScriptSystem.h"
 
+#include <math/Vector4.hpp>
+
+#include <fstream>
 #include "serialization/TextSerializer.h"
 
 engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
