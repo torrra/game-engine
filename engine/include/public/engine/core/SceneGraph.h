@@ -81,6 +81,10 @@ namespace engine
         template <CValidComponent TComponentType>
         TComponentType* GetComponent(EntityHandle ownerEntity);
 
+        // Permamently flag an entity's component for destruction / overwrite
+        template <CValidComponent TComponentType>
+        void DestroyComponent(EntityHandle ownerEntity);
+
         // Get a raw pointer to the entity from its handle.
         // Returns nullptr if:
         // - the entity does not exist
@@ -331,6 +335,16 @@ namespace engine
         ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
         return array.GetComponent(ownerEntity);
+    }
+
+    template<CValidComponent TComponentType>
+    inline void SceneGraph::DestroyComponent(EntityHandle ownerEntity)
+    {
+        GetComponentArray<TComponentType>().InvalidateComponent(ownerEntity);
+
+        // Remove component flag
+        if (Entity* ownerPtr = GetEntity(ownerEntity))
+            ownerEntity &= ~Entity::GetComponentFlag<TComponentType>();
     }
 
 
