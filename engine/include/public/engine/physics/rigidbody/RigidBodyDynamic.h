@@ -121,9 +121,6 @@ namespace engine
         ENGINE_API	void		    Register(void) override {}
 
         ENGINE_API
-        RigidBodyDynamic& operator=(const RigidBodyDynamic&) = default;
-
-        ENGINE_API
         RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
 
     private :

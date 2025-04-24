@@ -88,9 +88,6 @@ namespace engine
 		ENGINE_API	void		    RigidBodyStaticCleanUp(void);
 
         ENGINE_API
-        RigidBodyStatic& operator=(const RigidBodyStatic&) = default;
-
-        ENGINE_API
         RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 
 	private :
