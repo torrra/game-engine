@@ -33,7 +33,10 @@ namespace editor
         SceneGraphUI(const char* title, class engine::SceneGraph* graph);
         ~SceneGraphUI(void);
 
+        // Clear the graph for later re-use and reset root node
         void ClearGraph(void);
+
+        // Scene engine scene graph to be displayed and operated on
         void SetGraph(class engine::SceneGraph* graph);
 
         engine::EntityHandle GetSelectedEntity(void) const noexcept;
@@ -47,7 +50,10 @@ namespace editor
         void AddNode(TreeNode* parentNode);
         void CreateGraph(void);
         void DeleteAllChildren(TreeNode* node);
+
+        // Fully empty graph without root node reallocation
         void DeleteGraph(void);
+
         void ReparentNode(TreeNode* toReparent, TreeNode* newParent);
         void CheckRenameNode(TreeNode* node, std::string const& originalName);
         void DrawNodeAndChildren(TreeNode* node);
