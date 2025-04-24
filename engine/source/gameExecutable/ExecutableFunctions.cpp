@@ -1,9 +1,11 @@
-#include "gameExecutable/ExecutableFunctions.h"
-
 #include "engine/Engine.h"
 #include "engine/ConsoleLog.hpp"
 
 #include <filesystem>
+#include <iostream>
+
+#undef ERROR
+#include "gameExecutable/ExecutableFunctions.h"
 
 void* InitializeEngine(void)
 {
@@ -17,9 +19,10 @@ void* InitializeEngine(void)
 
         const std::filesystem::path& filePath = entry.path();
         uint64 size = filePath.native().size();
+        std::cout << "Directory entry: " << filePath << '\n';
 
         constexpr wchar_t extension[] = L".mustang";
-        constexpr uint64 arrayLength = sizeof(extension) / sizeof(extension[0]);
+        constexpr uint64 arrayLength = sizeof(extension) / sizeof(extension[0]) - 1;
 
         if (size <= sizeof(extension))
             continue;
@@ -40,13 +43,15 @@ void* InitializeEngine(void)
     return nullptr;
 }
 
-void RunGame(void* data)
+void RunGame(void*& data)
 {
     if (!data)
         return;
 
     engine::Engine* enginePtr = reinterpret_cast<engine::Engine*>(data);
     engine::Window* window = enginePtr->GetWindow();
+
+    enginePtr->GetCurrentScene().Start();
 
     while (!window->ShouldWindowClose())
     {
