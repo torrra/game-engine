@@ -51,7 +51,7 @@ namespace ui
     ENGINE_API void EndSection(void);
     ENGINE_API void StartDisabledSection(bool disabled = true);
     ENGINE_API void EndDisabledSection(void);
-    ENGINE_API bool CollapseSection(const char* name);
+    ENGINE_API bool CollapseSection(const char* name, bool& closeButton);
 
     // IDs
     ENGINE_API void SetID(std::string const& id);

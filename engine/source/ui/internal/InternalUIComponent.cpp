@@ -249,9 +249,33 @@ void ui::EndDisabledSection(void)
     ImGui::EndDisabled();
 }
 
-bool ui::CollapseSection(const char* name)
+bool ui::CollapseSection(const char* name, bool& closeButton)
 {
-    return ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_None);
+    int32 flags = ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_ClipLabelForTrailingButton;
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+    if (window->SkipItems)
+        return false;
+
+    uint32 id = window->GetID(name);
+
+    bool is_open = ImGui::TreeNodeBehavior(id, flags, name);
+    {
+        ImGuiContext& context = *GImGui;
+        ImGuiLastItemData last_item_backup = context.LastItemData;
+        float button_size = context.FontSize;
+
+        math::Vector2f buttonSize(
+            ImMax(context.LastItemData.Rect.Min.x, context.LastItemData.Rect.Max.x - context.Style.FramePadding.x - button_size),
+            context.LastItemData.Rect.Min.y + context.Style.FramePadding.y
+        );
+
+        uint32  close_button_id = ImGui::GetIDWithSeed("#CLOSE", NULL, id);
+        closeButton = (ImGui::CloseButton(close_button_id, buttonSize));
+        context.LastItemData = last_item_backup;
+    }
+
+    return is_open;
 }
 
 void ui::SetID(std::string const& id)
