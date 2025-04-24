@@ -1,6 +1,9 @@
 #include <cstdio>
 
 #include "core/Entity.h"
+#include "core/systems/ScriptSystem.h"
+
+#include "serialization/TextSerializer.h"
 
 namespace engine
 {
@@ -40,7 +43,7 @@ namespace engine
         return m_parent;
     }
 
-    std::string Entity::GetName(void) const
+    const std::string& Entity::GetName(void) const
     {
         return m_name;
     }
@@ -48,6 +51,43 @@ namespace engine
     void Entity::SetName(const std::string& name)
     {
         m_name = name;
+        ScriptSystem::RegisterNewEntity(m_handle, name);
+    }
+
+    void Entity::SerializeText(std::ofstream& file) const
+    {
+        if (m_statusFlags & ecs::NON_SERIALIZABLE_OBJECT)
+            return;
+
+        file << "[Entity]\n   ";
+        text::Serialize(file, "name", m_name);
+        file << "\n   ";
+        text::Serialize(file, "handle", m_handle);
+        file << "\n   ";
+        text::Serialize(file, "parent", m_parent);
+        file << "\n   ";
+        text::Serialize(file, "flags", m_statusFlags);
+        file << "\n   ";
+        text::Serialize(file, "components", m_components);
+        file << '\n';
+    }
+
+    const char* Entity::DeserializeText(const char* text, const char* end)
+    {
+        text = text::DeserializeString(text, end, m_name);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, m_handle);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, m_parent);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, m_statusFlags);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, m_components);
+        return text;
     }
 
     bool Entity::IsValid() const

@@ -6,21 +6,12 @@ extern "C"
 }
 
 #include <iostream>
-#include <fstream>
-#include <iostream>
 
 #include "core/components/Script.h"
 #include "core/systems/ScriptSystem.h"
 #include "core/SceneGraph.h"
 
-#include "scripting/EntityScriptFunctions.h"
-#include "scripting/ComponentFunctions.h"
-#include "scripting/ScriptFunctions.h"
-#include "scripting/CameraFunctions.h"
-#include "scripting/TransformFunctions.h"
-#include "scripting/InputFunctions.h"
-
-//#include "utility/StringConversion.h"
+#include "scripting/EngineScriptFunctions.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -66,11 +57,15 @@ namespace engine
         RunAllUserScripts();
     }
 
-    void ScriptSystem::Shutdown(void)
+    void ScriptSystem::Shutdown(bool deleteInstance)
     {
         lua_close(GetInstance()->m_luaState);
-        delete m_instance;
-        m_instance = nullptr;
+        
+        if (deleteInstance)
+        {
+            delete m_instance;
+            m_instance = nullptr;
+        }
     }
 
     void ScriptSystem::SetCurrentScene(SceneGraph* graph)
@@ -97,6 +92,15 @@ namespace engine
             LogLuaError();
     }
 
+    void ScriptSystem::UnregisterComponent(const char* function, EntityHandle owner)
+    {
+        lua_getglobal(GetInstance()->m_luaState, function);
+        lua_pushinteger(GetInstance()->m_luaState, owner);
+
+        if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
+            LogLuaError();
+    }
+
     void ScriptSystem::RegisterNewEntity(EntityHandle newEntity, const std::string& name)
     {
         if (name.empty())
@@ -110,11 +114,13 @@ namespace engine
             LogLuaError();
     }
 
-    void ScriptSystem::RegisterNewScriptComponent(EntityHandle owner)
+    void ScriptSystem::UnregisterEntity(EntityHandle toRemove)
     {
-        lua_getglobal(GetInstance()->m_luaState, "_NewScriptComponent");
-        lua_pushinteger(GetInstance()->m_luaState, owner);
-          
+        std::string fullName = GetInstance()->m_currentScene->GetFullEntityName(toRemove);
+
+        lua_getglobal(GetInstance()->m_luaState, "_UnregisterEntity");
+        lua_pushstring(GetInstance()->m_luaState, fullName.c_str());
+
         if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
             LogLuaError();
     }
@@ -166,17 +172,15 @@ namespace engine
 
     void ScriptSystem::ResetState(SceneGraph* newScene)
     {
-        SceneGraph* oldScenePtr = GetInstance()->m_currentScene;
-
-        Shutdown();
+        Shutdown(false);
         Startup();
 
         if (newScene)
+        {
             GetInstance()->m_currentScene = newScene;
-        else
-            GetInstance()->m_currentScene = oldScenePtr;
-
-        GetInstance()->m_currentScene->RegisterAllComponents();
+            GetInstance()->m_currentScene->RegisterAllEntities();
+            GetInstance()->m_currentScene->RegisterAllComponents();
+        }
     }
 
     void ScriptSystem::SetUserScriptLocation(const char* path)
@@ -195,7 +199,7 @@ namespace engine
 
         std::string formattedName = FormatLuaClassName(className);
 
-        if (formattedName.empty())
+        if (formattedName.empty() || formattedName.size() >= 64)
             return;
 
         std::ofstream newFile(fullPath,
@@ -276,11 +280,7 @@ ScriptObjectTypes.%s = %s\nreturn %s";
     {
         if (!m_instance)
         {
-            std::unique_lock lock(m_mutex);
-
-            if (!m_instance)
-                m_instance = new ScriptSystem();
-
+            m_instance = new ScriptSystem();
         }
 
         return m_instance;

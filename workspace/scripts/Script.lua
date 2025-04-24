@@ -17,6 +17,11 @@ function Script:_RegisterScriptObject(type)
 	ScriptObject._Register(type, self.entity, self)
 end
 
+function _RemoveScriptComponent(handle)
+
+	ExistingScriptComponents[handle] = nil
+end
+
 
 function Script:RefreshRef()
 	
