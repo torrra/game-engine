@@ -31,7 +31,8 @@ void editor::RendererComponent::SectionContent(void)
             modelName = modelName.substr(offset);
     }
     
-    ui::Text("Model: to do"); // TODO: add input for model (need asset window)
+    ui::Text("Model: ");
+    ui::SameLine(110.0f);
     ui::Button(modelName.c_str());
     
     if (ui::StartDragDropTarget())
@@ -69,5 +70,11 @@ void editor::RendererComponent::SectionContent(void)
         ui::EndDragDropTarget();
     }
 
-    ui::Text("Shader: to do"); // TODO: add input for shader (need asset window)
+    ui::VerticalSpacing();
+
+    // Shader
+    ui::Text("Shader: ");
+    ui::SameLine(110.0f);
+    ui::Button("WIP");
+    ui::VerticalSpacing();
 }
