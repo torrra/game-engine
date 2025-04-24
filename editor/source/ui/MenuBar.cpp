@@ -7,32 +7,16 @@
 
 void editor::MenuBar::Render(::engine::Engine& engine)
 {
-    ::ui::StartMainMenuBar();
-
-    static bool gameState = false;
-
-    // Start / stop game runtime
-    if (::ui::Button(gameState ? "Stop" : "Start"))
-    {
-        gameState = !gameState;
-        engine.SetGameState(gameState);
-
-        // TODO: remove print after implementing play / reset button logic
-        printf("Game running: %s\n", gameState ? "true" : "false");
-    }
-
-    ::ui::EndMainMenuBar();
+    (void)engine;
 }
 
 void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene, editor::SceneGraphUI& graphWindow)
 {
     ::ui::StartMainMenuBar();
 
-    static bool gameState = false;
-
-    if (gameState && ::ui::Button("Stop"))
+    if (m_gameRunning && ::ui::Button("Stop"))
     {
-        gameState = false;
+        m_gameRunning = false;
         activeScene.Stop();
         printf("Game running: %s\n", "false");
 
@@ -40,10 +24,10 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene, editor::
         activeScene.Reset();
         graphWindow.SetGraph(activeScene.GetGraph());
     }
-    else if (!gameState && ::ui::Button("Start"))
+    else if (!m_gameRunning && ::ui::Button("Start"))
     {
         activeScene.Start();
-        gameState = true;
+        m_gameRunning = true;
         printf("Game running: %s\n", "true");
     }
 
