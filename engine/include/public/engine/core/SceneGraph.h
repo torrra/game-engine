@@ -344,7 +344,7 @@ namespace engine
 
         // Remove component flag
         if (Entity* ownerPtr = GetEntity(ownerEntity))
-            ownerEntity &= ~Entity::GetComponentFlag<TComponentType>();
+            ownerPtr->m_components &= ~Entity::GetComponentFlag<TComponentType>();
     }
 
 
