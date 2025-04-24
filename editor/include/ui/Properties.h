@@ -42,7 +42,6 @@ namespace editor
         engine::EntityHandle m_handle;
     };
 
-
     template<CComponentType TComponentType, CValidComponentType TComponent>
     inline void editor::PropertyWnd::InitComponent(void)
     {

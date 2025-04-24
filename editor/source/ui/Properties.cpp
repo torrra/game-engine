@@ -43,13 +43,13 @@ void editor::PropertyWnd::SetHandle(engine::EntityHandle handle)
 void editor::PropertyWnd::RenderContents(void)
 {
     RenderMenuBar();
+
     if (m_handle == INVALID_HANDLE)
         return;
 
-
     // Render all components
     for (BaseComponent* component : m_components)
-        component->RenderSection();
+        component->RenderSection(m_graph);
 
 }
 

@@ -14,7 +14,7 @@ namespace editor
     class BaseComponent
     {
     public:
-        void RenderSection(void);
+        void RenderSection(engine::SceneGraph* graph);
     
         template<CValidComponentType ComponentType>
         void SetData(ComponentType* component);
@@ -30,6 +30,9 @@ namespace editor
     private:
         void* m_component = nullptr;
         std::string m_componentName;
+    
+    protected:
+        bool m_isClosed = false;
     };
 
     template<CValidComponentType ComponentType>

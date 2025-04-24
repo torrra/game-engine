@@ -14,7 +14,7 @@
 #define ASSET_HEIGHT 130.0f
 #define ASSET_PADDING 15.0f
 #define MAX_LABEL_LINE_LENGTH 16
-#define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag"}
+#define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag", ".mmat", ".mscn", ".ogg", ".mp3"}
 
 // Node implementation
 editor::DirTreeNode::DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent)

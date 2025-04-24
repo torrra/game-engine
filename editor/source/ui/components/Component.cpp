@@ -1,15 +1,21 @@
 #include "ui/components/Component.h"
-
+#include <engine/core/SceneGraph.h>
 #include <engine/ui/UIComponent.h>
 
-void editor::BaseComponent::RenderSection(void)
+void editor::BaseComponent::RenderSection(engine::SceneGraph* graph)
 {
     
-    if (ui::CollapseSection(m_componentName.c_str()))
+    if (ui::CollapseSection(m_componentName.c_str(), m_isClosed))
     {
         ui::StartSection(m_componentName.c_str());
         SectionContent();
         ui::EndSection();
+    }
+
+    if (m_isClosed)
+    {
+        // TODO: consider remove component
+        printf("Removing component... %s\n", m_componentName.c_str());
     }
 }
 
