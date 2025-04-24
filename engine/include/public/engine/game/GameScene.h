@@ -34,6 +34,7 @@ namespace engine
         ENGINE_API void Reset(void);
 
         ENGINE_API  void Rename(const std::string& newName);
+        ENGINE_API void EditPath(const std::filesystem::path& path);
 
         ENGINE_API void LoadNewScene(bool serialize, const std::filesystem::path& path);
 

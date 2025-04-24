@@ -46,6 +46,12 @@ namespace engine
         SerializeText();
     }
 
+    void GameScene::EditPath(const std::filesystem::path& path)
+    {
+        m_path = path;
+        m_path.append(m_name).replace_extension(".mscn");
+    }
+
     void GameScene::LoadNewScene(bool serialize, const std::filesystem::path& path)
     {
         if (serialize)
@@ -117,7 +123,7 @@ namespace engine
 
     void GameScene::UpdateNameAndPath(const std::string& name)
     {
-        m_path.replace_filename(name + ".mscn");
+        m_path.replace_filename(name).replace_extension(".mscn");
         m_name = name;
     }
 }
