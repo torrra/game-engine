@@ -5,6 +5,7 @@ editor::CameraComponent::CameraComponent(void)
     : m_rotationSynced(false)
 {
     SetName("Camera");
+    SetType(CAMERA);
 }
 
 editor::CameraComponent::~CameraComponent(void)

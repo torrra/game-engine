@@ -49,7 +49,16 @@ void editor::PropertyWnd::RenderContents(void)
 
     // Render all components
     for (BaseComponent* component : m_components)
-        component->RenderSection(m_graph);
+    {
+        component->RenderSection(m_graph, m_handle);
+
+        if (component->IsRemoved())
+        {
+            InitComponents();
+            break;
+        }
+
+    }
 
 }
 

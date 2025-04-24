@@ -5,6 +5,7 @@ editor::ScriptComponent::ScriptComponent(std::string const& scriptName)
     : m_script(nullptr)
 {
     SetName(scriptName.c_str());
+    SetType(SCRIPT);
 }
 
 editor::ScriptComponent::~ScriptComponent(void)

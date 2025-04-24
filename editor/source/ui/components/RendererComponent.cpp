@@ -9,6 +9,7 @@
 editor::RendererComponent::RendererComponent(void)
 {
     SetName("Renderer");
+    SetType(RENDERER);
 }
 
 editor::RendererComponent::~RendererComponent(void)
@@ -67,6 +68,8 @@ void editor::RendererComponent::ShaderInput(engine::Renderer* renderer)
 {
     ui::Text("Shader: ");
     ui::SameLine(110.0f);
-    ui::Button("WIP");
+    //ui::Button(renderer->n);
     ui::VerticalSpacing();
+
+    renderer->SetShader("ModelTextured");
 }

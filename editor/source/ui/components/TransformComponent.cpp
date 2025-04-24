@@ -6,6 +6,7 @@ editor::TransformComponent::TransformComponent(void)
     : m_isRotationSynced(false)
 {
     SetName("Transform");
+    SetType(TRANSFORM);
 }
 
 editor::TransformComponent::~TransformComponent(void)
@@ -16,7 +17,7 @@ editor::TransformComponent::~TransformComponent(void)
 void editor::TransformComponent::SectionContent(void)
 {
     engine::Transform* transform = GetData<engine::Transform>();
-    math::Vector3f& position = transform->SetPosition();
+        math::Vector3f& position = transform->SetPosition();
     math::Vector3f& size = transform->SetScale();
     
     if (!m_isRotationSynced)

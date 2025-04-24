@@ -2,7 +2,7 @@
 #include <engine/core/SceneGraph.h>
 #include <engine/ui/UIComponent.h>
 
-void editor::BaseComponent::RenderSection(engine::SceneGraph* graph)
+void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::EntityHandle const& handle)
 {
     
     if (ui::CollapseSection(m_componentName.c_str(), m_isClosed))
@@ -14,9 +14,38 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph)
 
     if (m_isClosed)
     {
-        // TODO: consider remove component
+        switch (m_componentType)
+        {
+        case editor::AUDIO:
+            break;
+        case editor::CAMERA:
+            graph->DestroyComponent<engine::Camera>(handle);
+            break;
+        case editor::RENDERER:
+            graph->DestroyComponent<engine::Renderer>(handle);
+            break;
+        case editor::RIGIDBODY:
+            // TODO: add rigidbody class
+            break;
+        case editor::SCRIPT:
+            graph->DestroyComponent<engine::Script>(handle);
+            break;
+        case editor::TRANSFORM:
+            graph->DestroyComponent<engine::Transform>(handle);
+            break;
+        case editor::INVALID_COMPONENT_TYPE:
+        default:
+            break;
+        }
+
         printf("Removing component... %s\n", m_componentName.c_str());
+        return;
     }
+}
+
+bool editor::BaseComponent::IsRemoved(void) const noexcept
+{
+    return m_isClosed;
 }
 
 void editor::BaseComponent::SectionContent(void)
@@ -32,4 +61,9 @@ bool editor::BaseComponent::InputField(const char* uid, f32* value, f32 incremen
 void editor::BaseComponent::SetName(const char* name)
 {
     m_componentName = name;
+}
+
+void editor::BaseComponent::SetType(EComponentType type)
+{
+    m_componentType = type;
 }
