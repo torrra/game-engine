@@ -71,7 +71,7 @@ void engine::TriangleMesh::CreateTriangleMesh(void)
     */
     m_triangleMeshImpl->m_triangleMeshDesc.triangles.count = static_cast<physx::PxU32>(
                                 m_model->GetStaticMeshes()[0].GetIndexCount() / 3);
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
+    m_triangleMeshImpl->m_triangleMeshDesc.triangles.stride = 3 * sizeof(uint32);
     m_triangleMeshImpl->m_triangleMeshDesc.triangles.data = 
                                 m_model->GetStaticMeshes()[0].GetIndices();
 
