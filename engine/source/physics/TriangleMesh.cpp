@@ -29,11 +29,14 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
     m_currentScene      = inScene;
 
     // Get the model and return if failed
-    m_model = m_currentScene->GetComponent<engine::Renderer>(m_owner)->GetModel();
-    if (m_model == nullptr)
-    {
+    if (engine::Renderer* renderer = m_currentScene->GetComponent<engine::Renderer>(m_owner))
+        m_model = renderer->GetModel();
+
+    else
         return;
-    }
+
+    if (m_model == nullptr)
+        return;
 }
 
 engine::TriangleMesh::~TriangleMesh(void)
