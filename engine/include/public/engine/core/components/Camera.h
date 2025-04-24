@@ -16,6 +16,7 @@ namespace engine
         f32 m_far = 250.0f;
         f32 m_fovRad = 1.0471976f;
         f32 m_ratio = 1.77777777778f;
+
     };
 
     class Camera : public Component
