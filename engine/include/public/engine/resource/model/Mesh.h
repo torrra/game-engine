@@ -5,12 +5,8 @@
 #include "engine/resource/model/Buffer.h"
 #include "engine/resource/material/MeshMaterial.h"
 
-#include <math/Vector3.hpp>
-#include <math/Vector2.hpp>
-
 #include <vector>
 #include <string>
-#include <iostream>
 
 namespace engine
 {

@@ -8,7 +8,6 @@
 #include <math/Vector3.hpp>
 
 #include <filesystem>
-#include <iostream>
 
 namespace engine
 {

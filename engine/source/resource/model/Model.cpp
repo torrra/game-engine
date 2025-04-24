@@ -3,8 +3,6 @@
 #include <assimp/postprocess.h>
 
 #include "resource/model/Model.h"
-#include "resource/model/Buffer.h"
-#include "resource/model/Vertex.h"
 
 #include "engine/thread/ThreadManager.h"
 #include "engine/resource/ResourceManager.h"
@@ -16,9 +14,7 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 
-#include <iostream>
 #include <string>
-#include <filesystem>
 #include <fstream>
 
 
@@ -45,8 +41,6 @@ bool engine::Model::LoadResource(const char* fileName)
     if (!fileName || *fileName == '\0')
         return false;
 
-    m_metaFilePath = fileName;
-    m_metaFilePath.replace_extension(".mres");
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
 }
@@ -94,21 +88,6 @@ void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) cons
     } 
 }
 
-void engine::Model::SerializeText(void)
-{
-    std::ofstream metaFile(m_metaFilePath, std::ios::out | std::ios::trunc);
-
-    metaFile << "[Model]\n";
-    text::Serialize(metaFile, "isDynamic", m_isDynamic);
-
-    if (m_isDynamic)
-    {
-        text::Serialize(metaFile, "isDynamic", true);
-        text::Serialize(metaFile, "meshCount", m_dynamicMeshes.size());
-    }
-
-
-}
 
 uint32 engine::Model::GetMeshCount(void) const
 {

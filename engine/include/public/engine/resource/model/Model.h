@@ -6,7 +6,6 @@
 #include "engine/resource/model/Mesh.h"
 
 #include <vector>
-#include <filesystem>
 
 namespace engine
 {
@@ -25,8 +24,6 @@ namespace engine
         ENGINE_API bool IsDynamic(void) const;
 
         ENGINE_API void Draw(const std::vector<const MeshMaterial*>& materials) const;
-
-        ENGINE_API void SerializeText(void);
 
         ENGINE_API uint32 GetMeshCount(void) const;
 
@@ -47,7 +44,6 @@ namespace engine
         void WorkerThreadLoad(const std::string& name);
         void RenderThreadSetup(void);
 
-        std::filesystem::path         m_metaFilePath;
         std::vector<DynamicMesh>      m_dynamicMeshes;
         std::vector<Mesh>			  m_staticMeshes;
         uint8						  m_loadStatus = 0;

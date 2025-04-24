@@ -2,8 +2,6 @@
 #include "resource/model/Buffer.h"
 #include "resource/texture/Texture.h"
 #include "resource/ResourceManager.h"
-#include "thread/ThreadManager.h"
-#include "serialization/TextSerializer.h"
 
 #include <assimp/mesh.h>
 #include <assimp/vector3.h>
