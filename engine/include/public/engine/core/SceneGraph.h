@@ -59,7 +59,7 @@ namespace engine
     public:
 
         ENGINE_API SceneGraph(void) = default;
-        ENGINE_API SceneGraph(const SceneGraph&) = delete;
+        SceneGraph(const SceneGraph&) = delete;
         ENGINE_API SceneGraph(SceneGraph&&) noexcept = default;
         ENGINE_API ~SceneGraph(void) = default;
 
