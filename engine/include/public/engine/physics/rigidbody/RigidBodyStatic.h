@@ -35,6 +35,9 @@ namespace engine
 		ENGINE_API				    RigidBodyStatic(EntityHandle inOwner, 
                                                     class SceneGraph* inScene);
 
+        ENGINE_API                  RigidBodyStatic(const RigidBodyStatic&) = delete;
+        ENGINE_API                  RigidBodyStatic(RigidBodyStatic&&) noexcept = default;
+
 		/// Destructor
 								    ~RigidBodyStatic(void);
         
@@ -83,6 +86,9 @@ namespace engine
 
 		// Delete the dynamic rigid body resources
 		ENGINE_API	void		    RigidBodyStaticCleanUp(void);
+
+        ENGINE_API
+        RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 
 	private :
 

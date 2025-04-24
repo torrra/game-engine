@@ -2,7 +2,7 @@
 
 #include "engine/EngineExport.h"
 #include "engine/core/Component.h"
-#include "engine/core/ComponentArray.h"
+#include "engine/core/ComponentArray.hpp"
 #include "engine/core/components/Transform.h"
 
 #include <fstream>
@@ -16,6 +16,15 @@ namespace engine
         using Component::Component;
 
         ENGINE_API
+        Renderer(const Renderer&) = default;
+
+        ENGINE_API
+        Renderer(Renderer&&) = default;
+
+        ENGINE_API
+        ~Renderer(void) = default;
+
+        ENGINE_API
         void Register(void) override;
 
         ENGINE_API
@@ -27,9 +36,6 @@ namespace engine
 
         ENGINE_API
         const class ShaderProgram* GetShader(void) const;
-
-        ENGINE_API
-        const class Texture* GetTexture(void) const;
 
         ENGINE_API
         void SetModel(const class Model* model);
@@ -50,6 +56,12 @@ namespace engine
 
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
+
+        ENGINE_API
+        Renderer& operator=(const Renderer&) = default;
+
+        ENGINE_API
+        Renderer& operator=(Renderer&&) noexcept = default;
 
     private:
 

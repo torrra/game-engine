@@ -12,22 +12,21 @@ namespace engine
 {
     struct Frustum
     {
-        f32 m_near;
-        f32 m_far;
-        f32 m_fovRad;
-        f32 m_ratio;
+        f32 m_near = 0.005f;
+        f32 m_far = 250.0f;
+        f32 m_fovRad = 1.0471976f;
+        f32 m_ratio = 1.77777777778f;
 
-        ENGINE_API Frustum(f32 near = 0.005f, f32 far = 250.0f, f32 fovDeg = 60.0f, f32 ratio = 1.77777777778f)
-            : m_near(near), m_far(far), m_fovRad(fovDeg* DEG2RAD), m_ratio(ratio)
-        {
-        }
     };
 
     class Camera : public Component
     {
     public:
-        
+       
+
         ENGINE_API Camera(EntityHandle, class SceneGraph*);
+        ENGINE_API Camera(Camera&&) noexcept = default;
+        ENGINE_API Camera(const Camera&) = default;
 
         ENGINE_API ~Camera(void) = default;
 
@@ -35,7 +34,8 @@ namespace engine
         ENGINE_API void Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed);
         ENGINE_API math::Matrix4f ViewProjection(void);
 
-        ENGINE_API void Register(void);
+        ENGINE_API void Register(void) override;
+        ENGINE_API void Unregister(void) override;
 
         ENGINE_API math::Vector3f GetPosition(void) const noexcept;
         ENGINE_API math::Vector3f GetRotation(void) const noexcept;
@@ -58,6 +58,11 @@ namespace engine
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
 
+        ENGINE_API
+        Camera& operator=(const Camera&) = default;
+
+        ENGINE_API
+        Camera& operator=(Camera&&) noexcept = default;
 
     private:
         math::Matrix4f GetViewMatrix(void);

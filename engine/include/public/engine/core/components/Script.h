@@ -13,8 +13,17 @@ namespace engine
     {
     public:
 
-        // Use parent class constructors
         using Component::Component;
+        
+        // Use parent class constructors
+        ENGINE_API
+        Script(void) = default;
+
+        ENGINE_API
+        Script(const Script&) = delete;
+
+        ENGINE_API
+        Script(Script&&) noexcept = default;
         
         ENGINE_API
         ~Script(void) = default;
@@ -32,6 +41,9 @@ namespace engine
         ENGINE_API
         void Register(void) override;
 
+        ENGINE_API
+        void Unregister(void) override;
+
         // Add a new lua script object to this component, and register it
         // in lua
         ENGINE_API
@@ -44,6 +56,12 @@ namespace engine
 
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
+
+        ENGINE_API
+        Script& operator=(const Script&) = default;
+
+        ENGINE_API
+        Script& operator=(Script&&) noexcept = default;
 
     private:
 
