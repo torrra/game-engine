@@ -138,11 +138,14 @@ void engine::Input::MouseScrollCallback(f64 xOffset, f64 yOffset)
 
 void engine::Input::CursorPosCallback(f64 xPos, f64 yPos)
 {
+    GetInstance()->m_lastCursorPos = GetInstance()->m_cursorPos;
     GetInstance()->m_cursorPos = math::Vector2d(xPos, yPos);
+    GetInstance()->m_cursorUpdated = true;
 }
 
 engine::Input::Input(void)
-    : m_cursorPos(0.00), m_scrollDelta(0.00), m_dirty(false)
+    : m_cursorPos(0.00), m_lastCursorPos(0.00), m_scrollDelta(0.00), m_dirty(false),
+    m_cursorUpdated(false)
 {
 }
 
@@ -153,6 +156,11 @@ void engine::Input::SetCursorMode(ECursorMode cursorMode)
 
 void engine::Input::ResetKeys(void)
 {
+    if (GetInstance()->m_cursorUpdated)
+        GetInstance()->m_cursorUpdated = false;
+    else
+        GetInstance()->m_lastCursorPos = GetInstance()->m_cursorPos;
+
     if (!GetInstance()->m_dirty)
         return;
     
