@@ -28,11 +28,9 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene, editor::
 {
     ::ui::StartMainMenuBar();
 
-    static bool gameState = false;
-
-    if (gameState && ::ui::Button("Stop"))
+    if (m_gameRunning && ::ui::Button("Stop"))
     {
-        gameState = false;
+        m_gameRunning = false;
         activeScene.Stop();
         printf("Game running: %s\n", "false");
 
@@ -40,10 +38,10 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene, editor::
         activeScene.Reset();
         graphWindow.SetGraph(activeScene.GetGraph());
     }
-    else if (!gameState && ::ui::Button("Start"))
+    else if (!m_gameRunning && ::ui::Button("Start"))
     {
         activeScene.Start();
-        gameState = true;
+        m_gameRunning = true;
         printf("Game running: %s\n", "true");
     }
 
