@@ -3,8 +3,6 @@
 #include <assimp/postprocess.h>
 
 #include "resource/model/Model.h"
-#include "resource/model/Buffer.h"
-#include "resource/model/Vertex.h"
 
 #include "engine/thread/ThreadManager.h"
 #include "engine/resource/ResourceManager.h"
@@ -16,9 +14,7 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 
-#include <iostream>
 #include <string>
-#include <filesystem>
 #include <fstream>
 
 
