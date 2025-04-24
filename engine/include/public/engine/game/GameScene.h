@@ -2,7 +2,6 @@
 
 #include <filesystem>
 #include <string>
-#include <future>
 #include <atomic>
 
 #include "engine/core/SceneGraph.h"
