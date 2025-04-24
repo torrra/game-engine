@@ -68,7 +68,7 @@ namespace editor
         const std::string m_payloadType;
     };
 
-    class AssetsWnd : public ::ui::UIWindow
+    class AssetsWnd final : public ::ui::UIWindow
     {
     public:
         AssetsWnd(void) = delete;
