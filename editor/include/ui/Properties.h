@@ -10,8 +10,7 @@
 
 namespace editor
 {
-    template<typename TDerrivedType>
-    concept CComponentType = std::derived_from<TDerrivedType, BaseComponent>;
+
 
     class PropertyWnd : public ::ui::UIWindow
     {
@@ -28,29 +27,31 @@ namespace editor
     private:
         void InitComponents(void);
 
-        template<CComponentType TComponentType, CValidComponentType TComponent>
+        template<CComponentUIType CUIType, CComponentType CType>
         void InitComponent(void);
 
-        template<CComponentType TComponentType, CValidComponentType TComponent>
+        template<CComponentUIType CUIType, CComponentType CType>
         void AddComponent(void);
 
         // Menu bar
         void RenderMenuBar(void);
+
+        void ClearComponentArray(void);
 
         std::vector<BaseComponent*> m_components;
         engine::SceneGraph* m_graph;
         engine::EntityHandle m_handle;
     };
 
-    template<CComponentType TComponentType, CValidComponentType TComponent>
+    template<CComponentUIType CUIType, CComponentType CType>
     inline void editor::PropertyWnd::InitComponent(void)
     {
-        TComponentType* component = new TComponentType;
-        dynamic_cast<BaseComponent*>(component)->SetData(m_graph->GetComponent<TComponent>(m_handle));
+        CUIType* component = new CUIType;
+        dynamic_cast<BaseComponent*>(component)->SetData(m_graph->GetComponent<CType>(m_handle));
         m_components.emplace_back(component);
     }
 
-    template<CComponentType TComponentType, CValidComponentType TComponent>
+    template<CComponentUIType CUIType, CComponentType TComponent>
     inline void editor::PropertyWnd::AddComponent(void)
     {
         // Prevent duplicate components or bad things happen...
@@ -58,6 +59,6 @@ namespace editor
             return;
 
         m_graph->CreateComponent<TComponent>(m_handle);
-        InitComponent<TComponentType, TComponent>();
+        InitComponent<CUIType, TComponent>();
     }
 }

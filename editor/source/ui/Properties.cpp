@@ -22,12 +22,7 @@ editor::PropertyWnd::PropertyWnd(engine::SceneGraph* graph)
 
 editor::PropertyWnd::~PropertyWnd(void)
 {
-    for (BaseComponent* component : m_components)
-    {
-        delete component;
-    }
-
-    m_components.clear();
+    ClearComponentArray();
 
     m_handle = INVALID_HANDLE;
     m_graph = nullptr;
@@ -64,9 +59,7 @@ void editor::PropertyWnd::RenderContents(void)
 
 void editor::PropertyWnd::InitComponents(void)
 {
-    for (BaseComponent* component : m_components)
-        delete component;
-    m_components.clear();
+    ClearComponentArray();
     
     if (m_handle == INVALID_HANDLE)
         return;
@@ -123,4 +116,37 @@ void editor::PropertyWnd::RenderMenuBar(void)
         ui::EndMenuBar();
     }
     ui::EndDisabledSection();
+}
+
+void editor::PropertyWnd::ClearComponentArray(void)
+{
+    for (BaseComponent* component : m_components)
+    {
+        // Call the derrived class destructor
+        switch (component->GetType())
+        {
+        case editor::AUDIO:
+            break;
+        case editor::CAMERA:
+            delete dynamic_cast<CameraComponent*>(component);
+            break;
+        case editor::RENDERER:
+            delete dynamic_cast<RendererComponent*>(component);
+            break;
+        case editor::RIGIDBODY:
+            break;
+        case editor::SCRIPT:
+            delete dynamic_cast<ScriptComponent*>(component);
+            break;
+        case editor::TRANSFORM:
+            delete dynamic_cast<TransformComponent*>(component);
+            break;
+        case editor::INVALID_COMPONENT_TYPE:
+        default:
+            delete component;
+            break;
+        }
+    }
+
+    m_components.clear();
 }
