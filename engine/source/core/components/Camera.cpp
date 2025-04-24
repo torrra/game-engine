@@ -1,11 +1,7 @@
 #include "core/components/Camera.h"
 #include "core/systems/ScriptSystem.h"
-#include "utility/Timer.h"
 
-#include <math/Arithmetic.hpp>
-#include <math/Vector4.hpp>
 
-#include <fstream>
 #include "serialization/TextSerializer.h"
 
 engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
@@ -63,6 +59,11 @@ math::Vector3f engine::Camera::GetPosition(void) const noexcept
 math::Vector3f engine::Camera::GetRotation(void) const noexcept
 {
     return m_rotation;
+}
+
+math::Quatf engine::Camera::GetRotationQuat(void) const noexcept
+{
+    return m_rotQuat;
 }
 
 f32 engine::Camera::GetFOV(void) const noexcept

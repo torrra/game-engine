@@ -5,8 +5,7 @@ extern "C"
 #include <lua/lauxlib.h>
 }
 
-#include "core/SceneGraph.h"
-#include "core/systems/ScriptSystem.h"
+#include "core/Component.h"
 #include "scripting/ComponentFunctions.h"
 
 int script_IsComponentValid(lua_State* luaState)

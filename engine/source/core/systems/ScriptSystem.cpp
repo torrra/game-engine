@@ -6,21 +6,12 @@ extern "C"
 }
 
 #include <iostream>
-#include <fstream>
-#include <iostream>
 
 #include "core/components/Script.h"
 #include "core/systems/ScriptSystem.h"
 #include "core/SceneGraph.h"
 
-#include "scripting/EntityScriptFunctions.h"
-#include "scripting/ComponentFunctions.h"
-#include "scripting/ScriptFunctions.h"
-#include "scripting/CameraFunctions.h"
-#include "scripting/TransformFunctions.h"
-#include "scripting/InputFunctions.h"
-
-//#include "utility/StringConversion.h"
+#include "scripting/EngineScriptFunctions.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>

@@ -12,6 +12,8 @@
 
 #pragma endregion
 
+#include "physics/Raycast.h"
+
 namespace engine
 {
     struct DebugDrawImpl;
@@ -20,6 +22,7 @@ namespace engine
     class DebugDraw
     {
         friend class PhysicsEngine;
+        friend class Raycast;
 
     private :
 
@@ -41,7 +44,10 @@ namespace engine
         // Update the debug draw in regard to the render buffer
         void            UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl);
         // Render the debug draw
-        void            RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount);
+        void            RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount, const math::Vector4f& inColor);
+
+        void AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, const uint32& inColor);
+
 
         const   ShaderProgram* m_debugDrawProgram   = nullptr;
                 DebugDrawImpl* m_debugDrawImpl      = nullptr;

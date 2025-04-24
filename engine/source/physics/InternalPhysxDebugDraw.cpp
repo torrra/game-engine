@@ -64,21 +64,32 @@ void engine::DebugDraw::InitDebugDraw(void)
 
 void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
 {
-    uint64 bufferSize = inDebugDrawImpl.m_renderBuffer->getNbLines() * sizeof(physx::PxDebugLine);
+    std::vector<physx::PxDebugLine> totalLines;
 
-    glNamedBufferData(m_debugDrawVBO, bufferSize, inDebugDrawImpl.m_renderBuffer->getLines(), GL_DYNAMIC_DRAW);
+    const physx::PxDebugLine* physxLines = inDebugDrawImpl.m_renderBuffer->getLines();
+    uint32 physxLineCount = inDebugDrawImpl.m_renderBuffer->getNbLines();
 
-    // Check for openGL error
+    totalLines.insert(totalLines.end(), physxLines, physxLines + physxLineCount);
+    totalLines.insert(totalLines.end(), m_debugDrawImpl->m_customLines.begin(), 
+                      m_debugDrawImpl->m_customLines.end());
+
+    uint64 bufferSize = totalLines.size() * sizeof(physx::PxDebugLine);
+    glNamedBufferData(m_debugDrawVBO, bufferSize, totalLines.data(), GL_DYNAMIC_DRAW);
+
+    m_debugDrawImpl->m_customLines.clear();
+
+    //// Check for openGL error
     OpenGLError();
 }
 
 
-void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount)
+void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount, const math::Vector4f& inColor)
 {
     // Use the debug draw program
     m_debugDrawProgram->Use();
     // Set the projection view matrix uniform
     m_debugDrawProgram->Set("projViewMatrix", inProjViewMatrix);
+    m_debugDrawProgram->Set("aColor", inColor);
     // Bind the VAO
     glBindVertexArray(m_debugDrawVAO);
     // Draw the lines in regard of the number of lines
@@ -88,4 +99,14 @@ void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32
 
     // Check for openGL error
     OpenGLError();
+}
+
+void engine::DebugDraw::AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, const uint32& inColor)
+{
+    if (!m_debugDrawImpl)
+    {
+        return;
+    }
+    physx::PxDebugLine line(ToPxVec3(inStart), ToPxVec3(inEnd), inColor);
+    m_debugDrawImpl->m_customLines.push_back(line);
 }
