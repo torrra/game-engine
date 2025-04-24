@@ -27,6 +27,8 @@ namespace engine
         ENGINE_API
         GameScene(GameScene&&) = default;
 
+        GameScene(const GameScene&) = delete;
+
         ENGINE_API
         ~GameScene(void) = default;
 
