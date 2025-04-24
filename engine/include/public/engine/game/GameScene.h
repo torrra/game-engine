@@ -60,7 +60,7 @@ namespace engine
         SceneGraph* GetGraph(void);
 
 
-    //private:
+    private:
 
         void PhysicsUpdate(void);
 
