@@ -9,7 +9,7 @@
 #include "TypesECS.h"
 #include "Component.h"
 #include "Entity.h"
-#include "ComponentArray.h"
+#include "ComponentArray.hpp"
 
 #include "components/Script.h"
 #include "components/Transform.h"
