@@ -6,8 +6,6 @@ extern "C"
 }
 
 #include <iostream>
-#include <fstream>
-#include <iostream>
 
 #include "core/components/Script.h"
 #include "core/systems/ScriptSystem.h"
@@ -19,8 +17,6 @@ extern "C"
 #include "scripting/CameraFunctions.h"
 #include "scripting/TransformFunctions.h"
 #include "scripting/InputFunctions.h"
-
-//#include "utility/StringConversion.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
