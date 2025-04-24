@@ -68,6 +68,11 @@ math::Vector3f engine::Camera::GetRotation(void) const noexcept
     return m_rotation;
 }
 
+math::Quatf engine::Camera::GetRotationQuat(void) const noexcept
+{
+    return m_rotQuat;
+}
+
 f32 engine::Camera::GetFOV(void) const noexcept
 {
     return m_frustum.m_fovRad;
