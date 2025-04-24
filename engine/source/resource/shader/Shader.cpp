@@ -17,6 +17,16 @@ bool engine::ShaderProgram::LoadResource(const char* filePath)
     return true;
 }
 
+void engine::ShaderProgram::SetName(std::string const& name)
+{
+    m_programName = name;
+}
+
+std::string engine::ShaderProgram::GetName(void) const noexcept
+{
+    return m_programName;
+}
+
 void engine::ShaderProgram::Use(void) const
 {
 	return glUseProgram(m_programID);

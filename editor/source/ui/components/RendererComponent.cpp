@@ -2,6 +2,7 @@
 #include "ui/Assets.h"
 
 #include <engine/resource/model/Model.h>
+#include <engine/resource/shader/Shader.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
@@ -66,10 +67,17 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 
 void editor::RendererComponent::ShaderInput(engine::Renderer* renderer)
 {
+    // Get shader program name
+    std::string shaderName("None");
+
+    if (const engine::ShaderProgram* shader = renderer->GetShader())
+        shaderName = shader->GetName();
+    else
+        renderer->SetShader("ModelTextured");
+
     ui::Text("Shader: ");
     ui::SameLine(110.0f);
-    //ui::Button(renderer->n);
+    ui::Button(shaderName.c_str());
     ui::VerticalSpacing();
 
-    renderer->SetShader("ModelTextured");
 }

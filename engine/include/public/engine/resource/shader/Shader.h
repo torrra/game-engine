@@ -23,6 +23,8 @@ namespace engine
 		ENGINE_API virtual ~ShaderProgram(void) override = default;
 
 		bool LoadResource(const char* filePath) override;
+        void SetName(std::string const& name);
+        ENGINE_API std::string GetName(void) const noexcept;
 
 		ENGINE_API void Use(void) const;
 
@@ -60,6 +62,7 @@ namespace engine
 
 		std::string m_vertexShader;
 		std::string m_fragShader;
+        std::string m_programName;
 		
 		uint32 m_programID = 0;
 

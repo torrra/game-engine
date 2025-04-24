@@ -18,11 +18,11 @@ void engine::ResourceManager::LoadShader(
 	}
 
 	ShaderProgram* newShader = new ShaderProgram();
-
     m_mutex.lock();
     GetInstance()->m_resources[shaderProgramName] = newShader;
     m_mutex.unlock();
 
+    newShader->SetName(shaderProgramName);
     newShader->m_vertexShader = vertShader;
     newShader->m_fragShader = fragShader;
     newShader->CreateProgram();
