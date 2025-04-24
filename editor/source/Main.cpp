@@ -95,7 +95,7 @@ int main(void)
         delete floorRb;
         engine::PhysicsEngine::Get().CleanUp();
 
-		engine.ShutDown();
+		engine.ShutDown(); 
 	}
 
 	// Memory leak check
