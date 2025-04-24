@@ -1,35 +1,11 @@
 #include <engine/Engine.h>
 #include <engine/utility/MemoryCheck.h>
-
-#include "engine/physics/PhysicsEngine.h"
-#include "engine/physics/rigidbody/RigidBodyDynamic.h"
-#include "engine/physics/rigidbody/RigidBodyStatic.h"
-#include "engine/physics/Raycast.h"
-
-#include <math/Vector3.hpp>
-#include <math/Quaternion.hpp>
-
-#include "engine/core/SceneGraph.h"
-#include "engine/core/Entity.h"
-#include "engine/core/components/Transform.h"
-#include "engine/resource/ResourceManager.h"
 #include <engine/input/Input.h>
-
-#include <engine/resource/texture/Texture.h>
-#include <engine/core/systems/ScriptSystem.h>
-#include "engine/resource/model/Model.h"
 #include "ui/EditorApplication.h"
-#include "Example.h"
 
 #include "engine/ConsoleLog.hpp"
 
-// UI includes
-#include "ui/MenuBar.h"
-#include "ui/Properties.h"
-#include "ui/SceneGraph.h"
-#include "ui/Viewport.h"
-
-// HACK: ductape style solution to re-purpose main
+// HACK: duct tape style solution to re-purpose main
 #define TESTING_PHYSX 1
 
 // Use dedicated graphics card
@@ -39,166 +15,61 @@ extern "C"
 	_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-#if TESTING_PHYSX == 1
-int main(void)
-{
-	// Memory check
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	{
-		//engine::Engine engine(false);
-
-		engine::Engine engine;
-        engine.SetEditorApplication(new editor::EditorApplication("Editor"));
-		
-		if (engine.Startup("Editor", nullptr))
-			return -1;
-
-		ExampleProject project;
-		project.StartUp(engine);
-
-        /// ---------------- Create entity ---------------- 
-        engine::EntityHandle floor = engine.GetGraph()->CreateEntity("Floor");
-
-        /// ---------------- PhysicsEngine use ---------------- 
-        engine::PhysicsEngine::Get().Init();
-
-        /// ---------------- Create rigidbody dynamic ----------------
-        std::cout << "\t" << std::endl;
-
-        engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
-                                            engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
-        rb->SetDebugVisualization(true);
-        //rb->SetGravityDisabled(true);
-
-        /// ---------------- Create rigidbody static ----------------
-        std::cout << "\t" << std::endl;
-        
-        engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
-                                                engine.GetGraph(), floor, engine::BOX);
-        floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
-        floorRb->SetDebugVisualization(true);
-
-		while (!engine.GetWindow()->ShouldWindowClose())
-		{       
-            project.Update(engine);
-            engine.UpdateGameplay();
-            // Update the debug draw
-           // engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
-            // Update the rigid body in regard to the entity (movement by keyboard input for example)
-            //rb->UpdateRigidBody();
-
-            engine.UpdateApplicationWindow();
-		}
-
-        /// ---------------- Clean ---------------- 
-        delete rb;
-        delete floorRb;
-        engine::PhysicsEngine::Get().CleanUp();
-
-		engine.ShutDown(); 
-	}
-
-	// Memory leak check
-	if (!_CrtDumpMemoryLeaks())
-		engine::PrintLog(engine::SuccessPreset(), "No memory leak detected.");
-
-	return 0;
-}
-#else
-
-#define MODEL_FILE ".\\assets\\padoru.obj"
-#define TEXTURE_FILE ".\\assets\\padoru.png"
-#define CONTROLLER_SCRIPT_FILE "ControllerScript"
-
-#define SHADER_PROGRAM_NAME		"ModelTextured"
-#define SHADER_PROGRAM_VERTEX	".\\shaders\\ModelTextured.vert"
-#define SHADER_PROGRAM_FRAGMENT ".\\shaders\\ModelTextured.frag"
-
 int appMain(void)
 {
-    engine::Engine engine(false);
-    //engine.SetEditorApplication(new editor::EditorApplication("Editor"));
+	engine::Engine engine;
+    engine.SetEditorApplication(new editor::EditorApplication("Editor"));
 
-    if (engine.Startup("Editor", nullptr))
-    {
-        engine.ShutDown();
-        return -1;
-    }
+    engine.OpenProject("C:\\Users\\noahd\\Bureau\\owaowa\\crazy_frog_dating_sim\\crazy_frog_dating_sim.mustang");
+    engine.Startup();
+    
+    /* /// ---------------- Create entity ---------------- 
+    engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
 
-    // All the stuff in the following region is temporary & for testing only
-#pragma region LoadTemporaryStuff
-        // Enable the following keys
-    int32 keys[] =
-    { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_W, KEY_S, KEY_A, KEY_D, KEY_ESCAPE };
+    /// ---------------- PhysicsEngine use ---------------- 
+    engine::PhysicsEngine::Get().Init();
 
-    for (int32 key : keys)
-        engine::Input::RegisterInput(key);
-    engine::ResourceManager::Load<engine::Model>(MODEL_FILE);
-    engine::ResourceManager::Load<engine::Texture>(TEXTURE_FILE);
+    /// ---------------- Create rigidbody dynamic ----------------
+    std::cout << "\t" << std::endl;
 
-    engine::ResourceManager::LoadShader(
-        SHADER_PROGRAM_NAME,
-        SHADER_PROGRAM_VERTEX,
-        SHADER_PROGRAM_FRAGMENT
-    );
+    engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
+                                        engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
+    rb->SetDebugVisualization(true);
+    rb->SetGravityDisabled(false);
 
-    engine::ScriptSystem::CreateUserScript(".\\userScripts\\", CONTROLLER_SCRIPT_FILE);
-    engine::EntityHandle padoruHandle = engine.GetGraph()->CreateEntity("Padoru");
-    engine.GetGraph()->CreateComponent<engine::Transform>(padoruHandle)->SetPosition(math::Vector3f(1.5f, 3.0f, 1.0f));
-    engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(padoruHandle);
-    engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(padoruHandle);
+    /// ---------------- Create rigidbody static ----------------
+    std::cout << "\t" << std::endl;
+    
+    engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
+                                            engine.GetGraph(), floor, engine::BOX);
+    floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
+    floorRb->SetDebugVisualization(true);
 
-    controllerScript->AddScriptObject(CONTROLLER_SCRIPT_FILE);
-    controllerScript->Start();
+    engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());*/
 
-    entityRenderer->SetModel(MODEL_FILE);
-    entityRenderer->SetShader(SHADER_PROGRAM_NAME);
-
-    engine::EntityHandle cameraHandle = engine.GetGraph()->CreateEntity("Camera");
-    engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(cameraHandle);
-    engine.GetGraph()->CreateComponent<engine::Transform>(cameraHandle);
-    camera->Rotation() = { -10.5f, 26.5f, 0.0f };
-    camera->Position() = { 1.5f, 3.0f, 3.2f };
-#pragma endregion
-
-    //editor::MenuBar menuBar;
-    //editor::SceneGraphUI sceneGraph("Scene Graph", engine.GetGraph());
-    //editor::PropertyWnd properties(engine.GetGraph());
-    //editor::Viewport* viewport = new editor::Viewport("Viewport", {0.1f, 0.1f, 0.1f, 1.0f});
-
-
-    while (!engine.GetWindow()->ShouldWindowClose())
-    {
-        //engine.Update();
-
-        //// Viewport
-        //viewport->RenderToViewport(engine.GetGraph());
-
-        //// Main menu bar ui
-        //menuBar.Render(engine);
-
-        //// Scene graph window ui
-        //sceneGraph.Render();
-
-        //// Property window ui
-        //if (sceneGraph.IsNewEntitySelected())
-        //    properties.SetHandle(sceneGraph.GetSelectedEntity());
-
-        //properties.Render();
-
-
-        //engine.PostUpdate(viewport);
-
+    engine.SaveProject();
+	while (!engine.GetWindow()->ShouldWindowClose())
+	{
+        //math::Matrix4f projViewMatrix = camera->ViewProjection();
         engine.UpdateGameplay();
+
+        // Update the debug draw
+        //engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
+
+        if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
+            engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
+            engine::Input::IsInputPressed(KEY_B))
+        {
+            //engine.BuildProjectExecutable(".\\tests");
+            engine.BuildProjectExecutable("C:\\Users\\noahd\\Bureau\\OOOOOOOOOO");
+
+        }
         engine.UpdateApplicationWindow();
-    }
+	}
 
-    //if (viewport)
-    //    delete viewport;
-    engine.ShutDown();
-    return 0;
+	engine.ShutDown();
+	return 0;
 }
-
 
 int main(void)
 {
@@ -206,10 +77,9 @@ int main(void)
     
     int res = appMain();
 
-    // Memory leak check
-    if (!_CrtDumpMemoryLeaks())
-        std::printf("No memory leaks found\n");
-
+	// Memory leak check
+	if (!_CrtDumpMemoryLeaks())
+		engine::PrintLog(engine::SuccessPreset(), "No memory leak detected.");
+    
     return res;
 }
-#endif

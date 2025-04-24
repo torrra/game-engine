@@ -25,32 +25,44 @@ void ExampleProject::StartUp(engine::Engine& engine)
 	RegisterInputs();
 	LoadResources();
 
-	// Add component to model entity
-	m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
-    engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
-    //engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetRotation(math::Quatf(1.f, 0.f, 1.f, 0.f));
-	engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
-	engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);
 
-	controllerScript->AddScriptObject(CONTROLLER_SCRIPT_FILE);
-	controllerScript->Start();
+    /*engine::Renderer* r = engine.GetGraph()->CreateComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle());
 
-	entityRenderer->SetModel(MODEL_FILE);
-	entityRenderer->SetShader(SHADER_PROGRAM_NAME);
+    r->SetModel(MODEL_FILE);
+    r->SetShader(SHADER_PROGRAM_NAME);
 
-    /*engine::MeshMaterial* newMat = engine::MeshMaterial::CreateMaterial("Padoru.mmat");
+    engine::MeshMaterial* m = engine::MeshMaterial::CreateMaterial("./assets/padoru.mmat");
+    m->SetDiffuseMap(engine::ResourceManager::GetResource<engine::Texture>(TEXTURE_FILE));
+    m->SerializeText();
 
-    newMat->SetDiffuseMap(engine::ResourceManager::GetResource<engine::Texture>(TEXTURE_FILE));
+    r->SetMaterial(0, "./assets/padoru.mmat");*/
 
-    entityRenderer->SetMaterial(0, newMat);*/
+	//// Add component to model entity
+	//m_modelHandle = engine.GetGraph()->CreateEntity("Padoru");
+ //   engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetPosition(math::Vector3f(0.f, 5.f, 0.f));
+ //   //engine.GetGraph()->CreateComponent<engine::Transform>(m_modelHandle)->SetRotation(math::Quatf(1.f, 0.f, 1.f, 0.f));
+	//engine::Renderer* entityRenderer = engine.GetGraph()->CreateComponent<engine::Renderer>(m_modelHandle);
+	//engine::Script* controllerScript = engine.GetGraph()->CreateComponent<engine::Script>(m_modelHandle);
+ //   
+	//controllerScript->AddScriptObject(CONTROLLER_SCRIPT_FILE);
+	//controllerScript->Start();
+ //   
+	//entityRenderer->SetModel(MODEL_FILE);
+	//entityRenderer->SetShader(SHADER_PROGRAM_NAME);
 
-	// Add component to camera entity
-	m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");
-	engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
-	engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
-    //engine.GetGraph()->ReparentEntity(m_cameraHandle, m_modelHandle);
-	camera->Rotation() = {-10.5f, 26.5f, 0.0f};
-	camera->Position() = {1.5f, 3.0f, 3.2f};
+ //   /*engine::MeshMaterial* newMat = engine::MeshMaterial::CreateMaterial("Padoru.mmat");
+
+ //   newMat->SetDiffuseMap(engine::ResourceManager::GetResource<engine::Texture>(TEXTURE_FILE));
+
+ //   entityRenderer->SetMaterial(0, newMat);*/
+
+	// // Add component to camera entity
+	//m_cameraHandle = engine.GetGraph()->CreateEntity("Camera");
+	//engine::Camera* camera = engine.GetGraph()->CreateComponent<engine::Camera>(m_cameraHandle);
+	//engine.GetGraph()->CreateComponent<engine::Transform>(m_cameraHandle);
+ //   //engine.GetGraph()->ReparentEntity(m_cameraHandle, m_modelHandle);
+	//camera->Rotation() = {-10.5f, 26.5f, 0.0f};
+	//camera->Position() = {1.5f, 3.0f, 3.2f};
 
     //m_test1 = engine.GetGraph()->CreateEntity("Test1");
     //m_test2 = engine.GetGraph()->CreateEntity("Test2");
@@ -65,11 +77,11 @@ void ExampleProject::StartUp(engine::Engine& engine)
 void ExampleProject::Update(engine::Engine& engine)
 {
 	// Get camera component
-	engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(m_cameraHandle);
-	
-	// Rotate camera
-	math::Vector2f cursorDelta = engine::Input::GetCursorDeltaPos<f32>();
-	camera->Rotate(cursorDelta.GetY(), cursorDelta.GetX(), 0.0f, 0.20F);
+	//engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(m_cameraHandle);
+	//
+	//// Rotate camera
+	//math::Vector2f cursorDelta = engine::Input::GetCursorDeltaPos<f32>();
+	//camera->Rotate(cursorDelta.GetY(), cursorDelta.GetX(), 0.0f, 0.20F);
 	//engine.GetViewport()->GetFBO().Bind();
 	//engine.RunTimeUpdate();
 	//engine.GetViewport()->GetFBO().UnBind();
