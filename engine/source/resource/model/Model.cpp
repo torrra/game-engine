@@ -43,6 +43,8 @@ bool engine::Model::LoadResource(const char* fileName)
     if (!fileName || !strcmp(fileName, ""))
         return false;
 
+    m_modelName = fileName;
+
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
 }
@@ -74,6 +76,11 @@ void engine::Model::Draw(void) const
         for (const Mesh& mesh : m_staticMeshes)
             mesh.Draw();
     } 
+}
+
+std::string engine::Model::GetName(void) const
+{
+    return m_modelName;
 }
 
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const

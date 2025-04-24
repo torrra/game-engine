@@ -42,6 +42,11 @@ ui::Payload ui::AcceptPayload(const char* payloadID, ::int32 flags)
     return ImGui::AcceptDragDropPayload(payloadID, flags);
 }
 
+ui::Payload ui::GetPayload(void)
+{
+    return ImGui::GetDragDropPayload();
+}
+
 ui::Payload::Payload(const ImGuiPayload* payload)
 {
     m_payload = payload;

@@ -67,5 +67,6 @@ namespace ui
     // Payload functions
     ENGINE_API void CreatePayload(const char* payloadID, const void* data, uint64 size);
     ENGINE_API Payload AcceptPayload(const char* payloadID, ::int32 flags);
+    ENGINE_API Payload GetPayload(void);
 }
 

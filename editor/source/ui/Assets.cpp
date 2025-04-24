@@ -4,6 +4,7 @@
 #include <engine/ui/UIDraw.h>
 #include <engine/ui/UITree.h>
 #include <engine/ui/UIStyle.h>
+#include <engine/ui/UIDragDrop.h>
 
 #include <engine/utility/MemoryCheck.h>
 #include <engine/input/Input.h>
@@ -190,6 +191,14 @@ void editor::AssetsWnd::RenderAssets(void)
 
                     if (ui::Selectable("", &isSelected, assetSize))
                         m_selectedIndex = index;
+
+                    // Create drag & drop payload 
+                    if (::ui::StartDragDropSource(0))
+                    {
+                        ::ui::CreatePayload("Asset", &m_assets[index], sizeof(Asset));
+                        ::ui::Text("%s", m_assets[index].m_fileName.c_str());
+                        ::ui::EndDragDropSource();
+                    }
 
                     if (isItemVisible)
                     {

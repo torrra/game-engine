@@ -25,6 +25,8 @@ namespace engine
 
         ENGINE_API void Draw(void) const;
 
+        ENGINE_API std::string GetName(void) const;
+
         // This function is meant to be used by renderer components, and ONLY from the
         // render thread.
         ENGINE_API
@@ -44,6 +46,7 @@ namespace engine
 
         std::vector<DynamicMesh>      m_dynamicMeshes;
         std::vector<Mesh>			  m_staticMeshes;
+        std::string                   m_modelName;
         uint8						  m_loadStatus = 0;
         bool                          m_isDynamic = false;
     };

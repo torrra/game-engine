@@ -39,6 +39,9 @@
 
 namespace editor
 {
+    class BaseComponent;
+    class RendererComponent;
+
     struct DirTreeNode
     {
         DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent);
@@ -65,7 +68,7 @@ namespace editor
         AssetsWnd(void) = delete;
         AssetsWnd(const char* name);
         ~AssetsWnd(void);
-
+        
     protected:
         virtual void RenderContents(void) override;
 
@@ -88,5 +91,6 @@ namespace editor
         ui::Table* m_layout;
         ui::ListClipper m_clipper;
         int16 m_selectedIndex;
+
     };
 }

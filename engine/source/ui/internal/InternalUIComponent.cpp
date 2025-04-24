@@ -25,6 +25,13 @@ bool ui::Button(const char* text, math::Vector2f const& size)
     return ImGui::Button(text, size);
 }
 
+bool ui::DropDown(const char* id, int32& selectedValue, std::vector<const char*> const& options)
+{
+    int32 arraySize = static_cast<int32>(options.size());
+
+    return ImGui::Combo(id, &selectedValue, options.data(), arraySize);
+}
+
 bool ui::InputBox(const char* id, const char* hint, std::string& outStr)
 {
     constexpr size_t size = 128;
