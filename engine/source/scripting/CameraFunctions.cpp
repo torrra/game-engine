@@ -103,9 +103,9 @@ int script_GetCameraRotation(lua_State* luaState)
     {
         math::Vector3f camEulers = camera->GetRotation();
 
-        lua_pushnumber(luaState, static_cast<lua_Number>(camEulers.GetX()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(camEulers.GetY()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(camEulers.GetZ()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetX()).Deg()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetY()).Deg()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetZ()).Deg()));
     }
 
     return 3;

@@ -269,8 +269,8 @@ ScriptObjectTypes.%s = %s\nreturn %s";
             if ((!isalnum(character)) && (character != '_'))
                 return std::string();
 
-            if (character >= 'A' && character <= 'Z')
-                character += 32;
+           /* if (character >= 'A' && character <= 'Z')
+                character += 32;*/
         }
 
         return formattedName;

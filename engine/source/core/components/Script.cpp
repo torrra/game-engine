@@ -32,7 +32,7 @@ namespace engine
 
     void Script::AddScriptObject(const std::string& type)
     {
-        std::string formattedType = type;
+        /*std::string formattedType = type;
 
         for (char& character : formattedType)
         {
@@ -40,7 +40,8 @@ namespace engine
                 character += 32;
         }
 
-        m_scriptObjects.emplace_back(m_owner, formattedType);
+        m_scriptObjects.emplace_back(m_owner, formattedType);*/
+        m_scriptObjects.emplace_back(m_owner, type);
     }
 
     void Script::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const

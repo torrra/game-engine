@@ -8,6 +8,7 @@
 #include "ui/UIWindow.h"
 #include "ui/Application.h"
 #include "Window.h"
+#include "physics/PhysicsEngine.h"
 
 #include <math/Vector2.hpp>
 
@@ -22,8 +23,7 @@
 #define FIX_UPDATE_FREQUENCY 20
 #define TO_MILLISECONDS 0.001f
 
-bool engine::Engine::m_hasEditor = false;
-
+engine::Engine* engine::g_defaultEngine;
 
 engine::Engine::Engine(bool withEditor)
     : m_projectDir("")
@@ -32,6 +32,9 @@ engine::Engine::Engine(bool withEditor)
         m_application = new Application();
 
    m_hasEditor = withEditor;
+
+   if (!g_defaultEngine)
+       g_defaultEngine = this;
 }
 
 int16 engine::Engine::Startup(const char* projectName, const char* projectDir, uint32 threadCount)
@@ -60,6 +63,42 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     return SUCCESS;
 }
 
+int16 engine::Engine::Startup(uint32 threadCount)
+{
+    m_application->Startup(m_currentProject.m_executableName.c_str());
+    ThreadManager::Startup(threadCount);
+
+    ScriptSystem::SetUserScriptLocation(m_projectDir.string().c_str());
+    ScriptSystem::Startup();
+    PhysicsEngine::Get().Init();
+
+    if (Input::StartUp() != SUCCESS)
+        return ERROR;
+
+    Input::SetCursorMode(ECursorMode::MODE_NORMAL);
+
+    // Load default resources
+    if (LoadEngineResources() != SUCCESS)
+        return ERROR;
+
+    Input::RegisterInput(KEY_W);
+    Input::RegisterInput(KEY_A);
+    Input::RegisterInput(KEY_S);
+    Input::RegisterInput(KEY_D);
+
+    m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
+    std::filesystem::path scenePath = m_projectDir;
+
+    if (m_hasEditor)
+        scenePath.append(m_currentProject.m_defaultEditorScene);
+    else
+        scenePath.append(m_currentProject.m_defaultGameScene);
+
+    m_activeScene.LoadNewScene(false, scenePath);
+    return SUCCESS;
+}
+
+
 void engine::Engine::ShutDown(void)
 {
     ThreadManager::Shutdown();
@@ -68,6 +107,7 @@ void engine::Engine::ShutDown(void)
     m_application->Shutdown();
     Input::ShutDown();
     m_uiManager.ShutDown();
+    PhysicsEngine::Get().CleanUp();
 
     if (m_application)
         delete m_application;
@@ -106,16 +146,31 @@ void engine::Engine::UpdateApplicationWindow(void)
     m_uiManager.NewFrame();
 
     m_application->Render(m_activeScene.GetGraph());
-    m_uiManager.UpdateUI();
 
-    // swaps buffers 
+    m_uiManager.EndFrame();
     m_application->EndFrame();
     Input::ResetKeys();
 }
 
 bool engine::Engine::HasEditor(void)
 {
-    return m_hasEditor;
+    return g_defaultEngine->m_hasEditor;
+}
+
+
+const std::filesystem::path& engine::Engine::GetProjectDir(void) const
+{
+    return m_projectDir;
+}
+
+void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)
+{
+    ThreadManager::AddTask([this, path, serialize]
+        {
+            m_activeScene.LoadNewScene(serialize, path);
+            ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(
+                &Application::SetCurrentScene, m_application, &m_activeScene);
+        });
 }
 
 void engine::Engine::CreateProject(const std::string & dir, const std::string& name)
@@ -132,7 +187,8 @@ void engine::Engine::CreateProject(const std::string & dir, const std::string& n
 
     if (!std::filesystem::exists(pathObj))
     {
-        PrintLog(ErrorPreset(), "Unable to create project: target location does not exist or path is not absolute.");
+        PrintLog(ErrorPreset(), "Unable to create project: target location\
+ does not exist or path is not absolute.");
         return;
     }
 
@@ -140,35 +196,37 @@ void engine::Engine::CreateProject(const std::string & dir, const std::string& n
 
     if (std::filesystem::exists(pathObj))
     {
-        PrintLog(ErrorPreset(), "Unable to create project: directory already exists.");
+        PrintLog(WarningPreset(), "Unable to create project: directory already \
+exists. Attempting to open project file...");
+
+        std::filesystem::path filename = pathObj.filename().replace_extension(".mustang");
+        pathObj += std::filesystem::path::preferred_separator;
+
+        OpenProject(pathObj += filename);
         return;
     }
 
     std::filesystem::create_directory(pathObj);
-
     pathObj.append(name);
     pathObj.replace_extension(".mustang");
 
-    std::filesystem::path projectFilePath = pathObj;
-    std::ofstream projFile(pathObj, std::ios::out);
+    m_projectFile = pathObj;
+    m_currentProject.m_defaultEditorScene =  m_currentProject.m_defaultGameScene = "default.mscn";
+    m_currentProject.m_executableName = name;
 
-    pathObj.remove_filename().append("assets");
+    m_projectDir = pathObj.remove_filename().append("assets");
     std::filesystem::create_directory(pathObj);
 
-    if (projFile)
-    {
-        text::Serialize(projFile, "defaultGameScene", "0", 1);
-        projFile << '\n';
-        text::Serialize(projFile, "defaultEditorScene", "0", 1);
-        projFile.close();
-
-        OpenProject(projectFilePath);
-    }
+    m_activeScene.EditPath(m_projectDir);
+    m_activeScene.Rename("default");
+    SaveProject();
 }
 
 void engine::Engine::OpenProject(const std::filesystem::path& projFile)
 {
-    wchar_t extension[] = L".mustang";
+    constexpr wchar_t extension[] = L".mustang";
+    
+    m_projectFile = projFile;
 
     if (memcmp(projFile.extension().c_str(), extension, sizeof(extension)) != 0)
     {
@@ -178,30 +236,35 @@ void engine::Engine::OpenProject(const std::filesystem::path& projFile)
 
     std::ifstream input(projFile, std::ios::in | std::ios::binary);
 
+    if (!input)
+    {
+        PrintLog(ErrorPreset(), "Unable to open project file");
+        return;
+    }
+
     const char* cursor;
     const char* end;
     const char* fileData = text::LoadFileData(input, cursor, end);
 
-    if (m_hasEditor)
-        cursor = text::GetNewLine(cursor, end);
+    m_projectDir = projFile.parent_path();
+    m_projectDir.append("assets");
 
-    m_projectDir = projFile.parent_path().string();
-
-    std::string scenePath;
-    cursor = text::DeserializeString(cursor, end, scenePath);
-
-    if (memcmp(scenePath.c_str(), "0", 1) == 0)
-    {
-        PrintLog(WarningPreset(), "No default scene set in this mode");
-        return;
-    }
-
+    DeserializeProjectFile(cursor, end);
     text::UnloadFileData(fileData);
-
-    //m_activeScene.Rename()
-
 }
 
+void engine::Engine::SaveProject(void)
+{
+    std::ofstream output(m_projectFile, std::ios::out);
+
+    text::Serialize(output, "defaultGameScene", m_currentProject.m_defaultGameScene);
+    output << '\n';
+    text::Serialize(output, "defaultEditorScene", m_currentProject.m_defaultEditorScene);
+    output << '\n';
+    text::Serialize(output, "executableName", m_currentProject.m_executableName);
+
+    m_activeScene.SerializeText();
+}
 
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
 {
@@ -248,4 +311,87 @@ inline int16 engine::Engine::LoadEngineResources(void)
     );
 
     return SUCCESS;
+}
+
+
+engine::GameScene& engine::Engine::GetCurrentScene(void)
+{
+    return m_activeScene;
+}
+
+
+void engine::Engine::SetExecutableName(const std::string& name)
+{
+    m_currentProject.m_executableName = name;
+    SaveProject();
+}
+
+void engine::Engine::SetDefaultGameScene(const std::string& relativePath)
+{
+    std::filesystem::path sceneFile = m_projectDir;
+
+    sceneFile.append(relativePath);
+
+    if (!std::filesystem::exists(sceneFile))
+    {
+        PrintLog(ErrorPreset(), "Invalid scene file");
+        return;
+    }
+
+    m_currentProject.m_defaultGameScene = relativePath;
+    SaveProject();
+}
+
+void engine::Engine::SetDefaultEditorScene(const std::string& relativePath)
+{
+    std::filesystem::path sceneFile = m_projectDir;
+
+    sceneFile.append(relativePath);
+
+    if (!std::filesystem::exists(sceneFile))
+    {
+        PrintLog(ErrorPreset(), "Invalid scene file");
+        return;
+    }
+
+    m_currentProject.m_defaultEditorScene = relativePath;
+    SaveProject();
+}
+
+
+void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
+{
+    cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultGameScene);
+    if (memcmp(m_currentProject.m_defaultGameScene.c_str(), "0", 1) == 0)
+        PrintLog(WarningPreset(), "No default scene set for standalone mode");
+
+    if (m_hasEditor)
+    {
+        cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultEditorScene);
+        if (memcmp(m_currentProject.m_defaultEditorScene.c_str(), "0", 1) == 0)
+            PrintLog(WarningPreset(), "No default scene set for editor mode");
+
+
+        cursor = text::DeserializeString(cursor, end, m_currentProject.m_executableName);
+        PrintLog(InfoPreset(), "Executable name: " + m_currentProject.m_executableName);
+    }
+}
+
+void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destination)
+{
+    std::filesystem::path buildDir = destination;
+    buildDir.append(m_currentProject.m_executableName);
+
+    if (std::filesystem::exists(buildDir))
+    {
+        PrintLog(ErrorPreset(), "Unable to create build dir: an entry with the executable's name already exists");
+        return;
+    }
+
+    std::filesystem::create_directory(buildDir);
+    std::filesystem::copy_file(m_projectFile, buildDir.replace_filename(m_currentProject.m_executableName));
+
+    buildDir.remove_filename();
+
+
 }
