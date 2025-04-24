@@ -1,6 +1,5 @@
 #include "core/components/Camera.h"
 #include "core/systems/ScriptSystem.h"
-#include "utility/Timer.h"
 
 #include <math/Arithmetic.hpp>
 #include <math/Vector4.hpp>
