@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/CoreTypes.h"
+#include <concepts>
 
 namespace engine
 {

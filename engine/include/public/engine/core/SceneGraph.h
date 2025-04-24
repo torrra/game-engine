@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <unordered_map>
 
 #include "engine/EngineExport.h"
 #include "TypesECS.h"
