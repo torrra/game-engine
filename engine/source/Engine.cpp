@@ -10,18 +10,9 @@
 #include "Window.h"
 #include "physics/PhysicsEngine.h"
 
-#include <math/Vector2.hpp>
-
-#include <glad/glad.h>	
+#include "utility/Platform.h"
 #include <iostream>
-
-
-#undef new
-#include <imgui/imgui.h>
-
-
-#define FIX_UPDATE_FREQUENCY 20
-#define TO_MILLISECONDS 0.001f
+#include <chrono>
 
 engine::Engine* engine::g_defaultEngine;
 
@@ -60,12 +51,17 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
 
     
     m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
+    PhysicsEngine::Get().Init();
     return SUCCESS;
 }
 
 int16 engine::Engine::Startup(uint32 threadCount)
 {
-    m_application->Startup(m_currentProject.m_executableName.c_str());
+    if (m_hasEditor)
+        m_application->Startup("Editor");
+    else
+        m_application->Startup(m_currentProject.m_executableName.c_str());
+
     ThreadManager::Startup(threadCount);
 
     ScriptSystem::SetUserScriptLocation(m_projectDir.string().c_str());
@@ -80,11 +76,6 @@ int16 engine::Engine::Startup(uint32 threadCount)
     // Load default resources
     if (LoadEngineResources() != SUCCESS)
         return ERROR;
-
-    Input::RegisterInput(KEY_W);
-    Input::RegisterInput(KEY_A);
-    Input::RegisterInput(KEY_S);
-    Input::RegisterInput(KEY_D);
 
     m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
     std::filesystem::path scenePath = m_projectDir;
@@ -379,19 +370,53 @@ void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
 
 void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destination)
 {
-    std::filesystem::path buildDir = destination;
-    buildDir.append(m_currentProject.m_executableName);
+    using TimePoint = std::chrono::system_clock::time_point;
 
-    if (std::filesystem::exists(buildDir))
+    std::filesystem::path buildDir = destination;
+
+    TimePoint now = std::chrono::system_clock::now();
+    std::time_t timeVal = std::chrono::system_clock::to_time_t(now);
+
+    buildDir.append(m_currentProject.m_executableName + +"-" +
+    std::to_string(math::Absolute(SceneGraph::RandomNumber())) + "-" + std::to_string(timeVal));
+
+    constexpr uint32 loopSafety = 100;
+    uint32 attempt = 0;
+
+    while (std::filesystem::exists(buildDir) && attempt++ < loopSafety)
     {
-        PrintLog(ErrorPreset(), "Unable to create build dir: an entry with the executable's name already exists");
-        return;
+        PrintLog(WarningPreset(), "An entry with the executable's name already exists. Re-generating build name");
+
+        if (attempt != loopSafety)
+        {
+            buildDir = destination;
+            buildDir.append(m_currentProject.m_executableName + +"-" +
+            std::to_string(math::Absolute(SceneGraph::RandomNumber())) + "-" + std::to_string(timeVal));
+        }
+        else
+        {
+            PrintLog(ErrorPreset(), "Unable to create build folder");
+            return;
+        }
     }
 
+    std::filesystem::copy_options copyOptions = std::filesystem::copy_options::skip_existing |
+                                                std::filesystem::copy_options::recursive;
+
     std::filesystem::create_directory(buildDir);
-    std::filesystem::copy_file(m_projectFile, buildDir.replace_filename(m_currentProject.m_executableName));
 
-    buildDir.remove_filename();
+    buildDir.append(m_currentProject.m_executableName).replace_extension(".mustang");
+    std::filesystem::copy_file(m_projectFile, buildDir);
 
+    buildDir.remove_filename().append("assets");
+    std::filesystem::copy(m_projectDir, buildDir, copyOptions);
+
+    std::filesystem::path currentPath = std::filesystem::current_path();
+    std::filesystem::copy(currentPath, buildDir.parent_path(), copyOptions);
+
+    std::filesystem::path exePath = currentPath = buildDir.replace_filename("defaultExecutable.exe");
+    std::filesystem::rename(currentPath,
+    exePath.replace_filename(m_currentProject.m_executableName).replace_extension(".exe"));
+    OpenFile(exePath.c_str(), buildDir.parent_path().c_str());
 
 }
