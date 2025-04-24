@@ -4,6 +4,7 @@
 #include "ui/components/ScriptComponent.h"
 #include "ui/components/TransformComponent.h"
 
+#include <engine/ui/UIComponent.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
 
@@ -13,6 +14,7 @@
 editor::PropertyWnd::PropertyWnd(engine::SceneGraph* graph)
 {
     SetName(WINDOW_NAME);
+    SetFlags(::ui::EWndFlags::MENU_BAR);
 
     m_handle = INVALID_HANDLE;
     m_graph = graph;
@@ -40,8 +42,10 @@ void editor::PropertyWnd::SetHandle(engine::EntityHandle handle)
 
 void editor::PropertyWnd::RenderContents(void)
 {
+    RenderMenuBar();
     if (m_handle == INVALID_HANDLE)
         return;
+
 
     // Render all components
     for (BaseComponent* component : m_components)
@@ -80,4 +84,34 @@ void editor::PropertyWnd::InitComponents(void)
         for (engine::ScriptObject script : scriptComponent->GetScripts())
             m_components.emplace_back(new ScriptComponent(script.GetType()));
     }
+}
+
+void editor::PropertyWnd::RenderMenuBar(void)
+{
+    ui::StartDisabledSection(!m_graph || m_handle == INVALID_HANDLE);
+    if (ui::StartMenuBar())
+    {
+        if (ui::StartMenu("Add Component"))
+        {
+                 if (ui::MenuItem("Renderer"))
+                AddComponent<RendererComponent, engine::Renderer>();
+
+            else if (ui::MenuItem("Rigidbody"))
+                printf("Adding rigidbody...\n"); // TODO: implement rigidbody
+            
+            else if (ui::MenuItem("Camera"))
+                AddComponent<CameraComponent, engine::Camera>();
+            
+             else if (ui::MenuItem("Script"))
+                printf("Adding script...\n"); // TODO: implement for script object
+            
+             else if (ui::MenuItem("Transform"))
+                AddComponent<TransformComponent, engine::Transform>();
+
+            ui::EndMenu();
+        }
+        
+        ui::EndMenuBar();
+    }
+    ui::EndDisabledSection();
 }

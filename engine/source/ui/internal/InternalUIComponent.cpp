@@ -71,6 +71,11 @@ bool ui::StartMainMenuBar(void)
     return ImGui::BeginMainMenuBar();
 }
 
+bool ui::StartMenu(const char* name)
+{
+    return ImGui::BeginMenu(name);
+}
+
 void ui::EndMenuBar(void)
 {
     ImGui::EndMenuBar();
@@ -79,6 +84,11 @@ void ui::EndMenuBar(void)
 void ui::EndMainMenuBar(void)
 {
     ImGui::EndMainMenuBar();
+}
+
+void ui::EndMenu(void)
+{
+    ImGui::EndMenu();
 }
 
 bool ui::MenuItem(const char* name, const char* shortcut)

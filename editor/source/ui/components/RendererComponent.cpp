@@ -28,7 +28,7 @@ void editor::RendererComponent::SectionContent(void)
 void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 {
     // Get file name
-    std::string modelName;
+    std::string modelName("None");
 
     if (const engine::Model* model = renderer->GetModel())
     {

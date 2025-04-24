@@ -19,8 +19,10 @@ namespace ui
     // Menus
     ENGINE_API bool StartMenuBar(void);
     ENGINE_API bool StartMainMenuBar(void);
+    ENGINE_API bool StartMenu(const char* name);
     ENGINE_API void EndMenuBar(void);
     ENGINE_API void EndMainMenuBar(void);
+    ENGINE_API void EndMenu(void);
     ENGINE_API bool MenuItem(const char* name, const char* shortcut = nullptr);
 
     // PopUps
