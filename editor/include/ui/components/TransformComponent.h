@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component.h"
-
 #include <engine/CoreTypes.h>
 #include <engine/core/components/Transform.h>
 
@@ -13,14 +12,15 @@ namespace editor
         TransformComponent(void);
         ~TransformComponent(void);
 
-        void SetTransform(engine::Transform* transform);
-    
     protected:
         virtual void SectionContent(void) override;
 
     private:
-        engine::Transform* m_transformData;
+        inline void SyncRotation(engine::Transform* transform);
+        inline void InputRotation(engine::Transform* transform, const char* uid, uint8 index);
+
         math::Vector3f m_lastRot;
         math::Vector3f m_rotation;
+        bool m_isRotationSynced;
     };
 }

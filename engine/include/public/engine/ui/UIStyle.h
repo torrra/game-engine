@@ -2,6 +2,7 @@
 
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
+#include <math/Vector2.hpp>
 
 namespace ui
 {
@@ -68,4 +69,6 @@ namespace ui
     };
 
     ENGINE_API uint32 GetColor(EColor colorID, f32 alpha);
+    ENGINE_API f32 GetFontSize(void);
+    ENGINE_API math::Vector2f GetTextSize(const char* text);
 }

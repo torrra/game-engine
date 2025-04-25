@@ -32,8 +32,8 @@ function Transform:RefreshRef()
 end
 
 function Transform:GetPosition()
-	
-	return TransformRef.GetTransformPosition(self.ref)
+    
+    return TransformRef.GetPosition(self.ref)
 end
 
 

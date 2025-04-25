@@ -3,6 +3,7 @@
 
 #undef new
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 #include <cstdarg>
 
@@ -22,6 +23,13 @@ void ui::Image(uint64 textureID, math::Vector2f const& size)
 bool ui::Button(const char* text, math::Vector2f const& size)
 {
     return ImGui::Button(text, size);
+}
+
+bool ui::DropDown(const char* id, int32& selectedValue, std::vector<const char*> const& options)
+{
+    int32 arraySize = static_cast<int32>(options.size());
+
+    return ImGui::Combo(id, &selectedValue, options.data(), arraySize);
 }
 
 bool ui::InputBox(const char* id, const char* hint, std::string& outStr)
@@ -48,6 +56,11 @@ bool ui::InputBox(const char* id, f32* value, f32 increment, bool returnOnComple
     return result;
 }
 
+bool ui::Selectable(const char* text, bool* selected, math::Vector2f const& size)
+{
+    return ImGui::Selectable(text, selected, ImGuiMultiSelectFlags_SingleSelect, size);
+}
+
 bool ui::StartMenuBar(void)
 {
     return ImGui::BeginMenuBar();
@@ -58,6 +71,11 @@ bool ui::StartMainMenuBar(void)
     return ImGui::BeginMainMenuBar();
 }
 
+bool ui::StartMenu(const char* name)
+{
+    return ImGui::BeginMenu(name);
+}
+
 void ui::EndMenuBar(void)
 {
     ImGui::EndMenuBar();
@@ -66,6 +84,11 @@ void ui::EndMenuBar(void)
 void ui::EndMainMenuBar(void)
 {
     ImGui::EndMainMenuBar();
+}
+
+void ui::EndMenu(void)
+{
+    ImGui::EndMenu();
 }
 
 bool ui::MenuItem(const char* name, const char* shortcut)
@@ -83,9 +106,9 @@ void ui::EndPopUp(void)
     ImGui::EndPopup();
 }
 
-void ui::SameLine(void)
+void ui::SameLine(f32 xOffset)
 {
-    ImGui::SameLine(0.0F, -1.0F);
+    ImGui::SameLine(xOffset, -1.0F);
 }
 
 void ui::ItemWidth(f32 widthPx)
@@ -103,19 +126,112 @@ math::Vector2f ui::GetPos(void)
     return ImGui::GetCursorPos();
 }
 
+math::Vector2f ui::GetScreenPos(void)
+{
+    return ImGui::GetCursorScreenPos();
+}
+
 math::Vector2f ui::GetAvailSpace(void)
 {
     return ImGui::GetContentRegionAvail();
 }
 
-void ui::StartSection(const char* name)
+math::Vector2i ui::GetViewportPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+    
+    if (window)
+        return math::Vector2i(
+                static_cast<int32>(window->ViewportPos.x),
+                static_cast<int32>(window->ViewportPos.y)
+        );
+
+    return math::Vector2i::Zero();
+}
+
+math::Vector2i ui::GetWindowPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+        return math::Vector2i(
+                static_cast<int32>(window->Pos.x),
+                static_cast<int32>(window->Pos.y)
+        );
+
+    return math::Vector2i::Zero();
+}
+
+math::Vector2f ui::GetWindowPos(void)
+{
+    return ImGui::GetWindowPos();
+}
+
+math::Vector2i ui::GetOuterRectMinPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+    {
+        ImVec2 position = window->OuterRectClipped.Min;
+        return math::Vector2i(
+            static_cast<int32>(position[0]),
+            static_cast<int32>(position[1])
+        );
+    }
+
+    return math::Vector2i::Zero();
+}
+
+math::Vector2i ui::GetInnerRectMinPos(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+    {
+        const ImVec2& position = window->ContentRegionRect.Min;
+        return math::Vector2i(
+            static_cast<int32>(position[0]),
+            static_cast<int32>(position[1])
+        );
+    }
+
+    return math::Vector2i::Zero();
+}
+
+void ui::SetAlignment(math::Vector2f const& gridIndex)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, gridIndex);
+}
+
+void ui::SetScreenPosition(math::Vector2f const& position)
+{
+    ImGui::SetCursorScreenPos(position);
+}
+
+void ui::UnsetAlignment(void)
+{
+    return ImGui::PopStyleVar();
+}
+
+bool ui::StartSection(const char* name)
 {
     constexpr int32 flags = 
         ImGuiChildFlags_Borders | 
         ImGuiChildFlags_AlwaysUseWindowPadding | 
         ImGuiChildFlags_AutoResizeY;
 
-    ImGui::BeginChild(name, ImVec2(0, 0), flags);
+    return ImGui::BeginChild(name, ImVec2(0, 0), flags);
+}
+
+ENGINE_API bool ui::StartSection(const char* name, math::Vector2f const& size)
+{
+    constexpr int32 flags =
+        ImGuiChildFlags_Borders |
+        ImGuiChildFlags_AlwaysUseWindowPadding |
+        ImGuiChildFlags_AutoResizeY;
+
+    return ImGui::BeginChild(name, size, flags);
 }
 
 void ui::EndSection(void)
@@ -133,14 +249,45 @@ void ui::EndDisabledSection(void)
     ImGui::EndDisabled();
 }
 
-bool ui::CollapseSection(const char* name)
+bool ui::CollapseSection(const char* name, bool& closeButton)
 {
-    return ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_None);
+    constexpr int32 flags = 
+        ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap | 
+        ImGuiTreeNodeFlags_ClipLabelForTrailingButton | ImGuiTreeNodeFlags_DefaultOpen;
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+    if (window->SkipItems)
+        return false;
+
+    uint32 id = window->GetID(name);
+
+    bool is_open = ImGui::TreeNodeBehavior(id, flags, name);
+    {
+        ImGuiContext& context = *GImGui;
+        ImGuiLastItemData last_item_backup = context.LastItemData;
+        float button_size = context.FontSize;
+
+        math::Vector2f buttonSize(
+            ImMax(context.LastItemData.Rect.Min.x, context.LastItemData.Rect.Max.x - context.Style.FramePadding.x - button_size),
+            context.LastItemData.Rect.Min.y + context.Style.FramePadding.y
+        );
+
+        uint32  close_button_id = ImGui::GetIDWithSeed("#CLOSE", NULL, id);
+        closeButton = (ImGui::CloseButton(close_button_id, buttonSize));
+        context.LastItemData = last_item_backup;
+    }
+
+    return is_open;
 }
 
 void ui::SetID(std::string const& id)
 {
     ImGui::PushID(id.c_str());
+}
+
+void ui::SetID(int32 id)
+{
+    ImGui::PushID(id);
 }
 
 void ui::UnsetID(void)
@@ -161,4 +308,31 @@ bool ui::IsItemSelected(void)
 bool ui::IsItemHovered(void)
 {
     return ImGui::IsItemHovered();
+}
+
+bool ui::IsWindowSelected(std::string const& name)
+{
+    ImGuiContext* context = ImGui::GetCurrentContext();
+
+    return ImGui::FindWindowByName(name.c_str()) == context->NavWindow;
+}
+
+bool ui::IsWindowDocked(std::string const& windowName)
+{
+    ImGuiWindow* window = ImGui::FindWindowByName(windowName.c_str());
+
+    if (window)
+        return window->DockIsActive;
+
+    return false;
+}
+
+bool ui::IsRectVisible(math::Vector2f const& size)
+{
+    return ImGui::IsRectVisible(size);
+}
+
+bool ui::IsRectVisible(math::Vector2f const& min, math::Vector2f const& max)
+{
+    return ImGui::IsRectVisible(min, max);
 }

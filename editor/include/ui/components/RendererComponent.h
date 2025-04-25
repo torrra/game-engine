@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ui/components/Component.h"
-
-#include <engine/CoreTypes.h>
+#include <engine/core/components/Renderer.h>
+#include <string>
 
 namespace editor
 {
@@ -16,5 +16,10 @@ namespace editor
         virtual void SectionContent(void) override;
 
     private:
+        void ModelInput(engine::Renderer* renderer);
+        void ShaderInput(engine::Renderer* renderer);
+
+        std::string m_modelName;
+        std::string m_fragName;
     };
 }

@@ -7,6 +7,7 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_impl_glfw.h>
 
+#include "ui/UIComponent.h"
 
 #include "utility/MemoryCheck.h"
 #include "Engine.h"
@@ -51,6 +52,11 @@ void engine::UIManager::ShutDown(void)
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
+}
+
+bool engine::UIManager::IsWindowFocused(std::string const& name)
+{
+    return ::ui::IsWindowSelected(name);
 }
 
 void engine::UIManager::InitUI(wnd::Wnd* window)

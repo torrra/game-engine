@@ -3,10 +3,6 @@
 #include <engine/input/Input.h>
 #include "ui/EditorApplication.h"
 
-
-#include "engine/physics/PhysicsEngine.h"
-
-
 #include "engine/ConsoleLog.hpp"
 
 
@@ -20,31 +16,10 @@ extern "C"
 int appMain(void)
 {
 	engine::Engine engine;
-    engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor"));
+    engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
 
     engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
-    
-    /// ---------------- Create entity ---------------- 
-    //engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
-
-    ///// ---------------- Create rigidbody dynamic ----------------
-    //std::cout << "\t" << std::endl;
-
-    //engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
-    //                                    engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
-    //rb->SetDebugVisualization(true);
-    //rb->SetGravityDisabled(false);
-
-    ///// ---------------- Create rigidbody static ----------------
-    //std::cout << "\t" << std::endl;
-    //
-    //engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
-    //                                        engine.GetGraph(), floor, engine::BOX);
-    //floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
-    //floorRb->SetDebugVisualization(true);
-
-    engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
     engine.SaveProject();
 	while (!engine.GetWindow()->ShouldWindowClose())
@@ -55,12 +30,12 @@ int appMain(void)
             engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
             engine::Input::IsInputPressed(KEY_B))
         {
-            //engine.BuildProjectExecutable(".\\tests");
             engine.BuildProjectExecutable("..\\testProjectBuildFolder");
-
         }
+
         engine.UpdateApplicationWindow();
 	}
+
 	engine.ShutDown();
 	return 0;
 }
