@@ -57,9 +57,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
 
 int16 engine::Engine::Startup(uint32 threadCount)
 {
-    if (m_hasEditor)
-        m_application->Startup("Editor");
-    else
+    if (!m_hasEditor)
         m_application->Startup(m_currentProject.m_executableName.c_str());
 
     ThreadManager::Startup(threadCount);
@@ -356,14 +354,14 @@ void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
     if (memcmp(m_currentProject.m_defaultGameScene.c_str(), "0", 1) == 0)
         PrintLog(WarningPreset(), "No default scene set for standalone mode");
 
+    cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultEditorScene);
+    cursor = text::DeserializeString(cursor, end, m_currentProject.m_executableName);
+
     if (m_hasEditor)
     {
-        cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultEditorScene);
         if (memcmp(m_currentProject.m_defaultEditorScene.c_str(), "0", 1) == 0)
             PrintLog(WarningPreset(), "No default scene set for editor mode");
 
-
-        cursor = text::DeserializeString(cursor, end, m_currentProject.m_executableName);
         PrintLog(InfoPreset(), "Executable name: " + m_currentProject.m_executableName);
     }
 }
