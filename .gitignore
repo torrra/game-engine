@@ -15,7 +15,11 @@
 # ImGui meta data
 /workspace/imgui.ini
 
-# TODO : remove
+# Build tests
+/testProjectBuildFolder/*
+!/testProjectBuildFolder/DoNotRemove.txt
+
+# Test assets
 /workspace/assets/banana-dancing-fortnite
 /workspace/assets/hilda
 /workspace/assets/freddy

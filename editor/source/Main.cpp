@@ -18,9 +18,9 @@ extern "C"
 int appMain(void)
 {
 	engine::Engine engine;
-    engine.SetEditorApplication(new editor::EditorApplication("Editor"));
+    engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor"));
 
-    engine.OpenProject("C:\\Users\\noahd\\Bureau\\owaowa\\crazy_frog_dating_sim\\crazy_frog_dating_sim.mustang");
+    engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
     
     /* /// ---------------- Create entity ---------------- 
@@ -61,7 +61,7 @@ int appMain(void)
             engine::Input::IsInputPressed(KEY_B))
         {
             //engine.BuildProjectExecutable(".\\tests");
-            engine.BuildProjectExecutable("C:\\Users\\noahd\\Bureau\\OOOOOOOOOO");
+            engine.BuildProjectExecutable("..\\testProjectBuildFolder");
 
         }
         engine.UpdateApplicationWindow();
