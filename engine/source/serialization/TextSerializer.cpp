@@ -79,7 +79,7 @@ namespace engine::text
         while (!parser::IsNewline(*text) && (text != end))
             ++text;
 
-        if (text != end)
+        while (parser::IsNewline(*text) && (text != end))
             ++text;
 
         return text;

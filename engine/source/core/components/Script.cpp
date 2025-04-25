@@ -5,8 +5,6 @@
 
 #include "serialization/TextSerializer.h"
 
-#include <iostream>
-
 namespace engine
 {
     void Script::Start(void)
@@ -27,17 +25,14 @@ namespace engine
             object.Register();
     }
 
+    void Script::Unregister(void)
+    {
+        ScriptSystem::UnregisterComponent("_RemoveScriptComponent", m_owner);
+    }
+
     void Script::AddScriptObject(const std::string& type)
     {
-        std::string formattedType = type;
-
-        for (char& character : formattedType)
-        {
-            if (character >= 'A' && character <= 'Z')
-                character += 32;
-        }
-
-        m_scriptObjects.emplace_back(m_owner, formattedType).Register();
+        m_scriptObjects.emplace_back(m_owner, type);
     }
 
     void Script::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const

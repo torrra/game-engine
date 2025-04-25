@@ -1,12 +1,8 @@
 #include "core/components/Camera.h"
 #include "core/SceneGraph.h"
 #include "core/systems/ScriptSystem.h"
-#include "utility/Timer.h"
 
-#include <math/Arithmetic.hpp>
-#include <math/Vector4.hpp>
 
-#include <fstream>
 #include "serialization/TextSerializer.h"
 
 engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
@@ -56,6 +52,11 @@ math::Matrix4f engine::Camera::ViewProjection(void)
 void engine::Camera::Register(void)
 {
     engine::ScriptSystem::RegisterNewComponent("_NewCameraComponent", m_owner);
+}
+
+void engine::Camera::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveCameraComponent", m_owner);
 }
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept

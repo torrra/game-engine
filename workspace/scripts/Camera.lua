@@ -8,12 +8,16 @@ function Camera:_RegisterCameraComponent(handle)
 	self.__index = self
 	setmetatable(newComponent, self)
 	ExistingCameraComponents[handle] = newComponent
-	print("\n[Camera component] successfully registered component owned by "..handle.."\n")
 end
 
 function _NewCameraComponent(handle)
 
 	Camera:_RegisterCameraComponent(handle)
+end
+
+function _RemoveCameraComponent(handle)
+	
+	ExistingCameraComponents[handle] = nil
 end
 
 function Camera:RefreshRef()

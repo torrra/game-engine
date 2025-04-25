@@ -2,7 +2,7 @@
 
 #include "engine/EngineExport.h"
 #include "engine/core/Component.h"
-#include "engine/core/ComponentArray.h"
+#include "engine/core/ComponentArray.hpp"
 #include "engine/core/components/Transform.h"
 #include <math/Matrix4.hpp>
 #include <fstream>
@@ -11,9 +11,22 @@ namespace engine
 {
     class Renderer final : public Component
     {
+    private:
+
+        using MaterialArray = std::vector<const class MeshMaterial*>;
+
     public:
 
         using Component::Component;
+
+        ENGINE_API
+        Renderer(const Renderer&) = default;
+
+        ENGINE_API
+        Renderer(Renderer&&) = default;
+
+        ENGINE_API
+        ~Renderer(void) = default;
 
         ENGINE_API
         void Register(void) override;
@@ -29,7 +42,13 @@ namespace engine
         const class ShaderProgram* GetShader(void) const;
 
         ENGINE_API
-        const class Texture* GetTexture(void) const;
+        const class MeshMaterial* GetMaterial(uint32 index) const;
+
+        ENGINE_API
+        void SetMaterial(uint32 index, const class MeshMaterial* material);
+
+        ENGINE_API
+        void SetMaterial(uint32 index, const char* key);
 
         ENGINE_API
         math::Matrix4f GetMVP(void) const;
@@ -54,11 +73,18 @@ namespace engine
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
 
+        ENGINE_API
+        Renderer& operator=(const Renderer&) = default;
+
+        ENGINE_API
+        Renderer& operator=(Renderer&&) noexcept = default;
+
     private:
 
         math::Matrix4f m_mvp = math::Matrix4f(1.0f);
-        const class Model* m_model = nullptr;
-        const class ShaderProgram* m_shader = nullptr;
+        MaterialArray                m_materials;
+        const class Model*           m_model = nullptr;
+        const class ShaderProgram*   m_shader = nullptr;
     };
 
 

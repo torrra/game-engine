@@ -18,12 +18,17 @@ void engine::Time::Update()
     m_lastTime = m_totalTime;
 }
 
-f32 engine::Time::GetDeltaTime(void)
+void engine::Time::Reset(void)
+{
+    m_totalTime = m_lastTime = m_deltaTime = 0.f;
+}
+
+f32 engine::Time::GetDeltaTime(void) const
 {
     return m_deltaTime;
 }
 
-f32 engine::Time::GetTotalTime(void)
+f32 engine::Time::GetTotalTime(void) const
 {
     return m_totalTime;
 }

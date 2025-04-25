@@ -60,6 +60,12 @@ namespace engine
 
     }; // !Struct RaycastImpl
 
+    struct TriangleMeshImpl
+    {
+        physx::PxTriangleMesh*          m_triangleMesh      = nullptr;
+        physx::PxTriangleMeshDesc       m_triangleMeshDesc;
+    };
+
     /// PhysX using
     using PxVisualParam = physx::PxVisualizationParameter;
     using PxInstruFlag  = physx::PxPvdInstrumentationFlag;

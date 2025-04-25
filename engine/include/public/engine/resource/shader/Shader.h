@@ -58,6 +58,10 @@ namespace engine
 		ENGINE_API void Set(const char* uniformName, math::Matrix3d* matrix) const;
 		ENGINE_API void Set(const char* uniformName, math::Matrix4d* matrix) const;
 
+
+        ENGINE_API const std::string& GetVertexShaderName(void) const;
+        ENGINE_API const std::string& GetFragmentShaderName(void) const;
+
 	private:
 		void CreateProgram(void);
 

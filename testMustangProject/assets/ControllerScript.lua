@@ -27,5 +27,5 @@ end
 
 
 -- Engine definitions
-ScriptObjectTypes.controllerscript = ControllerScript
+ScriptObjectTypes.ControllerScript = ControllerScript
 return ControllerScript

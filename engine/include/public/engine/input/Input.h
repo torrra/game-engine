@@ -85,11 +85,13 @@ namespace engine
         std::unordered_map<int32, InputData> m_keyMap;
         
         math::Vector2d m_cursorPos;
+        math::Vector2d m_lastCursorPos;
         math::Vector2d m_scrollDelta;
 
         static std::mutex			    m_mutex;
         static Input*					m_instance;
         bool							m_dirty;
+        bool                            m_cursorUpdated;
     };
 
     // Template function definitions
@@ -107,14 +109,12 @@ namespace engine
     template<math::CScalarType TValueType>
     inline math::Vector2<TValueType> Input::GetCursorDeltaPos(void)
     {
-        static math::Vector2<TValueType> lastPos = GetCursorPosition<TValueType>();
-        math::Vector2<TValueType> cursorPos = GetCursorPosition<TValueType>();
+        math::Vector2d delta = GetInstance()->m_cursorPos - GetInstance()->m_lastCursorPos;
 
-        math::Vector2<TValueType> deltaPos = cursorPos - lastPos;
-
-        lastPos = cursorPos;
-
-        return deltaPos;
+        return math::Vector2<TValueType>(
+            static_cast<TValueType>(delta.GetX()),
+            static_cast<TValueType>(delta.GetY())
+        );
     }
 
     template<math::CScalarType TValueType>

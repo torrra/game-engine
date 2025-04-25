@@ -24,7 +24,7 @@ namespace engine
         ENGINE_API void	NewFrame(void);
 
         // Update function, call at the end of the update loop before updating window buffers
-        ENGINE_API void	UpdateUI(void);
+        ENGINE_API void	EndFrame(void);
 
 		// Clear memory call at end of program
 		ENGINE_API void	ShutDown(void);

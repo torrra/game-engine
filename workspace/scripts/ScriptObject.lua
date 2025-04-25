@@ -14,8 +14,6 @@ function ScriptObject._Register(typename, handle, owner)
 	typeTable.__index = typeTable
 	setmetatable(newObj, typeTable)
 	owner[typename] = newObj
-	print("\n[ScriptObject script] successfully registered script object of type "..typename.." owned by "..handle.."\n")
-
 end
 
 -- Create a new instance of ScriptObject prototype table

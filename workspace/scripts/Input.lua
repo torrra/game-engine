@@ -143,3 +143,13 @@ function IsInputReleased(key)
 
     return Input.IsInputReleased(key)
 end
+
+function GetCursorPosition()
+
+    return Input.GetCursorPosition()
+end
+
+function GetCursorDeltaPos()
+
+    return Input.GetCursorDeltaPos()
+end

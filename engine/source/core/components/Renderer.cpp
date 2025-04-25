@@ -51,7 +51,10 @@ namespace engine
             m_shader->Set("normalMat", &identityMat);
         }
 
-        m_model->Draw();
+        if (m_materials.empty())
+            m_materials.resize(m_model->GetMeshCount());
+
+        m_model->Draw(m_materials);
     }
 
     const Model* Renderer::GetModel(void) const
@@ -69,15 +72,39 @@ namespace engine
         return m_mvp;
     }
 
+    const MeshMaterial* Renderer::GetMaterial(uint32 index) const
+    {
+        if (index < m_materials.size())
+            return m_materials.at(index);
+
+        else
+            return nullptr;
+    }
+
+    void Renderer::SetMaterial(uint32 index, const MeshMaterial* material)
+    {
+        if (index >= m_materials.size())
+            m_materials.resize(static_cast<uint64>(index + 1));
+
+        m_materials[index] = material;
+    }
+
+    void Renderer::SetMaterial(uint32 index, const char* key)
+    {
+        if (const MeshMaterial* mat = ResourceManager::GetResource<MeshMaterial>(key))
+            SetMaterial(index, mat);
+    }
+
     void Renderer::SetModel(const Model* model)
     {
         m_model = model;
+        m_materials.resize(model->GetMeshCount()); 
     }
 
     void Renderer::SetModel(const char* key)
     {
         if (const Model* model = ResourceManager::GetResource<Model>(key))
-            m_model = model;
+            SetModel(model);
     }
 
     void Renderer::SetShader(const ShaderProgram* shader)
@@ -115,8 +142,20 @@ namespace engine
         text::Serialize(output, "model", *model);
         output << "\n    ";
         text::Serialize(output, "shader", *shader);
+        output << "\n        ";
+        text::Serialize(output, "vertexShader", m_shader->GetVertexShaderName());
+        output << "\n        ";
+        text::Serialize(output, "fragmentShader", m_shader->GetFragmentShaderName());
         output << "\n    ";
 
+        text::Serialize(output, "materialCount", m_materials.size());
+        output << "\n    ";
+
+        for (const MeshMaterial* mat : m_materials)
+        {
+            text::Serialize(output, "material", mat->GetFilePath().string());
+            output << "\n    ";
+        }
         text::Serialize(output, "flags", m_flags);
         output << '\n';
     }
@@ -129,11 +168,36 @@ namespace engine
         std::string key;
         text = text::DeserializeString(text, end, key);
 
+        ResourceManager::Load<Model>(key);
         m_model = ResourceManager::GetResource<Model>(key);
 
         key.clear();
         text = text::DeserializeString(text, end, key);
+
+        std::string vertShader, fragShader;
+
+        text = text::DeserializeString(text, end, vertShader);
+        text = text::DeserializeString(text, end, fragShader);
+
+        ResourceManager::LoadShader(key.c_str(), vertShader.c_str(), fragShader.c_str());
         m_shader = ResourceManager::GetResource<ShaderProgram>(key);
+
+
+        uint64 matCount = 0;
+        std::string material;
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, matCount);
+
+        m_materials.resize(matCount);
+
+        for (uint64 matNum = 0; matNum < matCount; ++matNum)
+        {
+            material.clear();
+            text = text::DeserializeString(text, end, material);
+            ResourceManager::Load<MeshMaterial>(material);
+            m_materials[matNum] = ResourceManager::GetResource<MeshMaterial>(material);
+        }
 
         MOVE_TEXT_CURSOR(text, end);
         return text::DeserializeInteger(text, m_flags);

@@ -18,6 +18,7 @@ void engine::ThreadManager::Startup(uint32 numThreads)
 void engine::ThreadManager::Shutdown(void)
 {
     SynchronizeGameThread(nullptr);
+    ExecuteRenderThreadTasks();
 
     // lock mutex here, we want
     // the bool to be assigned BEFORE
@@ -50,10 +51,10 @@ void engine::ThreadManager::UpdateGameLogic(SceneGraph* scene, f32 deltaTime)
 }
 
 void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
-{
+{ 
     // Wait until the logic update is finished (unless no update was sent to a thread)
     if (GetInstance()->m_gameUpdateFinished.valid())
-        GetInstance()->m_gameUpdateFinished.wait();
+        GetInstance()->m_gameUpdateFinished.get();
 
     // Copy updated transforms into separate array for rendering
     if (scene)

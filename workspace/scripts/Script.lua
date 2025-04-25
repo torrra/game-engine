@@ -9,12 +9,16 @@ function Script:_RegisterScriptComponent(handle)
 	self.__index = self
 	setmetatable(newComponent, self)
 	ExistingScriptComponents[handle] = newComponent	
-	print("\n[Script component] successfully registered component owned by "..handle.."\n")
 end
 
 -- Add a new script object instance to this comopnent
 function Script:_RegisterScriptObject(type)
 	ScriptObject._Register(type, self.entity, self)
+end
+
+function _RemoveScriptComponent(handle)
+
+	ExistingScriptComponents[handle] = nil
 end
 
 
@@ -38,8 +42,6 @@ end
 
 -- Start all script objects in this component
 function Script:_StartComponent()
-
-	print("[Script component]: component starting...")
 
 	for _, object in pairs(self) do
 
@@ -80,7 +82,6 @@ end
 -- Call Start() on all script objects
 function _StartScript(handle)
 
-	print("\n[Script component] starting script component owned by "..handle.."\n")
 	local component = ExistingScriptComponents[handle]
 	component:_StartComponent()
 end

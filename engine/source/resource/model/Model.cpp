@@ -3,21 +3,19 @@
 #include <assimp/postprocess.h>
 
 #include "resource/model/Model.h"
-#include "resource/model/Buffer.h"
-#include "resource/model/Vertex.h"
 
 #include "engine/thread/ThreadManager.h"
 #include "engine/resource/ResourceManager.h"
 #include "engine/resource/texture/Texture.h"
 
+#include "serialization/TextSerializer.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 
-#include <iostream>
 #include <string>
-#include <filesystem>
-#include <cstring>
+#include <fstream>
 
 
 namespace engine::importer
@@ -40,7 +38,7 @@ engine::Model::~Model(void)
 
 bool engine::Model::LoadResource(const char* fileName)
 {
-    if (!fileName || !strcmp(fileName, ""))
+    if (!fileName || *fileName == '\0')
         return false;
 
     m_modelName = fileName;
@@ -64,18 +62,42 @@ bool engine::Model::IsDynamic(void) const
     return m_isDynamic;
 }
 
-void engine::Model::Draw(void) const
+void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) const
 {
     if (m_isDynamic)
     {
-        for (const Mesh& mesh : m_dynamicMeshes)
-            mesh.Draw();
+        for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
+        {
+            const MeshMaterial* currentMaterial = materials[meshIndex];
+
+            if (currentMaterial)
+                currentMaterial->Use(0);
+
+            m_dynamicMeshes[meshIndex].Draw(!currentMaterial);
+        }
     }
     else
     {
-        for (const Mesh& mesh : m_staticMeshes)
-            mesh.Draw();
+        for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
+        {
+            const MeshMaterial* currentMaterial = materials[meshIndex];
+
+            if (currentMaterial)
+                currentMaterial->Use(0);
+
+            m_staticMeshes[meshIndex].Draw(!currentMaterial);
+        }
     } 
+}
+
+
+uint32 engine::Model::GetMeshCount(void) const
+{
+    if (m_isDynamic)
+        return static_cast<uint32>(m_dynamicMeshes.size());
+
+    else
+        return static_cast<uint32>(m_staticMeshes.size());
 }
 
 std::string engine::Model::GetName(void) const
