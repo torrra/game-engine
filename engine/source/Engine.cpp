@@ -92,6 +92,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
 
 void engine::Engine::ShutDown(void)
 {
+    m_activeScene.GetGraph()->CleanRigidBodies();
     ThreadManager::Shutdown();
     ScriptSystem::Shutdown();
     ResourceManager::ShutDown();

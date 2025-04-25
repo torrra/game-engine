@@ -51,7 +51,7 @@ namespace engine
 
         /// Destructor
         // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
-        ENGINE_API				    ~RigidBodyDynamic(void) override;
+        ENGINE_API				    ~RigidBodyDynamic(void) override {}
 
         /// Getter
         /*
@@ -120,8 +120,14 @@ namespace engine
 
         ENGINE_API	void		    Register(void) override {}
 
+        ENGINE_API void				SerializeText(std::ostream& output,
+                                                  EntityHandle owner,
+                                                  uint64 index) const override;
+        ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
+                    void SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry);
         RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
+        uint64                  m_shape         = 0;
 
     private :
 
@@ -144,6 +150,7 @@ namespace engine
                     void            CreateDynamicSphereRigidBody(void);
         // Preset of a capsule dynamic rigid body
                     void            CreateDynamicCapsuleRigidBody(void);
+
                     
         /// TODO : Check transform to directly use the component transform
         ///		   of the entity
@@ -151,6 +158,7 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
+        uint64                  m_type          = EShapeType::DYNAMIC;
 
     }; // !Class RigidBodyDynamic
 

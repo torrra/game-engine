@@ -25,6 +25,8 @@
 
 #pragma endregion
 
+#include "serialization/TextSerializer.h"
+
 engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
@@ -34,10 +36,11 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 
 engine::RigidBodyStatic::~RigidBodyStatic(void)
 {
-	RigidBodyStaticCleanUp();
-
-	delete m_rigidBodyStaticImpl;
-	m_rigidBodyStaticImpl = nullptr;
+    //if (m_rigidBodyStaticImpl != nullptr)
+    //{
+    //    delete m_rigidBodyStaticImpl;
+    //    m_rigidBodyStaticImpl = nullptr;
+    //}
 }
 
 math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
@@ -174,25 +177,64 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
-    // Release the material
-    PX_RELEASE(m_materialImpl->GetImpl().m_material);
     // Delete the pointer to the implementation structure
     delete m_materialImpl;
+    m_materialImpl = nullptr;
     // Release the rigid body
 	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
+
+    delete m_rigidBodyStaticImpl;
+    m_rigidBodyStaticImpl = nullptr;
+}
+
+void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
+{
+    output << "[RigidBodyStatic]\n     ";
+
+    if constexpr (UpdateAfterParent<RigidBodyStatic>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
+    }
+
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+    text::Serialize(output, "type", m_type);
+    output << "\n     ";
+    text::Serialize(output, "shape", m_shape);
+    output << "\n     ";
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
+const char* engine::RigidBodyStatic::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_type);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_shape);
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
 }
 
 engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
 {
     // Check if the entity has a transform
-	if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
-	{
+    if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
+    {
         // If true take the entity transform
-		return *temp;
-	}
+        PrintLog(SuccessPreset(), "Found transform component on entity.");
+        return *temp;
+    }
 
     // If not create a new transform to the entity
-	return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
+    PrintLog(WarningPreset(), "No transform component found on entity create new one.");
+    return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }
 
 void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
@@ -212,6 +254,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::BOX;
 
     PrintLog(SuccessPreset(), "Created static box rigid body.");
 }
@@ -233,6 +276,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::SPHERE;
 
     PrintLog(SuccessPreset(), "Created static sphere rigid body.");
 }
@@ -254,6 +298,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::CAPSULE;
 
     PrintLog(SuccessPreset(), "Created static capsule rigid body.");
 }
@@ -273,6 +318,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::PLANE;
 
     PrintLog(SuccessPreset(), "Created static plane rigid body.");
 }
@@ -282,35 +328,38 @@ void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
                                                            inIsDebugVisualization);
 }
+
+void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry)
+{
+    switch (inGeometry)
+    {
+    case EGeometryType::BOX:
+        inRigidBody->CreateStaticBoxRigidBody();
+        break;
+    case EGeometryType::SPHERE:
+        inRigidBody->CreateStaticSphereRigidBody();
+        break;
+    case EGeometryType::CAPSULE:
+        inRigidBody->CreateStaticCapsuleRigidBody();
+        break;
+    case EGeometryType::PLANE:
+        inRigidBody->CreateStaticPlaneRigidBody();
+        break;
+    default:
+        PrintLog(ErrorPreset(), "Invalid geometry type");
+        break;
+    }
+}
+
 engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph* inScene, 
                                                                       EntityHandle inOwner, 
                                                                       const EGeometryType& inGeometry)
 {
     // Create static rigid body in regard to the geometry and give it an owner and a scene
-    if (RigidBodyStatic* temp = new RigidBodyStatic(inOwner, inScene))
+    if (RigidBodyStatic* temp = inScene->CreateComponent<RigidBodyStatic>(inOwner))
     {
-        switch (inGeometry)
-        {
-        case EGeometryType::BOX:
-            temp->CreateStaticBoxRigidBody();
-            return temp;
-            break;
-        case EGeometryType::SPHERE:
-            temp->CreateStaticSphereRigidBody();
-            return temp;
-            break;
-        case EGeometryType::CAPSULE:
-            temp->CreateStaticCapsuleRigidBody();
-            return temp;
-            break;
-        case EGeometryType::PLANE:
-            temp->CreateStaticPlaneRigidBody();
-            return temp;
-            break;
-        default:
-            PrintLog(ErrorPreset(), "Invalid geometry type");
-            break;
-        }
+        temp->SwitchShape(temp, inGeometry);
+        return temp;
     }
     PrintLog(ErrorPreset(), "Failed to create static rigid body.");
     return nullptr;

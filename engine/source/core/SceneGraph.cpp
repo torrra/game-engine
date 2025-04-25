@@ -1,4 +1,5 @@
 #include "core/SceneGraph.h"
+#include "core/SceneGraph.h"
 #include "core/Entity.h"
 #include "core/systems/ScriptSystem.h"
 
@@ -373,6 +374,20 @@ namespace engine
         return m_sceneEntities.emplace_back().DeserializeText(text, end);
     }
 
+    void SceneGraph::CleanRigidBodies(void)
+    {
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.RigidBodyDynamicCleanUp();
+        }
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.RigidBodyStaticCleanUp();
+        }
+        m_sceneDynamicRigidBodies = ComponentArray<RigidBodyDynamic>();
+        m_sceneStaticRigidBodies = ComponentArray<RigidBodyStatic>();
+    }
+
 
     void SceneGraph::SerializeText(std::ofstream& file)
     {
@@ -419,6 +434,8 @@ namespace engine
         Component::DeserializedArray<Camera>	cameras;
         Component::DeserializedArray<Renderer>	renderers;
         Component::DeserializedArray<Script>	scripts;
+        Component::DeserializedArray<RigidBodyDynamic>	dynamicRigidBodies;
+        Component::DeserializedArray<RigidBodyStatic>	staticRigidBodies;
 
         const char* start;
         const char* end;
@@ -440,13 +457,26 @@ namespace engine
 
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
+            
+            else if (memcmp(start, "[RigidBodyDynamic]", 17) == 0)
+                start = Component::DeserializeComponentText(dynamicRigidBodies, start, end);
+            
+            else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
+                start = Component::DeserializeComponentText(staticRigidBodies, start, end);
 
             start = text::GetNewLine(start, end);
         }
 
-        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies);
         text::UnloadFileData(data);
-
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.SwitchShape(&rbDynamic, static_cast<EGeometryType>(rbDynamic.m_shape));
+        }
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.SwitchShape(&rbStatic, static_cast<EGeometryType>(rbStatic.m_shape));
+        }
     }
 
 }

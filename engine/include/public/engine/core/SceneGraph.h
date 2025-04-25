@@ -172,6 +172,8 @@ namespace engine
         ENGINE_API
         void ClearCache(void);
 
+        ENGINE_API void CleanRigidBodies(void);
+
         // Serialize all valid entities and recalculate their handles
         // The handles are recalculated as invalid entities are filtered out,
         // potentially leaving empty spots to be filled by valid entities.
@@ -236,7 +238,6 @@ namespace engine
 
         template <CValidComponent TComponentType>
         void ReorderTextArray(Component::DeserializedArray<TComponentType>& array);
-
 
         // All transform components in the scene
         CopyableComponentArray<Transform>			m_sceneTransforms;
