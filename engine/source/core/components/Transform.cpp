@@ -47,10 +47,10 @@ math::Matrix4f engine::Transform::ToWorldMatrix(Transform& inTransform)
     inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
 
     // Iterate backwards to get parent closest to root first
-    for (auto parentIt = parents.rbegin(); parentIt != parents.rend(); ++parentIt)
+    for (auto parentIt = parents.begin(); parentIt != parents.end(); ++parentIt)
     {
         if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
-            world *= ToMatrixWithScale(*transform);
+            world = ToMatrixWithScale(*transform) * world;
     }
 
     return world * ToMatrixWithScale(inTransform);
