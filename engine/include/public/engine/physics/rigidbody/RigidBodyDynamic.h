@@ -168,5 +168,5 @@ namespace engine
         ENGINE_API static RigidBodyDynamic* CreateDynamic(class SceneGraph* inScene, 
                                                           EntityHandle inOwner,
                                                           const EGeometryType& inGeometry);
-    };
+    }; // !Class RigidBodyDynamicFactory
 } //!Namespace engine
