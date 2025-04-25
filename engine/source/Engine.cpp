@@ -9,6 +9,8 @@
 #include "ui/Application.h"
 #include "Window.h"
 #include "physics/PhysicsEngine.h"
+#include "ui/UIComponent.h"
+#include "engine/utility/GraphicsHelperFunctions.h"
 
 #include "utility/Platform.h"
 #include <iostream>
@@ -357,6 +359,8 @@ void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
 void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destination)
 {
     using TimePoint = std::chrono::system_clock::time_point;
+
+    SaveProject();
 
     std::filesystem::path buildDir = destination;
 

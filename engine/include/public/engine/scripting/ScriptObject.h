@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-
+#include "engine/EngineExport.h"
 #include "engine/core/TypesECS.h"
 
 namespace engine
@@ -17,7 +17,7 @@ namespace engine
         ScriptObject(const ScriptObject&) = default;
         ~ScriptObject(void) = default;
 
-        const std::string& GetType(void) const;
+        ENGINE_API const std::string& GetType(void) const;
 
         // Create lua instance
         void Register(void) const;

@@ -41,6 +41,8 @@ bool engine::Model::LoadResource(const char* fileName)
     if (!fileName || *fileName == '\0')
         return false;
 
+    m_modelName = fileName;
+
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
 }
@@ -96,6 +98,11 @@ uint32 engine::Model::GetMeshCount(void) const
 
     else
         return static_cast<uint32>(m_staticMeshes.size());
+}
+
+std::string engine::Model::GetName(void) const
+{
+    return m_modelName;
 }
 
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const

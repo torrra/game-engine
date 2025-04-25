@@ -98,6 +98,11 @@ namespace engine
         return &m_graph;
     }
 
+    bool GameScene::IsRunning(void) const
+    {
+        return m_state == EGameState::RUNNING;
+    }
+
 
     void GameScene::PhysicsUpdate(void)
     {

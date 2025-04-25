@@ -1,4 +1,5 @@
 #include "core/components/Camera.h"
+#include "core/SceneGraph.h"
 #include "core/systems/ScriptSystem.h"
 
 
@@ -9,12 +10,18 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
     m_owner = owner;
     m_currentScene = scene;
     GetProjectionMatrix();
+    
+    
+
 }
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
+    // Get or add transform
+
+
     math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
-    m_position += camSpaceDir.Normalized() * speed * deltaTime;
+    m_transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
 }
 
 void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
@@ -38,6 +45,11 @@ void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rot
 
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
+    m_transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+    if (!m_transform)
+        m_transform = m_currentScene->CreateComponent<Transform>(m_owner);
+
     return m_projectionMatrix * GetViewMatrix();
 }
 
@@ -53,7 +65,7 @@ void engine::Camera::Unregister(void)
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
 {
-    return m_position;
+    return m_transform->SetPosition();
 }
 
 math::Vector3f engine::Camera::GetRotation(void) const noexcept
@@ -83,7 +95,7 @@ f32 engine::Camera::GetFarPlane(void) const noexcept
 
 math::Vector3f& engine::Camera::Position(void)
 {
-    return m_position;
+    return m_transform->SetPosition();
 }
 
 math::Vector3f& engine::Camera::Rotation(void)
@@ -135,8 +147,8 @@ void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
 	output << "\n    ";
 	text::Serialize(output, "rotationEuler", m_rotation);
 	output << "\n    ";
-	text::Serialize(output, "position", m_position);
-	output << "\n    ";
+	//text::Serialize(output, "position", m_transform->SetPosition());
+	//output << "\n    ";
 	text::Serialize(output, "flags", m_flags);
 	output << '\n';
 }
@@ -161,8 +173,9 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 	MOVE_TEXT_CURSOR(text, end);
 	text = text::DeserializeVector(text, m_rotation);
 
-	MOVE_TEXT_CURSOR(text, end);
-	text = text::DeserializeVector(text, m_position);
+	//MOVE_TEXT_CURSOR(text, end);
+	//text = text::DeserializeVector(text, m_transform->SetPosition());
+    //text = text::GetNewLine(text, end);
 
 	MOVE_TEXT_CURSOR(text, end);
 	return text::DeserializeInteger(text, m_flags);
@@ -171,10 +184,11 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 math::Matrix4f engine::Camera::GetViewMatrix(void)
 {
     math::Matrix4f matrix(1.0f);
+    math::Vector3f position = GetPosition();
 
-    matrix[3][0] = -m_position.X();
-    matrix[3][1] = -m_position.Y();
-    matrix[3][2] = -m_position.Z();
+    matrix[3][0] = -position.X();
+    matrix[3][1] = -position.Y();
+    matrix[3][2] = -position.Z();
 
     return m_rotQuat.Inverse().RotationMatrix() * matrix;
 }

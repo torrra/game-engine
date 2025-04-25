@@ -63,6 +63,9 @@ namespace engine
         ENGINE_API
         Script& operator=(Script&&) noexcept = default;
 
+        ENGINE_API
+        const std::vector<ScriptObject>& GetScripts(void) const;
+
     private:
 
         std::vector<ScriptObject> m_scriptObjects;
