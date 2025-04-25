@@ -415,6 +415,9 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
     std::filesystem::path exePath = currentPath = buildDir.replace_filename("defaultExecutable.exe");
     std::filesystem::rename(currentPath,
     exePath.replace_filename(m_currentProject.m_executableName).replace_extension(".exe"));
-    OpenFile(exePath.c_str(), buildDir.parent_path().c_str());
+
+    // Directly execute .exe
+    OpenFile(std::filesystem::absolute(exePath).c_str(),
+             std::filesystem::absolute(buildDir.parent_path()).c_str());
 
 }
