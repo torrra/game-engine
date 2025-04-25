@@ -3,8 +3,11 @@
 #pragma region Internal
 
 #include "sounds/InternalSoundsStruct.hpp"
+#include "sounds/InternalFmodConversion.hpp"
 
 #pragma endregion
+
+#include "engine/ConsoleLog.hpp"
 
 engine::SoundsEngine::SoundsEngine(void)
 {
@@ -15,6 +18,20 @@ engine::SoundsEngine::~SoundsEngine(void)
 {
     delete m_soundsImpl;
     m_soundsImpl = nullptr;
+}
+
+void engine::SoundsEngine::SetPositionSound3D(const std::string& inID, 
+                                              const math::Vector3f& inPosition, 
+                                              const math::Vector3f& inForward, 
+                                              const math::Vector3f& inUp)
+{
+    inID;
+    const FMOD_VECTOR position  = ToFmodVector(inPosition);
+    const FMOD_VECTOR forward   = ToFmodVector(inForward);
+    const FMOD_VECTOR up        = ToFmodVector(inUp);
+    FMOD_VECTOR velocity        = { 1, 0, 0 };
+
+    m_soundsImpl->m_system->set3DListenerAttributes(0, &position, &velocity, &forward, &up);
 }
 
 engine::SoundsImpl* engine::SoundsEngine::GetSoundsImpl(void) const
@@ -90,6 +107,32 @@ void engine::SoundsEngine::PlaySound(const std::string& inID)
 
         m_soundsImpl->m_channels[inID] = channel;
     }
+}
+
+void engine::SoundsEngine::PlaySound3D(const std::string& inID, const math::Vector3f& inPosition)
+{
+    auto it = m_soundsImpl->m_sounds.find(inID);
+
+    if (it == m_soundsImpl->m_sounds.end())
+        return;
+
+    FMOD::Channel* channel = nullptr;
+    FMOD_RESULT result = m_soundsImpl->m_system->playSound(it->second, nullptr, true, &channel);
+
+    if (result != FMOD_OK)
+    {
+        PrintLog(ErrorPreset(), "Failed to play sound");
+        return;
+    }
+
+    channel->setMode(FMOD_3D);
+    channel->setVolume(1.0f);
+    channel->setPaused(false);
+    const FMOD_VECTOR& velocity = { 100, 0, 0 };
+    const FMOD_VECTOR& position = ToFmodVector(inPosition);
+    channel->set3DAttributes(&position, &velocity);
+    m_soundsImpl->m_channels[inID] = channel;
+    PrintLog(SuccessPreset(), "Sound played");
 }
 
 void engine::SoundsEngine::StopSound(const std::string& inID)

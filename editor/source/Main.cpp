@@ -193,58 +193,14 @@ int main(void)
         sounds->LoadSound("Test", ".\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3");
 
         engine::Input::RegisterInput(KEY_SPACE);
-        engine::Input::RegisterInput(KEY_BACKSPACE);
-        engine::Input::RegisterInput(KEY_P);
-        engine::Input::RegisterInput(KEY_O);
-        engine::Input::RegisterInput(KEY_1);
-        engine::Input::RegisterInput(KEY_2);
-
-        float volume = 1;
 
         while (!engine.GetWindow()->ShouldWindowClose())
         {
             if (engine::Input::IsInputPressed(KEY_SPACE) && !sounds->m_isPlaying)
             {
-                sounds->PlaySound("Test");
                 sounds->m_isPlaying = true;
-            }
-            if (engine::Input::IsInputPressed(KEY_BACKSPACE) && sounds->m_isPlaying)
-            {
-                sounds->StopSound("Test");
-                sounds->m_isPlaying = false;
-            }
-            if (engine::Input::IsInputPressed(KEY_P) && !sounds->m_isPaused)
-            {
-                sounds->PauseSound("Test", true);
-                sounds->m_isPaused = true;
-            }
-            if (engine::Input::IsInputPressed(KEY_O) && sounds->m_isPaused)
-            {
-                sounds->PauseSound("Test", false);
-                sounds->m_isPaused = false;
-            }
-            if (engine::Input::IsInputPressed(KEY_1) && !sounds->m_isPressed)
-            {
-                sounds->m_isPressed = true;
-                sounds->SetVolumeSound("Test", volume);
-                volume -= 0.01f;
-                sounds->m_isPressed = false;
-            }
-            if (engine::Input::IsInputPressed(KEY_2) && !sounds->m_isPressed)
-            {
-                sounds->m_isPressed = true;
-                sounds->SetVolumeSound("Test", volume);
-                volume += 0.01f;
-                sounds->m_isPressed = false;
-            }
-
-            if (volume < 0.f)
-            {
-                volume = 0.f;
-            }
-            else if (volume > 1.f)
-            {
-                volume = 1.f;
+                engine::PrintLog(engine::SuccessPreset(), "Playing sound");
+                sounds->PlaySound3D("Test", camera->GetPosition());
             }
 
             engine.Update();

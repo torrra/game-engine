@@ -12,6 +12,12 @@
 
 #pragma endregion
 
+#pragma region Math
+
+#include <math/Vector3.hpp>
+
+#pragma endregion
+
 namespace engine
 {
     struct SoundsImpl;
@@ -56,6 +62,8 @@ namespace engine
             <param> [in] inID : ID of the sound
         */
         ENGINE_API void         PlaySound(const std::string& inID);
+        ENGINE_API void         PlaySound3D(const std::string& inID, 
+                                            const math::Vector3f& inPosition);
         /*
             Stop a sound
             <param> [in] inID : ID of the sound
@@ -74,6 +82,17 @@ namespace engine
             <param> [in] inVolume : Volume of the sound : 0.0f to 1.0f
         */
         ENGINE_API void         SetVolumeSound(const std::string& inID, float inVolume);
+        /*
+            Set the 3D position of a sound
+            <param> [in] inID : ID of the sound
+            <param> [in] inPosition : Position of the sound
+            <param> [in] inForward : Forward vector of the sound
+            <param> [in] inUp : Up vector of the sound
+        */
+        ENGINE_API void         SetPositionSound3D(const std::string& inID, 
+                                                   const math::Vector3f& inPosition,
+                                                   const math::Vector3f& inForward,
+                                                   const math::Vector3f& inUp);
 
     private :
 
