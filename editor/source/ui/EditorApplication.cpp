@@ -27,7 +27,6 @@ namespace editor
             return;
 
         m_gameSimulationView->RenderToViewport(scene);
-       // engine::ThreadManager::RenderScene(scene);
         m_menuBar.UpdateStartButton(*m_currentScene, m_graphView);
         m_graphView.Render();
 
