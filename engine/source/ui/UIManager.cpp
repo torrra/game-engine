@@ -1,4 +1,5 @@
 #include "ui/UIManager.h"
+#include "ui/UIComponent.h"
 #include "Window.h"
 #include "window/WindowLib.h"
 
@@ -31,12 +32,6 @@ void engine::UIManager::NewFrame(void)
 #endif
 }
 
-void engine::UIManager::NewFrameNoUI(void)
-{
-    //ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-    NewFrame();
-}
-
 void engine::UIManager::EndFrame(void)
 {
     ImGui::Render();
@@ -49,13 +44,6 @@ void engine::UIManager::EndFrame(void)
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backupContext);
     }
-}
-
-void engine::UIManager::EndFrameNoUI(void)
-{
-    ImGui::PopItemFlag();
-    EndFrame();
-    //ImGui::PopStyleVar();
 }
 
 void engine::UIManager::ShutDown(void)

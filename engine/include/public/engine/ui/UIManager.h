@@ -20,11 +20,9 @@ namespace engine
 
         // Update function, call at start of update loop after reset window color
         ENGINE_API void	NewFrame(void);
-        ENGINE_API void NewFrameNoUI(void);
 
         // Update function, call at the end of the update loop before updating window buffers
         ENGINE_API void	EndFrame(void);
-        ENGINE_API void EndFrameNoUI(void);
 
 		// Clear memory call at end of program
 		ENGINE_API void	ShutDown(void);
