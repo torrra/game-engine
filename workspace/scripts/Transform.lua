@@ -8,7 +8,6 @@ function Transform:_RegisterTransformComponent(handle)
 	self.__index = self
 	setmetatable(newComponent, self)
 	ExistingTransformComponents[handle] = newComponent
-	print("\n[Transform component] successfully registered component owned by "..handle.."\n")
 end
 
 function _NewTransformComponent(handle)
