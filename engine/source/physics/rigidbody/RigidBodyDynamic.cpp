@@ -25,6 +25,9 @@
 
 #pragma endregion
 
+#include "serialization/TextSerializer.h"
+
+
 #include <iostream>
 
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene)
@@ -73,7 +76,8 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-
+    m_shape = EGeometryType::BOX;
+    m_type = EShapeType::DYNAMIC;
     PrintLog(SuccessPreset(), "Created dynamic box rigid body.");
 }
 
@@ -98,7 +102,8 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-
+    m_shape = EGeometryType::SPHERE;
+    m_type = EShapeType::DYNAMIC;
     PrintLog(SuccessPreset(), "Created dynamic sphere rigid body.");
 }
 
@@ -137,7 +142,8 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-
+    m_shape = EGeometryType::CAPSULE;
+    m_type = EShapeType::DYNAMIC;
     PrintLog(SuccessPreset(), "Created dynamic capsule rigid body.");
 }
 
@@ -162,14 +168,50 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
     PX_RELEASE(m_materialImpl->GetImpl().m_material);
     // Delete the pointer
     delete m_materialImpl;
+    m_materialImpl = nullptr;
     // Release the rigid body
     PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
+}
+
+void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
+{
+    output << "[RigidBodyDynamic]\n     ";
+
+    if constexpr (UpdateAfterParent<RigidBodyDynamic>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
+    }
+
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+    text::Serialize(output, "type", m_type);
+    output << "\n     ";
+    text::Serialize(output, "shape", m_shape);
+    output << "\n     ";
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
+const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_type);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_shape);
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
 }
 
 engine::RigidBodyDynamic::~RigidBodyDynamic(void)
 {
     // Release all rigid body resources
-    RigidBodyDynamicCleanUp();
+    //RigidBodyDynamicCleanUp();
 
     // Delete the pointer to the implementation structure
     delete m_rigidBodyImpl;
@@ -338,8 +380,7 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGr
                                                                          const EGeometryType& inGeometry)
 {
     // Create dynamic rigid body in regard to the geometry and give it an owner and a scene
-    //if (RigidBodyDynamic* temp = new RigidBodyDynamic(owner, scene))
-    if (RigidBodyDynamic* temp = new RigidBodyDynamic(inOwner, inScene))
+    if (RigidBodyDynamic* temp = inScene->CreateComponent<RigidBodyDynamic>(inOwner))
     {
         switch (inGeometry)
         {

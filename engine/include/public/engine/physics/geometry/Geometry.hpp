@@ -6,12 +6,18 @@ namespace engine
 
 	enum EGeometryType
 	{
-		BOX,
-		SPHERE,
-		CAPSULE,
-		PLANE
+		BOX = 0,
+		SPHERE = 1,
+		CAPSULE = 2,
+		PLANE = 3
 
 	}; // !Enum EGeometryType
+
+    enum EShapeType
+    {
+        DYNAMIC = 0,
+        STATIC = 1
+    };
 
     enum EErrorGeometryType
     {

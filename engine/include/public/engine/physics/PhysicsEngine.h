@@ -75,7 +75,7 @@ namespace engine
         ENGINE_API void     UpdateDebugDraw(math::Matrix4f* inProjViewMatrix);
         // Release all physx resources
         ENGINE_API void		CleanUp(void);
-        ENGINE_API void AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, uint32 inColor);
+        ENGINE_API void     AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, uint32 inColor);
 
     private :
 

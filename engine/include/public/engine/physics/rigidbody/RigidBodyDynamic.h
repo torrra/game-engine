@@ -120,6 +120,10 @@ namespace engine
 
         ENGINE_API	void		    Register(void) override {}
 
+        ENGINE_API void				SerializeText(std::ostream& output,
+                                                  EntityHandle owner,
+                                                  uint64 index) const override;
+        ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
         RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
 
@@ -151,6 +155,8 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
+        uint64                  m_type;
+        uint64                  m_shape;
 
     }; // !Class RigidBodyDynamic
 
