@@ -8,7 +8,7 @@
     @uint64 | index=0
     @int64 | owner=0
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,5,0}
+    @vec3f32 | position={0,4,-5}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Renderer]
@@ -41,7 +41,7 @@
     @uint64 | index=1
     @int64 | owner=1
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,9.35,0}
+    @vec3f32 | position={0,2.5,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Camera]
@@ -50,7 +50,7 @@
     @f32 | far=250
     @f32 | fov=1.0472
     @f32 | aspectRatio=1.77778
-    @vec3f32 | rotationEuler={-10.5,26.5,0}
+    @vec3f32 | rotationEuler={-10.5,8.5,0}
     @uint64 | flags=0
 [Script]
    @uint64 | index=1
@@ -68,7 +68,7 @@
     @uint64 | index=2
     @int64 | owner=2
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,0,0}
+    @vec3f32 | position={0,2,-5}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [RigidBodyStatic]
