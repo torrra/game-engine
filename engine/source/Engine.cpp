@@ -278,18 +278,6 @@ inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
     return SUCCESS;
 }
 
-inline int16 engine::Engine::InitWindow(const char* /*projectName*/)
-{
-//    if (Window::StartUp())
-//        return ERROR;
-//
-//    m_window = new Window((projectName) ? projectName : DEFAULT_NAME);
-//    // TODO: change dimensions however keep for debugging
-//    if (m_window->CreateWindow(1920, 1080))
-//        return ERROR;
-
-    return SUCCESS;
-}
 
 inline int16 engine::Engine::LoadEngineResources(void)
 {

@@ -67,7 +67,6 @@ namespace engine
     private:
 
         inline int16		InitScriptSystem(const char* projectDir);
-        inline int16		InitWindow(const char* projectName);
         inline int16		LoadEngineResources(void);
 
         void DeserializeProjectFile(const char* cursor, const char* end);
