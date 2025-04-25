@@ -188,21 +188,8 @@ int main(void)
         editor::PropertyWnd properties(engine.GetGraph());
         editor::Viewport* viewport = new editor::Viewport("Viewport", {0.1f, 0.1f, 0.1f, 1.0f});
 
-        engine::SoundsEngine* sounds = new engine::SoundsEngine();
-        sounds->InitSoundsEngine();
-        sounds->LoadSound("Test", ".\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3");
-
-        engine::Input::RegisterInput(KEY_SPACE);
-
         while (!engine.GetWindow()->ShouldWindowClose())
         {
-            if (engine::Input::IsInputPressed(KEY_SPACE) && !sounds->m_isPlaying)
-            {
-                sounds->m_isPlaying = true;
-                engine::PrintLog(engine::SuccessPreset(), "Playing sound");
-                sounds->PlaySound3D("Test", camera->GetPosition());
-            }
-
             engine.Update();
 
             // Viewport
@@ -227,10 +214,6 @@ int main(void)
 
         if (viewport)
             delete viewport;
-
-        sounds->CloseSoundsEngine();
-
-        delete sounds;
 
         engine.ShutDown();
     }

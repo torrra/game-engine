@@ -7,11 +7,12 @@
 
 #pragma endregion
 
-#include "engine/ConsoleLog.hpp"
-
-engine::SoundsEngine::SoundsEngine(void)
+engine::SoundsEngine::SoundsEngine(EntityHandle inOwner, SceneGraph* inScene)
 {
-    m_soundsImpl    = new SoundsImpl();
+    m_soundsImpl = new SoundsImpl();
+
+    m_owner         = inOwner;
+    m_currentScene  = inScene;
 }
 
 engine::SoundsEngine::~SoundsEngine(void)
@@ -20,16 +21,15 @@ engine::SoundsEngine::~SoundsEngine(void)
     m_soundsImpl = nullptr;
 }
 
-void engine::SoundsEngine::SetPositionSound3D(const std::string& inID, 
-                                              const math::Vector3f& inPosition, 
-                                              const math::Vector3f& inForward, 
-                                              const math::Vector3f& inUp)
+void engine::SoundsEngine::SetListenerPosition(const math::Vector3f& inPosition,
+                                               const math::Vector3f& inForward, 
+                                               const math::Vector3f& inUp,
+                                               const math::Vector3f& inVelocity)
 {
-    inID;
-    const FMOD_VECTOR position  = ToFmodVector(inPosition);
-    const FMOD_VECTOR forward   = ToFmodVector(inForward);
-    const FMOD_VECTOR up        = ToFmodVector(inUp);
-    FMOD_VECTOR velocity        = { 1, 0, 0 };
+    const   FMOD_VECTOR position    = ToFmodVector(inPosition);
+    const   FMOD_VECTOR forward     = ToFmodVector(inForward);
+    const   FMOD_VECTOR up          = ToFmodVector(inUp);
+            FMOD_VECTOR velocity    = ToFmodVector(inVelocity);
 
     m_soundsImpl->m_system->set3DListenerAttributes(0, &position, &velocity, &forward, &up);
 }
@@ -80,7 +80,7 @@ bool engine::SoundsEngine::LoadSound(const std::string& inID, const std::string&
     return true;
 }
 
-void engine::SoundsEngine::PlaySound(const std::string& inID)
+void engine::SoundsEngine::PlaySound(const std::string& inID, f32 inVolume, bool inPaused)
 {
     auto it = m_soundsImpl->m_sounds.find(inID);
 
@@ -95,12 +95,12 @@ void engine::SoundsEngine::PlaySound(const std::string& inID)
 
     if (channel)
     {
-        FMOD_RESULT result1 = channel->setVolume(1.0f);
+        FMOD_RESULT result1 = channel->setVolume(inVolume);
 
         if (result1 != FMOD_OK)
             return;
 
-        FMOD_RESULT result2 = channel->setPaused(false);
+        FMOD_RESULT result2 = channel->setPaused(inPaused);
 
         if (result2 != FMOD_OK)
             return;
@@ -109,7 +109,8 @@ void engine::SoundsEngine::PlaySound(const std::string& inID)
     }
 }
 
-void engine::SoundsEngine::PlaySound3D(const std::string& inID, const math::Vector3f& inPosition)
+void engine::SoundsEngine::PlaySound3D(const std::string& inID, const math::Vector3f& inPosition,
+                                       const math::Vector3f& inVelocity, f32 inVolume)
 {
     auto it = m_soundsImpl->m_sounds.find(inID);
 
@@ -120,19 +121,16 @@ void engine::SoundsEngine::PlaySound3D(const std::string& inID, const math::Vect
     FMOD_RESULT result = m_soundsImpl->m_system->playSound(it->second, nullptr, true, &channel);
 
     if (result != FMOD_OK)
-    {
-        PrintLog(ErrorPreset(), "Failed to play sound");
         return;
-    }
 
     channel->setMode(FMOD_3D);
-    channel->setVolume(1.0f);
-    channel->setPaused(false);
-    const FMOD_VECTOR& velocity = { 100, 0, 0 };
-    const FMOD_VECTOR& position = ToFmodVector(inPosition);
+    const FMOD_VECTOR velocity = ToFmodVector(inVelocity);
+    const FMOD_VECTOR position = ToFmodVector(inPosition);
     channel->set3DAttributes(&position, &velocity);
+    channel->setVolume(inVolume);
+    channel->setPaused(false);
+
     m_soundsImpl->m_channels[inID] = channel;
-    PrintLog(SuccessPreset(), "Sound played");
 }
 
 void engine::SoundsEngine::StopSound(const std::string& inID)
@@ -161,7 +159,7 @@ void engine::SoundsEngine::PauseSound(const std::string& inID, bool inIsPaused)
     }
 }
 
-void engine::SoundsEngine::SetVolumeSound(const std::string& inID, float inVolume)
+void engine::SoundsEngine::SetVolumeSound(const std::string& inID, f32 inVolume)
 {
     auto it = m_soundsImpl->m_channels.find(inID);
 
