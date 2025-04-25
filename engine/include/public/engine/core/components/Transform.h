@@ -42,7 +42,8 @@ namespace engine
                                                         f32 inTime);
 
 
-        ENGINE_API	static math::Matrix4f	ToWorldMatrix(Transform& inTransform);
+        ENGINE_API static math::Matrix4f   ToWorldMatrix(Transform& inTransform);
+        ENGINE_API static math::Matrix3f   ToNormalMatrix(Transform& inTransform);
 
 
         // Copy the position from another transform
@@ -129,7 +130,7 @@ namespace engine
         math::Vector3f	m_position	= math::Vector3f::Zero();
         math::Vector3f	m_scale		= math::Vector3f::One();
 
-        bool			m_dirty		= false;
+        bool			m_dirty		= true;
 
     }; // !Class Transform
 
