@@ -92,6 +92,7 @@ namespace editor
         std::string GetPayloadType(std::string const& extension) const;
         void RenderFile(std::filesystem::path const& file);
 
+        std::filesystem::path m_path;
         std::vector<Asset> m_assets;
         DirTreeNode* m_rootNode;
         DirTreeNode* m_selectedDirectory;

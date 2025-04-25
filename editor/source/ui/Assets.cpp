@@ -44,9 +44,11 @@ editor::AssetsWnd::AssetsWnd(const char* name)
 {
     SetName(name);
 
-    auto workingDir = std::filesystem::current_path();
-    m_rootNode = InitDirectoryRecursively(workingDir);
-    std::cout << "Working directory: " << workingDir << '\n';
+    m_path = std::filesystem::current_path();
+
+    //auto workingDir = std::filesystem::current_path();
+    m_rootNode = InitDirectoryRecursively(m_path);
+    std::cout << "Working directory: " << m_path << '\n';
 
     m_layout = new ui::Table("AssetWnd", 2);
     m_layout->SetFlags(ui::ETableFlags::TABLE_INNER_VERTICAL_BORDERS | ui::ETableFlags::TABLE_RESIZABLE);
@@ -247,7 +249,13 @@ void editor::AssetsWnd::OnSelectDir(void)
         std::string payloadType;
 
         if (IsSupportedExtension(filePath.extension().string(), payloadType))
-            m_assets.emplace_back(Asset(filePath, payloadType));
+        {
+            uint64 offset = m_path.string().length();
+            std::string relativeFilePath(".");
+            relativeFilePath += filePath.string().substr(offset);
+
+            m_assets.emplace_back(Asset(relativeFilePath, payloadType));
+        }
     }
 }
 
