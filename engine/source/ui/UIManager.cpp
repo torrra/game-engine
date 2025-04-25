@@ -56,7 +56,7 @@ void engine::UIManager::ShutDown(void)
 
 bool engine::UIManager::IsWindowFocused(std::string const& name)
 {
-    return ui::IsWindowSelected(name);
+    return ::ui::IsWindowSelected(name);
 }
 
 void engine::UIManager::InitUI(wnd::Wnd* window)

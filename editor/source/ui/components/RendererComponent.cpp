@@ -35,20 +35,20 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
     // Get file name
     std::string modelName("None##model");
 
-    if (const engine::Model* model = renderer->GetModel())
-    {
-        std::string path = model->GetName();
-        modelName = path;
-
-        uint64 offset = path.rfind('\\') + 1;
-        if (offset != path.npos);
-        modelName = modelName.substr(offset);
-    }
+    //if (const engine::Model* model = renderer->GetModel())
+    //{
+    //    std::string path = model->GetName();
+    //    modelName = path;
+    //
+    //    uint64 offset = path.rfind('\\') + 1;
+    //    if (offset != path.npos);
+    //    modelName = modelName.substr(offset);
+    //}
 
     // Model input
     ui::Text("Model: ");
     ui::SameLine(150.0f);
-    ui::Button(modelName.c_str());
+    ui::Button(m_modelName.c_str());
 
     // Drag / drop
     if (ui::StartDragDropTarget())
@@ -58,6 +58,7 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
         {
             Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
             engine::ResourceManager::Load<engine::Model>(payloadData->m_path.string());
+            m_modelName = payloadData->m_path.string().c_str();
             renderer->SetModel(payloadData->m_path.string().c_str());
         }
 

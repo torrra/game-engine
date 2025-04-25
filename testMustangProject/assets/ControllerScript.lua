@@ -23,6 +23,8 @@ function ControllerScript:Update(deltaTime)
     elseif IsInputDown(InputCode.KEY_D) then
         self.transform:AddTranslation(-1 * deltaTime, 0, 0)
     end
+
+    print(self.transform:GetPosition())
 end
 
 

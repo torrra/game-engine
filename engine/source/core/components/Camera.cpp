@@ -12,15 +12,14 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
     GetProjectionMatrix();
     
     
-    // Get or add transform
-    m_transform = scene->GetComponent<Transform>(owner);
-    
-    if (!m_transform)
-        m_transform = scene->CreateComponent<Transform>(m_owner);
+
 }
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
+    // Get or add transform
+
+
     math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
     m_transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
 }
@@ -46,6 +45,11 @@ void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rot
 
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
+    m_transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+    if (!m_transform)
+        m_transform = m_currentScene->CreateComponent<Transform>(m_owner);
+
     return m_projectionMatrix * GetViewMatrix();
 }
 
@@ -143,8 +147,8 @@ void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
 	output << "\n    ";
 	text::Serialize(output, "rotationEuler", m_rotation);
 	output << "\n    ";
-	text::Serialize(output, "position", m_transform->SetPosition());
-	output << "\n    ";
+	//text::Serialize(output, "position", m_transform->SetPosition());
+	//output << "\n    ";
 	text::Serialize(output, "flags", m_flags);
 	output << '\n';
 }
@@ -169,8 +173,9 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 	MOVE_TEXT_CURSOR(text, end);
 	text = text::DeserializeVector(text, m_rotation);
 
-	MOVE_TEXT_CURSOR(text, end);
-	text = text::DeserializeVector(text, m_transform->SetPosition());
+	//MOVE_TEXT_CURSOR(text, end);
+	//text = text::DeserializeVector(text, m_transform->SetPosition());
+    //text = text::GetNewLine(text, end);
 
 	MOVE_TEXT_CURSOR(text, end);
 	return text::DeserializeInteger(text, m_flags);

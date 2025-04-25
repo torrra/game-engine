@@ -15,11 +15,13 @@ namespace editor
     class PropertyWnd : public ::ui::UIWindow
     {
     public:
-        PropertyWnd(void) = delete;
+        // Should not use this constructor, is required for STL container
+        PropertyWnd(void) = default;
         PropertyWnd(engine::SceneGraph* graph);
         ~PropertyWnd(void);
 
         void SetHandle(engine::EntityHandle handle);
+        void ClearComponentArray(void);
 
     protected:
         virtual void RenderContents(void) override;
@@ -36,7 +38,6 @@ namespace editor
         // Menu bar
         void RenderMenuBar(void);
 
-        void ClearComponentArray(void);
 
         std::vector<BaseComponent*> m_components;
         engine::SceneGraph* m_graph;

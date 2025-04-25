@@ -360,6 +360,8 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
 {
     using TimePoint = std::chrono::system_clock::time_point;
 
+    SaveProject();
+
     std::filesystem::path buildDir = destination;
 
     TimePoint now = std::chrono::system_clock::now();

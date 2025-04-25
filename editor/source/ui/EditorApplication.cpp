@@ -5,12 +5,12 @@
 
 namespace editor
 {
-    EditorApplication::EditorApplication(const char* title)
-        : m_graphView("Scene Graph")
+    EditorApplication::EditorApplication(const char* title, class::engine::SceneGraph* scene)
+        : m_graphView("Scene Graph"), m_assetWnd("Assets"), m_menuBar(this)
     {
         Startup(title);
-        m_gameSimulationView = new Viewport("Simulation view", { 0.1f, 0.1f, 0.1f, 1.0f });
-        m_sceneEditorView = new Viewport("Editor view", { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_gameSimulationView = new Viewport("Simulation view", scene, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_sceneEditorView = new Viewport("Editor view", scene, { 0.1f, 0.1f, 0.1f, 1.0f });
     }
 
     void EditorApplication::SetCurrentScene(::engine::GameScene* scene)
@@ -26,8 +26,9 @@ namespace editor
         if (!m_currentScene)
             return;
 
-        m_gameSimulationView->RenderToViewport(scene);
-        m_menuBar.UpdateStartButton(*m_currentScene, m_graphView);
+        m_assetWnd.Render();
+        m_gameSimulationView->RenderToViewport();
+        m_menuBar.UpdateStartButton(*m_currentScene);
         m_graphView.Render();
 
         if (m_graphView.IsNewEntitySelected())
