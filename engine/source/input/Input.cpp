@@ -47,8 +47,8 @@ void engine::Input::UnregisterInput(int32 key)
 bool engine::Input::IsInputPressed(int32 input)
 {
     // Key not registered 
-    if (!GetInstance()->HasKey(input))
-        return false;
+    /*if (!GetInstance()->HasKey(input))
+        return false;*/
 
     InputData& data = GetInstance()->m_keyMap[input];
 
@@ -69,8 +69,8 @@ bool engine::Input::IsInputDown(int32 input)
 bool engine::Input::IsInputHeld(int32 input)
 {
     // Key not registered
-    if (!GetInstance()->HasKey(input))
-        return false;
+   /* if (!GetInstance()->HasKey(input))
+        return false;*/
 
     return GetInstance()->m_keyMap[input].m_currentState == EInputState::HELD;
 }
@@ -78,8 +78,8 @@ bool engine::Input::IsInputHeld(int32 input)
 bool engine::Input::IsInputReleased(int32 input)
 {
     // Key not registered
-    if (!GetInstance()->HasKey(input))
-        return false;
+    /*if (!GetInstance()->HasKey(input))
+        return false;*/
 
     InputData& data = GetInstance()->m_keyMap[input];
 
@@ -105,30 +105,30 @@ void engine::Input::KeyboardCallback(int32 key, int32 scanCode, int32 action, in
     (void) scanCode;
     (void) mods;
 
-    if (GetInstance()->m_keyMap.contains(key))
-    {
+    //if (GetInstance()->m_keyMap.contains(key))
+    //{
         InputData& input = GetInstance()->m_keyMap[key];
 
         input.m_prevState = input.m_currentState;
         input.m_currentState = static_cast<EInputState>(action);
         
         GetInstance()->m_dirty = (input.m_currentState == KEY_STATE_RELEASED);
-    }
+    //}
 }
 
 void engine::Input::MouseButtonCallback(int32 button, int32 action, int32 mods)
 {
     (void) mods;
 
-    if (GetInstance()->m_keyMap.contains(button))
-    {
+    //if (GetInstance()->m_keyMap.contains(button))
+    //{
         InputData& input = GetInstance()->m_keyMap[button];
         
         input.m_prevState = input.m_currentState;
         input.m_currentState = static_cast<EInputState>(action);
 
         GetInstance()->m_dirty = (input.m_currentState == KEY_STATE_RELEASED);
-    }
+   // }
 }
 
 void engine::Input::MouseScrollCallback(f64 xOffset, f64 yOffset)
@@ -138,11 +138,14 @@ void engine::Input::MouseScrollCallback(f64 xOffset, f64 yOffset)
 
 void engine::Input::CursorPosCallback(f64 xPos, f64 yPos)
 {
+    GetInstance()->m_lastCursorPos = GetInstance()->m_cursorPos;
     GetInstance()->m_cursorPos = math::Vector2d(xPos, yPos);
+    GetInstance()->m_cursorUpdated = true;
 }
 
 engine::Input::Input(void)
-    : m_cursorPos(0.00), m_scrollDelta(0.00), m_dirty(false)
+    : m_cursorPos(0.00), m_lastCursorPos(0.00), m_scrollDelta(0.00), m_dirty(false),
+    m_cursorUpdated(false)
 {
 }
 
@@ -153,6 +156,11 @@ void engine::Input::SetCursorMode(ECursorMode cursorMode)
 
 void engine::Input::ResetKeys(void)
 {
+    if (GetInstance()->m_cursorUpdated)
+        GetInstance()->m_cursorUpdated = false;
+    else
+        GetInstance()->m_lastCursorPos = GetInstance()->m_cursorPos;
+
     if (!GetInstance()->m_dirty)
         return;
     

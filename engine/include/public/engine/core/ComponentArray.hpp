@@ -90,10 +90,7 @@ namespace engine
         // do not do anything if the contained type is not sensitive to
         // the memory layout (if parents don't need to be updated before children)
         if constexpr (!UpdateAfterParent<TComponentType>::m_value)
-        {
-            printf("not moving component");
             return false;
-        }
 
         else
         {
@@ -103,7 +100,6 @@ namespace engine
             if (!m_entityIndexMap.contains(parent) ||
                 m_entityIndexMap[parent] < m_entityIndexMap[owner])
             {
-                printf("parent is already before child\n");
                 return false;
             }
 
@@ -114,8 +110,6 @@ namespace engine
 
             toMove.Invalidate();
             m_entityIndexMap[owner] = newIndex;
-
-            printf("yea we moving the component\n");
             return true;
         }
 
@@ -136,8 +130,6 @@ namespace engine
         toMove.Unregister();
         toMove.Invalidate();
         m_entityIndexMap[owner] = newIndex;
-
-        printf("yea we moving the component\n");
         return true;
     }
 
@@ -186,14 +178,11 @@ namespace engine
                 if (currentComponent.IsValid() || parentIndex > newIndex)
                     continue;
 
-                printf("[Component array]: filling invalid slot\n");
-
                 currentComponent = TComponentType(owner, scene);
                 m_entityIndexMap[owner] = newIndex;
                 return &currentComponent;
             }
 
-            printf("[Component array]: creating new slot\n");
             m_entityIndexMap[owner] = m_components.size();
             return &m_components.emplace_back(owner, scene);
         }
@@ -265,14 +254,10 @@ namespace engine
             if (currentComponent.IsValid())
                 continue;
 
-            printf("[Component array]: filling invalid slot\n");
-
             currentComponent = TComponentType(owner, scene);
             m_entityIndexMap[owner] = newIndex;
             return &currentComponent;
         }
-
-        printf("[Component array]: creating new slot\n");
 
         // create new component if no invalid component was found
         m_entityIndexMap[owner] = m_components.size();

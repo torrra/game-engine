@@ -1,0 +1,3 @@
+@string 12 | defaultGameScene=default.mscn
+@string 12 | defaultEditorScene=default.mscn
+@string 10 | executableName=pewpewBOOM

@@ -12,10 +12,8 @@ extern "C"
 #include "core/SceneGraph.h"
 
 #include "scripting/EngineScriptFunctions.h"
+#include "utility/Platform.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <shellapi.h>
 
 
 namespace engine
@@ -224,8 +222,8 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         FilePath pathObject(fullPath);
         
         // Open new file in text editor
-        ShellExecuteA(NULL, NULL, std::filesystem::absolute(fullPath).string().c_str(), NULL, NULL, SW_SHOW);
-
+        OpenFile(std::filesystem::absolute(fullPath).c_str());
+        
         // Run lua file to register existing type
         RunUserScript(fullPath);
     }
@@ -269,8 +267,8 @@ ScriptObjectTypes.%s = %s\nreturn %s";
             if ((!isalnum(character)) && (character != '_'))
                 return std::string();
 
-            if (character >= 'A' && character <= 'Z')
-                character += 32;
+           /* if (character >= 'A' && character <= 'Z')
+                character += 32;*/
         }
 
         return formattedName;

@@ -1,4 +1,5 @@
 #include "ui/UIManager.h"
+#include "ui/UIComponent.h"
 #include "Window.h"
 #include "window/WindowLib.h"
 
@@ -8,6 +9,7 @@
 
 
 #include "utility/MemoryCheck.h"
+#include "Engine.h"
 
 #define ENABLE_UI_DEBUG 0
 
@@ -22,14 +24,15 @@ void engine::UIManager::NewFrame(void)
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport();
+    if (Engine::HasEditor())
+        ImGui::DockSpaceOverViewport();
     
 #if ENABLE_UI_DEBUG == 1
     ImGui::ShowMetricsWindow();
 #endif
 }
 
-void engine::UIManager::UpdateUI(void)
+void engine::UIManager::EndFrame(void)
 {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -57,9 +60,13 @@ void engine::UIManager::InitUI(wnd::Wnd* window)
     
     // Set flags
     ImGuiIO& io = ImGui::GetIO();
-    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    if (Engine::HasEditor())
+    {
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    }
 
     
     // Set UI theme
