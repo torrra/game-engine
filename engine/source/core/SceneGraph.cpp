@@ -1,4 +1,5 @@
 #include "core/SceneGraph.h"
+#include "core/SceneGraph.h"
 #include "core/Entity.h"
 #include "core/systems/ScriptSystem.h"
 
@@ -468,7 +469,14 @@ namespace engine
 
         ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies);
         text::UnloadFileData(data);
-
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.SwitchShape(&rbDynamic, static_cast<EGeometryType>(rbDynamic.m_shape));
+        }
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.SwitchShape(&rbStatic, static_cast<EGeometryType>(rbStatic.m_shape));
+        }
     }
 
 }

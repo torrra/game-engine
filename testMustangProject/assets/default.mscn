@@ -7,8 +7,8 @@
 [Transform]
     @uint64 | index=0
     @int64 | owner=0
-    @quat32 | rotation={0.981627,0,0,-0.190809}
-    @vec3f32 | position={2.2,6.5,0.2}
+    @quat32 | rotation={1,0,0,0}
+    @vec3f32 | position={0,5,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Renderer]
@@ -75,7 +75,7 @@
 [RigidBodyStatic]
      @int64 | owner=2
      @uint64 | type=0
-     @uint64 | shape=1
+     @uint64 | shape=0
      @uint64 | flags=0
 [Entity]
    @string 12 | name=New Entity 0

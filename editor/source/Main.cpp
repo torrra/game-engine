@@ -25,7 +25,7 @@ int appMain(void)
     engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
     
-    ///// ---------------- Create entity ---------------- 
+    /// ---------------- Create entity ---------------- 
     //engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
 
     ///// ---------------- Create rigidbody dynamic ----------------

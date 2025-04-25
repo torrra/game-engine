@@ -90,11 +90,14 @@ namespace engine
         ENGINE_API void				SerializeText(std::ostream& output,
                                                   EntityHandle owner,
                                                   uint64 index) const override;
-        ENGINE_API const char* DeserializeText(const char* text, const char* end) override;
+        ENGINE_API const char*  DeserializeText(const char* text, const char* end) override;
 
+                    Transform&  CheckEntityTransform(void);
+                    void        SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry);
         ENGINE_API
         RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 
+        uint64                  m_shape                 = 0;
 	private :
 
         friend class RigidBodyStaticFactory;
@@ -104,7 +107,6 @@ namespace engine
             Check if the entity has a transform component if not create one
             <return> the entity transform
         */
-					Transform&	    CheckEntityTransform(void);
 
                     // Preset of a box dynamic rigid body
                     void            CreateStaticBoxRigidBody(void);
@@ -117,8 +119,7 @@ namespace engine
 
 		RigidBodyStaticImpl*    m_rigidBodyStaticImpl   = nullptr;
         Material*               m_materialImpl          = nullptr;
-        uint64                  m_type                  = 0;
-        uint64                  m_shape                 = EShapeType::STATIC;
+        uint64                  m_type                  = EShapeType::STATIC;
 
 	}; // !Class RigidBodyStatic
 

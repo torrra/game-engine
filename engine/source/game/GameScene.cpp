@@ -102,15 +102,20 @@ namespace engine
 
     void GameScene::PhysicsUpdate(void)
     {
-        constexpr f32 physicsUpdateInterval = 1.f / 60.f;
+        constexpr f32 physicsUpdateInterval = 0.02f;
 
         m_timeSincePhysicsTick += m_time.GetDeltaTime();
-        int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick * physicsUpdateInterval);
+        if (m_timeSincePhysicsTick <= 0.f)
+        {
+            return;
+        }
+        int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick / physicsUpdateInterval);
 
         if (numPhysicsUpdate < 1)
             return;
 
-        f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
+        //f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
+        f32 interval = m_time.GetDeltaTime();
 
         m_graph.SyncRigidbodiesPrePhysics();
 

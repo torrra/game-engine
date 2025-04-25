@@ -11,10 +11,15 @@ engine::Time::Time(void)
 
 void engine::Time::Update()
 {
+    constexpr f32 updateTime = 1.0f / 60.0f;
+
     m_totalTime = static_cast<f32>(glfwGetTime());
     
     m_deltaTime = m_totalTime - m_lastTime;
     
+    if (m_deltaTime > updateTime)
+        m_deltaTime = updateTime;
+
     m_lastTime = m_totalTime;
 }
 

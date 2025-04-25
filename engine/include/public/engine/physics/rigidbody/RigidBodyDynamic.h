@@ -125,7 +125,9 @@ namespace engine
                                                   uint64 index) const override;
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
+                    void SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry);
         RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
+        uint64                  m_shape         = 0;
 
     private :
 
@@ -148,6 +150,7 @@ namespace engine
                     void            CreateDynamicSphereRigidBody(void);
         // Preset of a capsule dynamic rigid body
                     void            CreateDynamicCapsuleRigidBody(void);
+
                     
         /// TODO : Check transform to directly use the component transform
         ///		   of the entity
@@ -155,8 +158,7 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
-        uint64                  m_type          = 0;
-        uint64                  m_shape         = EShapeType::DYNAMIC;
+        uint64                  m_type          = EShapeType::DYNAMIC;
 
     }; // !Class RigidBodyDynamic
 
