@@ -6,8 +6,8 @@
 #include <engine/resource/texture/Texture.h>
 #include <engine/core/systems/ScriptSystem.h>
 
-#define MODEL_FILE ".\\assets\\padoru.obj"
 //#define MODEL_FILE ".\\assets\\ch19\\Ch19_nonPBR.dae"
+#define MODEL_FILE ".\\assets\\padoru.obj"
 #define TEXTURE_FILE ".\\assets\\padoru.png"
 #define CONTROLLER_SCRIPT_FILE "ControllerScript"
 

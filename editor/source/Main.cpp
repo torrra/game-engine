@@ -5,9 +5,6 @@
 
 #include "engine/ConsoleLog.hpp"
 
-// HACK: duct tape style solution to re-purpose main
-#define TESTING_PHYSX 1
-
 // Use dedicated graphics card
 extern "C" 
 {
