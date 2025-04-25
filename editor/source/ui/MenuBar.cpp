@@ -29,6 +29,7 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene)
 
         m_application->m_graphView.ClearGraph();
         activeScene.Reset();
+        engine::ThreadManager::SynchronizeGameThread(activeScene.GetGraph());
         m_application->m_graphView.SetGraph(activeScene.GetGraph());
     }
     else if (!m_gameRunning && ::ui::Button("Start"))

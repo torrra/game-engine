@@ -98,7 +98,6 @@ namespace engine
     void Renderer::SetModel(const Model* model)
     {
         m_model = model;
-        m_materials.resize(model->GetMeshCount()); 
     }
 
     void Renderer::SetModel(const char* key)
@@ -148,10 +147,19 @@ namespace engine
         text::Serialize(output, "fragmentShader", m_shader->GetFragmentShaderName());
         output << "\n    ";
 
-        text::Serialize(output, "materialCount", m_materials.size());
-        output << "\n    ";
+        std::vector<const MeshMaterial*> validMeshMaterials;
+        validMeshMaterials.reserve(m_materials.size());
 
         for (const MeshMaterial* mat : m_materials)
+        {
+            if (mat)
+                validMeshMaterials.push_back(mat);
+        }
+
+        text::Serialize(output, "materialCount", validMeshMaterials.size());
+        output << "\n    ";
+
+        for (const MeshMaterial* mat : validMeshMaterials)
         {
             text::Serialize(output, "material", mat->GetFilePath().string());
             output << "\n    ";
