@@ -51,14 +51,12 @@ end
 function _AddEntityHandle(newHandle, entityName)
 
     ExistingEntities[entityName] = Entity:_NewNativeEntity(newHandle)
-    print("\n[Entity script] successfully registered "..entityName.."\n")
 end
 
 
 function _UnregisterEntity(entityName)
 
     ExistingEntities[entityName] = nil;
-    print("\n[Entity script] unregistered "..entityName.."\n")
 end
 
 return Entity

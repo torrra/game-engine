@@ -81,6 +81,7 @@ namespace engine
         ENGINE_API void DeserializeText(std::ifstream& input);
 
         ENGINE_API void MoveFile(const std::filesystem::path& newPath);
+        ENGINE_API const std::filesystem::path& GetFilePath(void) const;
 
         ENGINE_API static MeshMaterial* CreateMaterial(const char* path);
 
