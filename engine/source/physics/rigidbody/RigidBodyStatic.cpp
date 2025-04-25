@@ -34,8 +34,6 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 
 engine::RigidBodyStatic::~RigidBodyStatic(void)
 {
-	RigidBodyStaticCleanUp();
-
 	delete m_rigidBodyStaticImpl;
 	m_rigidBodyStaticImpl = nullptr;
 }
@@ -178,6 +176,7 @@ void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
     PX_RELEASE(m_materialImpl->GetImpl().m_material);
     // Delete the pointer to the implementation structure
     delete m_materialImpl;
+    m_materialImpl = nullptr;
     // Release the rigid body
 	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
 }
@@ -287,7 +286,7 @@ engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph
                                                                       const EGeometryType& inGeometry)
 {
     // Create static rigid body in regard to the geometry and give it an owner and a scene
-    if (RigidBodyStatic* temp = new RigidBodyStatic(inOwner, inScene))
+    if (RigidBodyStatic* temp = inScene->CreateComponent<RigidBodyStatic>(inOwner))
     {
         switch (inGeometry)
         {
