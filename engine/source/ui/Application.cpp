@@ -11,12 +11,6 @@
 
 namespace engine
 {
-    Application::~Application(void)
-    {
-        
-    }
-
-
     int16 Application::Startup(const char* projectName)
     {
         if (m_started)

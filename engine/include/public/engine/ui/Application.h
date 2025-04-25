@@ -25,7 +25,7 @@ namespace engine
         Application(const Application&) = delete;
         Application(Application&&) = delete;
 
-        ENGINE_API virtual ~Application(void);
+        ENGINE_API virtual ~Application(void) = default;
 
         ENGINE_API virtual int16 Startup(const char* projectName);
         ENGINE_API virtual void  BeginFrame(void);
