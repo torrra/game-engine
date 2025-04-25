@@ -90,13 +90,14 @@ int16 engine::Engine::Startup(uint32 threadCount)
 
 void engine::Engine::ShutDown(void)
 {
+    m_activeScene.GetGraph()->CleanRigidBodies();
+    PhysicsEngine::Get().CleanUp();
     ThreadManager::Shutdown();
     ScriptSystem::Shutdown();
     ResourceManager::ShutDown();
     m_application->Shutdown();
     Input::ShutDown();
     m_uiManager.ShutDown();
-    PhysicsEngine::Get().CleanUp();
 
     if (m_application)
         delete m_application;
