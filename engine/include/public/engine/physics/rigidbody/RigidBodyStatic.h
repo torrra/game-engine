@@ -87,6 +87,11 @@ namespace engine
 		// Delete the dynamic rigid body resources
 		ENGINE_API	void		    RigidBodyStaticCleanUp(void);
 
+        ENGINE_API void				SerializeText(std::ostream& output,
+                                                  EntityHandle owner,
+                                                  uint64 index) const override;
+        ENGINE_API const char* DeserializeText(const char* text, const char* end) override;
+
         ENGINE_API
         RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 
@@ -112,6 +117,8 @@ namespace engine
 
 		RigidBodyStaticImpl*    m_rigidBodyStaticImpl   = nullptr;
         Material*               m_materialImpl          = nullptr;
+        uint64                  m_type                  = 0;
+        uint64                  m_shape                 = EShapeType::STATIC;
 
 	}; // !Class RigidBodyStatic
 

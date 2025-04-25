@@ -4,7 +4,7 @@ namespace engine
 {
 	struct GeometryImpl;
 
-	enum EGeometryType
+	enum EGeometryType : uint64
 	{
 		BOX = 0,
 		SPHERE = 1,
@@ -13,7 +13,7 @@ namespace engine
 
 	}; // !Enum EGeometryType
 
-    enum EShapeType
+    enum EShapeType : uint64
     {
         DYNAMIC = 0,
         STATIC = 1

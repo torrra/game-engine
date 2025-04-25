@@ -25,6 +25,8 @@
 
 #pragma endregion
 
+#include "serialization/TextSerializer.h"
+
 engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
@@ -34,8 +36,11 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 
 engine::RigidBodyStatic::~RigidBodyStatic(void)
 {
-	delete m_rigidBodyStaticImpl;
-	m_rigidBodyStaticImpl = nullptr;
+    //if (m_rigidBodyStaticImpl != nullptr)
+    //{
+    //    delete m_rigidBodyStaticImpl;
+    //    m_rigidBodyStaticImpl = nullptr;
+    //}
 }
 
 math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
@@ -173,12 +178,50 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
     // Release the material
-    PX_RELEASE(m_materialImpl->GetImpl().m_material);
+    //PX_RELEASE(m_materialImpl->GetImpl().m_material);
     // Delete the pointer to the implementation structure
     delete m_materialImpl;
     m_materialImpl = nullptr;
     // Release the rigid body
 	PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
+
+    delete m_rigidBodyStaticImpl;
+    m_rigidBodyStaticImpl = nullptr;
+}
+
+void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
+{
+    output << "[RigidBodyStatic]\n     ";
+
+    if constexpr (UpdateAfterParent<RigidBodyStatic>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
+    }
+
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+    text::Serialize(output, "type", m_type);
+    output << "\n     ";
+    text::Serialize(output, "shape", m_shape);
+    output << "\n     ";
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
+const char* engine::RigidBodyStatic::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_type);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_shape);
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
 }
 
 engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
@@ -211,6 +254,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::BOX;
 
     PrintLog(SuccessPreset(), "Created static box rigid body.");
 }
@@ -232,6 +276,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::SPHERE;
 
     PrintLog(SuccessPreset(), "Created static sphere rigid body.");
 }
@@ -253,6 +298,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::CAPSULE;
 
     PrintLog(SuccessPreset(), "Created static capsule rigid body.");
 }
@@ -272,6 +318,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    m_type = EGeometryType::PLANE;
 
     PrintLog(SuccessPreset(), "Created static plane rigid body.");
 }

@@ -32,6 +32,7 @@ namespace engine
 
     void GameScene::Reset(void)
     {
+        m_graph.CleanRigidBodies();
         DeserializeText();
         ScriptSystem::ResetState();
     }

@@ -26,6 +26,11 @@
    @uint64 | count=1
    @string 16 | scriptObject=ControllerScript
    @uint64 | flags=0
+[RigidBodyDynamic]
+     @int64 | owner=0
+     @uint64 | type=0
+     @uint64 | shape=0
+     @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera
    @int64 | handle=1
@@ -67,6 +72,11 @@
     @vec3f32 | position={0,0,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
+[RigidBodyStatic]
+     @int64 | owner=2
+     @uint64 | type=0
+     @uint64 | shape=1
+     @uint64 | flags=0
 [Entity]
    @string 12 | name=New Entity 0
    @int64 | handle=3

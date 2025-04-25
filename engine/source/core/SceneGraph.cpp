@@ -375,14 +375,16 @@ namespace engine
 
     void SceneGraph::CleanRigidBodies(void)
     {
-        for (auto& rbDynamic : m_sceneDynamicRigidBodies)
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {
             rbDynamic.RigidBodyDynamicCleanUp();
         }
-        for (auto& rbStatic : m_sceneStaticRigidBodies)
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
         {
             rbStatic.RigidBodyStaticCleanUp();
         }
+        m_sceneDynamicRigidBodies = ComponentArray<RigidBodyDynamic>();
+        m_sceneStaticRigidBodies = ComponentArray<RigidBodyStatic>();
     }
 
 
@@ -431,6 +433,8 @@ namespace engine
         Component::DeserializedArray<Camera>	cameras;
         Component::DeserializedArray<Renderer>	renderers;
         Component::DeserializedArray<Script>	scripts;
+        Component::DeserializedArray<RigidBodyDynamic>	dynamicRigidBodies;
+        Component::DeserializedArray<RigidBodyStatic>	staticRigidBodies;
 
         const char* start;
         const char* end;
@@ -452,11 +456,17 @@ namespace engine
 
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
+            
+            else if (memcmp(start, "[RigidBodyDynamic]", 17) == 0)
+                start = Component::DeserializeComponentText(dynamicRigidBodies, start, end);
+            
+            else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
+                start = Component::DeserializeComponentText(staticRigidBodies, start, end);
 
             start = text::GetNewLine(start, end);
         }
 
-        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies);
         text::UnloadFileData(data);
 
     }

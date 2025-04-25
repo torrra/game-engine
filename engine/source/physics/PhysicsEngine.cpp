@@ -143,6 +143,8 @@ bool engine::PhysicsEngine::InitPvd(void)
         }
     }
 
+    std::cout << "Pvd " << (isConnected ? "connected" : "not connected") << std::endl;
+
     if (!isConnected)
     {
         return false;

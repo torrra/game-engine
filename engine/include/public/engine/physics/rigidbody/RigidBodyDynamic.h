@@ -51,7 +51,7 @@ namespace engine
 
         /// Destructor
         // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
-        ENGINE_API				    ~RigidBodyDynamic(void) override;
+        ENGINE_API				    ~RigidBodyDynamic(void) override {}
 
         /// Getter
         /*
@@ -155,8 +155,8 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
-        uint64                  m_type;
-        uint64                  m_shape;
+        uint64                  m_type          = 0;
+        uint64                  m_shape         = EShapeType::DYNAMIC;
 
     }; // !Class RigidBodyDynamic
 

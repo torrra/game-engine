@@ -25,24 +25,24 @@ int appMain(void)
     engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
     
-    /// ---------------- Create entity ---------------- 
-    engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
+    ///// ---------------- Create entity ---------------- 
+    //engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
 
-    /// ---------------- Create rigidbody dynamic ----------------
-    std::cout << "\t" << std::endl;
+    ///// ---------------- Create rigidbody dynamic ----------------
+    //std::cout << "\t" << std::endl;
 
-    engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
-                                        engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
-    rb->SetDebugVisualization(true);
-    rb->SetGravityDisabled(false);
+    //engine::RigidBodyDynamic* rb = engine::RigidBodyDynamicFactory::CreateDynamic(engine.GetGraph(), 
+    //                                    engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine::BOX);
+    //rb->SetDebugVisualization(true);
+    //rb->SetGravityDisabled(false);
 
-    /// ---------------- Create rigidbody static ----------------
-    std::cout << "\t" << std::endl;
-    
-    engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
-                                            engine.GetGraph(), floor, engine::BOX);
-    floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
-    floorRb->SetDebugVisualization(true);
+    ///// ---------------- Create rigidbody static ----------------
+    //std::cout << "\t" << std::endl;
+    //
+    //engine::RigidBodyStatic* floorRb = engine::RigidBodyStaticFactory::CreateStatic(
+    //                                        engine.GetGraph(), floor, engine::BOX);
+    //floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
+    //floorRb->SetDebugVisualization(true);
 
     engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
