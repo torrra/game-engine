@@ -16,6 +16,11 @@ function _NewCameraComponent(handle)
 	Camera:_RegisterCameraComponent(handle)
 end
 
+function _RemoveCameraComponent(handle)
+	
+	ExistingCameraComponents[handle] = nil
+end
+
 function Camera:RefreshRef()
 
 	self.ref = CamRef.GetCamRef(self.entity)

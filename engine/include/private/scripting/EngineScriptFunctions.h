@@ -1,0 +1,6 @@
+#include "scripting/EntityScriptFunctions.h"
+#include "scripting/ComponentFunctions.h"
+#include "scripting/ScriptFunctions.h"
+#include "scripting/CameraFunctions.h"
+#include "scripting/TransformFunctions.h"
+#include "scripting/InputFunctions.h"

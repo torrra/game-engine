@@ -25,7 +25,7 @@ namespace engine
         // Copy constructor set to default
         ENGINE_API 							Transform(const Transform& inTransform) = default;
         // AddTranslation constructor set to default
-        ENGINE_API 							Transform(Transform&& inTransform) = default;
+        ENGINE_API 							Transform(Transform&& inTransform) noexcept = default;
 
         /// Destructors
         // Destructor set to default
@@ -53,7 +53,9 @@ namespace engine
         ENGINE_API	void 					CopyScale(const Transform& inTransform);
         // Update the transform in regard to the given transform
         ENGINE_API	void					Update(const Transform& inTransform);
-        ENGINE_API	void					Register(void);
+
+        ENGINE_API	void					Register(void) override;
+        ENGINE_API  void                    Unregister(void) override;
 
         /// Getters
         // Get the position of the transform
@@ -108,7 +110,7 @@ namespace engine
         // Copy assignement set to default
                     Transform&				operator=(const Transform& inTransform) = default;
         // AddTranslation assignement set to default
-                    Transform&				operator=(Transform&& inTransform) = default;
+                    Transform&				operator=(Transform&& inTransform) noexcept = default;
         // Operator to print a transform
         std::ostream& operator<<(std::ostream& os);
     

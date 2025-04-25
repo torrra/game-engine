@@ -5,6 +5,7 @@
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
 #include "engine/physics/Raycast.h"
+#include "engine/physics/TriangleMesh.h"
 
 #include "engine/sounds/SoundsEngine.h"
 
@@ -31,7 +32,7 @@
 #include "ui/Viewport.h"
 
 // HACK: ductape style solution to re-purpose main
-#define TESTING_PHYSX 0
+#define TESTING_PHYSX 1
 
 // Use dedicated graphics card
 extern "C" 
@@ -82,6 +83,17 @@ int main(void)
         raycast->SetFlags(engine::ERaycastFlags::DYNAMIC);
         engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
 
+        while (!engine.GetGraph()->GetComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->GetModel()->CanRender())
+               engine::ThreadManager::RenderScene(engine.GetGraph());
+
+        engine::TriangleMesh* triangleMesh;
+        if (engine.GetGraph()->GetComponent<engine::Renderer>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->GetModel()->CanRender())
+        {
+            triangleMesh = new engine::TriangleMesh(engine.GetGraph()->GetEntity("Padoru")->GetHandle(), engine.GetGraph());
+
+            triangleMesh->CreateTriangleMesh();
+        }
+
 		while (!engine.GetWindow()->ShouldWindowClose())
 		{
             math::Vector3f camPos = camera->GetPosition();
@@ -117,6 +129,7 @@ int main(void)
         delete rb;
         delete floorRb;
         delete raycast;
+        delete triangleMesh;
         engine::PhysicsEngine::Get().CleanUp();
 
 		engine.ShutDown();
