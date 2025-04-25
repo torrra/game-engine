@@ -101,7 +101,7 @@ namespace engine
 
     void GameScene::PhysicsUpdate(void)
     {
-        constexpr f32 physicsUpdateInterval = 1.f / 0.2f;
+        constexpr f32 physicsUpdateInterval = 1.f / 60.f;
 
         m_timeSincePhysicsTick += m_time.GetDeltaTime();
         int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick * physicsUpdateInterval);

@@ -373,6 +373,18 @@ namespace engine
         return m_sceneEntities.emplace_back().DeserializeText(text, end);
     }
 
+    void SceneGraph::CleanRigidBodies(void)
+    {
+        for (auto& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.RigidBodyDynamicCleanUp();
+        }
+        for (auto& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.RigidBodyStaticCleanUp();
+        }
+    }
+
 
     void SceneGraph::SerializeText(std::ofstream& file)
     {

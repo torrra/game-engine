@@ -3,6 +3,10 @@
 #include <engine/input/Input.h>
 #include "ui/EditorApplication.h"
 
+
+#include "engine/physics/PhysicsEngine.h"
+
+
 #include "engine/ConsoleLog.hpp"
 
 
@@ -21,11 +25,8 @@ int appMain(void)
     engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
     
-    /* /// ---------------- Create entity ---------------- 
+    /// ---------------- Create entity ---------------- 
     engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
-
-    /// ---------------- PhysicsEngine use ---------------- 
-    engine::PhysicsEngine::Get().Init();
 
     /// ---------------- Create rigidbody dynamic ----------------
     std::cout << "\t" << std::endl;
@@ -43,16 +44,12 @@ int appMain(void)
     floorRb->SetBoxHalfExtents(math::Vector3f (5.f, 0.5f, 5.f));
     floorRb->SetDebugVisualization(true);
 
-    engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());*/
+    engine::Camera* camera = engine.GetGraph()->GetComponent<engine::Camera>(engine.GetGraph()->GetEntity("Camera")->GetHandle());
 
     engine.SaveProject();
 	while (!engine.GetWindow()->ShouldWindowClose())
 	{
-        //math::Matrix4f projViewMatrix = camera->ViewProjection();
         engine.UpdateGameplay();
-
-        // Update the debug draw
-        //engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
 
         if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
             engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
@@ -64,7 +61,6 @@ int appMain(void)
         }
         engine.UpdateApplicationWindow();
 	}
-
 	engine.ShutDown();
 	return 0;
 }
