@@ -251,7 +251,9 @@ void ui::EndDisabledSection(void)
 
 bool ui::CollapseSection(const char* name, bool& closeButton)
 {
-    int32 flags = ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_ClipLabelForTrailingButton;
+    constexpr int32 flags = 
+        ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap | 
+        ImGuiTreeNodeFlags_ClipLabelForTrailingButton | ImGuiTreeNodeFlags_DefaultOpen;
     ImGuiWindow* window = ImGui::GetCurrentWindow();
 
     if (window->SkipItems)
