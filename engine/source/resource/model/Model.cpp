@@ -7,6 +7,7 @@
 #include "engine/thread/ThreadManager.h"
 #include "engine/resource/ResourceManager.h"
 #include "engine/resource/texture/Texture.h"
+#include "engine/resource/animation/Animation.h"
 
 #include "serialization/TextSerializer.h"
 
@@ -235,6 +236,10 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
 
     ProcessTextures(scene); 
     ProcessMeshes(scene, scene->mRootNode, dir);
+
+    if (scene->HasAnimations())
+        Animation::LoadExtraAnimations(scene);
+
     m_loadStatus |= LOADED;
 
     // Send OpenGL setup to render thread
