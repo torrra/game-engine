@@ -7,13 +7,15 @@
 
 namespace engine::importer
 {
+    // Reuse same importer in the same thread as creating
+    // one is expensive and requires heap allocations
     thread_local Assimp::Importer g_animImporter;
 }
 
 
 namespace engine
 {
-    Animation::Animation(void* animData)
+    Animation::Animation(const void* animData)
     {
         ReadAnimation(animData);
     }
@@ -56,6 +58,8 @@ namespace engine
         boneData.m_rotations.resize(animNode->mNumRotationKeys);
         boneData.m_scales.resize(animNode->mNumScalingKeys);
 
+        // Copy all bone transformations for each frame
+
         for (uint32 posNum = 0; posNum < animNode->mNumPositionKeys; ++posNum)
         {
             Vec3BoneTransform& pos = boneData.m_positions[posNum];
@@ -91,7 +95,7 @@ namespace engine
         for (uint32 animNum = offset; animNum < scene->mNumAnimations; ++animNum)
         {
             const aiAnimation* anim = scene->mAnimations[animNum];
-            ResourceManager::CreateFromData<Animation>(anim->mName.C_Str(), (void*)anim);
+            ResourceManager::CreateFromData<Animation>(anim->mName.C_Str(), (const void*)anim);
         }
     }
 }

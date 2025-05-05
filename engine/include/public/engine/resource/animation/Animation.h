@@ -56,7 +56,7 @@ namespace engine
     public:
 
         ENGINE_API Animation(void) = default;
-        ENGINE_API Animation(void* animData);
+        ENGINE_API Animation(const void* animData);
                    Animation(const Animation&) = delete;
         ENGINE_API Animation(Animation&&) noexcept = default;
         ENGINE_API ~Animation(void) = default;
@@ -70,7 +70,10 @@ namespace engine
      
     private:
 
+        // Read entire animation
         void ReadAnimation(const void* animation);
+
+        // Read a single bone's transformations
         void ReadBoneAnim(void* boneAnim);
 
         std::vector<BoneAnimData>   m_animData;
