@@ -24,9 +24,6 @@ namespace engine
 
 		bool LoadResource(const char* filePath) override;
 
-        ENGINE_API std::string GetVertName(void) const noexcept;
-        ENGINE_API std::string GetFragName(void) const noexcept;
-
 		ENGINE_API void Use(void) const;
 
 		// Scalar types

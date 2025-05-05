@@ -17,16 +17,6 @@ bool engine::ShaderProgram::LoadResource(const char* filePath)
     return true;
 }
 
-std::string engine::ShaderProgram::GetVertName(void) const noexcept
-{
-    return m_vertexShader;
-}
-
-std::string engine::ShaderProgram::GetFragName(void) const noexcept
-{
-    return m_fragShader;
-}
-
 void engine::ShaderProgram::Use(void) const
 {
 	return glUseProgram(m_programID);
