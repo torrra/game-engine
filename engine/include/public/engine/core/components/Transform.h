@@ -46,7 +46,7 @@ namespace engine
         ENGINE_API static math::Matrix3f   ToNormalMatrix(Transform& inTransform);
 
         ENGINE_API static math::Vector3f   ToWorldPosition(Transform& inTransform);
-        ENGINE_API static math::Quatf      ToWorldRotation(Transform& inTransform)
+        ENGINE_API static math::Quatf      ToWorldRotation(Transform& inTransform);
 
         // Copy the position from another transform
         ENGINE_API	void					CopyPosition(const Transform& inTransform);
