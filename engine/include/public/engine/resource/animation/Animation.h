@@ -78,6 +78,6 @@ namespace engine
 
         std::vector<BoneAnimData>   m_animData;
         int32                       m_tickCount = -1;
-        float                       m_ticksPerSecond = 0.f;
+        f32                         m_ticksPerSecond = 0.f;
     };
 }
