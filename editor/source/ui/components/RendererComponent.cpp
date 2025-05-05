@@ -7,13 +7,16 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
 
+#define NO_MODEL_NAME "None##model"
+#define NO_FRAG_NAME "None##shader"
+
 editor::RendererComponent::RendererComponent(void)
 {
     SetName("Renderer");
     SetType(RENDERER);
 
-    m_modelName = "None##model";
-    m_fragName = "None##shader";
+    m_modelName = NO_MODEL_NAME;
+    m_fragName = NO_FRAG_NAME;
 }
 
 editor::RendererComponent::~RendererComponent(void)
@@ -33,17 +36,8 @@ void editor::RendererComponent::SectionContent(void)
 void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 {
     // Get file name
-    std::string modelName("None##model");
-
-    //if (const engine::Model* model = renderer->GetModel())
-    //{
-    //    std::string path = model->GetName();
-    //    modelName = path;
-    //
-    //    uint64 offset = path.rfind('\\') + 1;
-    //    if (offset != path.npos);
-    //    modelName = modelName.substr(offset);
-    //}
+    m_modelName = (renderer->GetModel()) ? renderer->GetModel()->GetName() : NO_MODEL_NAME;
+    m_fragName = (renderer->GetShader()) ? renderer->GetShader()->GetFragmentShaderName() : NO_FRAG_NAME;
 
     // Model input
     ui::Text("Model: ");
