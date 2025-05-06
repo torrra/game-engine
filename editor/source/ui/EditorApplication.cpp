@@ -27,7 +27,7 @@ namespace editor
             return;
 
         m_assetWnd.Render();
-        m_gameSimulationView->RenderToViewport();
+        
         m_menuBar.UpdateStartButton(*m_currentScene);
         m_graphView.Render();
 
@@ -35,9 +35,16 @@ namespace editor
             m_properties.SetHandle(m_graphView.GetSelectedEntity());
 
         m_properties.Render();
-        m_gameSimulationView->Render();
 
-        // TODO: add scene view render
+        if (m_currentScene->IsRunning())
+        {
+            m_gameSimulationView->RenderToViewport();
+        }
+            m_gameSimulationView->Render();
+
+        m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
+        m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
+        m_sceneEditorView->Render();
     }
 
     void EditorApplication::Shutdown(void)
