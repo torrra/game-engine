@@ -74,6 +74,8 @@ namespace editor
         AssetsWnd(void) = delete;
         AssetsWnd(const char* name);
         ~AssetsWnd(void);
+
+        void Path(std::filesystem::path const& projectDir);
         
     protected:
         virtual void RenderContents(void) override;
@@ -90,7 +92,6 @@ namespace editor
         void OnSelectDir(void);
         bool IsSupportedExtension(std::string const& extension, std::string& payloadType);
         std::string GetPayloadType(std::string const& extension) const;
-        void RenderFile(std::filesystem::path const& file);
 
         std::filesystem::path m_path;
         std::vector<Asset> m_assets;

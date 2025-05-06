@@ -117,6 +117,8 @@ void editor::MenuBar::OpenProject(void)
             // Open new project
             engine->OpenProject(projectPath);
             engine->LoadDefaultScene();
+
+            m_application->m_assetWnd.Path(engine->GetProjectDir());
         }
     }
 }
@@ -228,6 +230,8 @@ void editor::MenuBar::CreateProject(void)
                             projectPath += (std::string("\\") + projectName);
                             engine->OpenProject(projectPath);
                             engine->LoadDefaultScene();
+
+                            m_application->m_assetWnd.Path(engine->GetProjectDir());
                         }
                     }
                     
