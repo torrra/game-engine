@@ -3,10 +3,9 @@
 #include "core/Entity.h"
 #include "core/systems/ScriptSystem.h"
 
-#include "thread/ThreadManager.h"
-
 #include "serialization/TextSerializer.h"
-
+#include "thread/ThreadManager.h"
+#include "InternalOpenGLError.hpp"
 
 namespace engine
 {
@@ -274,13 +273,19 @@ namespace engine
 
             math::Matrix4f viewProjection = camera.ViewProjection();
 
-            for (Renderer& renderer : m_sceneRenderers)
-            {
-                if (!renderer.IsValid() || !renderer.IsActive())
-                    continue;
+            RenderFromCacheSingleCamera(viewProjection);
+        }
+    }
 
-                renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
-            }
+    void SceneGraph::RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection)
+    {
+        for (Renderer& renderer : m_sceneRenderers)
+        {
+            if (!renderer.IsValid() || !renderer.IsActive())
+                continue;
+
+            renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
+            OpenGLError();
         }
     }
 
