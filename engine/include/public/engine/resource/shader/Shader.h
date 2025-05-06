@@ -47,13 +47,13 @@ namespace engine
 		ENGINE_API void Set(const char* uniformName, math::Vector4d const& vec) const;
 
 		// Matrices
-		ENGINE_API void Set(const char* uniformName, math::Matrix2f* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix3f* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix4f* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix2f* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix3f* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix4f* matrix) const;
 
-		ENGINE_API void Set(const char* uniformName, math::Matrix2d* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix3d* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix4d* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix2d* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix3d* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix4d* matrix) const;
 
 
         ENGINE_API const std::string& GetVertexShaderName(void) const;
