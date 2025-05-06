@@ -29,8 +29,11 @@ void editor::RendererComponent::SectionContent(void)
     // Get renderer data
     engine::Renderer* rendererData = GetData<engine::Renderer>();
 
-    ModelInput(rendererData);
-    ShaderInput(rendererData);
+    if (rendererData)
+    {
+        ModelInput(rendererData);
+        ShaderInput(rendererData);
+    }
 }
 
 void editor::RendererComponent::ModelInput(engine::Renderer* renderer)

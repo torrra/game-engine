@@ -78,14 +78,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
         return ERROR;
 
     m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
-    std::filesystem::path scenePath = m_projectDir;
 
-    if (m_hasEditor)
-        scenePath.append(m_currentProject.m_defaultEditorScene);
-    else
-        scenePath.append(m_currentProject.m_defaultGameScene);
-
-    m_activeScene.LoadNewScene(false, scenePath);
     return SUCCESS;
 }
 
@@ -155,6 +148,11 @@ const std::filesystem::path& engine::Engine::GetProjectDir(void) const
     return m_projectDir;
 }
 
+std::string engine::Engine::GetProjectName(void) const
+{
+    return m_projectFile.filename().replace_extension().string();
+}
+
 void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)
 {
     ThreadManager::AddTask([this, path, serialize]
@@ -163,6 +161,18 @@ void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& p
             ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(
                 &Application::SetCurrentScene, m_application, &m_activeScene);
         });
+}
+
+void engine::Engine::LoadDefaultScene(void)
+{
+    std::filesystem::path scenePath = m_projectDir;
+
+    if (m_hasEditor)
+        scenePath.append(m_currentProject.m_defaultEditorScene);
+    else
+        scenePath.append(m_currentProject.m_defaultGameScene);
+
+    m_activeScene.LoadNewScene(false, scenePath);
 }
 
 void engine::Engine::CreateProject(const std::string & dir, const std::string& name)
@@ -211,7 +221,6 @@ exists. Attempting to open project file...");
 
     m_activeScene.EditPath(m_projectDir);
     m_activeScene.Rename("default");
-    SaveProject();
 }
 
 void engine::Engine::OpenProject(const std::filesystem::path& projFile)
@@ -414,3 +423,9 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
              std::filesystem::absolute(buildDir.parent_path()).c_str());
 
 }
+
+engine::Engine* engine::Engine::GetEngine(void)
+{
+    return g_defaultEngine;
+}
+

@@ -21,6 +21,7 @@ namespace editor
         ~PropertyWnd(void);
 
         void SetHandle(engine::EntityHandle handle);
+        engine::EntityHandle GetHandle(void) const noexcept;
         void ClearComponentArray(void);
 
     protected:

@@ -1,8 +1,9 @@
 #pragma once
 
+#include <filesystem>
+
 namespace engine
 {
-    class Engine;
     class GameScene;
 }
 
@@ -13,10 +14,16 @@ namespace editor
     public:
         MenuBar(class EditorApplication* application);
 
-        void Render(::engine::Engine& engine);
-        void UpdateStartButton(::engine::GameScene& scene);
+        void Render(engine::GameScene& activeScene);
 
     private:
+        void UpdateStartButton(::engine::GameScene& scene);
+        void DisplayCurrentProject(void);
+        void ProjectMenu(void);
+
+        void OpenProject(void);
+        bool SelectProject(std::filesystem::path& projectPath);
+
         class EditorApplication* m_application = nullptr;
         bool m_gameRunning = false;
     };
