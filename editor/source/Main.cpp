@@ -5,6 +5,8 @@
 
 #include "engine/ConsoleLog.hpp"
 
+#include "engine/sounds/SoundsEngine.h"
+#include "engine/sounds/PlayerAudio.h"
 
 // Use dedicated graphics card
 extern "C" 
@@ -21,6 +23,16 @@ int appMain(void)
     engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
     
+    engine::SoundEngine::Get().InitSoundEngine();
+
+    engine::EntityHandle music = engine.GetGraph()->CreateEntity("Music");
+    engine::PlayerAudio* playerAudio = 
+        engine.GetGraph()->CreateComponent<engine::PlayerAudio>(music);
+
+    if (playerAudio->LoadSound("Music", 
+                               "..\\workspace\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3"))
+        PrintLog(engine::SuccessPreset(), "Music loaded.");
+
     /* /// ---------------- Create entity ---------------- 
     engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
 
@@ -54,6 +66,23 @@ int appMain(void)
         // Update the debug draw
         //engine::PhysicsEngine::Get().UpdateDebugDraw(&projViewMatrix);
 
+        engine::SoundEngine::Get().UpdateSoundEngine();
+
+        static bool isPlaying = false;
+        if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT) && !isPlaying)
+        {
+            playerAudio->PlaySound("Music");
+            isPlaying = true;
+            engine::PrintLog(engine::InfoPreset(), "Music played.");
+        }
+        if (engine::Input::IsInputPressed(MOUSE_BUTTON_RIGHT) && isPlaying)
+        {
+
+            playerAudio->StopSound("Music");
+            isPlaying = false;
+            engine::PrintLog(engine::InfoPreset(), "Music stopped.");
+        }
+
         if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
             engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
             engine::Input::IsInputPressed(KEY_B))
@@ -64,6 +93,8 @@ int appMain(void)
         }
         engine.UpdateApplicationWindow();
 	}
+
+    engine::SoundEngine::Get().CloseSoundEngine();
 
 	engine.ShutDown();
 	return 0;

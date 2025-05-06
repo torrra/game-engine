@@ -32,7 +32,8 @@ namespace engine
             RENDERER = (uint64) (1 << 2),
             RIGIDBODY_DYNAMIC = (uint64) (1 << 3),
             RIGIDBODY_STATIC = (uint64) (1 << 4),
-            CAMERA = (uint64) (1 << 5)
+            CAMERA = (uint64) (1 << 5),
+            SOUND = (uint64) (1 << 6)
         };
 
         friend class SceneGraph;

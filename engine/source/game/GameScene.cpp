@@ -115,7 +115,7 @@ namespace engine
 
         for (int32 updateNum = 0; updateNum < numPhysicsUpdate; ++updateNum)
             PhysicsEngine::Get().StepSimulation(interval);
-
+        
          m_graph.SyncTransformsPostPhysics();
          m_timeSincePhysicsTick = 0.f;
     }

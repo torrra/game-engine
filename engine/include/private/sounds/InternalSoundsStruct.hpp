@@ -15,10 +15,10 @@
 
 namespace engine
 {
-    using SoundsMap = std::unordered_map<std::string, FMOD::Sound*>;
-    using ChannelsMap = std::unordered_map<std::string, FMOD::Channel*>;
+    using SoundsMap     = std::unordered_map<std::string, FMOD::Sound*>;
+    using ChannelsMap   = std::unordered_map<std::string, FMOD::Channel*>;
 
-    struct SoundsImpl
+    struct SoundImpl
     {
         SoundsMap       m_sounds;
         ChannelsMap     m_channels;
