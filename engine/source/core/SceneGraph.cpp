@@ -29,6 +29,14 @@ namespace engine
             if (entity && entity->IsActive())
                 rigidbody.UpdateEntity();
         }
+
+        for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateEntity();
+        }
     }
 
     void SceneGraph::SyncRigidbodiesPrePhysics(void)
@@ -41,13 +49,13 @@ namespace engine
                 rigidbody.UpdateRigidBody();
         }
 
-        /*for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
         {
             Entity* entity = GetEntity(rigidbody.GetOwner());
 
             if (entity && entity->IsActive())
                 rigidbody.UpdateRigidBody();
-        }*/
+        }
     }
 
     void SceneGraph::RegisterAllComponents(void)

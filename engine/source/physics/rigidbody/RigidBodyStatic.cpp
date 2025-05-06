@@ -175,6 +175,22 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
     return;
 }
 
+
+void engine::RigidBodyStatic::UpdateEntity(void)
+{
+    // Update the entity transform in regard to the rigid body for exemple,
+    // if the rigid body is under gravity then the rigid body fall so the entity fall
+    *m_currentScene->GetComponent<Transform>(m_owner) =
+        ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+}
+
+void engine::RigidBodyStatic::UpdateRigidBody(void)
+{
+    // Update the transform of the rigid body in regard to the entity
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(
+        *m_currentScene->GetComponent<Transform>(m_owner)));
+}
+
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
     // Delete the pointer to the implementation structure
