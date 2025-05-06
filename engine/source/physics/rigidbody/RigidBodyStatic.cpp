@@ -250,7 +250,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
@@ -272,7 +272,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
@@ -294,7 +294,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
@@ -315,7 +315,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::PLANE;
