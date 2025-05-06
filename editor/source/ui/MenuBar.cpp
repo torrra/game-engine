@@ -3,8 +3,14 @@
 #include "ui/SceneGraph.h"
 #include <engine/Engine.h>
 #include <engine/ui/UIComponent.h>
+#include <engine/ui/UITable.h>
 #include <engine/game/GameScene.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/input/Input.h>
+
+#define CREATE_PROJECT_IN_PROGRESS 0
+#define CREATE_PROJECT_SUCCESS 1
+#define CREATE_PROJECT_FAILED 2
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -25,6 +31,13 @@ void editor::MenuBar::Render(engine::GameScene& activeScene)
 
         ::ui::EndMainMenuBar();
     }
+
+    if (m_isCreateWndOpened)
+    {
+        ui::OpenModal("Create Project");
+        CreateProject();
+    }
+    
 }
 
 void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene)
@@ -64,8 +77,14 @@ void editor::MenuBar::DisplayCurrentProject(void)
 void editor::MenuBar::ProjectMenu(void)
 {
     ui::StartDisabledSection(m_gameRunning);
+    
     if (ui::StartMenu("Project"))
     {
+        if (ui::MenuItem("Create project"))
+        {
+            m_isCreateWndOpened = true;
+        }
+
         if (ui::MenuItem("Open project"))
         {
             OpenProject();
@@ -74,7 +93,6 @@ void editor::MenuBar::ProjectMenu(void)
         ui::EndMenu();
     }
     ui::EndDisabledSection();
-
 }
 
 void editor::MenuBar::OpenProject(void)
@@ -112,6 +130,7 @@ bool editor::MenuBar::SelectProject(std::filesystem::path& projectPath)
     {
         IFileOpenDialog* pFileOpen;
         result = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+        pFileOpen->SetOptions(FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
 
         // Check instance created successfully
         if (result == S_OK)
@@ -154,4 +173,183 @@ bool editor::MenuBar::SelectProject(std::filesystem::path& projectPath)
 
 
     return false;
+}
+
+void editor::MenuBar::CreateProject(void)
+{
+    // Open create project modal
+    if (ui::StartModal("Create Project", m_isCreateWndOpened))
+    {
+        static std::string projectName;
+        static std::filesystem::path projectPath;
+        static ui::Table table("modalLayout", 3, ui::GetAvailSpace());
+        static uint8 createProjectStatus = CREATE_PROJECT_IN_PROGRESS;
+
+        if (engine::Input::IsInputPressed(KEY_ESCAPE))
+            CloseCreateMenu(projectName, projectPath, createProjectStatus);
+
+        // Use table for alignment
+        if (table.StartTable())
+        {
+            // Line 1 - project name
+            ProjectName(table, projectName);
+
+            // Line 2 - project path
+            SelectProjectPath(table, projectPath);
+
+            // Line 3 - add Create project button + success info
+            if (ui::Button("Create Project"))
+                createProjectStatus = ((!projectName.empty() || !projectPath.empty()) && projectName.size() < 64) ? CREATE_PROJECT_SUCCESS : CREATE_PROJECT_FAILED;
+            
+            // Project creation status (display either 'success' or 'failed' text in menu)
+            ui::SameLine();
+            if (createProjectStatus)
+            {
+                ui::SameLine(160.f);
+                if (createProjectStatus == CREATE_PROJECT_SUCCESS)
+                {
+                    ui::Text("Success");
+                    
+                    // Create & open project
+                    engine::Engine* engine = engine::Engine::GetEngine();
+                    if (engine)
+                    {
+                        // Close project
+                        engine::ThreadManager::SynchronizeGameThread(engine->GetCurrentScene().GetGraph());
+                        engine->SaveProject();
+
+                        // Clean editor prior to opening new project
+                        m_application->m_properties.SetHandle(engine::Entity::EHandleUtils::INVALID_HANDLE);
+                        m_application->m_graphView.ClearGraph();
+
+                        if (engine->CreateProject(projectPath.string(), projectName))
+                        {
+                            // Open new project
+                            projectPath += (std::string("\\") + projectName);
+                            engine->OpenProject(projectPath);
+                            engine->LoadDefaultScene();
+                        }
+                    }
+                    
+                    CloseCreateMenu(projectName, projectPath, createProjectStatus);
+                }
+                else
+                    ui::Text("Failed");
+            }
+        }
+
+        ui::EndPopUp();
+    }
+}
+
+bool editor::MenuBar::SelectFolder(std::filesystem::path& projectPath)
+{
+    HRESULT result = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+    // Check com library initialized successfully
+    if (SUCCEEDED(result))
+    {
+        IFileOpenDialog* pFolderOpen;
+        result = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFolderOpen));
+        pFolderOpen->SetOptions(FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
+
+        // Check instance created successfully
+        if (result == S_OK)
+        {
+            // Display windows folder selection modal
+            result = pFolderOpen->Show(NULL);
+
+            // Successfully selected file
+            if (result == S_OK)
+            {
+                LPWSTR path;
+                IShellItem* pItem;
+                result = pFolderOpen->GetResult(&pItem);
+                pItem->GetDisplayName(SIGDN_FILESYSPATH, &path);
+
+                // Set new project directory
+                projectPath = path;
+
+                if (SUCCEEDED(result))
+                    CoTaskMemFree(path);
+
+                pItem->Release();
+                pFolderOpen->Release();
+                CoUninitialize();
+
+                return true;
+            }
+            else
+                printf("[WARNING]: Failed to select folder\n");
+
+            pFolderOpen->Release();
+        }
+        else
+            printf("[ERROR]: Failed to create windows com instance\n");
+
+        CoUninitialize();
+    }
+    else
+        printf("[ERROR]: Failed to initialize windows com library\n");
+
+
+    return false;
+}
+
+void editor::MenuBar::ProjectName(ui::Table& contentTable, std::string& name)
+{
+    ui::VerticalSpacing();
+
+    // Display text + format layout
+    contentTable.NextRow();
+    contentTable.NextColumn();
+    ui::Text("Project name: ");
+    ui::VerticalSpacing();
+
+    // Add interactable input field for user to write the project name + format layout 
+    contentTable.NextColumn(500.0f);
+    ui::ItemWidth(150.0f);
+    ui::InputBox("##ProjectName", "Project name", name, false);
+    ui::VerticalSpacing();
+
+    // Display current name
+    contentTable.NextColumn();
+    ui::Text(name.c_str());
+    ui::VerticalSpacing();
+}
+
+void editor::MenuBar::SelectProjectPath(ui::Table& contentTable, std::filesystem::path& path)
+{
+    contentTable.NextRow();
+ 
+    // Display text
+    contentTable.NextColumn();
+    ui::Text("Project path: ");
+    ui::VerticalSpacing();
+
+    // Interactable button to open file browser
+    contentTable.NextColumn();
+    if (ui::Button("Select"))
+    {
+        SelectFolder(path);
+        printf("path: %s\n", path.string().c_str());
+    }
+    ui::VerticalSpacing();
+
+    /*
+        Display current parent directory (we could display the entire absolute
+        path however this risks to destroy formatting).
+    */
+    contentTable.NextColumn();
+    ui::Text(path.filename().string().c_str());
+    ui::VerticalSpacing();
+    contentTable.EndTable();
+}
+
+void editor::MenuBar::CloseCreateMenu(std::string& projectName, std::filesystem::path& projectPath, uint8& status)
+{
+    projectName.clear();
+    projectPath.clear();
+    m_isCreateWndOpened = false;
+    status = CREATE_PROJECT_IN_PROGRESS;
 }

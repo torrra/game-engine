@@ -175,12 +175,12 @@ void engine::Engine::LoadDefaultScene(void)
     m_activeScene.LoadNewScene(false, scenePath);
 }
 
-void engine::Engine::CreateProject(const std::string & dir, const std::string& name)
+bool engine::Engine::CreateProject(const std::string & dir, const std::string& name)
 {
     if (name.length() > 64)
     {
         PrintLog(ErrorPreset(), "Unable to create project: name is too long! (over 64 characters)");
-        return;
+        return false;
     }
     std::filesystem::path pathObj = dir;
 
@@ -191,7 +191,7 @@ void engine::Engine::CreateProject(const std::string & dir, const std::string& n
     {
         PrintLog(ErrorPreset(), "Unable to create project: target location\
  does not exist or path is not absolute.");
-        return;
+        return false;
     }
 
     pathObj.append(name);
@@ -205,7 +205,7 @@ exists. Attempting to open project file...");
         pathObj += std::filesystem::path::preferred_separator;
 
         OpenProject(pathObj += filename);
-        return;
+        return false;
     }
 
     std::filesystem::create_directory(pathObj);
@@ -221,6 +221,10 @@ exists. Attempting to open project file...");
 
     m_activeScene.EditPath(m_projectDir);
     m_activeScene.Rename("default");
+
+    SaveProjectFile();
+
+    return true;
 }
 
 void engine::Engine::OpenProject(const std::filesystem::path& projFile)
@@ -265,6 +269,18 @@ void engine::Engine::SaveProject(void)
     text::Serialize(output, "executableName", m_currentProject.m_executableName);
 
     m_activeScene.SerializeText();
+}
+
+void engine::Engine::SaveProjectFile(void)
+{
+    std::ofstream output(m_projectFile, std::ios::out);
+
+    text::Serialize(output, "defaultGameScene", m_currentProject.m_defaultGameScene);
+    output << '\n';
+    text::Serialize(output, "defaultEditorScene", m_currentProject.m_defaultEditorScene);
+    output << '\n';
+    text::Serialize(output, "executableName", m_currentProject.m_executableName);
+
 }
 
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)

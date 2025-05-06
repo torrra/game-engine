@@ -49,9 +49,10 @@ namespace engine
         ENGINE_API void LoadNewScene(bool serialize, const std::filesystem::path& path);
         ENGINE_API void LoadDefaultScene(void);
 
-        ENGINE_API void CreateProject(const std::string& dir, const std::string& name);
+        ENGINE_API bool CreateProject(const std::string& dir, const std::string& name);
         ENGINE_API void OpenProject(const std::filesystem::path& projFile);
         ENGINE_API void SaveProject(void);
+        ENGINE_API void SaveProjectFile(void);
 
         ENGINE_API static bool HasEditor(void);
 

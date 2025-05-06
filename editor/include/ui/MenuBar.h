@@ -1,10 +1,16 @@
 #pragma once
 
+#include <engine/CoreTypes.h>
 #include <filesystem>
 
 namespace engine
 {
     class GameScene;
+}
+
+namespace ui
+{
+    class Table;
 }
 
 namespace editor
@@ -24,7 +30,14 @@ namespace editor
         void OpenProject(void);
         bool SelectProject(std::filesystem::path& projectPath);
 
+        void CreateProject(void);
+        bool SelectFolder(std::filesystem::path& projectPath);
+        void ProjectName(ui::Table& contentTable, std::string& name);
+        void SelectProjectPath(ui::Table& contentTable, std::filesystem::path& path);
+        void CloseCreateMenu(std::string& projectName, std::filesystem::path& projectPath, uint8& status);
+
         class EditorApplication* m_application = nullptr;
         bool m_gameRunning = false;
+        bool m_isCreateWndOpened = false;
     };
 }
