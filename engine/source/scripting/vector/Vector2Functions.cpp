@@ -1,6 +1,7 @@
 #include "scripting/vector/Vector2Functions.h"
 
 #include <math/Vector2.hpp>
+#include <math/Interpolation.hpp>
 
 extern "C"
 {
@@ -254,6 +255,50 @@ int script_ScaleVector2(lua_State* luaState)
     return 2;
 }
 
+int script_TranslateVector2(lua_State* luaState)
+{
+    math::Vector2<lua_Number> vectorA;
+    math::Vector2<lua_Number> vectorB;
+
+    Get2VectorArgs(luaState, vectorA, vectorB);
+    vectorA += vectorB;
+
+    lua_pushnumber(luaState, vectorA.GetX());
+    lua_pushnumber(luaState, vectorA.GetY());
+    return 2;
+}
+
+int script_LerpVector2(lua_State* luaState)
+{  
+
+    if (lua_gettop(luaState) != 5)
+        luaL_error(luaState, "Expected 5 arguments (x1, y1, x2, y2, lerpRatio)");
+
+    math::Vector2<lua_Number> vectorA
+    {
+        lua_tonumber(luaState, 1),
+        lua_tonumber(luaState, 2)
+    };
+
+    math::Vector2<lua_Number> vectorB
+    {
+        lua_tonumber(luaState, 3),
+        lua_tonumber(luaState, 4)
+    };
+
+    lua_Number ratio = lua_tonumber(luaState, 5);
+
+    math::Vector2<lua_Number> result =
+    {
+        math::Lerp(vectorA.GetX(), vectorB.GetX(), ratio),
+        math::Lerp(vectorA.GetY(), vectorB.GetY(), ratio)
+    };
+
+    lua_pushnumber(luaState, result.GetX());
+    lua_pushnumber(luaState, result.GetY());
+    return 2;
+}
+
 void engine::RegisterVector2Functions(lua_State* luaState)
 {
     constexpr luaL_Reg vector2Funcs[] =
@@ -282,6 +327,9 @@ void engine::RegisterVector2Functions(lua_State* luaState)
 
         {"Rotate", script_RotateVector2},
         {"Scale", script_ScaleVector2},
+        {"Translate", script_TranslateVector2},
+
+        {"Lerp", script_LerpVector2},
         {NULL, NULL}
     };
 

@@ -176,6 +176,16 @@ function Vector2:Scale(scaleVector)
 	return Vector2.new(Vec2C.Scale(self.x, self.y, scaleVector.x, scaleVector.y))
 end
 
+function Vector2:Translate(translation)
+
+	return Vector2.new(Vec2C.Translate(self.x, self.y, translation.x, translation.y))
+end
+
+function Vector2.Lerp(vectorA, vectorB, ratio)
+
+	return Vector2.new(Vec2C.Lerp(vectorA.x, vectorA.y, vectorB.x, vectorB.y, ratio))
+end
+
 Vector2.__index = Vector2
 
 Vector2.__add = Vector2.Add

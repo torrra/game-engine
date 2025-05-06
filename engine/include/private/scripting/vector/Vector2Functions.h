@@ -26,6 +26,9 @@ extern "C"
 
     int script_RotateVector2(struct lua_State* luaState);
     int script_ScaleVector2(struct lua_State* luaState);
+    int script_TranslateVector2(struct lua_State* luaState);
+
+    int script_LerpVector2(struct lua_State* luaState);
 }
 
 namespace engine
