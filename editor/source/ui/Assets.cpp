@@ -164,6 +164,8 @@ void editor::AssetsWnd::RenderAssets(void)
 
     if (ui::StartSection("AssetSection", regionSize))
     {
+        ui::SetWindowFontScale(0.8f);
+
         // Asset variables
         static const math::Vector2f assetSize(ASSET_WIDTH, ASSET_HEIGHT);
         static const f32 sizeDenominator = 1.0f / (assetSize.GetX() + ASSET_PADDING);

@@ -76,8 +76,7 @@ void engine::UIManager::InitUI(wnd::Wnd* window)
 
     // Set UI theme
     ImGui::StyleColorsDark();
-
-    io.Fonts->AddFontFromFileTTF(".\\fonts\\Roboto-Regular.ttf", 24.0f);
+    io.Fonts->AddFontFromFileTTF(".\\fonts\\Roboto-Regular.ttf", 19.0f);
 
     // Init
     ImGui_ImplGlfw_InitForOpenGL(*window, true);
