@@ -57,6 +57,7 @@ namespace engine
         RegisterComponents<Camera>();
         RegisterComponents<RigidBodyDynamic>();
         RegisterComponents<RigidBodyStatic>();
+        RegisterComponents<AudioPlayer>();
     }
 
     void SceneGraph::RegisterAllEntities(void)
