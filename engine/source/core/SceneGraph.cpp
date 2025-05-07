@@ -414,6 +414,7 @@ namespace engine
             SerializeSingleComponent<Script>(file, entity, handles);
             SerializeSingleComponent<RigidBodyDynamic>(file, entity, handles);
             SerializeSingleComponent<RigidBodyStatic>(file, entity, handles);
+            SerializeSingleComponent<AudioPlayer>(file, entity, handles);
         }
     }
 
