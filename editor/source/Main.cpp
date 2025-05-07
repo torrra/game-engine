@@ -6,7 +6,7 @@
 #include "engine/ConsoleLog.hpp"
 
 #include "engine/sounds/SoundsEngine.h"
-#include "engine/sounds/PlayerAudio.h"
+#include "engine/sounds/AudioPlayer.h"
 
 // Use dedicated graphics card
 extern "C" 
@@ -26,8 +26,8 @@ int appMain(void)
     engine::SoundEngine::Get().InitSoundEngine();
 
     engine::EntityHandle music = engine.GetGraph()->CreateEntity("Music");
-    engine::PlayerAudio* playerAudio = 
-        engine.GetGraph()->CreateComponent<engine::PlayerAudio>(music);
+    engine::AudioPlayer* playerAudio = 
+        engine.GetGraph()->CreateComponent<engine::AudioPlayer>(music);
 
     if (playerAudio->LoadSound("Music", 
                                "..\\workspace\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3"))

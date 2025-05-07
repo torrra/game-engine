@@ -1,4 +1,4 @@
-#include "engine/sounds/PlayerAudio.h"
+#include "engine/sounds/AudioPlayer.h"
 
 #pragma region Sounds
 
@@ -13,13 +13,13 @@
 
 #pragma endregion
 
-engine::PlayerAudio::PlayerAudio(EntityHandle inOwner, SceneGraph* inScene)
+engine::AudioPlayer::AudioPlayer(EntityHandle inOwner, SceneGraph* inScene)
 {
     m_owner         = inOwner;
     m_currentScene  = inScene;
 }
 
-void engine::PlayerAudio::SetVolumeSound(const std::string& inID, f32 inVolume)
+void engine::AudioPlayer::SetVolumeSound(const std::string& inID, f32 inVolume)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(inID);
     
@@ -41,7 +41,7 @@ void engine::PlayerAudio::SetVolumeSound(const std::string& inID, f32 inVolume)
     }
 }
 
-void engine::PlayerAudio::SetListenerPosition(const math::Vector3f& inPosition, 
+void engine::AudioPlayer::SetListenerPosition(const math::Vector3f& inPosition, 
                                               const math::Vector3f& inForward, 
                                               const math::Vector3f& inUp, 
                                               const math::Vector3f& inVelocity)
@@ -55,7 +55,7 @@ void engine::PlayerAudio::SetListenerPosition(const math::Vector3f& inPosition,
                                                                         &forward, &up);
 }
 
-bool engine::PlayerAudio::LoadSound(const std::string& inID, const std::string& inPath, bool inLoop)
+bool engine::AudioPlayer::LoadSound(const std::string& inID, const std::string& inPath, bool inLoop)
 {
     if (SoundEngine::Get().GetSoundImpl().m_sounds.find(inID) != 
         SoundEngine::Get().GetSoundImpl().m_sounds.end())
@@ -77,7 +77,7 @@ bool engine::PlayerAudio::LoadSound(const std::string& inID, const std::string& 
     return true;
 }
 
-void engine::PlayerAudio::PlaySound(const std::string& inID, f32 inVolume, bool inPaused)
+void engine::AudioPlayer::PlaySound(const std::string& inID, f32 inVolume, bool inPaused)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_sounds.find(inID);
     
@@ -107,7 +107,7 @@ void engine::PlayerAudio::PlaySound(const std::string& inID, f32 inVolume, bool 
     }
 }
 
-void engine::PlayerAudio::PlaySound3D(const std::string& inID, const math::Vector3f& inPosition, 
+void engine::AudioPlayer::PlaySound3D(const std::string& inID, const math::Vector3f& inPosition, 
                                       const math::Vector3f& inVelocity, f32 inVolume)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_sounds.find(inID);
@@ -133,7 +133,7 @@ void engine::PlayerAudio::PlaySound3D(const std::string& inID, const math::Vecto
         SoundEngine::Get().GetSoundImpl().m_channels[inID] = channel;
 }
 
-void engine::PlayerAudio::StopSound(const std::string& inID)
+void engine::AudioPlayer::StopSound(const std::string& inID)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(inID);
 
@@ -146,7 +146,7 @@ void engine::PlayerAudio::StopSound(const std::string& inID)
     }
 }
 
-void engine::PlayerAudio::PauseSound(const std::string& inID, bool inIsPaused)
+void engine::AudioPlayer::PauseSound(const std::string& inID, bool inIsPaused)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(inID);
     

@@ -14,18 +14,18 @@
 
 namespace engine
 {
-    class PlayerAudio : public Component
+    class AudioPlayer : public Component
     {
     public :
 
         /// Constructor
         // Component constructor
-        ENGINE_API          PlayerAudio(EntityHandle inOwner, class SceneGraph* inScene);
+        ENGINE_API          AudioPlayer(EntityHandle inOwner, class SceneGraph* inScene);
         // Move constructor
-        ENGINE_API          PlayerAudio(PlayerAudio&& inOther) noexcept = default;
+        ENGINE_API          AudioPlayer(AudioPlayer&& inOther) noexcept = default;
 
         /// Destructor
-                            ~PlayerAudio(void) override = default;
+                            ~AudioPlayer(void) override = default;
 
         /// Setters
         /*
@@ -48,7 +48,7 @@ namespace engine
                                                             math::Vector3f::Zero());
 
         ENGINE_API
-            PlayerAudio& operator=(PlayerAudio&&) noexcept = default;
+            AudioPlayer& operator=(AudioPlayer&&) noexcept = default;
 
         /// Functions
         /*
@@ -93,7 +93,7 @@ namespace engine
 
     private :
 
-        PlayerAudio(void) = delete;
+        AudioPlayer(void) = delete;
 
-    }; // !Class PlayerAudio
+    }; // !Class AudioPlayer
 } // !Namespace engine

@@ -19,7 +19,7 @@
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
 
-#include "engine/sounds/PlayerAudio.h"
+#include "engine/sounds/AudioPlayer.h"
 
 namespace engine
 {
@@ -257,7 +257,7 @@ namespace engine
         ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
 
         // All sound components in the scene
-        ComponentArray<PlayerAudio>			m_sceneSounds;
+        ComponentArray<AudioPlayer>			m_sceneSounds;
 
 
          
@@ -321,13 +321,13 @@ namespace engine
     }
     
     template<>
-    inline ComponentArray<PlayerAudio>& SceneGraph::GetComponentArray<PlayerAudio>(void)
+    inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
     {
         return m_sceneSounds;
     }
 
     template<> inline
-    const ComponentArray<PlayerAudio>& SceneGraph::GetComponentArray<PlayerAudio>(void) const
+    const ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void) const
     {
         return m_sceneSounds;
     }
