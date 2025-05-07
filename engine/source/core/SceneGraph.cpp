@@ -202,6 +202,7 @@ namespace engine
             m_sceneScripts.InvalidateComponent(entity);
             m_sceneDynamicRigidBodies.InvalidateComponent(entity);
             m_sceneStaticRigidBodies.InvalidateComponent(entity);
+            m_sceneSounds.InvalidateComponent(entity);
 
             ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
