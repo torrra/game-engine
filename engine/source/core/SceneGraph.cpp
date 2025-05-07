@@ -345,6 +345,7 @@ namespace engine
         m_sceneScripts.MoveReparentedComponent(reparented, newParent);
         m_sceneDynamicRigidBodies.MoveReparentedComponent(reparented, newParent);
         m_sceneStaticRigidBodies.MoveReparentedComponent(reparented, newParent);
+        m_sceneSounds.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
 
@@ -356,6 +357,7 @@ namespace engine
            m_sceneRenderers.MoveReparentedComponent(child);
            m_sceneDynamicRigidBodies.MoveReparentedComponent(child);
            m_sceneStaticRigidBodies.MoveReparentedComponent(child);
+           m_sceneSounds.MoveReparentedComponent(child);
         }
     }
 
