@@ -96,4 +96,11 @@ namespace engine
         AudioPlayer(void) = delete;
 
     }; // !Class AudioPlayer
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Transform>()
+    {
+        return AUDIO_PLAYER;
+    }
+
 } // !Namespace engine
