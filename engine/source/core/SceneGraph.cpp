@@ -420,10 +420,11 @@ namespace engine
 
     void SceneGraph::DeserializeText(std::ifstream& file)
     {
-        Component::DeserializedArray<Transform> transforms;
-        Component::DeserializedArray<Camera>	cameras;
-        Component::DeserializedArray<Renderer>	renderers;
-        Component::DeserializedArray<Script>	scripts;
+        Component::DeserializedArray<Transform>     transforms;
+        Component::DeserializedArray<Camera>	    cameras;
+        Component::DeserializedArray<Renderer>	    renderers;
+        Component::DeserializedArray<Script>	    scripts;
+        Component::DeserializedArray<AudioPlayer>   audioPlayers;
 
         const char* start;
         const char* end;
@@ -445,6 +446,9 @@ namespace engine
 
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
+
+            else if (memcmp(start, "[AudioPlayer]", 13) == 0)
+                start = Component::DeserializeComponentText(audioPlayers, start, end);
 
             start = text::GetNewLine(start, end);
         }
