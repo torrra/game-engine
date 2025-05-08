@@ -71,7 +71,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
         false);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
 
     // Add the rigid body to the physics scene
@@ -98,7 +98,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
         false);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
@@ -138,7 +138,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
         false);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
@@ -156,9 +156,13 @@ void engine::RigidBodyDynamic::UpdateEntity()
 
 void engine::RigidBodyDynamic::UpdateRigidBody()
 {
+    Transform worldTransform;
+
+    worldTransform.SetPosition(Transform::ToWorldPosition(*m_currentScene->GetComponent<Transform>(m_owner)));
+    worldTransform.SetRotation(Transform::ToWorldRotation(*m_currentScene->GetComponent<Transform>(m_owner)));
+
     // Update the transform of the rigid body in regard to the entity
-    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(
-        *m_currentScene->GetComponent<Transform>(m_owner)));
+    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
 }
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)

@@ -5,7 +5,7 @@
    @uint64 | flags=0
    @uint64 | components=7
 [Transform]
-    @uint64 | index=0
+    @uint64 | index=3
     @int64 | owner=0
     @quat32 | rotation={1,0,0,0}
     @vec3f32 | position={0,4,-5}
@@ -38,10 +38,10 @@
    @uint64 | flags=0
    @uint64 | components=35
 [Transform]
-    @uint64 | index=1
+    @uint64 | index=0
     @int64 | owner=1
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,2.5,0}
+    @vec3f32 | position={0,3.2,-1.65}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Camera]
@@ -50,7 +50,7 @@
     @f32 | far=250
     @f32 | fov=1.0472
     @f32 | aspectRatio=1.77778
-    @vec3f32 | rotationEuler={-10.5,8.5,0}
+    @vec3f32 | rotationEuler={0,0,-1}
     @uint64 | flags=0
 [Script]
    @uint64 | index=1
@@ -65,7 +65,7 @@
    @uint64 | flags=0
    @uint64 | components=1
 [Transform]
-    @uint64 | index=2
+    @uint64 | index=1
     @int64 | owner=2
     @quat32 | rotation={1,0,0,0}
     @vec3f32 | position={0,2,-5}
@@ -77,11 +77,18 @@
      @uint64 | shape=0
      @uint64 | flags=0
 [Entity]
-   @string 12 | name=New Entity 0
+   @string 4 | name=Test
    @int64 | handle=3
    @int64 | parent=-1
    @uint64 | flags=0
-   @uint64 | components=0
+   @uint64 | components=1
+[Transform]
+    @uint64 | index=2
+    @int64 | owner=3
+    @quat32 | rotation={1,0,0,0}
+    @vec3f32 | position={0,4,-5}
+    @vec3f32 | scale={1,1,1}
+    @uint64 | flags=0
 [Entity]
    @string 12 | name=New Entity 1
    @int64 | handle=4
