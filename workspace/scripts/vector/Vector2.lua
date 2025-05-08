@@ -64,7 +64,7 @@ end
 function Vector2.EqualTo(vectorA, vectorB)
 
 	if (Utils.AlmostEqual(vectorA.x , vectorB.x) and AlmostEqual(vectorA.y, vectorB.y)) then
-		return true;
+		return true
 
 	else
 		return false
