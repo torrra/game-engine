@@ -48,7 +48,7 @@ namespace engine
                                                             math::Vector3f::Zero());
 
         ENGINE_API
-            AudioPlayer& operator=(AudioPlayer&&) noexcept = default;
+            AudioPlayer&    operator=(AudioPlayer&&) noexcept = default;
 
         /// Functions
         /*
@@ -98,7 +98,7 @@ namespace engine
     }; // !Class AudioPlayer
 
     template<>
-    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Transform>()
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<AudioPlayer>()
     {
         return AUDIO_PLAYER;
     }
