@@ -6,6 +6,8 @@
 
 #pragma endregion
 
+#include "engine/Engine.h"
+#include "engine/core/SceneGraph.h"
 void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, const physx::PxContactPair* inPairs, physx::PxU32 inNbPairs)
 {
     ICollisionListener* listenerA = static_cast<ICollisionListener*>(inPairHeader.actors[0]->userData);

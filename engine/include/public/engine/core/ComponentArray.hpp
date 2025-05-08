@@ -60,6 +60,8 @@ namespace engine
 
         ComponentArray& operator=(ComponentArray&&) noexcept = default;
 
+        size_t GetThisIndex(TComponentType* component) const { return component - m_components.data(); }
+
     protected:
 
         // Create a component without checking if the object's parent is

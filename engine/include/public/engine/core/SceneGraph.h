@@ -196,6 +196,12 @@ namespace engine
         ENGINE_API
         static int64 RandomNumber(void);
 
+        template<CValidComponent TComponentType>
+        size_t GetThisIndex(TComponentType* component) const 
+        { 
+            return GetComponentArray<TComponentType>().GetThisIndex(component); 
+        }
+
     private:
 
         // Get the component array corresponding to a type

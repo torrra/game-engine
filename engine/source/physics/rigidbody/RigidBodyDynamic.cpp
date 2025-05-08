@@ -10,6 +10,7 @@
 #pragma region Core
 
 #include "core/SceneGraph.h"
+#include "core/ComponentArray.hpp"
 
 #pragma endregion
 
@@ -72,7 +73,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = this;
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = reinterpret_cast<void*>(m_currentScene->GetThisIndex(this));
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
