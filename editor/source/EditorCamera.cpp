@@ -39,26 +39,23 @@ math::Matrix4f editor::EditorCamera::ViewProjection(void)
 
 void editor::EditorCamera::UpdatePosition(f32 deltaTime)
 {
-    f32 forwardMovement = (engine::Input::IsInputDown(KEY_W)) ? -m_speed * deltaTime : 0.f;
-    f32 backwardMovement = (engine::Input::IsInputDown(KEY_S)) ? m_speed * deltaTime : 0.f;
+    const f32 movementScale = m_speed * deltaTime;
 
-    f32 leftMovement = (engine::Input::IsInputDown(KEY_A)) ? -m_speed * deltaTime : 0.f;
-    f32 rightMovement = (engine::Input::IsInputDown(KEY_D)) ? m_speed * deltaTime : 0.f;
+    math::Vector3f movement{ 0.f };
 
-    f32 upMovement = (engine::Input::IsInputDown(KEY_Q)) ? -m_speed * deltaTime : 0.f;
-    f32 downMovement = (engine::Input::IsInputDown(KEY_E)) ? m_speed * deltaTime : 0.f;
+    movement.X() += (engine::Input::IsInputDown(KEY_D)) ? movementScale : 0.f;
+    movement.X() -= (engine::Input::IsInputDown(KEY_A)) ? movementScale : 0.f;
 
-    math::Vector3f movement =
-    {
-        rightMovement + leftMovement,
-        0.f,
-        forwardMovement + backwardMovement
-    };
+    movement.Z() -= (engine::Input::IsInputDown(KEY_W)) ? movementScale : 0.f;
+    movement.Z() += (engine::Input::IsInputDown(KEY_S)) ? movementScale : 0.f;
 
-    math::Vector3f orientedMovement = m_rotationQuat.Rotate(movement);
+    m_position += m_rotationQuat.Rotate(movement);
 
-    m_position += orientedMovement;
-    m_position.Y() += upMovement + downMovement;
+    if (engine::Input::IsInputDown(KEY_Q))
+        m_position.Y() += movementScale;
+
+    if (engine::Input::IsInputDown(KEY_E))
+        m_position.Y() -= movementScale;
 }
 
 void editor::EditorCamera::UpdateRotation(void)
