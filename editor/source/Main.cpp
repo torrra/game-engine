@@ -7,6 +7,9 @@
 
 #include "engine/sounds/SoundsEngine.h"
 #include "engine/sounds/AudioPlayer.h"
+#include "engine/sounds/Sound.h"
+
+#include "engine/resource/ResourceManager.h"
 
 // Use dedicated graphics card
 extern "C" 
@@ -28,10 +31,16 @@ int appMain(void)
     engine::EntityHandle music = engine.GetGraph()->CreateEntity("Music");
     engine::AudioPlayer* playerAudio = 
         engine.GetGraph()->CreateComponent<engine::AudioPlayer>(music);
+    engine::ResourceManager::Load<engine::Sound>("..\\workspace\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3");
+    playerAudio->SetSound(engine::ResourceManager::GetResource<engine::Sound>("..\\workspace\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3"));
 
-    if (playerAudio->LoadSound("Music", 
-                               "..\\workspace\\assets\\music\\Falling_In_Reverse-Im_Not_A_Vampire.mp3"))
-        PrintLog(engine::SuccessPreset(), "Music loaded.");
+    engine::EntityHandle music2 = engine.GetGraph()->CreateEntity("Music2");
+    engine::AudioPlayer* playerAudio2 = 
+        engine.GetGraph()->CreateComponent<engine::AudioPlayer>(music2);
+    engine::ResourceManager::Load<engine::Sound>("..\\workspace\\assets\\music\\Crazy Frog - Axel F (Official Video).mp3");
+    playerAudio2->SetSound(engine::ResourceManager::GetResource<engine::Sound>("..\\workspace\\assets\\music\\Crazy Frog - Axel F (Official Video).mp3"));
+
+    playerAudio = engine.GetGraph()->GetComponent<engine::AudioPlayer>(music);
 
     /* /// ---------------- Create entity ---------------- 
     engine::EntityHandle floor = engine.GetGraph()->GetEntity("Floor")->GetHandle();
@@ -69,18 +78,29 @@ int appMain(void)
         engine::SoundEngine::Get().UpdateSoundEngine();
 
         static bool isPlaying = false;
+        static bool isPlaying2 = false;
         if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT) && !isPlaying)
         {
-            playerAudio->PlaySound("Music");
+            playerAudio->PlaySound();
             isPlaying = true;
             engine::PrintLog(engine::InfoPreset(), "Music played.");
         }
         if (engine::Input::IsInputPressed(MOUSE_BUTTON_RIGHT) && isPlaying)
         {
 
-            playerAudio->StopSound("Music");
+            playerAudio->StopSound();
             isPlaying = false;
             engine::PrintLog(engine::InfoPreset(), "Music stopped.");
+        }
+        if (engine::Input::IsInputPressed(KEY_SPACE) && !isPlaying2)
+        {
+            playerAudio2->PlaySound();
+            isPlaying2 = true;
+        }
+        if (engine::Input::IsInputPressed(KEY_BACKSPACE) && isPlaying2)
+        {
+            playerAudio2->StopSound();
+            isPlaying2 = false;
         }
 
         if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
