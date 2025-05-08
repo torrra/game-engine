@@ -69,7 +69,7 @@ editor::AssetsWnd::~AssetsWnd(void)
     m_rootNode = nullptr;
 }
 
-void editor::AssetsWnd::Path(std::filesystem::path const& projectDir)
+void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
 {
     m_selectedIndex = -1;
     m_selectedDirectory = nullptr;

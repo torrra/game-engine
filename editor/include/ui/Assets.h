@@ -75,7 +75,7 @@ namespace editor
         AssetsWnd(const char* name);
         ~AssetsWnd(void);
 
-        void Path(std::filesystem::path const& projectDir);
+        void SetPath(std::filesystem::path const& projectDir);
         
     protected:
         virtual void RenderContents(void) override;

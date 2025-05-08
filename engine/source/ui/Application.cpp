@@ -8,6 +8,8 @@
 #include <glad/glad.h>
 
 #define DEFAULT_NAME "Editor"
+#define SUCCESS		0
+#define ERROR		1
 
 namespace engine
 {

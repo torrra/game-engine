@@ -83,6 +83,7 @@ namespace engine
         ProjectData             m_currentProject;
         std::filesystem::path   m_projectDir;
         std::filesystem::path   m_projectFile;
+        std::string             m_projectName;
 
         Application*            m_application = nullptr;
         UIManager               m_uiManager;

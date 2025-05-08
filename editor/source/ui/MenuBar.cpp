@@ -6,6 +6,7 @@
 #include <engine/ui/UITable.h>
 #include <engine/game/GameScene.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/ConsoleLog.hpp>
 #include <engine/input/Input.h>
 
 #define CREATE_PROJECT_IN_PROGRESS 0
@@ -118,7 +119,7 @@ void editor::MenuBar::OpenProject(void)
             engine->OpenProject(projectPath);
             engine->LoadDefaultScene();
 
-            m_application->m_assetWnd.Path(engine->GetProjectDir());
+            m_application->m_assetWnd.SetPath(engine->GetProjectDir());
         }
     }
 }
@@ -161,17 +162,17 @@ bool editor::MenuBar::SelectProject(std::filesystem::path& projectPath)
                 return true;
             }
             else
-                printf("[WARNING]: Failed to select file\n");
+                engine::PrintLog(engine::WarningPreset(), "Failed to select file\n");
             
             pFileOpen->Release();
         }
         else
-            printf("[ERROR]: Failed to create windows com instance\n");
+            engine::PrintLog(engine::ErrorPreset(), "Failed to create windows com instance\n");
 
         CoUninitialize();
     }
     else
-        printf("[ERROR]: Failed to initialize windows com library\n");
+        engine::PrintLog(engine::ErrorPreset(), "Failed to initialize windows com library\n");
 
 
     return false;
@@ -194,7 +195,7 @@ void editor::MenuBar::CreateProject(void)
         if (table.StartTable())
         {
             // Line 1 - project name
-            ProjectName(table, projectName);
+            SetProjectName(table, projectName);
 
             // Line 2 - project path
             SelectProjectPath(table, projectPath);
@@ -231,7 +232,7 @@ void editor::MenuBar::CreateProject(void)
                             engine->OpenProject(projectPath);
                             engine->LoadDefaultScene();
 
-                            m_application->m_assetWnd.Path(engine->GetProjectDir());
+                            m_application->m_assetWnd.SetPath(engine->GetProjectDir());
                         }
                     }
                     
@@ -284,23 +285,23 @@ bool editor::MenuBar::SelectFolder(std::filesystem::path& projectPath)
                 return true;
             }
             else
-                printf("[WARNING]: Failed to select folder\n");
+                engine::PrintLog(engine::WarningPreset(), "Failed to select folder\n");
 
             pFolderOpen->Release();
         }
         else
-            printf("[ERROR]: Failed to create windows com instance\n");
+            engine::PrintLog(engine::ErrorPreset(), "Failed to create windows com instance\n");
 
         CoUninitialize();
     }
     else
-        printf("[ERROR]: Failed to initialize windows com library\n");
+        engine::PrintLog(engine::ErrorPreset(), "Failed to initialize windows com library\n");
 
 
     return false;
 }
 
-void editor::MenuBar::ProjectName(ui::Table& contentTable, std::string& name)
+void editor::MenuBar::SetProjectName(ui::Table& contentTable, std::string& name)
 {
     ui::VerticalSpacing();
 

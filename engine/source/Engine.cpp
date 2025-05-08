@@ -16,6 +16,9 @@
 #include <iostream>
 #include <chrono>
 
+#define SUCCESS		0
+#define ERROR		1
+
 engine::Engine* engine::g_defaultEngine;
 
 engine::Engine::Engine(bool withEditor)
@@ -150,7 +153,7 @@ const std::filesystem::path& engine::Engine::GetProjectDir(void) const
 
 std::string engine::Engine::GetProjectName(void) const
 {
-    return m_projectFile.filename().replace_extension().string();
+    return m_projectName;
 }
 
 void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)
@@ -232,6 +235,7 @@ void engine::Engine::OpenProject(const std::filesystem::path& projFile)
     constexpr wchar_t extension[] = L".mustang";
     
     m_projectFile = projFile;
+    m_projectName = projFile.filename().replace_extension().string();
 
     if (memcmp(projFile.extension().c_str(), extension, sizeof(extension)) != 0)
     {
