@@ -11,15 +11,10 @@ editor::EditorCamera::EditorCamera(void)
 
 void editor::EditorCamera::Update(f32 deltaTime)
 {
-    if (engine::Input::IsInputDown(KEY_LEFT_ALT) ||
-        engine::Input::IsInputDown(KEY_RIGHT_ALT))
-    {
-        UpdateSpeed();
-    }
-
     if (!engine::Input::IsInputDown(MOUSE_BUTTON_RIGHT))
         return;
 
+    UpdateSpeed();
     UpdatePosition(deltaTime);
     UpdateRotation();
 }
@@ -75,7 +70,7 @@ void editor::EditorCamera::UpdateRotation(void)
 void editor::EditorCamera::UpdateSpeed(void)
 {
     m_speed += engine::Input::GetScrollDelta<f32>().GetY();
-    m_speed = math::Clamp(m_speed, 0.f, 100.f);
+    m_speed = math::Clamp(m_speed, 1.f, 100.f);
 }
 
 void editor::EditorCamera::CalculateProjectionMatrix(void)
