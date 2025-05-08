@@ -133,3 +133,9 @@
    @int64 | parent=-1
    @uint64 | flags=0
    @uint64 | components=64
+[Entity]
+   @string 5 | name=Music
+   @int64 | handle=14
+   @int64 | parent=-1
+   @uint64 | flags=0
+   @uint64 | components=64

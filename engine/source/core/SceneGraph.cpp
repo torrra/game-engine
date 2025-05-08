@@ -202,7 +202,7 @@ namespace engine
             m_sceneScripts.InvalidateComponent(entity);
             m_sceneDynamicRigidBodies.InvalidateComponent(entity);
             m_sceneStaticRigidBodies.InvalidateComponent(entity);
-            m_sceneSounds.InvalidateComponent(entity);
+            m_sceneAudioPlayer.InvalidateComponent(entity);
 
             ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
@@ -345,7 +345,7 @@ namespace engine
         m_sceneScripts.MoveReparentedComponent(reparented, newParent);
         m_sceneDynamicRigidBodies.MoveReparentedComponent(reparented, newParent);
         m_sceneStaticRigidBodies.MoveReparentedComponent(reparented, newParent);
-        m_sceneSounds.MoveReparentedComponent(reparented, newParent);
+        m_sceneAudioPlayer.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
 
@@ -357,7 +357,7 @@ namespace engine
            m_sceneRenderers.MoveReparentedComponent(child);
            m_sceneDynamicRigidBodies.MoveReparentedComponent(child);
            m_sceneStaticRigidBodies.MoveReparentedComponent(child);
-           m_sceneSounds.MoveReparentedComponent(child);
+           m_sceneAudioPlayer.MoveReparentedComponent(child);
         }
     }
 

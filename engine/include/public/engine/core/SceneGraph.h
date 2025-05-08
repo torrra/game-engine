@@ -257,7 +257,7 @@ namespace engine
         ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
 
         // All sound components in the scene
-        ComponentArray<AudioPlayer>			m_sceneSounds;
+        ComponentArray<AudioPlayer>			m_sceneAudioPlayer;
 
 
          
@@ -323,13 +323,13 @@ namespace engine
     template<>
     inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
     {
-        return m_sceneSounds;
+        return m_sceneAudioPlayer;
     }
 
     template<> inline
     const ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void) const
     {
-        return m_sceneSounds;
+        return m_sceneAudioPlayer;
     }
 
     template<> inline
