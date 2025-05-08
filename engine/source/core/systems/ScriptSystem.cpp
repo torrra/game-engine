@@ -41,6 +41,7 @@ namespace engine
         RegisterTransformFunctions(GetInstance()->m_luaState);
         RegisterInputFunctions(GetInstance()->m_luaState);
         RegisterVector2Functions(GetInstance()->m_luaState);
+        RegisterVector3Functions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
@@ -52,6 +53,7 @@ namespace engine
         RunConfigScript("Input.lua");
 
         RunConfigScript("vector/Vector2.lua");
+        RunConfigScript("vector/Vector3.lua");
         RunConfigScript("tests/Vector2Tests.lua");
         RunAllUserScripts();
     }
