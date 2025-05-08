@@ -12,7 +12,7 @@ namespace ui
     ENGINE_API void Image(uint64 textureID, math::Vector2f const& size);
     ENGINE_API bool Button(const char* text, math::Vector2f const& size = {0.0F, 0.0F});
     ENGINE_API bool DropDown(const char* id, int32& selectedValue, std::vector<const char*> const& options);
-    ENGINE_API bool InputBox(const char* id, const char* hint, std::string& outStr);
+    ENGINE_API bool InputBox(const char* id, const char* hint, std::string& outStr, bool enterReturnTrue = true);
     ENGINE_API bool InputBox(const char* id, f32* value, f32 increment, bool returnOnComplete = false);
     ENGINE_API bool Selectable(const char* text, bool* selected, math::Vector2f const& size);
 
@@ -26,8 +26,10 @@ namespace ui
     ENGINE_API bool MenuItem(const char* name, const char* shortcut = nullptr);
 
     // PopUps
+    ENGINE_API bool StartModal(const char* name, bool& shouldClose);
     ENGINE_API bool StartPopUp(const char* name);
     ENGINE_API void EndPopUp(void);
+    ENGINE_API void OpenModal(const char* name);
 
     // Layout
     ENGINE_API void SameLine(f32 xOffset = -1.0f);

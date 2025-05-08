@@ -44,7 +44,7 @@ namespace engine
         // Update the debug draw in regard to the render buffer
         void            UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl);
         // Render the debug draw
-        void            RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount, const math::Vector4f& inColor);
+        void            RenderDebugDraw(const math::Matrix4f* inProjViewMatrix, uint32 inLineCount, const math::Vector4f& inColor);
 
         void AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, const uint32& inColor);
 

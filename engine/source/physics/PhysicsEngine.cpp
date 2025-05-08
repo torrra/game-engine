@@ -325,13 +325,14 @@ void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
     m_impl->m_scene->fetchResults(true);
 }
 
-void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
+void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatrix)
 {
     /*
         Get the render buffer of the scene to retrieve all the lines of the body in the scene
         <param> [out] renderBuffer : Interface for points, lines, triangles, and text buffer
     */
     m_debugDraw->GetDebugDrawImpl()->m_renderBuffer = &m_impl->m_scene->getRenderBuffer();
+
     /*
         Update the debug draw in regard of the position of all the lines in the render buffer, and
         update their position
@@ -346,7 +347,12 @@ void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
                                point is the start and the end of a line)
     */
 
-    //math::Vector4f color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
+    math::Vector4f color = math::Vector4f(1.f, 0.f, 0.f, 1.f);
+
+    if (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines() != nullptr)
+    {
+        color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
+    }
     if (m_debugDraw->GetDebugDrawImpl()->m_customLines.size() > 0)
     {
         math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
@@ -354,6 +360,10 @@ void engine::PhysicsEngine::UpdateDebugDraw(math::Matrix4f* inProjViewMatrix)
             (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
                 sizeof(m_debugDraw->GetDebugDrawImpl()->m_customLines.size())) * 2,
             color2);
+    }
+    else
+    {
+        m_debugDraw->RenderDebugDraw(inProjViewMatrix, m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2, color);
     }
 }
 

@@ -5,8 +5,10 @@
 #include <engine/thread/ThreadManager.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/physics/PhysicsEngine.h>
 
 #include <math/Vector2.hpp>
+
 
 editor::Viewport::Viewport(const char* title, engine::SceneGraph* graph, math::Vector4f const& bgColor)
     : m_bgColor(bgColor)
@@ -42,6 +44,20 @@ void editor::Viewport::RenderToViewport(void)
     engine::ThreadManager::RenderScene(m_graph);
     m_fbo.Unbind();
     
+}
+
+void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)
+{
+    m_fbo.Bind();
+    SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
+    engine::ThreadManager::ExecuteRenderThreadTasks();
+
+    if (m_graph)
+        m_graph->RenderFromCacheSingleCamera(viewProjection);
+
+    engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
+
+    m_fbo.Unbind();
 }
 
 void editor::Viewport::RenderPickingPass(void)

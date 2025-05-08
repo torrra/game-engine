@@ -17,6 +17,7 @@ namespace editor
 
         // The scene which the viewport should render
         void RenderToViewport(void);
+        void RenderToDebugViewport(const math::Matrix4f& viewProjection);
         void RenderPickingPass(void);
 
         // BgColor - background color (vec4 all values between 0 - 1)

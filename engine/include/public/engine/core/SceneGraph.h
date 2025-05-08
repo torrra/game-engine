@@ -162,6 +162,10 @@ namespace engine
         ENGINE_API
         void RenderFromCache(void);
 
+
+        ENGINE_API
+        void RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection);
+
         // Copy all data from transform component array to a separate cache
         // This function is used after the game logic update, allowing to start the next
         // gameplay tick before rendering on the main thread

@@ -87,6 +87,9 @@ namespace engine
 		/// Functions
 		ENGINE_API	void		    Register(void) override {}
 
+        ENGINE_API  void            UpdateEntity(void);
+        ENGINE_API  void            UpdateRigidBody(void);
+
 		// Delete the dynamic rigid body resources
 		ENGINE_API	void		    RigidBodyStaticCleanUp(void);
 

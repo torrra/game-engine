@@ -17,3 +17,8 @@ math::Vector2f ui::GetTextSize(const char* text)
 {
     return ImGui::CalcTextSize(text);
 }
+
+void ui::SetWindowFontScale(f32 scale)
+{
+    ImGui::SetWindowFontScale(scale);
+}

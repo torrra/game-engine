@@ -1,7 +1,11 @@
 #include "ui/EditorApplication.h"
-#include <engine/game/GameScene.h>
 
+#include <engine/game/GameScene.h>
 #include <engine/thread/ThreadManager.h>
+#include <engine/ui/UIComponent.h>
+
+#define SIMULATION_VIEW_WINDOW "Simulation view"
+#define EDITOR_VIEW_WINDOW "Editor view"
 
 namespace editor
 {
@@ -9,8 +13,8 @@ namespace editor
         : m_graphView("Scene Graph"), m_assetWnd("Assets"), m_menuBar(this)
     {
         Startup(title);
-        m_gameSimulationView = new Viewport("Simulation view", scene, { 0.1f, 0.1f, 0.1f, 1.0f });
-        m_sceneEditorView = new Viewport("Editor view", scene, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_sceneEditorView = new Viewport(EDITOR_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
     }
 
     void EditorApplication::SetCurrentScene(::engine::GameScene* scene)
@@ -27,17 +31,26 @@ namespace editor
             return;
 
         m_assetWnd.Render();
-        m_gameSimulationView->RenderToViewport();
-        m_menuBar.UpdateStartButton(*m_currentScene);
+        
+        m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
 
         if (m_graphView.IsNewEntitySelected())
             m_properties.SetHandle(m_graphView.GetSelectedEntity());
 
         m_properties.Render();
-        m_gameSimulationView->Render();
 
-        // TODO: add scene view render
+        if (m_currentScene->IsRunning())
+        {
+            m_gameSimulationView->RenderToViewport();
+        }
+            m_gameSimulationView->Render();
+
+        if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
+            m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
+
+        m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
+        m_sceneEditorView->Render();
     }
 
     void EditorApplication::Shutdown(void)
