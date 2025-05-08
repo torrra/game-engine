@@ -58,17 +58,6 @@ void engine::SoundEngine::UpdateSoundEngine(void)
 
 void engine::SoundEngine::CloseSoundEngine(void)
 {
-    for (auto& [id, sound] : m_soundImpl->m_sounds)
-    {
-        if (sound)
-        {
-            FMOD_RESULT result = sound->release();
-
-            if (result != FMOD_OK)
-                continue;
-        }
-    }
-    m_soundImpl->m_sounds.clear();
     m_soundImpl->m_channels.clear();
 
     if (m_soundImpl->m_system)

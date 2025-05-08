@@ -12,6 +12,12 @@
 
 #pragma endregion
 
+#pragma region Sounds
+
+#include "engine/sounds/Sound.h"
+
+#pragma endregion
+
 namespace engine
 {
     class AudioPlayer : public Component
@@ -33,7 +39,7 @@ namespace engine
             <param> [in] inID       : ID of the sound
             <param> [in] inVolume   : Volume of the sound : 0.0f to 1.0f
         */
-        ENGINE_API void     SetVolumeSound(const std::string& inID, f32 inVolume = 1.f);
+        ENGINE_API void     SetVolumeSound(f32 inVolume = 1.f);
         /*
             Set the 3D position of a sound
             <param> [in] inPosition : Position of the sound
@@ -47,6 +53,8 @@ namespace engine
                                                 const math::Vector3f& inVelocity =
                                                             math::Vector3f::Zero());
 
+        ENGINE_API void SetSound(const Sound* inSound);
+
         ENGINE_API
             AudioPlayer&    operator=(AudioPlayer&&) noexcept = default;
 
@@ -57,15 +65,15 @@ namespace engine
             <param> [in] inPath : Path of the sound
             <param> [in] inLoop : Loop flag : set by default to false (optional)
         */
-        ENGINE_API bool     LoadSound(const std::string& inID, const std::string& inPath,
-                                      bool inLoop = false);
+        //ENGINE_API bool     LoadSound(const std::string& inID, const std::string& inPath,
+        //                              bool inLoop = false);
         /*
             Play a sound
             <param> [in] inID       : ID of the sound
             <param> [in] inVolume   : Volume of the sound   : 0.0f to 1.0f (optional)
             <param> [in] inPaused   : Pause flag (optional)
         */
-        ENGINE_API void     PlaySound(const std::string& inID, f32 inVolume = 1.f,
+        ENGINE_API void     PlaySound(f32 inVolume = 1.f,
                                       bool inPaused = false);
         /*
             Play a 3D sound
@@ -74,26 +82,27 @@ namespace engine
             <param> [in] inVelocity : Velocity of the sound (Calculate the doppler effect) (optional)
             <param> [in] inVolume   : Volume of the sound   : 0.0f to 1.0f (optional)
         */
-        ENGINE_API void     PlaySound3D(const std::string& inID,
-                                        const math::Vector3f& inPosition,
+        ENGINE_API void     PlaySound3D(const math::Vector3f& inPosition,
                                         const math::Vector3f& inVelocity = math::Vector3f::Zero(),
                                         f32 inVolume = 1.f);
         /*
             Stop a sound
             <param> [in] inID : ID of the sound
         */
-        ENGINE_API void     StopSound(const std::string& inID);
+        ENGINE_API void     StopSound(void);
         /*
             Put a sound in pause or resume
             <param> [in] inID       : ID of the sound
             <param> [in] inIsPaused : Pause flag
         */
-        ENGINE_API void     PauseSound(const std::string& inID, bool inIsPaused);
+        ENGINE_API void     PauseSound(bool inIsPaused);
         ENGINE_API void     Register(void) override {}
 
     private :
 
         AudioPlayer(void) = delete;
+
+        const Sound*              m_sound = nullptr;
 
     }; // !Class AudioPlayer
 
