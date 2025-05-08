@@ -45,8 +45,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
         const physx::PxTriggerPair& pair = inPairs[pairIndex];
 
         // Récupère les objets de l'utilisateur
-        auto* triggerListener = static_cast<ICollisionListener*>(pair.triggerActor->userData);
-        auto* otherListener = static_cast<ICollisionListener*>(pair.otherActor->userData);
+        ICollisionListener* triggerListener = static_cast<ICollisionListener*>(pair.triggerActor->userData);
+        ICollisionListener* otherListener = static_cast<ICollisionListener*>(pair.otherActor->userData);
 
         if (!triggerListener || !otherListener) continue;
 
