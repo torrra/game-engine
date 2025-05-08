@@ -42,6 +42,23 @@ namespace engine
 
     class Input
     {
+    private:
+
+        // Mouse scroll delta callback is called to late (right before reset),
+        // so we're keeping scroll through the next frame
+        enum class EScrollState
+        {
+            // No input detected yet
+            NO_INPUT,
+
+            // Frame at which scroll delta is available
+            FIRST_FRAME,
+
+            // Reset scroll delta
+            SECOND_FRAME
+        };
+
+
     public:
         ~Input(void) = default;
 
@@ -92,6 +109,7 @@ namespace engine
         static Input*					m_instance;
         bool							m_dirty;
         bool                            m_cursorUpdated;
+        EScrollState                    m_scrollUpdated;
     };
 
     // Template function definitions

@@ -29,12 +29,12 @@
 *    Keys such as shift, alt & control which
 *    modify the function of another key.
 */
-#define MOD_SHIFT                    0x0001
-#define MOD_CONTROL                  0x0002
-#define MOD_ALT                      0x0004
-#define MOD_SUPER                    0x0008
-#define MOD_CAPS_LOCK                0x0010
-#define MOD_NUM_LOCK                 0x0020
+#define KEY_MOD_SHIFT                    0x0001
+#define KEY_MOD_CONTROL                  0x0002
+#define KEY_MOD_ALT                      0x0004
+#define KEY_MOD_SUPER                    0x0008
+#define KEY_MOD_CAPS_LOCK                0x0010
+#define KEY_MOD_NUM_LOCK                 0x0020
 
 /*
 *    Key State

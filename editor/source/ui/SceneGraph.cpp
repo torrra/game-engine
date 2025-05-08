@@ -85,6 +85,13 @@ void editor::SceneGraphUI::SetGraph(engine::SceneGraph* graph)
     CreateGraph();
 }
 
+void editor::SceneGraphUI::SelectEntity(engine::EntityHandle const& handle)
+{
+    m_selectedHandle = handle;
+    m_newEntitySelected = true;
+    m_reset = true;
+}
+
 engine::EntityHandle editor::SceneGraphUI::GetSelectedEntity(void) const noexcept
 {
     return m_selectedHandle;

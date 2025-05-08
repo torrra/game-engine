@@ -7,6 +7,7 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_impl_glfw.h>
 
+#include "ui/UIComponent.h"
 
 #include "utility/MemoryCheck.h"
 #include "Engine.h"
@@ -53,6 +54,11 @@ void engine::UIManager::ShutDown(void)
     ImGui::DestroyContext();
 }
 
+bool engine::UIManager::IsWindowFocused(std::string const& name)
+{
+    return ::ui::IsWindowSelected(name);
+}
+
 void engine::UIManager::InitUI(wnd::Wnd* window)
 {
     IMGUI_CHECKVERSION();
@@ -68,9 +74,9 @@ void engine::UIManager::InitUI(wnd::Wnd* window)
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     }
 
-    
     // Set UI theme
     ImGui::StyleColorsDark();
+    io.Fonts->AddFontFromFileTTF(".\\fonts\\Roboto-Regular.ttf", 19.0f);
 
     // Init
     ImGui_ImplGlfw_InitForOpenGL(*window, true);

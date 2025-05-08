@@ -38,6 +38,7 @@ namespace editor
 
         // Scene engine scene graph to be displayed and operated on
         void SetGraph(class engine::SceneGraph* graph);
+        void SelectEntity(engine::EntityHandle const& handle);
 
         engine::EntityHandle GetSelectedEntity(void) const noexcept;
         bool IsNewEntitySelected(void) const noexcept;

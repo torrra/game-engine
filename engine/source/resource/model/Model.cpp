@@ -7,6 +7,7 @@
 #include "engine/thread/ThreadManager.h"
 #include "engine/resource/ResourceManager.h"
 #include "engine/resource/texture/Texture.h"
+#include "engine/resource/animation/Animation.h"
 
 #include "serialization/TextSerializer.h"
 
@@ -40,6 +41,8 @@ bool engine::Model::LoadResource(const char* fileName)
 {
     if (!fileName || *fileName == '\0')
         return false;
+
+    m_modelName = fileName;
 
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
@@ -96,6 +99,11 @@ uint32 engine::Model::GetMeshCount(void) const
 
     else
         return static_cast<uint32>(m_staticMeshes.size());
+}
+
+std::string engine::Model::GetName(void) const
+{
+    return m_modelName;
 }
 
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const
@@ -235,6 +243,10 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
 
     ProcessTextures(scene); 
     ProcessMeshes(scene, scene->mRootNode, dir);
+
+    if (scene->HasAnimations())
+        Animation::LoadExtraAnimations(scene);
+
     m_loadStatus |= LOADED;
 
     // Send OpenGL setup to render thread

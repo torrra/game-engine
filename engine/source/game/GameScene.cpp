@@ -1,6 +1,7 @@
 #include "game/GameScene.h"
 #include "thread/ThreadManager.h"
 #include "core/systems/ScriptSystem.h"
+#include "Engine.h"
 
 #include "physics/PhysicsEngine.h"
 
@@ -17,7 +18,7 @@ namespace engine
 
     void GameScene::Start(void)
     {
-
+        m_timeSincePhysicsTick = 0.f;
         m_time.Reset();
         SerializeText();
         ScriptSystem::ResetState(&m_graph);
@@ -32,6 +33,7 @@ namespace engine
 
     void GameScene::Reset(void)
     {
+        m_graph.CleanRigidBodies();
         DeserializeText();
         ScriptSystem::ResetState();
     }
@@ -62,6 +64,7 @@ namespace engine
         m_path = path;
         m_name = m_path.filename().replace_extension().string();
         DeserializeText();
+        
     }
 
     void GameScene::SerializeText(void)
@@ -79,18 +82,38 @@ namespace engine
 
         m_graph = SceneGraph();
         m_graph.DeserializeText(input);
+        PhysicsEngine::Get().StepSimulation(0.0001f);
+        m_graph.SyncTransformsPostPhysics();
+        ThreadManager::SynchronizeGameThread(&m_graph);
         return true;
     }
 
     void GameScene::Tick(void)
     {
+ 
+
         if (m_state == EGameState::RUNNING)
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
+            m_graph.SyncRigidbodiesPrePhysics();
             PhysicsUpdate();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
-            m_time.Update();
         }
+
+        else if (Engine::HasEditor())
+        {
+            // Update render cache
+            ThreadManager::SynchronizeGameThread(&m_graph);
+
+            // Execute a dummy physics tick to update debug draw 
+            m_graph.SyncRigidbodiesPrePhysics();
+            PhysicsEngine::Get().StepSimulation(0.0001f);
+
+            // 'undo' physics tick (set physx transform back to pre-update values)
+            m_graph.SyncRigidbodiesPrePhysics();
+        }
+
+        m_time.Update();
     }
 
     SceneGraph* GameScene::GetGraph(void)
@@ -98,18 +121,28 @@ namespace engine
         return &m_graph;
     }
 
+    bool GameScene::IsRunning(void) const
+    {
+        return m_state == EGameState::RUNNING;
+    }
+
 
     void GameScene::PhysicsUpdate(void)
     {
-        constexpr f32 physicsUpdateInterval = 1.f / 0.2f;
+        constexpr f32 physicsUpdateInterval = 0.02f;
 
         m_timeSincePhysicsTick += m_time.GetDeltaTime();
-        int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick * physicsUpdateInterval);
+        if (m_timeSincePhysicsTick <= 0.f)
+        {
+            return;
+        }
+        int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick / physicsUpdateInterval);
 
         if (numPhysicsUpdate < 1)
             return;
 
-        f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
+        //f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
+        f32 interval = m_time.GetDeltaTime();
 
         m_graph.SyncRigidbodiesPrePhysics();
 
@@ -118,6 +151,11 @@ namespace engine
         
          m_graph.SyncTransformsPostPhysics();
          m_timeSincePhysicsTick = 0.f;
+    }
+
+    const Time& GameScene::GetTime(void) const
+    {
+        return m_time;
     }
 
     void GameScene::UpdateNameAndPath(const std::string& name)

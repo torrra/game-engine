@@ -14,6 +14,8 @@
 
 #include "glad/glad.h"
 
+#include "InternalOpenGLError.hpp"
+
 namespace engine
 {
     void Renderer::Register(void)
@@ -34,27 +36,30 @@ namespace engine
         if (Transform* transform = transforms.GetComponent(m_owner))
         {
             math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
-            math::Matrix4f mvp = viewProjection * transformMat;
+            m_mvp = viewProjection * transformMat;
 
             math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
             math::Matrix3f normalMat3x3 = math::Matrix3f(normalMat4x4);
 
             m_shader->Set("model", &transformMat);
-            m_shader->Set("mvp", &mvp);
-            m_shader->Set("normalMat", &normalMat3x3);		
+            m_shader->Set("mvp", &m_mvp);
+            m_shader->Set("normalMat", &normalMat3x3);
         }
         else
         {
-            math::Matrix3f identityMat{ 1.f };
+            math::Matrix4f identity4x4{ 1.f };
+            math::Matrix3f identity3x3{ 1.f };
 
+            m_shader->Set("model", &identity4x4);
             m_shader->Set("mvp", &viewProjection);
-            m_shader->Set("normalMat", &identityMat);
+            m_shader->Set("normalMat", &identity3x3);
         }
 
         if (m_materials.empty())
             m_materials.resize(m_model->GetMeshCount());
 
         m_model->Draw(m_materials);
+        OpenGLError();
     }
 
     const Model* Renderer::GetModel(void) const
@@ -65,6 +70,11 @@ namespace engine
     const ShaderProgram* Renderer::GetShader(void) const
     {
         return m_shader;
+    }
+
+    math::Matrix4f Renderer::GetMVP(void) const
+    {
+        return m_mvp;
     }
 
     const MeshMaterial* Renderer::GetMaterial(uint32 index) const
@@ -93,7 +103,6 @@ namespace engine
     void Renderer::SetModel(const Model* model)
     {
         m_model = model;
-        m_materials.resize(model->GetMeshCount()); 
     }
 
     void Renderer::SetModel(const char* key)
@@ -143,10 +152,19 @@ namespace engine
         text::Serialize(output, "fragmentShader", m_shader->GetFragmentShaderName());
         output << "\n    ";
 
-        text::Serialize(output, "materialCount", m_materials.size());
-        output << "\n    ";
+        std::vector<const MeshMaterial*> validMeshMaterials;
+        validMeshMaterials.reserve(m_materials.size());
 
         for (const MeshMaterial* mat : m_materials)
+        {
+            if (mat)
+                validMeshMaterials.push_back(mat);
+        }
+
+        text::Serialize(output, "materialCount", validMeshMaterials.size());
+        output << "\n    ";
+
+        for (const MeshMaterial* mat : validMeshMaterials)
         {
             text::Serialize(output, "material", mat->GetFilePath().string());
             output << "\n    ";

@@ -1,11 +1,11 @@
 #include "core/SceneGraph.h"
+#include "core/SceneGraph.h"
 #include "core/Entity.h"
 #include "core/systems/ScriptSystem.h"
 
-#include "thread/ThreadManager.h"
-
 #include "serialization/TextSerializer.h"
-
+#include "thread/ThreadManager.h"
+#include "InternalOpenGLError.hpp"
 
 namespace engine
 {
@@ -29,6 +29,14 @@ namespace engine
             if (entity && entity->IsActive())
                 rigidbody.UpdateEntity();
         }
+
+        for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateEntity();
+        }
     }
 
     void SceneGraph::SyncRigidbodiesPrePhysics(void)
@@ -41,13 +49,13 @@ namespace engine
                 rigidbody.UpdateRigidBody();
         }
 
-        /*for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
         {
             Entity* entity = GetEntity(rigidbody.GetOwner());
 
             if (entity && entity->IsActive())
                 rigidbody.UpdateRigidBody();
-        }*/
+        }
     }
 
     void SceneGraph::RegisterAllComponents(void)
@@ -57,7 +65,6 @@ namespace engine
         RegisterComponents<Camera>();
         RegisterComponents<RigidBodyDynamic>();
         RegisterComponents<RigidBodyStatic>();
-        RegisterComponents<AudioPlayer>();
     }
 
     void SceneGraph::RegisterAllEntities(void)
@@ -202,7 +209,6 @@ namespace engine
             m_sceneScripts.InvalidateComponent(entity);
             m_sceneDynamicRigidBodies.InvalidateComponent(entity);
             m_sceneStaticRigidBodies.InvalidateComponent(entity);
-            m_sceneAudioPlayer.InvalidateComponent(entity);
 
             ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
@@ -275,13 +281,19 @@ namespace engine
 
             math::Matrix4f viewProjection = camera.ViewProjection();
 
-            for (Renderer& renderer : m_sceneRenderers)
-            {
-                if (!renderer.IsValid() || !renderer.IsActive())
-                    continue;
+            RenderFromCacheSingleCamera(viewProjection);
+        }
+    }
 
-                renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
-            }
+    void SceneGraph::RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection)
+    {
+        for (Renderer& renderer : m_sceneRenderers)
+        {
+            if (!renderer.IsValid() || !renderer.IsActive())
+                continue;
+
+            renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
+            OpenGLError();
         }
     }
 
@@ -345,7 +357,6 @@ namespace engine
         m_sceneScripts.MoveReparentedComponent(reparented, newParent);
         m_sceneDynamicRigidBodies.MoveReparentedComponent(reparented, newParent);
         m_sceneStaticRigidBodies.MoveReparentedComponent(reparented, newParent);
-        m_sceneAudioPlayer.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
 
@@ -357,7 +368,6 @@ namespace engine
            m_sceneRenderers.MoveReparentedComponent(child);
            m_sceneDynamicRigidBodies.MoveReparentedComponent(child);
            m_sceneStaticRigidBodies.MoveReparentedComponent(child);
-           m_sceneAudioPlayer.MoveReparentedComponent(child);
         }
     }
 
@@ -375,6 +385,20 @@ namespace engine
     const char* SceneGraph::DeserializeEntityText(const char* text, const char* end)
     {    
         return m_sceneEntities.emplace_back().DeserializeText(text, end);
+    }
+
+    void SceneGraph::CleanRigidBodies(void)
+    {
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.RigidBodyDynamicCleanUp();
+        }
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.RigidBodyStaticCleanUp();
+        }
+        m_sceneDynamicRigidBodies = ComponentArray<RigidBodyDynamic>();
+        m_sceneStaticRigidBodies = ComponentArray<RigidBodyStatic>();
     }
 
 
@@ -414,17 +438,17 @@ namespace engine
             SerializeSingleComponent<Script>(file, entity, handles);
             SerializeSingleComponent<RigidBodyDynamic>(file, entity, handles);
             SerializeSingleComponent<RigidBodyStatic>(file, entity, handles);
-            SerializeSingleComponent<AudioPlayer>(file, entity, handles);
         }
     }
 
     void SceneGraph::DeserializeText(std::ifstream& file)
     {
-        Component::DeserializedArray<Transform>     transforms;
-        Component::DeserializedArray<Camera>	    cameras;
-        Component::DeserializedArray<Renderer>	    renderers;
-        Component::DeserializedArray<Script>	    scripts;
-        Component::DeserializedArray<AudioPlayer>   audioPlayers;
+        Component::DeserializedArray<Transform> transforms;
+        Component::DeserializedArray<Camera>	cameras;
+        Component::DeserializedArray<Renderer>	renderers;
+        Component::DeserializedArray<Script>	scripts;
+        Component::DeserializedArray<RigidBodyDynamic>	dynamicRigidBodies;
+        Component::DeserializedArray<RigidBodyStatic>	staticRigidBodies;
 
         const char* start;
         const char* end;
@@ -446,16 +470,26 @@ namespace engine
 
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
-
-            else if (memcmp(start, "[AudioPlayer]", 13) == 0)
-                start = Component::DeserializeComponentText(audioPlayers, start, end);
+            
+            else if (memcmp(start, "[RigidBodyDynamic]", 17) == 0)
+                start = Component::DeserializeComponentText(dynamicRigidBodies, start, end);
+            
+            else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
+                start = Component::DeserializeComponentText(staticRigidBodies, start, end);
 
             start = text::GetNewLine(start, end);
         }
 
-        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies);
         text::UnloadFileData(data);
-
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.SwitchShape(&rbDynamic, static_cast<EGeometryType>(rbDynamic.m_shape));
+        }
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.SwitchShape(&rbStatic, static_cast<EGeometryType>(rbStatic.m_shape));
+        }
     }
 
 }

@@ -18,7 +18,6 @@ void engine::ResourceManager::LoadShader(
 	}
 
 	ShaderProgram* newShader = new ShaderProgram();
-
     m_mutex.lock();
     GetInstance()->m_resources[shaderProgramName] = newShader;
     m_mutex.unlock();

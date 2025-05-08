@@ -17,8 +17,13 @@ namespace ui
         DrawList(ImDrawList* drawList);
         ENGINE_API ~DrawList(void) = default;
 
+        ENGINE_API void AddText(const char* text, math::Vector2f const& position, math::Vector4f const& color);
+        ENGINE_API void AddText(const char* text, math::Vector2f const& position, bool selected);
         ENGINE_API void AddRectFilled(math::Vector2f const& min, math::Vector2f const& max, int32 color, f32 rounding = 0.0F);
         ENGINE_API void AddRectFilled(math::Vector2f const& min, math::Vector2f const& max, math::Vector4f const& color, f32 rounding = 0.0F);
+
+        ENGINE_API math::Vector2f GetMin(void) const noexcept;
+        ENGINE_API math::Vector2f GetMax(void) const noexcept;
 
         operator ImDrawList*(void);
         operator ImDrawList*(void) const;

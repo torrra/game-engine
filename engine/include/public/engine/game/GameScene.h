@@ -44,6 +44,9 @@ namespace engine
 
         ENGINE_API SceneGraph* GetGraph(void);
 
+        ENGINE_API bool IsRunning(void) const;
+        ENGINE_API const Time& GetTime(void) const;
+
         ENGINE_API GameScene& operator=(GameScene&&) = default;
 
 

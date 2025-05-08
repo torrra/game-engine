@@ -58,6 +58,8 @@ void engine::FrameBuffer::RescaleFBO(int32 width, int32 height)
 
     DeleteFrameBuffer();
     Init(width, height);
+
+
 }
 
 void engine::FrameBuffer::Bind(void) const
@@ -68,6 +70,11 @@ void engine::FrameBuffer::Bind(void) const
 void engine::FrameBuffer::Unbind(void) const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+uint32 engine::FrameBuffer::GetFBO(void) const
+{
+    return m_fbo;
 }
 
 uint64 engine::FrameBuffer::GetFrameTexture(void) const noexcept

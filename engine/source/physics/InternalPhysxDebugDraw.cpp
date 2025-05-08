@@ -83,13 +83,14 @@ void engine::DebugDraw::UpdateDebugDraw(const DebugDrawImpl& inDebugDrawImpl)
 }
 
 
-void engine::DebugDraw::RenderDebugDraw(math::Matrix4f* inProjViewMatrix, uint32 inLineCount, const math::Vector4f& inColor)
+void engine::DebugDraw::RenderDebugDraw(const math::Matrix4f* inProjViewMatrix, uint32 inLineCount, const math::Vector4f& inColor)
 {
     // Use the debug draw program
     m_debugDrawProgram->Use();
     // Set the projection view matrix uniform
     m_debugDrawProgram->Set("projViewMatrix", inProjViewMatrix);
     m_debugDrawProgram->Set("aColor", inColor);
+
     // Bind the VAO
     glBindVertexArray(m_debugDrawVAO);
     // Draw the lines in regard of the number of lines

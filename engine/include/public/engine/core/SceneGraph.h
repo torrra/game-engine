@@ -164,6 +164,10 @@ namespace engine
         ENGINE_API
         void RenderFromCache(void);
 
+
+        ENGINE_API
+        void RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection);
+
         // Copy all data from transform component array to a separate cache
         // This function is used after the game logic update, allowing to start the next
         // gameplay tick before rendering on the main thread
@@ -173,6 +177,8 @@ namespace engine
         // Clear transforms and cameras in render cache
         ENGINE_API
         void ClearCache(void);
+
+        ENGINE_API void CleanRigidBodies(void);
 
         // Serialize all valid entities and recalculate their handles
         // The handles are recalculated as invalid entities are filtered out,
@@ -238,7 +244,6 @@ namespace engine
 
         template <CValidComponent TComponentType>
         void ReorderTextArray(Component::DeserializedArray<TComponentType>& array);
-
 
         // All transform components in the scene
         CopyableComponentArray<Transform>			m_sceneTransforms;

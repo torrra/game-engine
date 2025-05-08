@@ -2,10 +2,13 @@
 
 #include <engine/ui/Application.h>
 
+#include "EditorCamera.h"
+
 #include "ui/MenuBar.h"
 #include "ui/Properties.h"
 #include "ui/SceneGraph.h"
 #include "ui/Viewport.h"
+#include "ui/Assets.h"
 
 namespace editor
 {
@@ -13,7 +16,7 @@ namespace editor
     {
     public:
 
-        EditorApplication(const char* title);
+        EditorApplication(const char* title, class ::engine::SceneGraph* scene);
         EditorApplication(const EditorApplication&) = delete;
         EditorApplication(EditorApplication&&) = delete;
 
@@ -24,11 +27,15 @@ namespace editor
 
     private:
 
+        AssetsWnd                   m_assetWnd;
+        PropertyWnd                 m_properties;
+        EditorCamera                m_editorViewCamera;
+        SceneGraphUI                m_graphView;
         Viewport*                   m_sceneEditorView;
         Viewport*                   m_gameSimulationView;
-        PropertyWnd                 m_properties;
-        SceneGraphUI                m_graphView;
         class ::engine::GameScene*  m_currentScene = nullptr;
         MenuBar                     m_menuBar;
+
+        friend class MenuBar;
     };
 }
