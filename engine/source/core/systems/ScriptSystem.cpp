@@ -54,7 +54,6 @@ namespace engine
 
         RunConfigScript("vector/Vector2.lua");
         RunConfigScript("vector/Vector3.lua");
-        RunConfigScript("tests/Vector2Tests.lua");
         RunAllUserScripts();
     }
 
