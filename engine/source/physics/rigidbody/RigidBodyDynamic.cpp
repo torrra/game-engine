@@ -72,7 +72,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -109,7 +109,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -141,7 +141,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -424,16 +424,16 @@ void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCo
 
 void engine::RigidBodyDynamic::OnCollisionEnter(void* inOther)
 {
-    auto* otherRigidBody = static_cast<engine::RigidBodyDynamic*>(inOther);
+    auto* otherRigidBody = static_cast<engine::RigidBodyStatic*>(inOther);
 
-    std::cout << "Collision enter with " << otherRigidBody->GetOwner() << std::endl;
+    std::cout << "Collision enter between : " << this->GetOwner() << " with " << otherRigidBody->GetOwner() << std::endl;
 }
 
 void engine::RigidBodyDynamic::OnCollisionExit(void* inOther)
 {
-    auto* otherRigidBody = static_cast<engine::RigidBodyDynamic*>(inOther);
+    auto* otherRigidBody = static_cast<engine::RigidBodyStatic*>(inOther);
 
-    std::cout << "Collision exit with " << otherRigidBody->GetOwner() << std::endl;
+    std::cout << "Collision exit between : " << this->GetOwner() << " with " << otherRigidBody->GetOwner() << std::endl;
 }
 
 void engine::RigidBodyDynamic::SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry)

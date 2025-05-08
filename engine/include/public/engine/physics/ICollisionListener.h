@@ -15,11 +15,12 @@ namespace engine
         enum class ECollisionGroup : uint32
         {
             NONE_COLLISION = 0,
-            PLAYER_COLLISION = 1 << 0,
-            ENEMY_COLLISION = 1 << 1,
-            PROJECTILE_COLLISION = 1 << 2,
-            ENVIRONMENT_COLLISION = 1 << 3,
-            TRIGGER_COLLISION = 1 << 4
+            CHARACTER_COLLISION = 1 << 0,
+            PROJECTILE_COLLISION = 1 << 1,
+            ENVIRONMENT_COLLISION = 1 << 2,
+            TRIGGER_COLLISION = 1 << 3,
+            DEFAULT_COLLISION = 1 << 4
+
         }; // !Enum ECollisionGroup
 
         inline ECollisionGroup operator|(ECollisionGroup inLhs, ECollisionGroup inRhs) 
@@ -36,34 +37,33 @@ namespace engine
             case engine::collision::ECollisionGroup::NONE_COLLISION:
                 return 0;
 
-            case engine::collision::ECollisionGroup::PLAYER_COLLISION:
+            case engine::collision::ECollisionGroup::CHARACTER_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::ENEMY_COLLISION |
+                    ECollisionGroup::CHARACTER_COLLISION |
                     ECollisionGroup::PROJECTILE_COLLISION |
-                    ECollisionGroup::ENVIRONMENT_COLLISION |
-                    ECollisionGroup::TRIGGER_COLLISION);
-
-            case engine::collision::ECollisionGroup::ENEMY_COLLISION:
-                return static_cast<uint32>(
-                    ECollisionGroup::PLAYER_COLLISION |
                     ECollisionGroup::ENVIRONMENT_COLLISION |
                     ECollisionGroup::TRIGGER_COLLISION);
 
             case engine::collision::ECollisionGroup::PROJECTILE_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::ENEMY_COLLISION |
+                    ECollisionGroup::CHARACTER_COLLISION |
                     ECollisionGroup::ENVIRONMENT_COLLISION);
 
             case engine::collision::ECollisionGroup::ENVIRONMENT_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::PLAYER_COLLISION |
-                    ECollisionGroup::ENEMY_COLLISION |
+                    ECollisionGroup::CHARACTER_COLLISION |
                     ECollisionGroup::PROJECTILE_COLLISION);
 
             case engine::collision::ECollisionGroup::TRIGGER_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::PLAYER_COLLISION |
-                    ECollisionGroup::ENEMY_COLLISION);
+                    ECollisionGroup::CHARACTER_COLLISION);
+
+            case engine::collision::ECollisionGroup::DEFAULT_COLLISION:
+                return static_cast<uint32>(
+                    ECollisionGroup::CHARACTER_COLLISION |
+                    ECollisionGroup::PROJECTILE_COLLISION |
+                    ECollisionGroup::ENVIRONMENT_COLLISION |
+                    ECollisionGroup::TRIGGER_COLLISION);
 
             default:
                 return 0;

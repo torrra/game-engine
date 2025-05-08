@@ -25,7 +25,7 @@ namespace engine
 {
 	struct RigidBodyStaticImpl;
 
-	class RigidBodyStatic : public Component, public ICollisionListener
+	class RigidBodyStatic : public ICollisionListener, public Component
 	{
 	public:
 

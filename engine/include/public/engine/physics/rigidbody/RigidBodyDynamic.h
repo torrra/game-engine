@@ -33,7 +33,7 @@ namespace engine
     /// Forward declaration
     struct RigidBodyDynamicImpl;
 
-    class RigidBodyDynamic : public Component, public ICollisionListener
+    class RigidBodyDynamic : public ICollisionListener, public Component
     {
     public :
 
@@ -137,7 +137,7 @@ namespace engine
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 
         uint64                      m_shape             = 0;
-        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::PLAYER_COLLISION;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::CHARACTER_COLLISION;
 
 
     private :

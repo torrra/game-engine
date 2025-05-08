@@ -266,7 +266,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
     
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -292,7 +292,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -318,7 +318,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -343,7 +343,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
