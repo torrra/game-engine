@@ -69,10 +69,12 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
-
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
@@ -93,12 +95,23 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
                                             physx::PxSphereGeometry(0.5f),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
+    //physx::PxShape* shapes = nullptr;
+    //m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    //if (shapes)
+    //{
+    //    shapes->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
+    //}
+
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
-        false);
+        true);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
@@ -119,19 +132,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
                                             physx::PxCapsuleGeometry(0.25f, 0.25f),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
-    // Rotate the intiale position of the capsule to be at the vertical by default
-    // By using the local pose to not rotate the entity attach to it
-    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
-    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
-
-    // Update the local pose via the shape
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
-    {
-        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
-                            );
-    }
+    SetCapsuleBaseOrientation();
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
@@ -139,6 +140,10 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
@@ -381,26 +386,72 @@ void engine::RigidBodyDynamic::SetDebugVisualization(bool inIsDebugVisualization
                                                       inIsDebugVisualization);
 }
 
+void engine::RigidBodyDynamic::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
+{
+    physx::PxFilterData filterData;
+    filterData.word0 = inCollisionGroup;
+    filterData.word1 = inCollisionMask;
+
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setSimulationFilterData(filterData);
+    }
+}
+
+void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
+{
+    // Rotate the intiale position of the capsule to be at the vertical by default
+    // By using the local pose to not rotate the entity attach to it
+    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+
+    // Update the local pose via the shape
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
+        );
+    }
+}
+
+void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
+{
+    m_collisionGroup = inCollisionGroup;
+}
+
+void engine::RigidBodyDynamic::OnCollisionEnter(void* inOther)
+{
+    auto* otherRigidBody = static_cast<engine::RigidBodyDynamic*>(inOther);
+
+    std::cout << "Collision enter with " << otherRigidBody->GetOwner() << std::endl;
+}
+
+void engine::RigidBodyDynamic::OnCollisionExit(void* inOther)
+{
+    auto* otherRigidBody = static_cast<engine::RigidBodyDynamic*>(inOther);
+
+    std::cout << "Collision exit with " << otherRigidBody->GetOwner() << std::endl;
+}
+
 void engine::RigidBodyDynamic::SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry)
 {
     switch (inGeometry)
     {
     case EGeometryType::BOX:
         inRigidBody->CreateDynamicBoxRigidBody();
-        //return inRigidBody;
         break;
     case EGeometryType::SPHERE:
         inRigidBody->CreateDynamicSphereRigidBody();
-        //return inRigidBody;
         break;
     case EGeometryType::CAPSULE:
         inRigidBody->CreateDynamicCapsuleRigidBody();
-        //return inRigidBody;
         break;
     default:
         PrintLog(ErrorPreset(), "Invalid geometry type, create box by default.");
         inRigidBody->CreateDynamicBoxRigidBody();
-        //return inRigidBody;
         break;
     }
 }

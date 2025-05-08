@@ -18,6 +18,7 @@
 
 #include "engine/physics/PhysicsMaterial.h"
 #include "engine/physics/geometry/Geometry.hpp"
+#include "engine/physics/ICollisionListener.h"
 
 #pragma endregion
 
@@ -32,7 +33,7 @@ namespace engine
     /// Forward declaration
     struct RigidBodyDynamicImpl;
 
-    class RigidBodyDynamic : public Component
+    class RigidBodyDynamic : public Component, public ICollisionListener
     {
     public :
 
@@ -103,6 +104,12 @@ namespace engine
                                                                              false = disabled
         */
         ENGINE_API  void            SetDebugVisualization(bool inIsDebugVisualization);
+
+        ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
+
+        ENGINE_API void OnCollisionEnter(void* inOther) override;
+        ENGINE_API void OnCollisionExit(void* inOther) override;
+
         /// Functions
         /*
             Update the entity transform in reference to the dynamic rigid body
@@ -125,9 +132,13 @@ namespace engine
                                                   uint64 index) const override;
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
-                    void SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry);
-        RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
-        uint64                  m_shape         = 0;
+                    void            SwitchShape(RigidBodyDynamic* inRigidBody, 
+                                                const EGeometryType& inGeometry);
+        RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
+
+        uint64                      m_shape             = 0;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::PLAYER_COLLISION;
+
 
     private :
 
@@ -136,6 +147,12 @@ namespace engine
         /// Constructor
         // Delete the copy constructor
                                     RigidBodyDynamic(const RigidBodyDynamic& inOther) = delete;
+
+
+                    void            SetCollisionGroupAndMask(uint32 inCollisionGroup,
+                                                             uint32 inCollisionMask);
+
+                    void            SetCapsuleBaseOrientation(void);
 
         /// Functions
         /*
