@@ -56,6 +56,41 @@ math::Matrix4f engine::Transform::ToWorldMatrix(Transform& inTransform)
     return world * ToMatrixWithScale(inTransform);
 }
 
+math::Vector3f engine::Transform::ToWorldPosition(Transform& inTransform)
+{
+    math::Vector3f worldPosition = inTransform.m_position;
+
+    std::vector<EntityHandle> parents =
+        inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
+
+    for (auto parentIt = parents.begin(); parentIt != parents.end(); ++parentIt)
+    {
+        if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
+        {
+            worldPosition = worldPosition * transform->m_scale;
+            worldPosition = transform->m_rotation * worldPosition;
+            worldPosition += transform->m_position;
+        }
+    }
+
+    return worldPosition;
+}
+
+math::Quatf engine::Transform::ToWorldRotation(Transform& inTransform)
+{
+    math::Quatf worldRotation = inTransform.m_rotation;
+
+    std::vector<EntityHandle> parents =
+        inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
+
+    for (auto parentIt = parents.begin(); parentIt != parents.end(); ++parentIt)
+    {
+        if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
+            worldRotation = transform->m_rotation * inTransform.m_rotation;
+    }
+
+    return worldRotation;
+}
 
 void engine::Transform::CopyPosition(const Transform& inTransform)
 {
