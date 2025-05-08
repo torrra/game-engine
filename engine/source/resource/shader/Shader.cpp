@@ -97,47 +97,47 @@ void engine::ShaderProgram::Set(const char* uniformName, math::Vector4d const& v
 }
 
 // Matrix float
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2f* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix2f* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix2fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
+	glUniformMatrix2fv(location, 1, GL_FALSE, reinterpret_cast<const f32*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3f* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix3f* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix3fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
+	glUniformMatrix3fv(location, 1, GL_FALSE, reinterpret_cast<const f32*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4f* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix4f* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
+	glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const f32*>(matrix));
 }
 
 // Matrix double
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2d* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix2d* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix2dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
+	glUniformMatrix2dv(location, 1, GL_FALSE, reinterpret_cast<const f64*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3d* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix3d* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix3dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
+	glUniformMatrix3dv(location, 1, GL_FALSE, reinterpret_cast<const f64*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4d* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix4d* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix4dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
+	glUniformMatrix4dv(location, 1, GL_FALSE, reinterpret_cast<const f64*>(matrix));
 }
 
 const std::string& engine::ShaderProgram::GetVertexShaderName(void) const

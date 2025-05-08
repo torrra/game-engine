@@ -134,6 +134,7 @@ void engine::Input::MouseButtonCallback(int32 button, int32 action, int32 mods)
 void engine::Input::MouseScrollCallback(f64 xOffset, f64 yOffset)
 {
     GetInstance()->m_scrollDelta = math::Vector2d(xOffset, yOffset);
+    GetInstance()->m_scrollUpdated = EScrollState::FIRST_FRAME;
 }
 
 void engine::Input::CursorPosCallback(f64 xPos, f64 yPos)
@@ -145,7 +146,7 @@ void engine::Input::CursorPosCallback(f64 xPos, f64 yPos)
 
 engine::Input::Input(void)
     : m_cursorPos(0.00), m_lastCursorPos(0.00), m_scrollDelta(0.00), m_dirty(false),
-    m_cursorUpdated(false)
+    m_cursorUpdated(false), m_scrollUpdated(EScrollState::NO_INPUT)
 {
 }
 
@@ -161,6 +162,15 @@ void engine::Input::ResetKeys(void)
     else
         GetInstance()->m_lastCursorPos = GetInstance()->m_cursorPos;
 
+    if (GetInstance()->m_scrollUpdated == EScrollState::FIRST_FRAME)
+        GetInstance()->m_scrollUpdated = EScrollState::SECOND_FRAME;
+
+    else if (GetInstance()->m_scrollUpdated == EScrollState::SECOND_FRAME)
+    {
+        GetInstance()->m_scrollDelta = math::Vector2d::Zero();
+        GetInstance()->m_scrollUpdated = EScrollState::NO_INPUT;
+    }
+
     if (!GetInstance()->m_dirty)
         return;
     
@@ -172,9 +182,6 @@ void engine::Input::ResetKeys(void)
         else if (key.second.m_currentState == EInputState::PRESSED)
             key.second.m_prevState = EInputState::PRESSED;
     }
-
-    if (GetInstance()->m_scrollDelta.MagnitudeSquared())
-        GetInstance()->m_scrollDelta = math::Vector2d::Zero();
 
     GetInstance()->m_dirty = false;
 }

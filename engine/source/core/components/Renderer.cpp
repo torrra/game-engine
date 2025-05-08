@@ -14,6 +14,8 @@
 
 #include "glad/glad.h"
 
+#include "InternalOpenGLError.hpp"
+
 namespace engine
 {
     void Renderer::Register(void)
@@ -45,16 +47,19 @@ namespace engine
         }
         else
         {
-            math::Matrix3f identityMat{ 1.f };
+            math::Matrix4f identity4x4{ 1.f };
+            math::Matrix3f identity3x3{ 1.f };
 
+            m_shader->Set("model", &identity4x4);
             m_shader->Set("mvp", &viewProjection);
-            m_shader->Set("normalMat", &identityMat);
+            m_shader->Set("normalMat", &identity3x3);
         }
 
         if (m_materials.empty())
             m_materials.resize(m_model->GetMeshCount());
 
         m_model->Draw(m_materials);
+        OpenGLError();
     }
 
     const Model* Renderer::GetModel(void) const
