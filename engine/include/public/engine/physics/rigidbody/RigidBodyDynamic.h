@@ -143,7 +143,7 @@ namespace engine
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 
         uint64                      m_shape             = 0;
-        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::CHARACTER_COLLISION;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::DEFAULT_COLLISION;
 
 
     private :
