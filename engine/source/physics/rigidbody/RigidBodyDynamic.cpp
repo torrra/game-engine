@@ -150,8 +150,12 @@ void engine::RigidBodyDynamic::UpdateEntity()
 {
     // Update the entity transform in regard to the rigid body for exemple,
     // if the rigid body is under gravity then the rigid body fall so the entity fall
-    *m_currentScene->GetComponent<Transform>(m_owner) = 
-                            ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+    Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+    Transform updatedTransform = ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+
+    transform->CopyPosition(updatedTransform);
+    transform->CopyRotation(updatedTransform);
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody()
