@@ -11,9 +11,6 @@
 
 #include <filesystem>
 
-#define SUCCESS		0
-#define ERROR		1
-
 namespace engine
 {
     class Application

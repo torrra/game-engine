@@ -35,6 +35,11 @@ void editor::PropertyWnd::SetHandle(engine::EntityHandle handle)
     InitComponents();
 }
 
+engine::EntityHandle editor::PropertyWnd::GetHandle(void) const noexcept
+{
+    return m_handle;
+}
+
 void editor::PropertyWnd::RenderContents(void)
 {
     RenderMenuBar();

@@ -9,6 +9,7 @@
 #pragma region Engine
 
 #include "engine/CoreTypes.h"
+#include "engine/EngineExport.h"
 
 #pragma endregion
 
@@ -80,14 +81,14 @@ namespace engine
     }; // !Struct ConsoleLog
 
     // Function to print using escape sequence
-    inline void PrintLog(ConsoleLog consoleLog, const std::string& message)
+    ENGINE_API inline void PrintLog(ConsoleLog consoleLog, const std::string& message)
     {
         printf("\033[%d;%d;%dm%s %s\033[0m\n", (int32)consoleLog.m_textFormat, (int32)consoleLog.m_bgColor,
                (int32)consoleLog.m_fgColor, consoleLog.m_prefix.c_str(), message.c_str());
     }
 
     // Preset of an error log
-    inline ConsoleLog ErrorPreset()
+    ENGINE_API inline ConsoleLog ErrorPreset()
     {
         ConsoleLog consoleLog;
 
@@ -100,7 +101,7 @@ namespace engine
     }
 
     // Preset of a warning log
-    inline ConsoleLog WarningPreset()
+    ENGINE_API inline ConsoleLog WarningPreset()
     {
         ConsoleLog consoleLog;
 
@@ -113,7 +114,7 @@ namespace engine
     }
 
     // Preset of an info log
-    inline ConsoleLog InfoPreset()
+    ENGINE_API inline ConsoleLog InfoPreset()
     {
         ConsoleLog consoleLog;
 
@@ -126,7 +127,7 @@ namespace engine
     }
 
     // Preset of a success log
-    inline ConsoleLog SuccessPreset()
+    ENGINE_API inline ConsoleLog SuccessPreset()
     {
         ConsoleLog consoleLog;
 

@@ -71,4 +71,5 @@ namespace ui
     ENGINE_API uint32 GetColor(EColor colorID, f32 alpha);
     ENGINE_API f32 GetFontSize(void);
     ENGINE_API math::Vector2f GetTextSize(const char* text);
+    ENGINE_API void SetWindowFontScale(f32 scale);
 }

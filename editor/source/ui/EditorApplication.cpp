@@ -32,7 +32,7 @@ namespace editor
 
         m_assetWnd.Render();
         
-        m_menuBar.UpdateStartButton(*m_currentScene);
+        m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
 
         if (m_graphView.IsNewEntitySelected())

@@ -16,6 +16,9 @@
 #include <iostream>
 #include <chrono>
 
+#define SUCCESS		0
+#define ERROR		1
+
 engine::Engine* engine::g_defaultEngine;
 
 engine::Engine::Engine(bool withEditor)
@@ -78,14 +81,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
         return ERROR;
 
     m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
-    std::filesystem::path scenePath = m_projectDir;
 
-    if (m_hasEditor)
-        scenePath.append(m_currentProject.m_defaultEditorScene);
-    else
-        scenePath.append(m_currentProject.m_defaultGameScene);
-
-    m_activeScene.LoadNewScene(false, scenePath);
     return SUCCESS;
 }
 
@@ -155,6 +151,11 @@ const std::filesystem::path& engine::Engine::GetProjectDir(void) const
     return m_projectDir;
 }
 
+std::string engine::Engine::GetProjectName(void) const
+{
+    return m_projectName;
+}
+
 void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)
 {
     ThreadManager::AddTask([this, path, serialize]
@@ -165,12 +166,24 @@ void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& p
         });
 }
 
-void engine::Engine::CreateProject(const std::string & dir, const std::string& name)
+void engine::Engine::LoadDefaultScene(void)
+{
+    std::filesystem::path scenePath = m_projectDir;
+
+    if (m_hasEditor)
+        scenePath.append(m_currentProject.m_defaultEditorScene);
+    else
+        scenePath.append(m_currentProject.m_defaultGameScene);
+
+    m_activeScene.LoadNewScene(false, scenePath);
+}
+
+bool engine::Engine::CreateProject(const std::string & dir, const std::string& name)
 {
     if (name.length() > 64)
     {
         PrintLog(ErrorPreset(), "Unable to create project: name is too long! (over 64 characters)");
-        return;
+        return false;
     }
     std::filesystem::path pathObj = dir;
 
@@ -181,7 +194,7 @@ void engine::Engine::CreateProject(const std::string & dir, const std::string& n
     {
         PrintLog(ErrorPreset(), "Unable to create project: target location\
  does not exist or path is not absolute.");
-        return;
+        return false;
     }
 
     pathObj.append(name);
@@ -195,7 +208,7 @@ exists. Attempting to open project file...");
         pathObj += std::filesystem::path::preferred_separator;
 
         OpenProject(pathObj += filename);
-        return;
+        return false;
     }
 
     std::filesystem::create_directory(pathObj);
@@ -211,7 +224,10 @@ exists. Attempting to open project file...");
 
     m_activeScene.EditPath(m_projectDir);
     m_activeScene.Rename("default");
-    SaveProject();
+
+    SaveProjectFile();
+
+    return true;
 }
 
 void engine::Engine::OpenProject(const std::filesystem::path& projFile)
@@ -219,6 +235,7 @@ void engine::Engine::OpenProject(const std::filesystem::path& projFile)
     constexpr wchar_t extension[] = L".mustang";
     
     m_projectFile = projFile;
+    m_projectName = projFile.filename().replace_extension().string();
 
     if (memcmp(projFile.extension().c_str(), extension, sizeof(extension)) != 0)
     {
@@ -256,6 +273,18 @@ void engine::Engine::SaveProject(void)
     text::Serialize(output, "executableName", m_currentProject.m_executableName);
 
     m_activeScene.SerializeText();
+}
+
+void engine::Engine::SaveProjectFile(void)
+{
+    std::ofstream output(m_projectFile, std::ios::out);
+
+    text::Serialize(output, "defaultGameScene", m_currentProject.m_defaultGameScene);
+    output << '\n';
+    text::Serialize(output, "defaultEditorScene", m_currentProject.m_defaultEditorScene);
+    output << '\n';
+    text::Serialize(output, "executableName", m_currentProject.m_executableName);
+
 }
 
 inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
@@ -414,3 +443,9 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
              std::filesystem::absolute(buildDir.parent_path()).c_str());
 
 }
+
+engine::Engine* engine::Engine::GetEngine(void)
+{
+    return g_defaultEngine;
+}
+

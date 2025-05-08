@@ -69,6 +69,20 @@ editor::AssetsWnd::~AssetsWnd(void)
     m_rootNode = nullptr;
 }
 
+void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
+{
+    m_selectedIndex = -1;
+    m_selectedDirectory = nullptr;
+    
+    if (m_rootNode)
+        delete m_rootNode;
+
+    m_assets.clear();
+
+    m_path = projectDir;
+    m_rootNode = InitDirectoryRecursively(m_path);
+}
+
 void editor::AssetsWnd::RenderContents(void)
 {
     math::Vector2f windowSize = ::ui::GetAvailSpace();
@@ -150,6 +164,8 @@ void editor::AssetsWnd::RenderAssets(void)
 
     if (ui::StartSection("AssetSection", regionSize))
     {
+        ui::SetWindowFontScale(0.8f);
+
         // Asset variables
         static const math::Vector2f assetSize(ASSET_WIDTH, ASSET_HEIGHT);
         static const f32 sizeDenominator = 1.0f / (assetSize.GetX() + ASSET_PADDING);
@@ -303,12 +319,3 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
 
     return payloadType;
 }
-
-void editor::AssetsWnd::RenderFile(std::filesystem::path const& file)
-{
-
-    //drawList.AddRectFilled()
-    ui::Text("%s\n", file.filename().string().c_str());
-}
-
-

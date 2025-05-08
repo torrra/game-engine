@@ -28,8 +28,6 @@ void ui::Table::NextRow(void)
 bool ui::Table::NextColumn(f32 width)
 {
     width;
-    //if (width != 0.0f)
-    //    ImGui::SetColumnWidth(m_columnIndex++, width);
     return ImGui::TableNextColumn();
 }
 

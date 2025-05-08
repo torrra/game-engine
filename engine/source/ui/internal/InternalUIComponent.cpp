@@ -32,12 +32,12 @@ bool ui::DropDown(const char* id, int32& selectedValue, std::vector<const char*>
     return ImGui::Combo(id, &selectedValue, options.data(), arraySize);
 }
 
-bool ui::InputBox(const char* id, const char* hint, std::string& outStr)
+bool ui::InputBox(const char* id, const char* hint, std::string& outStr, bool enterReturnTrue)
 {
     constexpr size_t size = 128;
     char buffer[size] = "";
 
-    if (ImGui::InputTextWithHint(id, hint, buffer, size, ImGuiInputTextFlags_EnterReturnsTrue))
+    if (ImGui::InputTextWithHint(id, hint, buffer, size, (enterReturnTrue) ? ImGuiInputTextFlags_EnterReturnsTrue : 0))
     {
         outStr = buffer;
         return true;
@@ -96,6 +96,16 @@ bool ui::MenuItem(const char* name, const char* shortcut)
     return ImGui::MenuItem(name, shortcut);
 }
 
+bool ui::StartModal(const char* name, bool& shouldClose)
+{
+    int32 flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    return ImGui::BeginPopupModal(name, &shouldClose, flags);;
+}
+
 bool ui::StartPopUp(const char* name)
 {
     return ImGui::BeginPopupContextItem(name);
@@ -104,6 +114,11 @@ bool ui::StartPopUp(const char* name)
 void ui::EndPopUp(void)
 {
     ImGui::EndPopup();
+}
+
+void ui::OpenModal(const char* name)
+{
+    ImGui::OpenPopup(name);
 }
 
 void ui::SameLine(f32 xOffset)
