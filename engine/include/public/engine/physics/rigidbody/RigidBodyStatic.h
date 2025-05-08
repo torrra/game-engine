@@ -17,6 +17,7 @@
 
 #include "engine/physics/PhysicsMaterial.h"
 #include "engine/physics/geometry/Geometry.hpp"
+#include "engine/physics/ICollisionListener.h"
 
 #pragma endregion
 
@@ -24,7 +25,7 @@ namespace engine
 {
 	struct RigidBodyStaticImpl;
 
-	class RigidBodyStatic : public Component
+	class RigidBodyStatic : public Component, public ICollisionListener
 	{
 	public:
 
@@ -81,6 +82,8 @@ namespace engine
         */
         ENGINE_API  void            SetDebugVisualization(bool inIsDebugVisualization);
 
+        ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
+
 		/// Functions
 		ENGINE_API	void		    Register(void) override {}
 
@@ -98,9 +101,14 @@ namespace engine
         RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 
         uint64                  m_shape                 = 0;
+        collision::ECollisionGroup  m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+
 	private :
 
         friend class RigidBodyStaticFactory;
+
+        void            SetCollisionGroupAndMask(uint32 inCollisionGroup,
+                                                 uint32 inCollisionMask);
 
 		/// Functions
         /*

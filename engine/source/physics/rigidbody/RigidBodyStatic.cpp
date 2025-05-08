@@ -237,6 +237,20 @@ engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
     return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
 }
 
+void engine::RigidBodyStatic::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
+{
+    physx::PxFilterData filterData;
+    filterData.word0 = inCollisionGroup;
+    filterData.word1 = inCollisionMask;
+
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setSimulationFilterData(filterData);
+    }
+}
+
 void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 {
     // Create a new material with default values
@@ -251,6 +265,10 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
@@ -274,6 +292,10 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::SPHERE;
@@ -296,6 +318,10 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::CAPSULE;
@@ -317,6 +343,10 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<ICollisionListener*>(this);
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::PLANE;
 
@@ -327,6 +357,11 @@ void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
 {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
                                                            inIsDebugVisualization);
+}
+
+void engine::RigidBodyStatic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
+{
+    m_collisionGroup = inCollisionGroup;
 }
 
 void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry)
