@@ -97,6 +97,15 @@ namespace engine
 
                     Transform&  CheckEntityTransform(void);
                     void        SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry);
+
+        ENGINE_API  void        OnCollisionEnter(void* inOther) override { inOther; }
+        ENGINE_API  void        OnCollisionStay(void* inOther) override { inOther; }
+        ENGINE_API  void        OnCollisionExit(void* inOther) override { inOther; }
+
+        ENGINE_API  void        OnTriggerEnter(void* inOther) override { inOther; }
+        ENGINE_API  void        OnTriggerStay(void* inOther) override { inOther; }
+        ENGINE_API  void        OnTriggerExit(void* inOther) override { inOther; }
+
         ENGINE_API
         RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 

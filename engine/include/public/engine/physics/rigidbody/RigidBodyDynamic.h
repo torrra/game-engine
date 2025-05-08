@@ -107,9 +107,6 @@ namespace engine
 
         ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
 
-        ENGINE_API void OnCollisionEnter(void* inOther) override;
-        ENGINE_API void OnCollisionExit(void* inOther) override;
-
         /// Functions
         /*
             Update the entity transform in reference to the dynamic rigid body
@@ -134,6 +131,15 @@ namespace engine
         ENGINE_API
                     void            SwitchShape(RigidBodyDynamic* inRigidBody, 
                                                 const EGeometryType& inGeometry);
+
+        ENGINE_API  void            OnCollisionEnter(void* inOther) override;
+        ENGINE_API  void            OnCollisionStay(void* inOther) override { inOther; }
+        ENGINE_API  void            OnCollisionExit(void* inOther) override;
+
+        ENGINE_API  void            OnTriggerEnter(void* inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerStay(void* inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerExit(void* inOther) override { inOther; }
+
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 
         uint64                      m_shape             = 0;
