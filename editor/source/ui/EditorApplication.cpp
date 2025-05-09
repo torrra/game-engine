@@ -30,25 +30,31 @@ namespace editor
         if (!m_currentScene)
             return;
 
+        // Render editor windows
         m_assetWnd.Render();
-        
         m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
 
+        // Get selected entity to dislay its components
         if (m_graphView.IsNewEntitySelected())
             m_properties.SetHandle(m_graphView.GetSelectedEntity());
 
         m_properties.Render();
 
+        // Simulation viewport
         if (m_currentScene->IsRunning())
-        {
             m_gameSimulationView->RenderToViewport();
-        }
-            m_gameSimulationView->Render();
+        
+        m_gameSimulationView->Render();
+
+        // Editor camera
+        if (m_sceneEditorView->HasWindowResized())
+            m_editorViewCamera.UpdateAspectRatio(m_sceneEditorView->GetViewportSize());
 
         if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
 
+        // Editor viewport
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->Render();
     }

@@ -5,6 +5,8 @@
 #include <engine/ui/UIWindow.h>
 #include <engine/utility/FrameBuffer.h>
 #include <engine/core/SceneGraph.h>
+
+#include <math/Vector2.hpp>
 #include <math/Vector4.hpp>
 
 namespace editor
@@ -27,6 +29,9 @@ namespace editor
         void SetEnablePicking(bool value = true);
         void SetGraph(engine::SceneGraph* graph);
 
+        bool HasWindowResized(void) const;
+        const math::Vector2f& GetViewportSize(void) const;
+
     protected:
         virtual void RenderContents(void) override;
     
@@ -35,6 +40,9 @@ namespace editor
         engine::SceneGraph* m_graph = nullptr;
         engine::FrameBuffer m_fbo;
         math::Vector4f m_bgColor;
+        math::Vector2f m_size;
+        math::Vector2f m_prevSize;
         bool m_enablePicking = false;
+        bool m_sizeUpdated = false;
     };
 }

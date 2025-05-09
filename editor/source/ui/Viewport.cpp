@@ -94,17 +94,29 @@ void editor::Viewport::SetGraph(engine::SceneGraph* graph)
     SetEnablePicking(m_enablePicking);
 }
 
+bool editor::Viewport::HasWindowResized(void) const
+{
+    return m_sizeUpdated;
+}
+
+const math::Vector2f& editor::Viewport::GetViewportSize(void) const
+{
+    return m_size;
+}
+
 void editor::Viewport::RenderContents(void)
 {
     // Transform
-    math::Vector2f regionAvail = ::ui::GetAvailSpace();
+    m_size = ::ui::GetAvailSpace();
+    m_sizeUpdated = (m_size != m_prevSize);
     math::Vector2i sizePx(
-        static_cast<int32>(regionAvail.GetX()),
-        static_cast<int32>(regionAvail.GetY())
-    );
-
+        static_cast<int32>(m_size.GetX()),
+        static_cast<int32>(m_size.GetY())
+    ); 
+    
     SetViewportTransform({0, 0}, sizePx);
     m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
+    ui::Image(m_fbo.GetFrameTexture(), m_size);
 
-    ui::Image(m_fbo.GetFrameTexture(), regionAvail);
+    m_prevSize = m_size;
 }
