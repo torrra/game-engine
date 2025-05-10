@@ -1,17 +1,44 @@
 #include "physics/SimulationEventCallback.h"
 
-#pragma region Physics
-
-#include "engine/physics/ICollisionListener.h"
-
-#pragma endregion
-
 #include "engine/Engine.h"
 #include "engine/core/SceneGraph.h"
+#include "engine/physics/geometry/Geometry.hpp"
+
 void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, const physx::PxContactPair* inPairs, physx::PxU32 inNbPairs)
 {
-    ICollisionListener* listenerA = static_cast<ICollisionListener*>(inPairHeader.actors[0]->userData);
-    ICollisionListener* listenerB = static_cast<ICollisionListener*>(inPairHeader.actors[1]->userData);
+    //uint32 type = GetShapeType(reinterpret_cast<uint64>(inPairHeader.actors[0]->userData));
+    //uint32 index = GetRigidBodyIndex(reinterpret_cast<uint64>(inPairHeader.actors[0]->userData));
+    //uint32 type2 = GetShapeType(reinterpret_cast<uint64>(inPairHeader.actors[1]->userData));
+    //uint32 index2 = GetRigidBodyIndex(reinterpret_cast<uint64>(inPairHeader.actors[1]->userData));
+
+    auto* data0 = reinterpret_cast<RigidBodyData*>(inPairHeader.actors[0]->userData);
+    auto* data1 = reinterpret_cast<RigidBodyData*>(inPairHeader.actors[1]->userData);
+
+    ICollisionListener* listenerA = nullptr;
+    ICollisionListener* listenerB = nullptr;
+
+    switch (data0->m_type)
+    {
+    case EShapeType::DYNAMIC:
+        listenerA =  dynamic_cast<ICollisionListener*>(&(*(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + data0->m_index)));
+        break;
+    case EShapeType::STATIC:
+        listenerA = dynamic_cast<ICollisionListener*>(&(*(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + data0->m_index)));
+        break;
+    default:
+        break;
+    }
+    switch (data1->m_type)
+    {
+    case EShapeType::DYNAMIC:
+        listenerB = dynamic_cast<ICollisionListener*>(&(*(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + data1->m_index)));
+        break;
+    case EShapeType::STATIC:
+        listenerB = dynamic_cast<ICollisionListener*>(&(*(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + data1->m_index)));
+        break;
+    default:
+        break;
+    }
 
     if (!listenerA || !listenerB)
         return;

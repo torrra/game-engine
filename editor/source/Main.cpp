@@ -17,7 +17,15 @@ int appMain(void)
 {
 	engine::Engine engine;
     engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
+    engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
+
+    //for (uint64 entityNum = 0; entityNum < 64; ++entityNum)
+    //{
+    //    engine::EntityHandle newEntity = engine.GetGraph()->CreateEntity("testCollision " + std::to_string(entityNum));
+    //    engine::RigidBodyDynamic* newRigidBody = engine.GetGraph()->CreateComponent<engine::RigidBodyDynamic>(newEntity);
+    //    newRigidBody->SwitchShape(newRigidBody, engine::EGeometryType::BOX);
+    //}
 
 	while (!engine.GetWindow()->ShouldWindowClose())
 	{

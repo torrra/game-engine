@@ -6,7 +6,11 @@
 
 #pragma endregion
 
-#include <iostream>
+#pragma region Standard
+
+#include <type_traits>
+
+#pragma endregion
 
 namespace engine
 {
@@ -26,8 +30,7 @@ namespace engine
         inline ECollisionGroup operator|(ECollisionGroup inLhs, ECollisionGroup inRhs) 
         { 
             return static_cast<ECollisionGroup>(
-                            static_cast<std::underlying_type_t<ECollisionGroup>>(inLhs) |
-                            static_cast<std::underlying_type_t<ECollisionGroup>>(inRhs));
+                static_cast<uint32>(inLhs) | static_cast<uint32>(inRhs));
         }
 
         inline uint32 GetCollisionMask(ECollisionGroup inGroup)
@@ -68,8 +71,7 @@ namespace engine
             default:
                 return 0;
             }
-        }
-
+        }      
     } // !Namespace collision
 
     class ICollisionListener
@@ -86,7 +88,7 @@ namespace engine
 
         virtual void OnTriggerEnter(void* inOther) = 0;
         virtual void OnTriggerExit(void* inOther) = 0;
-        virtual void OnTriggerStay(void* inOther) = 0;
+        virtual void OnTriggerStay(void* inOther) = 0;        
 
     }; // !Class ICollisionListener
 } // !Namespace engine
