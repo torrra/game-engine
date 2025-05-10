@@ -30,6 +30,7 @@
 engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
+    m_data                  = new RigidBodyData();   
 	m_owner					= inOwner;
 	m_currentScene			= inScene;
 }
@@ -175,8 +176,29 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
     return;
 }
 
+void engine::RigidBodyStatic::UpdateEntity(void)
+{
+    // Update the entity transform in regard to the rigid body for exemple,
+    // if the rigid body is under gravity then the rigid body fall so the entity fall
+    *m_currentScene->GetComponent<Transform>(m_owner) =
+        ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+}
+
+void engine::RigidBodyStatic::UpdateRigidBody(void)
+{
+    Transform worldTransform;
+
+    worldTransform.SetPosition(Transform::ToWorldPosition(*m_currentScene->GetComponent<Transform>(m_owner)));
+    worldTransform.SetRotation(Transform::ToWorldRotation(*m_currentScene->GetComponent<Transform>(m_owner)));
+
+    // Update the transform of the rigid body in regard to the entity
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));
+}
+
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
+    delete m_data;
+    m_data = nullptr;
     // Delete the pointer to the implementation structure
     delete m_materialImpl;
     m_materialImpl = nullptr;
@@ -266,7 +288,12 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
     
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
+    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data->m_type = EShapeType::STATIC;
+
+    std::cout << "[RigidBodyStatic] Index: " << m_data->m_index << " | Type: " << m_data->m_type << std::endl;
+
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 

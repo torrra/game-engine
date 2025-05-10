@@ -35,6 +35,7 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
 {
     // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
+    m_data = new RigidBodyData();
     // Set the owner and the current scene
     m_owner			= inOwner;
     m_currentScene	= inScene;
@@ -73,7 +74,12 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = reinterpret_cast<void*>(m_currentScene->GetThisIndex(this));
+    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data->m_type = EShapeType::DYNAMIC;
+
+    std::cout << "[RigidBodyDynamic] Index: " << m_data->m_index << " | Type: " << m_data->m_type << std::endl;
+
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = static_cast<void*>(m_data);
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -96,13 +102,6 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
                                             physx::PxSphereGeometry(0.5f),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
-    //physx::PxShape* shapes = nullptr;
-    //m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    //if (shapes)
-    //{
-    //    shapes->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
-    //}
-
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         true);
@@ -110,7 +109,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = this;
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = reinterpret_cast<void*>(m_currentScene->GetThisIndex(this));
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -142,7 +141,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = this;
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = reinterpret_cast<void*>(m_currentScene->GetThisIndex(this));
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -173,6 +172,8 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
+    delete m_data;
+    m_data = nullptr;
     // Delete the pointer
     delete m_materialImpl;
     m_materialImpl = nullptr;
@@ -429,16 +430,28 @@ void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCo
 
 void engine::RigidBodyDynamic::OnCollisionEnter(void* inOther)
 {
-    auto* otherRigidBody = static_cast<engine::RigidBodyStatic*>(inOther);
+    RigidBodyStatic* otherRigidBody = reinterpret_cast<engine::RigidBodyStatic*>(inOther);
 
-    std::cout << "Collision enter between : " << this->GetOwner() << " with " << otherRigidBody->GetOwner() << std::endl;
+    if (otherRigidBody != nullptr)
+    {
+        if (m_data != nullptr && otherRigidBody->m_data != nullptr)
+        {
+            std::cout << "Collision enter between : " << m_data->m_index << " with " << otherRigidBody->m_data->m_index << std::endl;
+        }
+    }
 }
 
 void engine::RigidBodyDynamic::OnCollisionExit(void* inOther)
 {
-    auto* otherRigidBody = static_cast<engine::RigidBodyStatic*>(inOther);
+    auto* otherRigidBody = reinterpret_cast<engine::RigidBodyStatic*>(inOther);
 
-    std::cout << "Collision exit between : " << this->GetOwner() << " with " << otherRigidBody->GetOwner() << std::endl;
+    if (otherRigidBody != nullptr)
+    {
+        if (m_data != nullptr && otherRigidBody->m_data != nullptr)
+        {
+            std::cout << "Collision exit between : " << m_data->m_index << " with " << otherRigidBody->m_data->m_index << std::endl;
+        }
+    }
 }
 
 void engine::RigidBodyDynamic::SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry)

@@ -112,8 +112,10 @@ namespace engine
         ENGINE_API
         RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
 
-        uint64                  m_shape                 = 0;
-        collision::ECollisionGroup  m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+        RigidBodyData*              m_data              = nullptr;
+        uint64                      m_shape             = 0;
+        uint32                      m_type              = EShapeType::STATIC;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
 
 	private :
 
@@ -139,7 +141,6 @@ namespace engine
 
 		RigidBodyStaticImpl*    m_rigidBodyStaticImpl   = nullptr;
         Material*               m_materialImpl          = nullptr;
-        uint64                  m_type                  = EShapeType::STATIC;
 
 	}; // !Class RigidBodyStatic
 
