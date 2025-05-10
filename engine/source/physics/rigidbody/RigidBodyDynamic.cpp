@@ -443,7 +443,7 @@ void engine::RigidBodyDynamic::OnCollisionEnter(void* inOther)
 
 void engine::RigidBodyDynamic::OnCollisionExit(void* inOther)
 {
-    auto* otherRigidBody = reinterpret_cast<engine::RigidBodyStatic*>(inOther);
+    RigidBodyStatic* otherRigidBody = reinterpret_cast<engine::RigidBodyStatic*>(inOther);
 
     if (otherRigidBody != nullptr)
     {

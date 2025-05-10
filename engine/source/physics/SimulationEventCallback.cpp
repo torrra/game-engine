@@ -49,20 +49,20 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
 
         if (contactPair.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND)
         {
-            listenerA->OnCollisionEnter(inPairHeader.actors[1]->userData);
-            listenerB->OnCollisionEnter(inPairHeader.actors[0]->userData);
+            listenerA->OnCollisionEnter(listenerB);
+            listenerB->OnCollisionEnter(listenerA);
         }
 
         if (contactPair.events & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
         {
-            listenerA->OnCollisionStay(inPairHeader.actors[1]->userData);
-            listenerB->OnCollisionStay(inPairHeader.actors[0]->userData);
+            listenerA->OnCollisionStay(listenerB);
+            listenerB->OnCollisionStay(listenerA);
         }
 
         if (contactPair.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
         {
-            listenerA->OnCollisionExit(inPairHeader.actors[1]->userData);
-            listenerB->OnCollisionExit(inPairHeader.actors[0]->userData);
+            listenerA->OnCollisionExit(listenerB);
+            listenerB->OnCollisionExit(listenerA);
         }
     }
 }
