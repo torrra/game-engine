@@ -205,9 +205,6 @@ namespace engine
         { 
             return GetComponentArray<TComponentType>().GetThisIndex(component); 
         }
-
-    private:
-
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         ComponentArray<TComponentType>& GetComponentArray(void);
@@ -215,6 +212,9 @@ namespace engine
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         const ComponentArray<TComponentType>& GetComponentArray(void) const;
+
+    private:
+
 
         // Group the index and uid bits together in a 64-bit handle
         EntityHandle MakeHandle(int32 index, int32 uid);
