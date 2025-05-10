@@ -9,7 +9,7 @@ extern "C"
 #include "core/SceneGraph.h"
 #include "core/components/Camera.h"
 #include "core/systems/ScriptSystem.h"
-#include "scripting/CameraFunctions.h"
+#include "scripting/ecs/CameraFunctions.h"
 
 int script_GetCameraRef(lua_State* luaState)
 {
