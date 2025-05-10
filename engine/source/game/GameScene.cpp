@@ -4,6 +4,7 @@
 #include "Engine.h"
 
 #include "physics/PhysicsEngine.h"
+#include "physics/Raycast.h"
 
 #include <fstream>
  
@@ -75,6 +76,7 @@ namespace engine
 
     bool GameScene::DeserializeText(void)
     {
+        Raycast::CleanupRays();
         std::ifstream input(m_path, std::ios::in | std::ios::binary);
 
         if (!input)

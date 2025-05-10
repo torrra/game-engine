@@ -315,6 +315,7 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
                                point is the start and the end of a line)
     */
 
+    Raycast::DrawAllRays();
     math::Vector4f color = math::Vector4f(1.f, 0.f, 0.f, 1.f);
 
     if (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines() != nullptr)
@@ -326,7 +327,7 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
         math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
         m_debugDraw->RenderDebugDraw(inProjViewMatrix,
             (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
-                sizeof(m_debugDraw->GetDebugDrawImpl()->m_customLines.size())) * 2,
+                (uint32)m_debugDraw->GetDebugDrawImpl()->m_customLines.size()) * 2,
             color2);
     }
     else
@@ -337,6 +338,9 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
 
 void engine::PhysicsEngine::CleanUp(void)
 {
+    Raycast::CleanupRays();
+    Raycast::m_existingRays.~vector();
+
     // Delete the debug draw pointer
     delete m_debugDraw;
 
