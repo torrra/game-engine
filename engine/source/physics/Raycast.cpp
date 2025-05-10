@@ -19,6 +19,8 @@
 
 #pragma endregion
 
+std::vector<engine::Raycast> engine::Raycast::m_existingRays;
+
 engine::Raycast::Raycast(void)
 {
     // Initialize the raycast implementation pointer
@@ -38,6 +40,17 @@ engine::Raycast::Raycast(void)
                                                    physx::PxU32(physx::PxDebugColor::eARGB_GREEN));
     m_raycastImpl->m_failureLine = new physx::PxDebugLine(ToPxVec3(m_origin), physx::PxVec3(0.f), 
                                                    physx::PxU32(physx::PxDebugColor::eARGB_RED));
+}
+
+engine::Raycast::Raycast(Raycast&& inRaycast) noexcept
+{
+    m_direction = inRaycast.m_direction;
+    m_distance = inRaycast.m_distance;
+    m_origin = inRaycast.m_origin;
+    m_index = inRaycast.m_index;
+    m_raycastImpl = inRaycast.m_raycastImpl;
+
+    inRaycast.m_raycastImpl = nullptr;
 }
 
 engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& inDirection,
@@ -60,10 +73,15 @@ engine::Raycast::Raycast(const math::Vector3f& inOrigin, const math::Vector3f& i
                                                    physx::PxU32(physx::PxDebugColor::eARGB_GREEN));
     m_raycastImpl->m_failureLine = new physx::PxDebugLine(ToPxVec3(m_origin), physx::PxVec3(0.f), 
                                                    physx::PxU32(physx::PxDebugColor::eARGB_RED));
+
+    SetFlags(engine::ERaycastFlags::ALL);
 }
 
 engine::Raycast::~Raycast(void)
 {
+    if (!m_raycastImpl)
+        return;
+
     // Delete the raycast lines
     delete m_raycastImpl->m_successLine;
     m_raycastImpl->m_successLine = nullptr;
@@ -145,7 +163,7 @@ void engine::Raycast::SetFlags(ERaycastFlags inFlags)
     }
 }
 
-bool engine::Raycast::HasHit(void)
+bool engine::Raycast::HasHit(HitData* outData)
 {
     /*
         Set the raycast hit flags    : To request hit fields to be filled in by scene queries 
@@ -196,11 +214,26 @@ bool engine::Raycast::HasHit(void)
 
     if (status && m_raycastImpl->m_hit->hasBlock)
     {
-        PrintLog(SuccessPreset(), "Raycast hit something !");
+        //PrintLog(SuccessPreset(), "Raycast hit something !");
+
+        if (outData)
+        {
+            const physx::PxRaycastHit& block = m_raycastImpl->m_hit->block;
+
+            // TODO: do stuff with that to retrieve entity handle
+            (void)block.actor->userData;
+            outData->m_hitEntity = Entity::INVALID_HANDLE;
+
+            outData->m_position = ToVector3f(block.position);
+            outData->m_distance = block.distance;
+
+            //std::cout << "hit position: " << outData->m_position << "\nhit distance: " << outData->m_distance << '\n';
+        }
+
         return true;
     }
 
-    PrintLog(ErrorPreset(), "Raycast hit nothing...");
+    //PrintLog(InfoPreset(), "Raycast hit nothing...");
     return false;
 }
 
@@ -238,3 +271,73 @@ void engine::Raycast::DrawRay(void)
             physx::PxU32(physx::PxDebugColor::eARGB_RED));
     }
 }
+
+engine::Raycast& engine::Raycast::operator=(Raycast&& inOther) noexcept
+{
+    m_direction = inOther.m_direction;
+    m_distance = inOther.m_distance;
+    m_origin = inOther.m_origin;
+    m_index = inOther.m_index;
+    m_raycastImpl = inOther.m_raycastImpl;
+
+    inOther.m_raycastImpl = nullptr;
+    return *this;
+}
+
+
+int32 engine::Raycast::CreateRaycast(const math::Vector3f& inOrigin,
+                                     const math::Vector3f& inDirection, f32 inDistance)
+{
+    int32 index = 0;
+
+    for (; index < static_cast<int32>(m_existingRays.size()); ++index)
+    {
+        Raycast& ray = m_existingRays[index];
+
+        if (ray.m_index == INVALID_INDEX)
+        {
+            ray.SetRay(inOrigin, inDirection, inDistance);
+            ray.m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eNO_BLOCK);
+            *ray.m_raycastImpl->m_hit = physx::PxRaycastBuffer();
+            return ray.m_index = index;
+        }
+    }
+
+    Raycast& newRay = m_existingRays.emplace_back(inOrigin, inDirection, inDistance);
+    return newRay.m_index = index;
+}
+
+void engine::Raycast::DestroyRay(int32 inIndex)
+{
+    if (inIndex < 0 || inIndex >= static_cast<int32>(m_existingRays.size()))
+        return;
+
+    m_existingRays[inIndex].m_index = INVALID_INDEX;
+}
+
+engine::Raycast* engine::Raycast::GetRay(int32 inIndex)
+{
+    if (inIndex < 0 || inIndex >= static_cast<int32>(m_existingRays.size()))
+        return nullptr;
+
+    Raycast& ray = m_existingRays[inIndex];
+       
+    if (ray.m_index == INVALID_INDEX)
+        return nullptr;
+
+    else
+        return &ray;
+}
+
+void engine::Raycast::CleanupRays(void)
+{
+    m_existingRays.clear();
+    m_existingRays.shrink_to_fit();
+}
+
+void engine::Raycast::DrawAllRays(void)
+{
+    for (Raycast& ray : m_existingRays)
+        ray.DrawRay();
+}
+
