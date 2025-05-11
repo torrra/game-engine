@@ -40,18 +40,22 @@ namespace engine
         RegisterCameraFunctions(GetInstance()->m_luaState);
         RegisterTransformFunctions(GetInstance()->m_luaState);
         RegisterInputFunctions(GetInstance()->m_luaState);
+        RegisterVector2Functions(GetInstance()->m_luaState);
+        RegisterVector3Functions(GetInstance()->m_luaState);
         RegisterRaycastFunctions(GetInstance()->m_luaState);
 
+        RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
         RunConfigScript("Entity.lua");
-
         RunConfigScript("ScriptObject.lua");
         RunConfigScript("Script.lua");
-
         RunConfigScript("Camera.lua");
         RunConfigScript("Transform.lua");
-
         RunConfigScript("Input.lua");
+
+        RunConfigScript("vector/Vector2.lua");
+        RunConfigScript("vector/Vector3.lua");
+
         RunConfigScript("physics/Raycast.lua");
 
         RunAllUserScripts();
