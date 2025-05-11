@@ -40,6 +40,7 @@ namespace engine
         RegisterCameraFunctions(GetInstance()->m_luaState);
         RegisterTransformFunctions(GetInstance()->m_luaState);
         RegisterInputFunctions(GetInstance()->m_luaState);
+        RegisterRaycastFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Component.lua");
         RunConfigScript("Entity.lua");
@@ -51,6 +52,7 @@ namespace engine
         RunConfigScript("Transform.lua");
 
         RunConfigScript("Input.lua");
+        RunConfigScript("physics/Raycast.lua");
 
         RunAllUserScripts();
     }

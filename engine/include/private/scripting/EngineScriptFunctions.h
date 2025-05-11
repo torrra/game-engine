@@ -4,3 +4,4 @@
 #include "scripting/ecs/CameraFunctions.h"
 #include "scripting/ecs/TransformFunctions.h"
 #include "scripting/InputFunctions.h"
+#include "scripting/physics/RaycastFunctions.h"
