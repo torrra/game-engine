@@ -170,36 +170,25 @@ int script_SetRaycastDistance(lua_State* luaState)
 int script_HasRaycastHit(lua_State* luaState)
 {
     if (lua_gettop(luaState) != 1)
-    {
         luaL_error(luaState, "Expected 1 argument (index)");
-        lua_pushnil(luaState);
-        return 1;
-    }
 
     int32 index = static_cast<int32>(luaL_checkinteger(luaState, 1));
+    engine::Raycast::HitData hit;
 
     if (engine::Raycast* ray = engine::Raycast::GetRay(index))
-    {
-        engine::Raycast::HitData hit;
-
         lua_pushboolean(luaState, ray->HasHit(&hit));
-        lua_pushinteger(luaState, hit.m_hitEntity);
 
-        lua_pushnumber(luaState, hit.m_position.GetX());
-        lua_pushnumber(luaState, hit.m_position.GetY());
-        lua_pushnumber(luaState, hit.m_position.GetZ());
-
-        lua_pushnumber(luaState, hit.m_distance);
-
-        return 6;
-
-    }
     else
-    {
         luaL_error(luaState, "Invalid raycast");
-        lua_pushnil(luaState);
-        return 1;
-    }
+
+    lua_pushinteger(luaState, hit.m_hitEntity);
+
+    lua_pushnumber(luaState, hit.m_position.GetX());
+    lua_pushnumber(luaState, hit.m_position.GetY());
+    lua_pushnumber(luaState, hit.m_position.GetZ());
+
+    lua_pushnumber(luaState, hit.m_distance);
+    return 6;   
 }
 
 int script_CreateRaycast(lua_State* luaState)
