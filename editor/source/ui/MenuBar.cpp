@@ -120,6 +120,7 @@ void editor::MenuBar::OpenProject(void)
             engine->LoadDefaultScene();
 
             m_application->m_assetWnd.SetPath(engine->GetProjectDir());
+            m_application->m_sceneEditorView->GetPicking()->InitEntities(engine->GetGraph());
         }
     }
 }

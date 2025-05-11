@@ -26,6 +26,7 @@ namespace editor
         void Shutdown(void) override;
 
     private:
+        void PickEntity(void);
 
         AssetsWnd                   m_assetWnd;
         PropertyWnd                 m_properties;

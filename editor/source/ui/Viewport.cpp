@@ -43,7 +43,6 @@ void editor::Viewport::RenderToViewport(void)
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::RenderScene(m_graph);
     m_fbo.Unbind();
-    
 }
 
 void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)
@@ -60,13 +59,13 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     m_fbo.Unbind();
 }
 
-void editor::Viewport::RenderPickingPass(void)
+void editor::Viewport::RenderPickingPass(const math::Matrix4f& viewProjection)
 {
     if (!m_enablePicking)
         return;
 
     SetViewportBg(0.0f, 0.0f, 0.0f, 1.0f);
-    m_picking->RenderSceneColored(m_graph);
+    m_picking->RenderSceneColored(m_graph, viewProjection);
 }
 
 void editor::Viewport::SetBgColor(math::Vector4f const& bgColor)
