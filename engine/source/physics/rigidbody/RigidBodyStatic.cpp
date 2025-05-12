@@ -250,7 +250,7 @@ engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
     if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
         // If true take the entity transform
-        PrintLog(SuccessPreset(), "Found transform component on entity.");
+        PrintLog(InfoPreset(), "Found transform component on entity.");
         return *temp;
     }
 
@@ -300,8 +300,6 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::BOX;
-
-    PrintLog(SuccessPreset(), "Created static box rigid body.");
 }
 
 void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
@@ -316,18 +314,19 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
         physx::PxSphereGeometry(0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
+    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data->m_type = EShapeType::STATIC;
+
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::SPHERE;
-
-    PrintLog(SuccessPreset(), "Created static sphere rigid body.");
 }
 
 void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
@@ -342,18 +341,19 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         physx::PxCapsuleGeometry(0.25f, 0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
+    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data->m_type = EShapeType::STATIC;
+
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::CAPSULE;
-
-    PrintLog(SuccessPreset(), "Created static capsule rigid body.");
 }
 
 void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
@@ -367,17 +367,18 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
         physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 0.f),
         *m_materialImpl->GetImpl().m_material);
 
+    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data->m_type = EShapeType::STATIC;
+
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = this;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::PLANE;
-
-    PrintLog(SuccessPreset(), "Created static plane rigid body.");
 }
 
 void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)

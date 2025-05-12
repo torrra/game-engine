@@ -47,7 +47,7 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
     if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
         // If true take the entity transform
-        PrintLog(SuccessPreset(), "Found transform component on entity.");
+        PrintLog(InfoPreset(), "Found transform component on entity.");
         return *temp;
     }
 
@@ -86,8 +86,6 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::BOX;
-    //m_type = EShapeType::DYNAMIC;
-    PrintLog(SuccessPreset(), "Created dynamic box rigid body.");
 }
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
@@ -116,8 +114,6 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::SPHERE;
-    //m_type = EShapeType::DYNAMIC;
-    PrintLog(SuccessPreset(), "Created dynamic sphere rigid body.");
 }
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
@@ -148,7 +144,6 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::CAPSULE;
-    PrintLog(SuccessPreset(), "Created dynamic capsule rigid body.");
 }
 
 void engine::RigidBodyDynamic::UpdateEntity()
@@ -183,7 +178,6 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
     // Delete the pointer to the implementation structure
     delete m_rigidBodyImpl;
     m_rigidBodyImpl = nullptr;
-    PrintLog(SuccessPreset(), "Cleaned up dynamic rigid body.");
 }
 
 void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
@@ -222,20 +216,6 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
 }
-
-//engine::RigidBodyDynamic::~RigidBodyDynamic(void)
-//{
-//    // Release all rigid body resources
-//    //RigidBodyDynamicCleanUp();
-//
-//    //// Delete the pointer to the implementation structure
-//    //if (m_rigidBodyImpl != nullptr)
-//    //{
-//    //    delete m_rigidBodyImpl;
-//    //    m_rigidBodyImpl = nullptr;
-//    //    PrintLog(SuccessPreset(), "Cleaned up dynamic rigid body.");
-//    //}
-//}
 
 bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
 {
