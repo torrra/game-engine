@@ -165,6 +165,10 @@ void engine::Raycast::SetFlags(ERaycastFlags inFlags)
 
 bool engine::Raycast::HasHit(HitData* outData)
 {
+
+    if (math::AlmostEqual(m_direction.MagnitudeSquared(), 0.f))
+        return false;
+
     /*
         Set the raycast hit flags    : To request hit fields to be filled in by scene queries 
                                              (such as hit position, normal, face index or UVs). 
@@ -239,6 +243,9 @@ bool engine::Raycast::HasHit(HitData* outData)
 
 void engine::Raycast::DrawRay(void)
 {
+    if (math::AlmostEqual(m_direction.MagnitudeSquared(), 0.f))
+        return;
+
     // Convert the ray direction and origin to physx vectors
     physx::PxVec3 origin                = ToPxVec3(m_origin);
     physx::PxVec3 end                   = origin + ToPxVec3(m_direction.Normalized()) * m_distance;
