@@ -84,6 +84,8 @@ namespace engine
 
         ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
 
+        ENGINE_API void             SetTrigger(bool inIsTrigger);
+
 		/// Functions
 		ENGINE_API	void		    Register(void) override {}
 
@@ -115,7 +117,7 @@ namespace engine
         RigidBodyData*              m_data              = nullptr;
         uint64                      m_shape             = 0;
         uint32                      m_type              = EShapeType::STATIC;
-        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::DEFAULT_COLLISION;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
 
 	private :
 

@@ -107,6 +107,8 @@ namespace engine
 
         ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
 
+        ENGINE_API void             SetTrigger(bool inIsTrigger);
+
         /// Functions
         /*
             Update the entity transform in reference to the dynamic rigid body
@@ -145,7 +147,7 @@ namespace engine
         RigidBodyData*              m_data              = nullptr;
         uint64                      m_shape             = 0;
         uint32                      m_type              = EShapeType::DYNAMIC;
-        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::TRIGGER_COLLISION;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::DEFAULT_COLLISION;
 
 
     private :

@@ -72,15 +72,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
-
-    physx::PxShape* shape = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
-    if (shape)
-    {
-        shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-        shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
-    }
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);    
 
     m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
     m_data->m_type = EShapeType::DYNAMIC;
@@ -434,6 +426,27 @@ void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
 void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
 {
     m_collisionGroup = inCollisionGroup;
+}
+
+void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
+{
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+    if (shape)
+    {
+        if (inIsTrigger)
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+            m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
+        }
+        else
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+            m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+        }
+    }
 }
 
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)

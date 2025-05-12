@@ -286,15 +286,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
-    
-    //physx::PxShape* shape = nullptr;
-    //m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shape, 1);
-    //if (shape)
-    //{
-    //    shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-    //    shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
-    //}
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);    
 
     m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
     m_data->m_type = EShapeType::STATIC;
@@ -397,6 +389,27 @@ void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
 void engine::RigidBodyStatic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
 {
     m_collisionGroup = inCollisionGroup;
+}
+
+void engine::RigidBodyStatic::SetTrigger(bool inIsTrigger)
+{
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shape, 1);
+    if (shape)
+    {
+        if (inIsTrigger)
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+            m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
+        }
+        else
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+            m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+        }
+    }
 }
 
 void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry)
