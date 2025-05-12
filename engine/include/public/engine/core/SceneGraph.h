@@ -19,6 +19,8 @@
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
 
+#include "engine/sounds/AudioPlayer.h"
+
 namespace engine
 {
     class SceneGraph
@@ -262,6 +264,10 @@ namespace engine
 
         ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
 
+        // All sound components in the scene
+        ComponentArray<AudioPlayer>			m_sceneAudioPlayer;
+
+
          
 
         // All entities in the scene
@@ -327,7 +333,18 @@ namespace engine
     {
         return m_sceneStaticRigidBodies;
     }
+    
+    template<>
+    inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
+    {
+        return m_sceneAudioPlayer;
+    }
 
+    template<> inline
+    const ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void) const
+    {
+        return m_sceneAudioPlayer;
+    }
 
     template<> inline
     const ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void) const
