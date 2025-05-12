@@ -48,6 +48,11 @@ function ScriptObject:Update(deltaTime)
 
 end
 
+function ScriptObject:OnCollisionEnter(otherEntity)
+
+	print("Parent class")
+end
+
 -- Internal Start() caller
 function ScriptObject:_ExecuteStart()
 
