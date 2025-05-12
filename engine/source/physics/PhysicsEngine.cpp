@@ -11,6 +11,7 @@
 #include "physics/InternalPhysXStruct.hpp"
 #include "physics/InternalPhyxConversion.hpp"
 #include "physics/InternalPhysxDebugDraw.h"
+#include "physics/SimulationEventCallback.h"
 
 #pragma endregion
 
@@ -179,6 +180,31 @@ void engine::PhysicsEngine::InitPhysics(bool inIsPvdConnected)
     }
 }
 
+physx::PxFilterFlags CustomFilterShader(
+    physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
+    physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,
+    physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize)
+{
+    (void)attributes0;          // To avoid warning
+    (void)attributes1;          // To avoid warning
+    (void)constantBlock;        // To avoid warning
+    (void)constantBlockSize;    // To avoid warning
+    // Test to check if objects are collidable
+    if ((filterData0.word0 & filterData1.word1) == 0 &&
+        (filterData1.word0 & filterData0.word1) == 0)
+    {
+        return physx::PxFilterFlag::eSUPPRESS;
+    }
+
+    // To enable contact generation
+    pairFlags = physx::PxPairFlag::eCONTACT_DEFAULT |
+        physx::PxPairFlag::eNOTIFY_TOUCH_FOUND |
+        physx::PxPairFlag::eNOTIFY_TOUCH_LOST |
+        physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS;
+
+    return physx::PxFilterFlag::eDEFAULT;
+}
+
 void engine::PhysicsEngine::InitScene(void)
 {
     if (m_impl->m_physics != nullptr)
@@ -212,8 +238,11 @@ void engine::PhysicsEngine::InitScene(void)
             <param> Flags : To determine what we want to do between the two objects
                     (trigger, collide, etc.)
             <param> Data : Constant data (mostly unused)
-        */
-        sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+        */ 
+        //sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+        sceneDesc.filterShader = CustomFilterShader;
+        m_eventCallback = new SimulationEventCallback();
+        sceneDesc.simulationEventCallback = m_eventCallback;
 
         /*
             Create an instance of a physic scene where all the simulation run. It's the
@@ -223,6 +252,7 @@ void engine::PhysicsEngine::InitScene(void)
             <param> SceneDesc : The description of the scene
         */
         m_impl->m_scene = m_impl->m_physics->createScene(sceneDesc);
+
 
         /*
             Allow to create a physic material to personalize the physic behavior of the 
@@ -259,6 +289,8 @@ math::Vector4f engine::PhysicsEngine::ConvertPhysxColorToVector4f(uint32 inColor
 
     return math::Vector4f(r, g, b, a);
 }
+
+
 
 void engine::PhysicsEngine::StepSimulation(f32 inDeltaTime)
 {
@@ -342,6 +374,10 @@ void engine::PhysicsEngine::CleanUp(void)
 
     // Release all physX elements in the good order
     PX_RELEASE(m_impl->m_material);
+
+    delete m_eventCallback;
+    m_eventCallback = nullptr;
+
     PX_RELEASE(m_impl->m_scene);
     PX_RELEASE(m_impl->m_dispatcher);
     PX_RELEASE(m_impl->m_physics);

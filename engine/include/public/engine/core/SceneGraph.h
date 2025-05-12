@@ -202,8 +202,8 @@ namespace engine
         ENGINE_API
         static int64 RandomNumber(void);
 
-    private:
-
+        template<CValidComponent TComponentType>
+        uint64 GetThisIndex(TComponentType* component) const;
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         ComponentArray<TComponentType>& GetComponentArray(void);
@@ -211,6 +211,9 @@ namespace engine
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         const ComponentArray<TComponentType>& GetComponentArray(void) const;
+
+    private:
+
 
         // Group the index and uid bits together in a 64-bit handle
         EntityHandle MakeHandle(int32 index, int32 uid);
@@ -292,6 +295,12 @@ namespace engine
             if (component.IsValid() && component.IsActive())
                 component.Update(std::forward<TVariadicArgs>(args)...);
         }
+    }
+
+    template<CValidComponent TComponentType>
+    inline uint64 SceneGraph::GetThisIndex(TComponentType* component) const
+    {
+        return GetComponentArray<TComponentType>().GetThisIndex(component);
     }
 
     template<>

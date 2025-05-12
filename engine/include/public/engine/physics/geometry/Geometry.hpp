@@ -13,7 +13,7 @@ namespace engine
 
 	}; // !Enum EGeometryType
 
-    enum EShapeType : uint64
+    enum EShapeType : uint32
     {
         DYNAMIC = 0,
         STATIC = 1
@@ -24,4 +24,30 @@ namespace engine
         EErrorGeometryType_None = -1,
         EErrorGeometryType_Invalid = 0
     };// !Enum EErrorGeometryType
+
+    struct RigidBodyData
+    {
+        uint32 m_index;
+        uint32 m_type;
+
+    }; // !Struct RigidBodyDynamicData
+
+    inline uint64 MakeRigidBodyIndex(uint32 inIndex, EShapeType inShapeType)
+    {
+        if (inIndex >= ULONG_MAX || inShapeType >= ULONG_MAX)
+            return ULLONG_MAX;
+
+        return (static_cast<uint64>(inShapeType) << 32) | static_cast<uint64>(inIndex);
+    }
+
+    inline uint32 GetRigidBodyIndex(uint64 inIndex)
+    {
+        return static_cast<uint32>(inIndex & 0xFFFFFFFF);
+    }
+
+    inline uint32 GetShapeType(uint64 inShapeType)
+    {
+        return static_cast<uint32>((inShapeType >> 32) & 0xFFFFFFFF);
+    }
+
 } // !Namespace engine
