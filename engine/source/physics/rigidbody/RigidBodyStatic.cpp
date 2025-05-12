@@ -434,36 +434,64 @@ void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EG
     }
 }
 
+void engine::RigidBodyStatic::OnCollisionEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyStatic::OnCollisionExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
+}
+
 void engine::RigidBodyStatic::OnTriggerEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-    {
-        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-    {
-        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
     else
-    {
-        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with something else" << std::endl;
-    }
+        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
 }
 
 void engine::RigidBodyStatic::OnTriggerExit(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-    {
-        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-    {
-        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
     else
-    {
-        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with something else" << std::endl;
-    }
+        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
 }
 
 engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph* inScene, 

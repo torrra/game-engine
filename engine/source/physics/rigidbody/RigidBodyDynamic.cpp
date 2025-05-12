@@ -452,65 +452,61 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-    {
-        std::cout << "Collision enter between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
+                                  " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-    {
-        std::cout << "Collision enter between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) + 
+                                  " with static " + std::to_string(rbStatic->m_data->m_index));
+
     else
-    {
-        std::cout << "Collision exit between : " << m_data->m_index << " with something else" << std::endl;
-    }
+        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) + 
+                                " with wrong entity");
 }
 
 void engine::RigidBodyDynamic::OnCollisionExit(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-    {
-        std::cout << "Collision exit between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-    {
-        std::cout << "Collision exit between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
     else
-    {
-        std::cout << "Collision exit between : " << m_data->m_index << " with something else" << std::endl;
-    }
+        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
 }
 
 void engine::RigidBodyDynamic::OnTriggerEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-    {
-        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-    {
-        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
     else
-    {
-        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with something else" << std::endl;
-    }
+        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
 }
 
 void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-    {
-        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-    {
-        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
-    }
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+            " with static " + std::to_string(rbStatic->m_data->m_index));
+
     else
-    {
-        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with something else" << std::endl;
-    }
+        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+            " with wrong entity");
 }
 
 void engine::RigidBodyDynamic::SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry)
