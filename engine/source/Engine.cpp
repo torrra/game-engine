@@ -392,6 +392,12 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
 
     SaveProject();
 
+    if (!std::filesystem::exists(m_projectFile))
+    {
+        PrintLog(ErrorPreset(), "Cannot build invalid project");
+        return;
+    }
+
     std::filesystem::path buildDir = destination;
 
     TimePoint now = std::chrono::system_clock::now();
@@ -435,12 +441,13 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
     std::filesystem::copy(currentPath, buildDir.parent_path(), copyOptions);
 
     std::filesystem::path exePath = currentPath = buildDir.replace_filename("defaultExecutable.exe");
+
     std::filesystem::rename(currentPath,
-    exePath.replace_filename(m_currentProject.m_executableName).replace_extension(".exe"));
+              exePath.replace_filename(m_currentProject.m_executableName).replace_extension(".exe"));
 
     // Directly execute .exe
     OpenFile(std::filesystem::absolute(exePath).c_str(),
-             std::filesystem::absolute(buildDir.parent_path()).c_str());
+        std::filesystem::absolute(buildDir.parent_path()).c_str());
 
 }
 
