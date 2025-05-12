@@ -168,10 +168,13 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
 
 void engine::RigidBodyStatic::UpdateEntity(void)
 {
-    // Update the entity transform in regard to the rigid body for exemple,
-    // if the rigid body is under gravity then the rigid body fall so the entity fall
-    *m_currentScene->GetComponent<Transform>(m_owner) =
-        ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+    // Update the entity transform in regard to the rigid body
+    Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+    Transform updatedTransform = ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+
+    transform->CopyPosition(updatedTransform);
+    transform->CopyRotation(updatedTransform);
 }
 
 void engine::RigidBodyStatic::UpdateRigidBody(void)
