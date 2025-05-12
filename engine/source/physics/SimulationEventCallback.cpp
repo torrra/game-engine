@@ -3,6 +3,7 @@
 #include "engine/Engine.h"
 #include "engine/core/SceneGraph.h"
 #include "engine/physics/geometry/Geometry.hpp"
+#include "core/systems/ScriptSystem.h"
 
 void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, const physx::PxContactPair* inPairs, physx::PxU32 inNbPairs)
 {
@@ -60,6 +61,9 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
         {
             listenerA->OnCollisionEnter(ownerB);
             listenerB->OnCollisionEnter(ownerA);
+
+            ScriptSystem::NotifyCollisionEnter(ownerA, ownerB);
+
         }
 
         if (contactPair.events & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
