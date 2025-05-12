@@ -201,10 +201,7 @@ namespace engine
         static int64 RandomNumber(void);
 
         template<CValidComponent TComponentType>
-        size_t GetThisIndex(TComponentType* component) const 
-        { 
-            return GetComponentArray<TComponentType>().GetThisIndex(component); 
-        }
+        uint64 GetThisIndex(TComponentType* component) const;
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         ComponentArray<TComponentType>& GetComponentArray(void);
@@ -292,6 +289,12 @@ namespace engine
             if (component.IsValid() && component.IsActive())
                 component.Update(std::forward<TVariadicArgs>(args)...);
         }
+    }
+
+    template<CValidComponent TComponentType>
+    inline uint64 SceneGraph::GetThisIndex(TComponentType* component) const
+    {
+        return GetComponentArray<TComponentType>().GetThisIndex(component);
     }
 
     template<>
