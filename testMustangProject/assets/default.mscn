@@ -28,8 +28,9 @@
    @uint64 | flags=0
 [RigidBodyDynamic]
      @int64 | owner=0
-     @uint64 | type=0
+     @uint32 | type=0
      @uint64 | shape=0
+     @uint32 | collision group=1
      @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera
@@ -73,8 +74,9 @@
     @uint64 | flags=0
 [RigidBodyStatic]
      @int64 | owner=2
-     @uint64 | type=0
+     @uint32 | type=0
      @uint64 | shape=0
+     @uint32 | collision group=3
      @uint64 | flags=0
 [Entity]
    @string 4 | name=Test

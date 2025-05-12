@@ -60,6 +60,8 @@ namespace engine
 
         ComponentArray& operator=(ComponentArray&&) noexcept = default;
 
+        uint64 GetThisIndex(TComponentType* component) const;
+
     protected:
 
         // Create a component without checking if the object's parent is
@@ -238,6 +240,12 @@ namespace engine
     inline auto ComponentArray<TComponentType>::end(void)
     {
         return m_components.end();
+    }
+
+    template<CValidComponent TComponentType>
+    inline uint64 ComponentArray<TComponentType>::GetThisIndex(TComponentType* component) const
+    {
+        return component - m_components.data();
     }
 
     template<CValidComponent TComponentType> inline

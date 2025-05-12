@@ -17,6 +17,7 @@
 
 #include "engine/physics/PhysicsMaterial.h"
 #include "engine/physics/geometry/Geometry.hpp"
+#include "engine/physics/ICollisionListener.h"
 
 #pragma endregion
 
@@ -24,7 +25,7 @@ namespace engine
 {
 	struct RigidBodyStaticImpl;
 
-	class RigidBodyStatic : public Component
+	class RigidBodyStatic : public ICollisionListener, public Component
 	{
 	public:
 
@@ -37,9 +38,6 @@ namespace engine
 
         ENGINE_API                  RigidBodyStatic(const RigidBodyStatic&) = delete;
         ENGINE_API                  RigidBodyStatic(RigidBodyStatic&&) noexcept = default;
-
-		/// Destructor
-								    ~RigidBodyStatic(void);
         
         /// Getter
         /*
@@ -81,6 +79,10 @@ namespace engine
         */
         ENGINE_API  void            SetDebugVisualization(bool inIsDebugVisualization);
 
+        ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
+
+        ENGINE_API void             SetTrigger(bool inIsTrigger);
+
 		/// Functions
 		ENGINE_API	void		    Register(void) override {}
 
@@ -93,17 +95,33 @@ namespace engine
         ENGINE_API void				SerializeText(std::ostream& output,
                                                   EntityHandle owner,
                                                   uint64 index) const override;
-        ENGINE_API const char*  DeserializeText(const char* text, const char* end) override;
+        ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
 
-                    Transform&  CheckEntityTransform(void);
-                    void        SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry);
+                    Transform&      CheckEntityTransform(void);
+                    void            SwitchShape(const EGeometryType& inGeometry);
+
+        ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnCollisionStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnCollisionExit(EntityHandle inOther) override;
+
+        ENGINE_API  void            OnTriggerEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnTriggerStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerExit(EntityHandle inOther) override;
+
         ENGINE_API
-        RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
+        RigidBodyStatic&            operator=(RigidBodyStatic&&) noexcept = default;
 
-        uint64                  m_shape                 = 0;
+        RigidBodyData               m_data;
+        uint64                      m_shape             = 0;
+        uint32                      m_type              = EShapeType::STATIC;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+
 	private :
 
         friend class RigidBodyStaticFactory;
+
+        void                        SetCollisionGroupAndMask(uint32 inCollisionGroup,
+                                                             uint32 inCollisionMask);
 
 		/// Functions
         /*
@@ -122,7 +140,6 @@ namespace engine
 
 		RigidBodyStaticImpl*    m_rigidBodyStaticImpl   = nullptr;
         Material*               m_materialImpl          = nullptr;
-        uint64                  m_type                  = EShapeType::STATIC;
 
 	}; // !Class RigidBodyStatic
 

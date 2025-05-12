@@ -65,6 +65,7 @@ namespace engine
         RegisterComponents<Camera>();
         RegisterComponents<RigidBodyDynamic>();
         RegisterComponents<RigidBodyStatic>();
+        RegisterComponents<AudioPlayer>();
     }
 
     void SceneGraph::RegisterAllEntities(void)
@@ -209,6 +210,7 @@ namespace engine
             m_sceneScripts.InvalidateComponent(entity);
             m_sceneDynamicRigidBodies.InvalidateComponent(entity);
             m_sceneStaticRigidBodies.InvalidateComponent(entity);
+            m_sceneAudioPlayer.InvalidateComponent(entity);
 
             ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
@@ -357,6 +359,7 @@ namespace engine
         m_sceneScripts.MoveReparentedComponent(reparented, newParent);
         m_sceneDynamicRigidBodies.MoveReparentedComponent(reparented, newParent);
         m_sceneStaticRigidBodies.MoveReparentedComponent(reparented, newParent);
+        m_sceneAudioPlayer.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
 
@@ -368,6 +371,7 @@ namespace engine
            m_sceneRenderers.MoveReparentedComponent(child);
            m_sceneDynamicRigidBodies.MoveReparentedComponent(child);
            m_sceneStaticRigidBodies.MoveReparentedComponent(child);
+           m_sceneAudioPlayer.MoveReparentedComponent(child);
         }
     }
 
@@ -438,6 +442,7 @@ namespace engine
             SerializeSingleComponent<Script>(file, entity, handles);
             SerializeSingleComponent<RigidBodyDynamic>(file, entity, handles);
             SerializeSingleComponent<RigidBodyStatic>(file, entity, handles);
+            SerializeSingleComponent<AudioPlayer>(file, entity, handles);
         }
     }
 
@@ -449,6 +454,7 @@ namespace engine
         Component::DeserializedArray<Script>	scripts;
         Component::DeserializedArray<RigidBodyDynamic>	dynamicRigidBodies;
         Component::DeserializedArray<RigidBodyStatic>	staticRigidBodies;
+        Component::DeserializedArray<AudioPlayer>	audioPlayers;
 
         const char* start;
         const char* end;
@@ -477,18 +483,21 @@ namespace engine
             else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
                 start = Component::DeserializeComponentText(staticRigidBodies, start, end);
 
+            else if (memcmp(start, "[AudioPlayer]", 13) == 0)
+                start = Component::DeserializeComponentText(audioPlayers, start, end);
+
             start = text::GetNewLine(start, end);
         }
 
-        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies);
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies, audioPlayers);
         text::UnloadFileData(data);
         for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {
-            rbDynamic.SwitchShape(&rbDynamic, static_cast<EGeometryType>(rbDynamic.m_shape));
+            rbDynamic.SwitchShape(static_cast<EGeometryType>(rbDynamic.m_shape));
         }
         for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
         {
-            rbStatic.SwitchShape(&rbStatic, static_cast<EGeometryType>(rbStatic.m_shape));
+            rbStatic.SwitchShape(static_cast<EGeometryType>(rbStatic.m_shape));
         }
     }
 
