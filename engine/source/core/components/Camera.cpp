@@ -65,7 +65,11 @@ void engine::Camera::Unregister(void)
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
 {
-    return m_transform->SetPosition();
+    if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+        return transform->GetPosition();
+
+    else
+        return math::Vector3f();
 }
 
 math::Vector3f engine::Camera::GetRotation(void) const noexcept
@@ -95,6 +99,7 @@ f32 engine::Camera::GetFarPlane(void) const noexcept
 
 math::Vector3f& engine::Camera::Position(void)
 {
+    m_transform = m_currentScene->GetComponent<Transform>(m_owner);
     return m_transform->SetPosition();
 }
 
