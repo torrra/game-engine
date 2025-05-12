@@ -7,8 +7,8 @@
 [Transform]
     @uint64 | index=3
     @int64 | owner=0
-    @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,4,-5}
+    @quat32 | rotation={1,5.00608e-07,0.000392575,2.56484e-08}
+    @vec3f32 | position={-0.00529975,3,-5.00181}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Renderer]
@@ -50,7 +50,7 @@
     @f32 | far=250
     @f32 | fov=1.0472
     @f32 | aspectRatio=1.77778
-    @vec3f32 | rotationEuler={0,0,-1}
+    @vec3f32 | rotationEuler={-14.2,23.8,-1}
     @uint64 | flags=0
 [Script]
    @uint64 | index=1
