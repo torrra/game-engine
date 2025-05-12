@@ -498,22 +498,22 @@ void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
             " with wrong entity");
 }
 
-void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
+void engine::RigidBodyDynamic::SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry)
 {
     switch (inGeometry)
     {
     case EGeometryType::BOX:
-        CreateDynamicBoxRigidBody();
+        inRigidBody->CreateDynamicBoxRigidBody();
         break;
     case EGeometryType::SPHERE:
-        CreateDynamicSphereRigidBody();
+        inRigidBody->CreateDynamicSphereRigidBody();
         break;
     case EGeometryType::CAPSULE:
-        CreateDynamicCapsuleRigidBody();
+        inRigidBody->CreateDynamicCapsuleRigidBody();
         break;
     default:
         PrintLog(ErrorPreset(), "Invalid geometry type, create box by default.");
-        CreateDynamicBoxRigidBody();
+        inRigidBody->CreateDynamicBoxRigidBody();
         break;
     }
 }
@@ -525,7 +525,7 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGr
     // Create dynamic rigid body in regard to the geometry and give it an owner and a scene
     if (RigidBodyDynamic* temp = inScene->CreateComponent<RigidBodyDynamic>(inOwner))
     {
-        temp->SwitchShape(inGeometry);
+        temp->SwitchShape(temp, inGeometry);
         return temp;
     }
     PrintLog(ErrorPreset(), "Failed to create dynamic rigid body.");

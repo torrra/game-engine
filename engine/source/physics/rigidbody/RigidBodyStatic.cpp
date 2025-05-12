@@ -408,21 +408,21 @@ void engine::RigidBodyStatic::SetTrigger(bool inIsTrigger)
     }
 }
 
-void engine::RigidBodyStatic::SwitchShape(const EGeometryType& inGeometry)
+void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry)
 {
     switch (inGeometry)
     {
     case EGeometryType::BOX:
-        CreateStaticBoxRigidBody();
+        inRigidBody->CreateStaticBoxRigidBody();
         break;
     case EGeometryType::SPHERE:
-        CreateStaticSphereRigidBody();
+        inRigidBody->CreateStaticSphereRigidBody();
         break;
     case EGeometryType::CAPSULE:
-        CreateStaticCapsuleRigidBody();
+        inRigidBody->CreateStaticCapsuleRigidBody();
         break;
     case EGeometryType::PLANE:
-        CreateStaticPlaneRigidBody();
+        inRigidBody->CreateStaticPlaneRigidBody();
         break;
     default:
         PrintLog(ErrorPreset(), "Invalid geometry type");
@@ -497,7 +497,7 @@ engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph
     // Create static rigid body in regard to the geometry and give it an owner and a scene
     if (RigidBodyStatic* temp = inScene->CreateComponent<RigidBodyStatic>(inOwner))
     {
-        temp->SwitchShape(inGeometry);
+        temp->SwitchShape(temp, inGeometry);
         return temp;
     }
     PrintLog(ErrorPreset(), "Failed to create static rigid body.");
