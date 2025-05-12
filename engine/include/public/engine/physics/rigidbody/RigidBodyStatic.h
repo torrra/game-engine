@@ -38,9 +38,6 @@ namespace engine
 
         ENGINE_API                  RigidBodyStatic(const RigidBodyStatic&) = delete;
         ENGINE_API                  RigidBodyStatic(RigidBodyStatic&&) noexcept = default;
-
-		/// Destructor
-								    ~RigidBodyStatic(void);
         
         /// Getter
         /*
