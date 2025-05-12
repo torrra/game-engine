@@ -2,6 +2,7 @@
 #include "resource/shader/ShaderResource.h"
 #include "resource/ResourceManager.h"
 #include "utility/MemoryCheck.h"
+#include "ConsoleLog.hpp"
 
 #include <glad/glad.h>
 
@@ -157,11 +158,17 @@ void engine::ShaderProgram::CreateProgram(void)
         return;
      
 	// Resource manager will only load if resource does not exist
-	ResourceManager::Load<Shader>(m_vertexShader);
+	ResourceManager::Load<Shader>(m_vertexShader, true);
 	ResourceManager::Load<Shader>(m_fragShader);
 	
 	const Shader* vShader = ResourceManager::GetResource<Shader>(m_vertexShader);
 	const Shader* fShader = ResourceManager::GetResource<Shader>(m_fragShader);
+
+    if (!vShader || !fShader)
+    {
+        PrintLog(ErrorPreset(), "Failed to compute shader");
+        return;
+    }
 
 	if (!vShader->GetShaderType() ||
 		!fShader->GetShaderType())
