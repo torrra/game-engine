@@ -30,7 +30,6 @@
 engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
-    m_data                  = new RigidBodyData();   
 	m_owner					= inOwner;
 	m_currentScene			= inScene;
 }
@@ -197,8 +196,6 @@ void engine::RigidBodyStatic::UpdateRigidBody(void)
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
-    delete m_data;
-    m_data = nullptr;
     // Delete the pointer to the implementation structure
     delete m_materialImpl;
     m_materialImpl = nullptr;
@@ -295,12 +292,10 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);    
 
-    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data->m_type = EShapeType::STATIC;
-
-    std::cout << "[RigidBodyStatic] Index: " << m_data->m_index << " | Type: " << m_data->m_type << std::endl;
-
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
     
@@ -321,13 +316,13 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
         physx::PxSphereGeometry(0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
-    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data->m_type = EShapeType::STATIC;
-
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -348,13 +343,13 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         physx::PxCapsuleGeometry(0.25f, 0.5f), 
         *m_materialImpl->GetImpl().m_material);
 
-    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data->m_type = EShapeType::STATIC;
-
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -374,13 +369,13 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
         physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 0.f),
         *m_materialImpl->GetImpl().m_material);
 
-    m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data->m_type = EShapeType::STATIC;
-
     // Set the visualization of the rigid body to false by default
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
 
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
@@ -445,60 +440,60 @@ void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EG
 void engine::RigidBodyStatic::OnCollisionEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
 
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
-            " with static " + std::to_string(rbStatic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
 
     else
-        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data->m_index) +
+        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
             " with wrong entity");
 }
 
 void engine::RigidBodyStatic::OnCollisionExit(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
 
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
-            " with static " + std::to_string(rbStatic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
 
     else
-        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data->m_index) +
+        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
             " with wrong entity");
 }
 
 void engine::RigidBodyStatic::OnTriggerEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
 
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
-            " with static " + std::to_string(rbStatic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
 
     else
-        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data->m_index) +
+        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
             " with wrong entity");
 }
 
 void engine::RigidBodyStatic::OnTriggerExit(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
 
     else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
-            " with static " + std::to_string(rbStatic->m_data->m_index));
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
 
     else
-        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data->m_index) +
+        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
             " with wrong entity");
 }
 

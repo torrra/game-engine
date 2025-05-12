@@ -144,7 +144,7 @@ namespace engine
 
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 
-        RigidBodyData*              m_data              = nullptr;
+        RigidBodyData               m_data;
         uint64                      m_shape             = 0;
         uint32                      m_type              = EShapeType::DYNAMIC;
         collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::DEFAULT_COLLISION;

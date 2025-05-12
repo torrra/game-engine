@@ -6,8 +6,8 @@
 
 void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, const physx::PxContactPair* inPairs, physx::PxU32 inNbPairs)
 {
-    RigidBodyData* data0 = reinterpret_cast<RigidBodyData*>(inPairHeader.actors[0]->userData);
-    RigidBodyData* data1 = reinterpret_cast<RigidBodyData*>(inPairHeader.actors[1]->userData);
+    RigidBodyData* data0 = reinterpret_cast<RigidBodyData*>(&inPairHeader.actors[0]->userData);
+    RigidBodyData* data1 = reinterpret_cast<RigidBodyData*>(&inPairHeader.actors[1]->userData);
 
     ICollisionListener* listenerA = nullptr;
     ICollisionListener* listenerB = nullptr;
@@ -78,8 +78,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
 
 void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, physx::PxU32 inNbPairs)
 {
-    RigidBodyData* data0 = reinterpret_cast<RigidBodyData*>(inPairs->triggerActor->userData);
-    RigidBodyData* data1 = reinterpret_cast<RigidBodyData*>(inPairs->otherActor->userData);
+    RigidBodyData* data0 = reinterpret_cast<RigidBodyData*>(&inPairs->triggerActor->userData);
+    RigidBodyData* data1 = reinterpret_cast<RigidBodyData*>(&inPairs->otherActor->userData);
 
     ICollisionListener* listenerA = nullptr;
     ICollisionListener* listenerB = nullptr;

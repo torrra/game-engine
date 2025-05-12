@@ -114,7 +114,7 @@ namespace engine
         ENGINE_API
         RigidBodyStatic&            operator=(RigidBodyStatic&&) noexcept = default;
 
-        RigidBodyData*              m_data              = nullptr;
+        RigidBodyData               m_data;
         uint64                      m_shape             = 0;
         uint32                      m_type              = EShapeType::STATIC;
         collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
