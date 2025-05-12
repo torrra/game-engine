@@ -132,20 +132,20 @@ namespace engine
                     void            SwitchShape(RigidBodyDynamic* inRigidBody, 
                                                 const EGeometryType& inGeometry);
 
-        ENGINE_API  void            OnCollisionEnter(void* inOther) override;
-        ENGINE_API  void            OnCollisionStay(void* inOther) override { inOther; }
-        ENGINE_API  void            OnCollisionExit(void* inOther) override;
+        ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnCollisionStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnCollisionExit(EntityHandle inOther) override;
 
-        ENGINE_API  void            OnTriggerEnter(void* inOther) override { inOther; }
-        ENGINE_API  void            OnTriggerStay(void* inOther) override { inOther; }
-        ENGINE_API  void            OnTriggerExit(void* inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnTriggerStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerExit(EntityHandle inOther) override;
 
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 
         RigidBodyData*              m_data              = nullptr;
         uint64                      m_shape             = 0;
         uint32                      m_type              = EShapeType::DYNAMIC;
-        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::DEFAULT_COLLISION;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::TRIGGER_COLLISION;
 
 
     private :

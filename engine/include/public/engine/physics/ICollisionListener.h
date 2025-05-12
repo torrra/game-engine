@@ -82,13 +82,13 @@ namespace engine
         virtual ~ICollisionListener() = default;
 
         /// Functions
-        virtual void OnCollisionEnter(void* inOther) = 0;
-        virtual void OnCollisionExit(void* inOther) = 0;
-        virtual void OnCollisionStay(void* inOther) = 0;
+        virtual void OnCollisionEnter(EntityHandle inOther) = 0;
+        virtual void OnCollisionExit(EntityHandle inOther) = 0;
+        virtual void OnCollisionStay(EntityHandle inOther) = 0;
 
-        virtual void OnTriggerEnter(void* inOther) = 0;
-        virtual void OnTriggerExit(void* inOther) = 0;
-        virtual void OnTriggerStay(void* inOther) = 0;        
+        virtual void OnTriggerEnter(EntityHandle inOther) = 0;
+        virtual void OnTriggerExit(EntityHandle inOther) = 0;
+        virtual void OnTriggerStay(EntityHandle inOther) = 0;        
 
     }; // !Class ICollisionListener
 } // !Namespace engine

@@ -286,8 +286,16 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
     
+    //physx::PxShape* shape = nullptr;
+    //m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shape, 1);
+    //if (shape)
+    //{
+    //    shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+    //    shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+    //}
+
     m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
     m_data->m_type = EShapeType::STATIC;
 
@@ -296,7 +304,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = static_cast<void*>(m_data);
 
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
-
+    
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_type = EGeometryType::BOX;
@@ -410,6 +418,38 @@ void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EG
     default:
         PrintLog(ErrorPreset(), "Invalid geometry type");
         break;
+    }
+}
+
+void engine::RigidBodyStatic::OnTriggerEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+    {
+        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
+    }
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+    {
+        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
+    }
+    else
+    {
+        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with something else" << std::endl;
+    }
+}
+
+void engine::RigidBodyStatic::OnTriggerExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+    {
+        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
+    }
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+    {
+        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
+    }
+    else
+    {
+        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with something else" << std::endl;
     }
 }
 

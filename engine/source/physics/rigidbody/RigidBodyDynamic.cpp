@@ -74,6 +74,14 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+        shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+    }
+
     m_data->m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
     m_data->m_type = EShapeType::DYNAMIC;
 
@@ -428,29 +436,67 @@ void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCo
     m_collisionGroup = inCollisionGroup;
 }
 
-void engine::RigidBodyDynamic::OnCollisionEnter(void* inOther)
+void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
 {
-    RigidBodyStatic* otherRigidBody = reinterpret_cast<engine::RigidBodyStatic*>(inOther);
-
-    if (otherRigidBody != nullptr)
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
     {
-        if (m_data != nullptr && otherRigidBody->m_data != nullptr)
-        {
-            std::cout << "Collision enter between : " << m_data->m_index << " with " << otherRigidBody->m_data->m_index << std::endl;
-        }
+        std::cout << "Collision enter between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
+    }
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+    {
+        std::cout << "Collision enter between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
+    }
+    else
+    {
+        std::cout << "Collision exit between : " << m_data->m_index << " with something else" << std::endl;
     }
 }
 
-void engine::RigidBodyDynamic::OnCollisionExit(void* inOther)
+void engine::RigidBodyDynamic::OnCollisionExit(EntityHandle inOther)
 {
-    RigidBodyStatic* otherRigidBody = reinterpret_cast<engine::RigidBodyStatic*>(inOther);
-
-    if (otherRigidBody != nullptr)
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
     {
-        if (m_data != nullptr && otherRigidBody->m_data != nullptr)
-        {
-            std::cout << "Collision exit between : " << m_data->m_index << " with " << otherRigidBody->m_data->m_index << std::endl;
-        }
+        std::cout << "Collision exit between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
+    }
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+    {
+        std::cout << "Collision exit between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
+    }
+    else
+    {
+        std::cout << "Collision exit between : " << m_data->m_index << " with something else" << std::endl;
+    }
+}
+
+void engine::RigidBodyDynamic::OnTriggerEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+    {
+        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
+    }
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+    {
+        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
+    }
+    else
+    {
+        std::cout << "[Collision trigger] enter between : " << m_data->m_index << " with something else" << std::endl;
+    }
+}
+
+void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+    {
+        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with dynamic " << rbDynamic->m_data->m_index << std::endl;
+    }
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+    {
+        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with static " << rbStatic->m_data->m_index << std::endl;
+    }
+    else
+    {
+        std::cout << "[Collision trigger] exit between : " << m_data->m_index << " with something else" << std::endl;
     }
 }
 
