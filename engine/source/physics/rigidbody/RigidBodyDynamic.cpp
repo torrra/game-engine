@@ -196,6 +196,8 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
     output << "\n     ";
     text::Serialize(output, "shape", m_shape);
     output << "\n     ";
+    text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -211,7 +213,10 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     MOVE_TEXT_CURSOR(text, end);
     text = text::DeserializeInteger(text, m_shape);
 
-    //SwitchShape(this, static_cast<EGeometryType>(m_shape));
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 collisionGroup = 0;
+    text = text::DeserializeInteger(text, collisionGroup);
+    m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);

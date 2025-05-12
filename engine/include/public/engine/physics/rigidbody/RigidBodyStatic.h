@@ -98,21 +98,21 @@ namespace engine
         ENGINE_API void				SerializeText(std::ostream& output,
                                                   EntityHandle owner,
                                                   uint64 index) const override;
-        ENGINE_API const char*  DeserializeText(const char* text, const char* end) override;
+        ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
 
-                    Transform&  CheckEntityTransform(void);
-                    void        SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry);
+                    Transform&      CheckEntityTransform(void);
+                    void            SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry);
 
-        ENGINE_API  void        OnCollisionEnter(EntityHandle inOther) override;
-        ENGINE_API  void        OnCollisionStay(EntityHandle inOther) override { inOther; }
-        ENGINE_API  void        OnCollisionExit(EntityHandle inOther) override;
+        ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnCollisionStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnCollisionExit(EntityHandle inOther) override;
 
-        ENGINE_API  void        OnTriggerEnter(EntityHandle inOther) override;
-        ENGINE_API  void        OnTriggerStay(EntityHandle inOther) override { inOther; }
-        ENGINE_API  void        OnTriggerExit(EntityHandle inOther) override;
+        ENGINE_API  void            OnTriggerEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnTriggerStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerExit(EntityHandle inOther) override;
 
         ENGINE_API
-        RigidBodyStatic& operator=(RigidBodyStatic&&) noexcept = default;
+        RigidBodyStatic&            operator=(RigidBodyStatic&&) noexcept = default;
 
         RigidBodyData*              m_data              = nullptr;
         uint64                      m_shape             = 0;
@@ -123,8 +123,8 @@ namespace engine
 
         friend class RigidBodyStaticFactory;
 
-        void            SetCollisionGroupAndMask(uint32 inCollisionGroup,
-                                                 uint32 inCollisionMask);
+        void                        SetCollisionGroupAndMask(uint32 inCollisionGroup,
+                                                             uint32 inCollisionMask);
 
 		/// Functions
         /*

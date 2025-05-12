@@ -18,12 +18,12 @@ namespace engine
     {
         enum class ECollisionGroup : uint32
         {
-            NONE_COLLISION = 0,
-            CHARACTER_COLLISION = 1 << 0,
-            PROJECTILE_COLLISION = 1 << 1,
-            ENVIRONMENT_COLLISION = 1 << 2,
-            TRIGGER_COLLISION = 1 << 3,
-            DEFAULT_COLLISION = 1 << 4
+            NONE_COLLISION,
+            CHARACTER_COLLISION,
+            PROJECTILE_COLLISION,
+            ENVIRONMENT_COLLISION,
+            TRIGGER_COLLISION,
+            DEFAULT_COLLISION
 
         }; // !Enum ECollisionGroup
 

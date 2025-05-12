@@ -225,6 +225,8 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
     output << "\n     ";
     text::Serialize(output, "shape", m_shape);
     output << "\n     ";
+    text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -239,6 +241,11 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
 
     MOVE_TEXT_CURSOR(text, end);
     text = text::DeserializeInteger(text, m_shape);
+    
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 collisionGroup = 0;
+    text = text::DeserializeInteger(text, collisionGroup);
+    m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
@@ -299,7 +306,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::BOX;
+    m_shape = EGeometryType::BOX;
 }
 
 void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
@@ -326,7 +333,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::SPHERE;
+    m_shape = EGeometryType::SPHERE;
 }
 
 void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
@@ -353,7 +360,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::CAPSULE;
+    m_shape = EGeometryType::CAPSULE;
 }
 
 void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
@@ -378,7 +385,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
     SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::PLANE;
+    m_shape = EGeometryType::PLANE;
 }
 
 void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
