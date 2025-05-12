@@ -36,7 +36,7 @@ end
 
 function Raycast:SetDistance(distance)
 
-	RayC.SetDitance(self.index, vdistance)
+	RayC.SetDistance(self.index, distance)
 end
 
 function Raycast:HasHit()
@@ -47,12 +47,14 @@ function Raycast:HasHit()
 	local hitData = 
 	{
 		hasHit = hasHitBool,
-		hitEntity = Entity:_NeawNativeEntity(hitHandle),
+		hitEntity = Entity:_NewNativeEntity(hitHandle),
 		location = Vector3.new(hitLocationX, hitLocationY, hitLocationZ),
 		distance = hitDistance
 	}
 
 	return hitData
 end
+
+Raycast.__index = Raycast
 
 return Raycast
