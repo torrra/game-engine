@@ -218,5 +218,5 @@ void engine::RegisterRaycastFunctions(lua_State* luaState)
 
     lua_newtable(luaState);
     luaL_setfuncs(luaState, raycastFuncs, 0);
-    lua_setglobal(luaState, "RayC ");
+    lua_setglobal(luaState, "RayC");
 }
