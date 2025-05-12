@@ -34,6 +34,15 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 	m_currentScene			= inScene;
 }
 
+engine::RigidBodyStatic::~RigidBodyStatic(void)
+{
+    //if (m_rigidBodyStaticImpl != nullptr)
+    //{
+    //    delete m_rigidBodyStaticImpl;
+    //    m_rigidBodyStaticImpl = nullptr;
+    //}
+}
+
 math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
 {
     // Retrieve the box half extents by getting the shape of the rigid body to access
@@ -178,10 +187,8 @@ void engine::RigidBodyStatic::UpdateRigidBody(void)
 {
     Transform worldTransform;
 
-    Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
-
-    worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-    worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+    worldTransform.SetPosition(Transform::ToWorldPosition(*m_currentScene->GetComponent<Transform>(m_owner)));
+    worldTransform.SetRotation(Transform::ToWorldRotation(*m_currentScene->GetComponent<Transform>(m_owner)));
 
     // Update the transform of the rigid body in regard to the entity
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));

@@ -162,10 +162,8 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
 {
     Transform worldTransform;
 
-    Transform &entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
-
-    worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-    worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+    worldTransform.SetPosition(Transform::ToWorldPosition(*m_currentScene->GetComponent<Transform>(m_owner)));
+    worldTransform.SetRotation(Transform::ToWorldRotation(*m_currentScene->GetComponent<Transform>(m_owner)));
 
     // Update the transform of the rigid body in regard to the entity
     m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
