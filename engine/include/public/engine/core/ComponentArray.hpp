@@ -245,7 +245,7 @@ namespace engine
     template<CValidComponent TComponentType>
     inline uint64 ComponentArray<TComponentType>::GetThisIndex(TComponentType* component) const
     {
-        return return component - m_components.data();
+        return component - m_components.data();
     }
 
     template<CValidComponent TComponentType> inline
