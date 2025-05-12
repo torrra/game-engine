@@ -185,18 +185,18 @@ physx::PxFilterFlags CustomFilterShader(
     physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,
     physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize)
 {
-    (void)attributes0;          //,eviter les warnings
-    (void)attributes1;          //,eviter les warnings
-    (void)constantBlock;        // éviter les warnings
-    (void)constantBlockSize;    // éviter les warnings
-    // Test si les objets doivent interagir (groupes et masques)
+    (void)attributes0;          // To avoid warning
+    (void)attributes1;          // To avoid warning
+    (void)constantBlock;        // To avoid warning
+    (void)constantBlockSize;    // To avoid warning
+    // Test to check if objects are collidable
     if ((filterData0.word0 & filterData1.word1) == 0 &&
         (filterData1.word0 & filterData0.word1) == 0)
     {
         return physx::PxFilterFlag::eSUPPRESS;
     }
 
-    // Autoriser les contacts + événements
+    // To enable contact generation
     pairFlags = physx::PxPairFlag::eCONTACT_DEFAULT |
         physx::PxPairFlag::eNOTIFY_TOUCH_FOUND |
         physx::PxPairFlag::eNOTIFY_TOUCH_LOST |
