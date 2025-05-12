@@ -32,7 +32,6 @@ function ScriptObject:_PreExecute()
 	for _, object in pairs(self) do
 		if type(object) == "table" and
 		object.RefreshRef ~= nil then
-			-- print("[Script object]: refreshing ref "..tostring(object))
 			object:RefreshRef()
 		end
 	end
