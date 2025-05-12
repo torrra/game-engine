@@ -19,11 +19,10 @@ namespace engine
         enum class ECollisionGroup : uint32
         {
             NONE_COLLISION,
-            CHARACTER_COLLISION,
+            DEFAULT_COLLISION,
             PROJECTILE_COLLISION,
             ENVIRONMENT_COLLISION,
-            TRIGGER_COLLISION,
-            DEFAULT_COLLISION
+            TRIGGER_COLLISION
 
         }; // !Enum ECollisionGroup
 
@@ -40,33 +39,26 @@ namespace engine
             case engine::collision::ECollisionGroup::NONE_COLLISION:
                 return 0;
 
-            case engine::collision::ECollisionGroup::CHARACTER_COLLISION:
+            case engine::collision::ECollisionGroup::DEFAULT_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::CHARACTER_COLLISION |
+                    ECollisionGroup::DEFAULT_COLLISION |
                     ECollisionGroup::PROJECTILE_COLLISION |
                     ECollisionGroup::ENVIRONMENT_COLLISION |
                     ECollisionGroup::TRIGGER_COLLISION);
 
             case engine::collision::ECollisionGroup::PROJECTILE_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::CHARACTER_COLLISION |
+                    ECollisionGroup::DEFAULT_COLLISION |
                     ECollisionGroup::ENVIRONMENT_COLLISION);
 
             case engine::collision::ECollisionGroup::ENVIRONMENT_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::CHARACTER_COLLISION |
+                    ECollisionGroup::DEFAULT_COLLISION |
                     ECollisionGroup::PROJECTILE_COLLISION);
 
             case engine::collision::ECollisionGroup::TRIGGER_COLLISION:
                 return static_cast<uint32>(
-                    ECollisionGroup::CHARACTER_COLLISION);
-
-            case engine::collision::ECollisionGroup::DEFAULT_COLLISION:
-                return static_cast<uint32>(
-                    ECollisionGroup::CHARACTER_COLLISION |
-                    ECollisionGroup::PROJECTILE_COLLISION |
-                    ECollisionGroup::ENVIRONMENT_COLLISION |
-                    ECollisionGroup::TRIGGER_COLLISION);
+                    ECollisionGroup::DEFAULT_COLLISION);
 
             default:
                 return 0;

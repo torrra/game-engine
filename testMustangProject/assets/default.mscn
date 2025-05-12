@@ -30,7 +30,7 @@
      @int64 | owner=0
      @uint32 | type=0
      @uint64 | shape=0
-     @uint32 | collision group=5
+     @uint32 | collision group=1
      @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera
