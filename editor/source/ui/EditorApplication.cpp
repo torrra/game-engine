@@ -40,11 +40,8 @@ namespace editor
 
         m_properties.Render();
 
-        if (m_currentScene->IsRunning())
-        {
-            m_gameSimulationView->RenderToViewport();
-        }
-            m_gameSimulationView->Render();
+        m_gameSimulationView->RenderToViewport();
+        m_gameSimulationView->Render();
 
         if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
