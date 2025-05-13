@@ -18,6 +18,7 @@
 
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
+#include "engine/physics/TriangleMesh.h"
 
 #include "engine/sounds/AudioPlayer.h"
 
@@ -264,6 +265,8 @@ namespace engine
 
         ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
 
+        ComponentArray<TriangleMesh>        m_sceneTriangleMeshes;
+
         // All sound components in the scene
         ComponentArray<AudioPlayer>			m_sceneAudioPlayer;
 
@@ -335,6 +338,12 @@ namespace engine
     }
     
     template<>
+    inline ComponentArray<TriangleMesh>& SceneGraph::GetComponentArray<TriangleMesh>(void)
+    {
+        return m_sceneTriangleMeshes;
+    }
+    
+    template<>
     inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
     {
         return m_sceneAudioPlayer;
@@ -375,6 +384,12 @@ namespace engine
     const ComponentArray<RigidBodyStatic>& SceneGraph::GetComponentArray<RigidBodyStatic>(void) const
     {
         return m_sceneStaticRigidBodies;
+    }
+    
+    template<> inline
+    const ComponentArray<TriangleMesh>& SceneGraph::GetComponentArray<TriangleMesh>(void) const
+    {
+        return m_sceneTriangleMeshes;
     }
 
     template<CValidComponent TComponentType>
