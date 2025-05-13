@@ -72,7 +72,7 @@ namespace editor
     {
     public:
         AssetsWnd(void) = delete;
-        AssetsWnd(const char* name);
+        AssetsWnd(const char* name, class EditorApplication* owner);
         ~AssetsWnd(void);
 
         void SetPath(std::filesystem::path const& projectDir);
@@ -93,11 +93,16 @@ namespace editor
         bool IsSupportedExtension(std::string const& extension, std::string& payloadType);
         std::string GetPayloadType(std::string const& extension) const;
 
+        void SelectResource(void);
+
         std::filesystem::path m_path;
         std::vector<Asset> m_assets;
         DirTreeNode* m_rootNode;
         DirTreeNode* m_selectedDirectory;
         ui::Table* m_layout;
+
+        class EditorApplication* m_ownerApplication;
+
         ui::ListClipper m_clipper;
         int16 m_selectedIndex;
 

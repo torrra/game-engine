@@ -172,10 +172,11 @@ void engine::Engine::LoadDefaultScene(void)
 
     if (m_hasEditor)
         scenePath.append(m_currentProject.m_defaultEditorScene);
+    
     else
         scenePath.append(m_currentProject.m_defaultGameScene);
-
-    m_activeScene.LoadNewScene(false, scenePath);
+  
+   m_application->LoadNewScene(m_activeScene, scenePath);
 }
 
 bool engine::Engine::CreateProject(const std::string & dir, const std::string& name)

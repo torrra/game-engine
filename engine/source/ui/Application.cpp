@@ -56,6 +56,21 @@ namespace engine
     {
     }
 
+    void Application::ResetScene(::engine::GameScene&)
+    {
+    }
+
+    void  Application::LoadNewScene(GameScene& activeScene,
+                                    const std::filesystem::path& filePath)
+    {
+        ThreadManager::SynchronizeGameThread(nullptr);
+        activeScene.Stop();
+        activeScene.GetGraph()->CleanRigidBodies();
+
+
+        activeScene.LoadNewScene(false, filePath);
+    }
+
     void Application::Render(SceneGraph* scene)
     {
         ThreadManager::RenderScene(scene);

@@ -10,7 +10,7 @@
 namespace editor
 {
     EditorApplication::EditorApplication(const char* title, class::engine::SceneGraph* scene)
-        : m_graphView("Scene Graph"), m_assetWnd("Assets"), m_menuBar(this)
+        : m_graphView("Scene Graph"), m_assetWnd("Assets", this), m_menuBar(this)
     {
         Startup(title);
         m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
@@ -51,6 +51,30 @@ namespace editor
 
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->Render();
+    }
+
+    void EditorApplication::ResetScene(::engine::GameScene& activeScene)
+    {
+        engine::ThreadManager::SynchronizeGameThread(nullptr);
+        activeScene.Stop();
+
+        m_graphView.ClearGraph();
+        activeScene.Reset();
+        engine::ThreadManager::SynchronizeGameThread(activeScene.GetGraph());
+        m_graphView.SetGraph(activeScene.GetGraph());
+    }
+
+    void EditorApplication::LoadNewScene(::engine::GameScene& activeScene, const std::filesystem::path& filePath)
+    {
+        engine::ThreadManager::SynchronizeGameThread(nullptr);
+        activeScene.Stop();
+
+        m_graphView.ClearGraph();
+
+        activeScene.LoadNewScene(false, filePath);
+
+        engine::ThreadManager::SynchronizeGameThread(activeScene.GetGraph());
+        m_graphView.SetGraph(activeScene.GetGraph());
     }
 
     void EditorApplication::Shutdown(void)

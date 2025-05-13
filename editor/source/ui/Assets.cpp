@@ -1,5 +1,7 @@
 #include "ui/Assets.h"
 #include "ui/components/Component.h"
+#include "ui/EditorApplication.h"
+
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDraw.h>
 #include <engine/ui/UITree.h>
@@ -8,6 +10,7 @@
 
 #include <engine/utility/MemoryCheck.h>
 #include <engine/input/Input.h>
+#include <engine/Engine.h>
 #include <filesystem>
 
 #define ASSET_WIDTH 120.0f
@@ -40,7 +43,8 @@ editor::Asset::Asset(std::filesystem::path const& path, std::string const& paylo
 }
 
 // Asset window implementation
-editor::AssetsWnd::AssetsWnd(const char* name)
+editor::AssetsWnd::AssetsWnd(const char* name, EditorApplication* owner)
+    : m_ownerApplication(owner)
 {
     SetName(name);
 
@@ -209,7 +213,10 @@ void editor::AssetsWnd::RenderAssets(void)
                     bool isSelected = index == m_selectedIndex; // TODO: use index to get selected value from asset struct
 
                     if (ui::Selectable("", &isSelected, assetSize))
+                    {
                         m_selectedIndex = index;
+                        SelectResource();
+                    }
 
                     // Create drag & drop payload 
                     if (::ui::StartDragDropSource(0))
@@ -267,8 +274,7 @@ void editor::AssetsWnd::OnSelectDir(void)
         if (IsSupportedExtension(filePath.extension().string(), payloadType))
         {
             uint64 offset = m_path.string().length();
-            std::string relativeFilePath(".");
-            relativeFilePath += filePath.string().substr(offset);
+            std::string relativeFilePath = filePath.string().substr(offset);
 
             m_assets.emplace_back(Asset(relativeFilePath, payloadType));
         }
@@ -318,4 +324,30 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
         payloadType = FRAGMENT_SHADER_PAYLOAD;
 
     return payloadType;
+}
+
+void editor::AssetsWnd::SelectResource(void)
+{
+    constexpr const char sceneExtension[] = ".mscn";
+
+    // subtract 1 to ignore null terminator
+    constexpr uint64 sceneExtensionLen = sizeof(sceneExtension) - 1;
+
+    Asset& selectedAsset = m_assets[m_selectedIndex];
+
+    uint64 dotPos = selectedAsset.m_fileName.find_last_of('.');
+
+    if (dotPos == std::string::npos)
+        return;
+
+    uint64 extensionLen = selectedAsset.m_fileName.length() - dotPos;
+    
+    if (extensionLen != sceneExtensionLen)
+        return;
+
+    if (memcmp(selectedAsset.m_fileName.data() + dotPos, sceneExtension, sceneExtensionLen) != 0)
+        return;
+
+    m_ownerApplication->LoadNewScene(engine::Engine::GetEngine()->GetCurrentScene(),
+                                     std::filesystem::absolute(selectedAsset.m_path));
 }

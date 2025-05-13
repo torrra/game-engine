@@ -45,18 +45,12 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene)
 {
     if (m_gameRunning && ::ui::Button("Stop"))
     {
-        engine::ThreadManager::SynchronizeGameThread(nullptr);
         m_gameRunning = false;
-        activeScene.Stop();
-        printf("Game running: false\n");
-
-        m_application->m_graphView.ClearGraph();
-        activeScene.Reset();
-        engine::ThreadManager::SynchronizeGameThread(activeScene.GetGraph());
-        m_application->m_graphView.SetGraph(activeScene.GetGraph());
+        m_application->ResetScene(activeScene);
         
         // Re-select the previously selected entity for property window
         m_application->m_properties.SetHandle(m_application->m_graphView.GetSelectedEntity());
+        printf("Game running: false\n");
     }
     else if (!m_gameRunning && ::ui::Button("Start"))
     {

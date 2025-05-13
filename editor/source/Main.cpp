@@ -5,6 +5,8 @@
 
 #include "engine/ConsoleLog.hpp"
 
+#include <engine/ui/Canvas.h>
+
 
 // Use dedicated graphics card
 extern "C" 
@@ -17,14 +19,11 @@ int appMain(void)
 {
 	engine::Engine engine;
     engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
+
+    //engine.OpenProject("C:\\Users\\noahd\\Bureau\\Mustang\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
 
-    //for (uint64 entityNum = 0; entityNum < 64; ++entityNum)
-    //{
-    //    engine::EntityHandle newEntity = engine.GetGraph()->CreateEntity("testCollision " + std::to_string(entityNum));
-    //    engine::RigidBodyDynamic* newRigidBody = engine.GetGraph()->CreateComponent<engine::RigidBodyDynamic>(newEntity);
-    //    newRigidBody->SwitchShape(newRigidBody, engine::EGeometryType::BOX);
-    //}
+    
 
 	while (!engine.GetWindow()->ShouldWindowClose())
 	{
@@ -41,6 +40,17 @@ int appMain(void)
 
             else if (engine::Input::IsInputReleased(KEY_S))
                 engine.SaveProject();
+        }
+
+        if (engine::Input::IsInputDown(KEY_R))
+        {
+            auto size = engine.GetWindow()->GetSize<f32>();
+
+            engine::Canvas* sceneCanvas = new engine::Canvas(size, math::Vector4f::Zero());
+
+            auto rec = sceneCanvas->AddRectangle(size / 2.f, { 2.f, 2.f });
+
+            rec->SetColor(1.f, 1.f, 1.f, 1.f);
         }
 
         engine.UpdateApplicationWindow();
