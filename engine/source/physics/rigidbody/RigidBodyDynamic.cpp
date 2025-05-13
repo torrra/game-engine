@@ -452,6 +452,16 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
     }
 }
 
+void engine::RigidBodyDynamic::SetLinearVelocity(math::Vector3f inLinearVelocity, bool inAutoWake)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+}
+
+void engine::RigidBodyDynamic::SetAngularVelocity(math::Vector3f inAngularVelocity, bool inAutoWake)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+}
+
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
