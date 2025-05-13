@@ -307,6 +307,16 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
     return math::Vector2f(EErrorGeometryType_Invalid);
 }
 
+math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
+{
+    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+}
+
+math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
+{
+    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+}
+
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
     // Set the gravity disabled or enabled state
