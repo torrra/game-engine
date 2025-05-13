@@ -77,6 +77,7 @@ namespace engine
                 uint32                      m_type              = EShapeType::STATIC;
                 collision::ECollisionGroup  m_collisionGroup    = 
                                                 collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+                bool                        m_isDrawn           = false;
 
     }; // !Class TriangleMesh
 } // !Namespace engine

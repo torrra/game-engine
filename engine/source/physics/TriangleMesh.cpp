@@ -51,6 +51,28 @@ void engine::TriangleMesh::CreateTriangleMesh(void)
 
     if (m_model == nullptr)
         return;
+
+    /*
+        Create the triangle mesh description
+        points.count : The number of points
+        points.stride : The stride of the points
+        points.data : The data of the points
+    */
+    physx::PxTriangleMeshDesc meshDesc;
+    if (m_model->CanRender() && !m_isDrawn)
+    {
+        m_triangleMeshImpl->m_triangleMeshDesc.points.count = 
+            m_model->GetStaticMeshes()[0].GetIndexCount();
+        m_triangleMeshImpl->m_triangleMeshDesc.points.stride = sizeof(math::Vector3f);
+        m_triangleMeshImpl->m_triangleMeshDesc.points.data =
+            m_model->GetStaticMeshes()[0].GetVertices();
+
+        CookTriangleMesh();
+
+        m_isDrawn = true;
+    }
+}
+
 void engine::TriangleMesh::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
 {
     output << "[TriangleMesh]\n     ";
@@ -59,7 +81,7 @@ void engine::TriangleMesh::SerializeText(std::ostream& output, EntityHandle owne
     {
         text::Serialize(output, "index", index);
         output << "\n     ";
-}
+    }
 
     text::Serialize(output, "owner", owner);
     output << "\n     ";
@@ -94,7 +116,7 @@ const char* engine::TriangleMesh::DeserializeText(const char* text, const char* 
 }
 
 void engine::TriangleMesh::CleanUpTriangleMesh(void)
-{
+{   
     m_triangleMeshImpl->m_triangleMeshDesc.setToDefault();
 
     PhysicsEngine::Get().GetImpl().m_scene->removeActor(*m_triangleMeshImpl->m_actor);
@@ -117,7 +139,7 @@ void engine::TriangleMesh::UpdateEntity(void)
 
         transform->CopyPosition(updatedTransform);
         transform->CopyRotation(updatedTransform);
-}
+    }
 }
 
 void engine::TriangleMesh::UpdateTriangleMesh(void)
