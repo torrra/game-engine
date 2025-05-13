@@ -25,6 +25,14 @@ namespace engine
         EErrorGeometryType_Invalid = 0
     };// !Enum EErrorGeometryType
 
+    enum EForceMode : uint32
+    {
+        FORCE = 0,
+        IMPULSE = 1 << 1,
+        VELOCITY_CHANGE = 1 << 2,
+        ACCELERATION = 1 << 3
+    }; // !Enum EForceMode
+
     struct RigidBodyData
     {
         uint32 m_index;
