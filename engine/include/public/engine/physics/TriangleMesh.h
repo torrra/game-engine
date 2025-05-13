@@ -66,9 +66,14 @@ namespace engine
         // Cook the triangle mesh
         void                            CookTriangleMesh(void);
 
+        void                            SetCollisionGroupAndMask(uint32 inCollisionGroup,
+                                                                 uint32 inCollisionMask);
+
         /// Private members
         const   Model*              m_model             = nullptr;
                 TriangleMeshImpl*   m_triangleMeshImpl  = nullptr;
+                collision::ECollisionGroup  m_collisionGroup    = 
+                                                collision::ECollisionGroup::ENVIRONMENT_COLLISION;
 
     }; // !Class TriangleMesh
 } // !Namespace engine

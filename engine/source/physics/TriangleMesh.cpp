@@ -167,6 +167,19 @@ void engine::TriangleMesh::CookTriangleMesh(void)
 
     // Add the actor to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*actor);
+
+void engine::TriangleMesh::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
+{
+    physx::PxFilterData filterData;
+    filterData.word0 = inCollisionGroup;
+    filterData.word1 = inCollisionMask;
+
+    physx::PxShape* shape = nullptr;
+    reinterpret_cast<physx::PxRigidBody*>(m_triangleMeshImpl->m_actor)->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setSimulationFilterData(filterData);
+    }
 }
 
 engine::TriangleMeshImpl* engine::TriangleMesh::GetTriangleMeshImpl(void)
