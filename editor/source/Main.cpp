@@ -17,7 +17,6 @@ int appMain(void)
 {
 	engine::Engine engine;
     engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
-    engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
 
     //for (uint64 entityNum = 0; entityNum < 64; ++entityNum)
@@ -31,11 +30,17 @@ int appMain(void)
 	{
         engine.UpdateGameplay();
 
-        if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
-            engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
-            engine::Input::IsInputPressed(KEY_B))
+        if (engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
+            engine::Input::IsInputDown(KEY_RIGHT_CONTROL))
+
         {
-            engine.BuildProjectExecutable("..\\testProjectBuildFolder");
+            if (engine::Input::IsInputReleased(KEY_B))
+            {
+                engine.BuildProjectExecutable("..\\testProjectBuildFolder");
+            }
+
+            else if (engine::Input::IsInputReleased(KEY_S))
+                engine.SaveProject();
         }
 
         engine.UpdateApplicationWindow();

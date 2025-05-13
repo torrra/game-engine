@@ -1,5 +1,5 @@
 [Entity]
-   @string 6 | name=Padoru
+   @string | name="Padoru"
    @int64 | handle=0
    @int64 | parent=-1
    @uint64 | flags=0
@@ -13,18 +13,18 @@
     @uint64 | flags=0
 [Renderer]
     @int64 | owner=0
-    @string 19 | model=.\assets\padoru.obj
-    @string 13 | shader=ModelTextured
-        @string 28 | vertexShader=.\shaders\ModelTextured.vert
-        @string 28 | fragmentShader=.\shaders\ModelTextured.frag
+    @string | model="padoru.obj"
+    @string | shader="ModelTextured"
+        @string 28 | vertexShader="ModelTextured.vert"
+        @string 28 | fragmentShader="ModelTextured.frag"
     @uint64 | materialCount=1
-    @string 20 | material=./assets/padoru.mmat
+    @string | material="padoru.mmat"
     @uint64 | flags=0
 [Script]
    @uint64 | index=0
    @int64 | owner=0
    @uint64 | count=1
-   @string 16 | scriptObject=ControllerScript
+   @string | scriptObject="ControllerScript"
    @uint64 | flags=0
 [RigidBodyDynamic]
      @int64 | owner=0
@@ -33,7 +33,7 @@
      @uint32 | collision group=1
      @uint64 | flags=0
 [Entity]
-   @string 6 | name=Camera
+   @string | name="Camera"
    @int64 | handle=1
    @int64 | parent=-1
    @uint64 | flags=0
@@ -42,7 +42,7 @@
     @uint64 | index=0
     @int64 | owner=1
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,3.2,-1.65}
+    @vec3f32 | position={0,3.6,-1.65}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Camera]
@@ -57,10 +57,10 @@
    @uint64 | index=1
    @int64 | owner=1
    @uint64 | count=1
-   @string 16 | scriptObject=CameraController
+   @string | scriptObject="CameraController"
    @uint64 | flags=0
 [Entity]
-   @string 5 | name=Floor
+   @string| name="Floor"
    @int64 | handle=2
    @int64 | parent=-1
    @uint64 | flags=0
@@ -79,7 +79,7 @@
      @uint32 | collision group=3
      @uint64 | flags=0
 [Entity]
-   @string 4 | name=Test
+   @string | name="Test"
    @int64 | handle=3
    @int64 | parent=-1
    @uint64 | flags=0
@@ -92,19 +92,19 @@
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Entity]
-   @string 12 | name=New Entity 1
+   @string | name="New Entity 1"
    @int64 | handle=4
    @int64 | parent=-1
    @uint64 | flags=0
    @uint64 | components=0
 [Entity]
-   @string 12 | name=New Entity 2
+   @string | name="New Entity 2"
    @int64 | handle=5
    @int64 | parent=-1
    @uint64 | flags=0
    @uint64 | components=0
 [Entity]
-   @string 12 | name=New Entity 3
+   @string | name="New Entity 3"
    @int64 | handle=6
    @int64 | parent=-1
    @uint64 | flags=0
