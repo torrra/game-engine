@@ -98,19 +98,18 @@ void engine::TriangleMesh::CleanUpTriangleMesh(void)
     m_triangleMeshImpl = nullptr;
 }
 
-void engine::TriangleMesh::CreateTriangleMesh(void)
+void engine::TriangleMesh::UpdateEntity(void)
 {
-    /*
-        Create the triangle mesh description
-        points.count : The number of points
-        points.stride : The stride of the points
-        points.data : The data of the points
-    */
-    physx::PxTriangleMeshDesc meshDesc;
-    m_triangleMeshImpl->m_triangleMeshDesc.points.count = static_cast<physx::PxU32>(
-                                m_model->GetStaticMeshes()[0].GetIndexCount());
-    m_triangleMeshImpl->m_triangleMeshDesc.points.stride = sizeof(math::Vector3f);
-    m_triangleMeshImpl->m_triangleMeshDesc.points.data = 
+    if (m_triangleMeshImpl->m_actor != nullptr)
+    {
+        // Update the entity transform in regard to the rigid body
+        Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+        Transform updatedTransform = ToTransform(m_triangleMeshImpl->m_actor->getGlobalPose());
+
+        transform->CopyPosition(updatedTransform);
+        transform->CopyRotation(updatedTransform);
+}
                                 m_model->GetStaticMeshes()[0].GetVertices();
 
     /*

@@ -55,6 +55,8 @@ namespace engine
         ENGINE_API const char*          DeserializeText(const char* text, const char* end) override;
 
         ENGINE_API void                 CleanUpTriangleMesh(void);
+
+        ENGINE_API void                 UpdateEntity(void);
     private :
 
         /// Functions
