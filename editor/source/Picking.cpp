@@ -59,11 +59,7 @@ editor::Picking::Picking(engine::SceneGraph* graph)
     m_pickingShader = engine::ResourceManager::GetResource<engine::ShaderProgram>(SHADER_NAME);
 
     // Create structure for each entity in scene
-    for (engine::EntityHandle handle : graph->GetChildrenAllLevels(INVALID_HANDLE))
-    {
-        PickableEntity entity(handle);
-        m_pickableEntity[entity.GetPickingID()] = entity;
-    }
+    InitEntities(graph);
 }
 
 editor::Picking::~Picking(void)
@@ -71,12 +67,13 @@ editor::Picking::~Picking(void)
     m_pickingShader = nullptr;
 }
 
-void editor::Picking::RenderSceneColored(engine::SceneGraph* graph)
+void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection)
 {
     for (auto pickableEntity : m_pickableEntity)
     {
         engine::EntityHandle handle = pickableEntity.second.GetEntityHandle();
         engine::Renderer* renderer = graph->GetComponent<engine::Renderer>(handle);
+        engine::Transform* transform = graph->GetComponent<engine::Transform>(handle);
 
         // To select an entity it must have a model & therefore a renderer component
         if (!renderer)
@@ -86,39 +83,31 @@ void editor::Picking::RenderSceneColored(engine::SceneGraph* graph)
         if (!model)
             continue;
         
+        math::Matrix4f modelMatrix(1.0f);
+        if (transform)
+            modelMatrix = engine::Transform::ToWorldMatrix(*transform);
+        
         // Set uniforms
-        math::Matrix4f mvp = renderer->GetMVP();
+        math::Matrix4f mvp = viewProjection * modelMatrix;
         m_pickingShader->Use();
         m_pickingShader->Set("mvp", &mvp);
         m_pickingShader->Set("pickingColor", math::Vector3f(pickableEntity.second.GetColor()));
-
+        
         // Render picking stage (render models as block colors based on their identifier)
         std::vector<const engine::MeshMaterial*> materialArray(model->GetMeshCount());
         model->Draw(materialArray);
     }
 }
 
-engine::EntityHandle editor::Picking::FindSelectedEntity(void) const
+engine::EntityHandle editor::Picking::FindSelectedEntity(std::string const& wndName) const
 {
     engine::SendCmdsToGPU();
     engine::SetPixelStorageMode();
 
-    // Get window position
-    math::Vector2i windowPos = ui::GetViewportPos("Viewport");
-    
-    // Get window padding
-    const math::Vector2i& windowPadding = 
-        ui::GetInnerRectMinPos("Viewport") - ui::GetOuterRectMinPos("Viewport");
-    
-    // Calculate mouse position
-    math::Vector2i mousePos = engine::Input::GetCursorPosition<int32>() - windowPadding;
-    
-    // Adjust mouse position if window is docked
-    if (ui::IsWindowDocked("Viewport"))
-    {
-        windowPos = ui::GetWindowPos("Viewport") - windowPos;
-        mousePos -= windowPos;
-    }
+    // Inverse cursor Y axis for picking position due to picking color texture being flipped on X axis
+    math::Vector2i mousePos = ui::GetWindowCursorPos(wndName.c_str());
+    int32 height = static_cast<int32>(ui::GetWindowContentSize(wndName.c_str()).GetY());
+    mousePos.Y() = height - mousePos.GetY();
 
     // Get pixel color data at mouse position
     uint8 data[4];
@@ -130,4 +119,14 @@ engine::EntityHandle editor::Picking::FindSelectedEntity(void) const
     // Attempt to find the related entity via its picking identifier
     auto entity = m_pickableEntity.find(pickedID);
     return (entity != m_pickableEntity.end()) ? entity->second.GetEntityHandle() : INVALID_HANDLE;
+}
+
+void editor::Picking::InitEntities(engine::SceneGraph* graph)
+{
+    // Create structure for each entity in scene
+    for (engine::EntityHandle handle : graph->GetChildrenAllLevels(INVALID_HANDLE))
+    {
+        PickableEntity entity(handle);
+        m_pickableEntity[entity.GetPickingID()] = entity;
+    }
 }

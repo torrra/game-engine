@@ -27,7 +27,7 @@ void editor::MenuBar::Render(engine::GameScene& activeScene)
     if (::ui::StartMainMenuBar())
     {
         DisplayCurrentProject();
-        ProjectMenu();
+        ProjectMenu(activeScene);
         UpdateStartButton(activeScene);
 
         ::ui::EndMainMenuBar();
@@ -69,7 +69,7 @@ void editor::MenuBar::DisplayCurrentProject(void)
     ui::Text(engine->GetProjectName().c_str());
 }
 
-void editor::MenuBar::ProjectMenu(void)
+void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
 {
     ui::StartDisabledSection(m_gameRunning);
     
@@ -82,7 +82,7 @@ void editor::MenuBar::ProjectMenu(void)
 
         if (ui::MenuItem("Open project"))
         {
-            OpenProject();
+            OpenProject(scene);
         }
 
         ui::EndMenu();
@@ -90,7 +90,7 @@ void editor::MenuBar::ProjectMenu(void)
     ui::EndDisabledSection();
 }
 
-void editor::MenuBar::OpenProject(void)
+void editor::MenuBar::OpenProject(::engine::GameScene& scene)
 {
     std::filesystem::path projectPath;
 
@@ -113,7 +113,9 @@ void editor::MenuBar::OpenProject(void)
             engine->OpenProject(projectPath);
             engine->LoadDefaultScene();
 
+            m_application->m_graphView.SetGraph(scene.GetGraph());
             m_application->m_assetWnd.SetPath(engine->GetProjectDir());
+            m_application->m_sceneEditorView->GetPicking()->InitEntities(engine->GetGraph());
         }
     }
 }

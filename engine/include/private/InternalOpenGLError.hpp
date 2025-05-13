@@ -13,6 +13,8 @@
 
 #pragma endregion
 
+#define ALLOW_NOTIFICATIONS 0
+
 namespace engine
 {
     void OpenGLError(void);
@@ -28,7 +30,6 @@ inline void engine::OpenGLError(void)
     {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(MessageCallback, nullptr);
-        __debugbreak();
     }
 }
 
@@ -74,5 +75,7 @@ inline void engine::MessageCallback(GLenum source, GLenum type, GLuint id, GLenu
         default: return "NONE";
         }
         }();
-    printf("%s, %s, %s, %d, %s\n", srcStr, typeStr, severityStr, (int)id, message);
+
+    if (severityStr[0] != 'N' || ALLOW_NOTIFICATIONS)
+        printf("%s, %s, %s, %d, %s\n\n", srcStr, typeStr, severityStr, (int)id, message);
 }

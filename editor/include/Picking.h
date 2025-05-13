@@ -4,6 +4,7 @@
 #include <engine/core/SceneGraph.h>
 #include <engine/resource/shader/Shader.h>
 #include <math/Vector3.hpp>
+#include <math/Matrix4.hpp>
 #include <unordered_map>
 
 namespace editor
@@ -34,9 +35,9 @@ namespace editor
         Picking(engine::SceneGraph* graph);
         ~Picking(void);
 
-        engine::EntityHandle FindSelectedEntity(void) const;
-        
-        void RenderSceneColored(engine::SceneGraph* graph);
+        engine::EntityHandle FindSelectedEntity(std::string const& wndName) const;
+        void InitEntities(engine::SceneGraph* graph);
+        void RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection);
 
     private:
         std::unordered_map<uint32, PickableEntity> m_pickableEntity;

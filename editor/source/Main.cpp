@@ -42,7 +42,7 @@ int appMain(void)
                 engine.SaveProject();
         }
 
-        if (engine::Input::IsInputDown(KEY_R))
+        /*if (engine::Input::IsInputDown(KEY_R))
         {
             auto size = engine.GetWindow()->GetSize<f32>();
 
@@ -51,7 +51,7 @@ int appMain(void)
             auto rec = sceneCanvas->AddRectangle(size / 2.f, { 2.f, 2.f });
 
             rec->SetColor(1.f, 1.f, 1.f, 1.f);
-        }
+        }*/
 
         engine.UpdateApplicationWindow();
 	}
