@@ -307,6 +307,16 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
     return math::Vector2f(EErrorGeometryType_Invalid);
 }
 
+math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
+{
+    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+}
+
+math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
+{
+    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+}
+
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
     // Set the gravity disabled or enabled state
@@ -442,6 +452,16 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
     }
 }
 
+void engine::RigidBodyDynamic::SetLinearVelocity(math::Vector3f inLinearVelocity, bool inAutoWake)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+}
+
+void engine::RigidBodyDynamic::SetAngularVelocity(math::Vector3f inAngularVelocity, bool inAutoWake)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+}
+
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
@@ -500,6 +520,62 @@ void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
     else
         PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
             " with wrong entity");
+}
+
+void engine::RigidBodyDynamic::AddForce(const math::Vector3f& inForce, EForceMode inForceMode, bool inAutoWake)
+{
+    switch (inForceMode)
+    {
+    case EForceMode::FORCE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eFORCE,
+                                                      inAutoWake);
+        break;
+    case EForceMode::IMPULSE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eIMPULSE,
+                                                      inAutoWake);
+        break;
+    case EForceMode::VELOCITY_CHANGE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eVELOCITY_CHANGE,
+                                                      inAutoWake);
+        break;
+    case EForceMode::ACCELERATION:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eACCELERATION,
+                                                      inAutoWake);
+        break;
+    default:
+        PrintLog(ErrorPreset(), "Invalid force mode, use force mode by default.");
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eFORCE,
+                                                      inAutoWake);
+        break;
+    }
+}
+
+void engine::RigidBodyDynamic::AddTorque(const math::Vector3f& inTorque, EForceMode inForceMode, bool inAutoWake)
+{
+    switch (inForceMode)
+    {
+    case EForceMode::FORCE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eFORCE,
+            inAutoWake);
+        break;
+    case EForceMode::IMPULSE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eIMPULSE,
+            inAutoWake);
+        break;
+    case EForceMode::VELOCITY_CHANGE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eVELOCITY_CHANGE,
+            inAutoWake);
+        break;
+    case EForceMode::ACCELERATION:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eACCELERATION,
+            inAutoWake);
+        break;
+    default:
+        PrintLog(ErrorPreset(), "Invalid force mode, use force mode by default.");
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eFORCE,
+            inAutoWake);
+        break;
+    }
 }
 
 void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
