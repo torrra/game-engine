@@ -63,6 +63,11 @@ function ScriptObject:OnTriggerEnter(otherEntity)
 	print("LUA [trigger] enter")
 end
 
+function ScriptObject:OnTriggerExit(otherEntity)
+
+	print("LUA [trigger] exit")
+end
+
 -- Internal Start() caller
 function ScriptObject:_ExecuteStart()
 

@@ -150,6 +150,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
         if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
         {
             listenerA->OnTriggerExit(ownerB);
+
+            ScriptSystem::NotifyTriggerExit(ownerA, ownerB);
         }
         if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
         {

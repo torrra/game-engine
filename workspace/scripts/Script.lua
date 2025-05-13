@@ -102,6 +102,21 @@ function Script:_OnTriggerEnter(otherHandle)
 	end
 end
 
+function Script:_OnTriggerExit(otherHandle)
+
+	for _, object in pairs(self) do
+		
+		if type(object) == "table" and
+			object.OnTriggerExit ~= nil and
+			object._PreExecute ~= nil then
+
+			object:_PreExecute()
+			object:OnTriggerExit(otherHandle)
+
+		end
+	end
+end
+
 -- Get an existing script component
 function GetScriptComponent(ownerHandle)
 
@@ -153,5 +168,10 @@ function _OnTriggerEnterScript(handleOwner, handleOther)
 	component:_OnTriggerEnter(handleOther)
 end
 
+function _OnTriggerExitScript(handleOwner, handleOther)
+
+	local component = ExistingScriptComponents[handleOwner]
+	component:_OnTriggerExit(handleOther)
+end
 
 return Script

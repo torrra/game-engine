@@ -116,6 +116,9 @@ namespace engine
         ENGINE_API
         static void NotifyTriggerEnter(EntityHandle entityA, EntityHandle entityB);
 
+        ENGINE_API
+        static void NotifyTriggerExit(EntityHandle entityA, EntityHandle entityB);
+
     private:
 
         static void RunUserScript(const std::string& filename);
