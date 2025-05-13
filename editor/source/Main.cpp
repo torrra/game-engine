@@ -20,16 +20,14 @@ int appMain(void)
     engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
 
-    //for (uint64 entityNum = 0; entityNum < 64; ++entityNum)
-    //{
-    //    engine::EntityHandle newEntity = engine.GetGraph()->CreateEntity("testCollision " + std::to_string(entityNum));
-    //    engine::RigidBodyDynamic* newRigidBody = engine.GetGraph()->CreateComponent<engine::RigidBodyDynamic>(newEntity);
-    //    newRigidBody->SwitchShape(newRigidBody, engine::EGeometryType::BOX);
-    //}
-
 	while (!engine.GetWindow()->ShouldWindowClose())
 	{
         engine.UpdateGameplay();
+
+        if (engine::Input::IsInputPressed(KEY_SPACE))
+        {
+            engine.GetGraph()->GetComponent<engine::RigidBodyDynamic>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->AddForce(math::Vector3f(0.f, 100.f, 0.f));
+        }
 
         if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
             engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
