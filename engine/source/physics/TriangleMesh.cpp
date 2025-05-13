@@ -43,9 +43,48 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
 
     if (m_model == nullptr)
         return;
+void engine::TriangleMesh::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
+{
+    output << "[TriangleMesh]\n     ";
+
+    if constexpr (UpdateAfterParent<TriangleMesh>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
 }
 
-engine::TriangleMesh::~TriangleMesh(void)
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+    text::Serialize(output, "type", m_type);
+    output << "\n     ";
+    text::Serialize(output, "shape", m_shape);
+    output << "\n     ";
+    text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
+const char* engine::TriangleMesh::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_type);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_shape);
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 collisionGroup = 0;
+    text = text::DeserializeInteger(text, collisionGroup);
+    m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
+}
+
 {
     // Release the triangle mesh
     PX_RELEASE(m_triangleMeshImpl->m_triangleMesh);
