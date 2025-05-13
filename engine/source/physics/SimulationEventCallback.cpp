@@ -76,6 +76,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
         {
             listenerA->OnCollisionExit(ownerB);
             listenerB->OnCollisionExit(ownerA);
+
+            ScriptSystem::NotifyCollisionExit(ownerA, ownerB);
         }
     }
 }

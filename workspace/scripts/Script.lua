@@ -70,6 +70,21 @@ function Script:_OnCollisionEnter(otherHandle)
 	end
 end
 
+function Script:_OnCollisionExit(otherHandle)
+
+	for _, object in pairs(self) do
+		
+		if type(object) == "table" and
+			object.OnCollisionExit ~= nil and
+			object._PreExecute ~= nil then
+
+			object:_PreExecute()
+			object:OnCollisionExit(otherHandle)
+
+		end
+
+	end
+end
 
 -- Get an existing script component
 function GetScriptComponent(ownerHandle)
@@ -108,6 +123,12 @@ function _OnCollisionEnterScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
 	component:_OnCollisionEnter(handleOther)
+end
+
+function _OnCollisionExitScript(handleOwner, handleOther)
+
+	local component = ExistingScriptComponents[handleOwner]
+	component:_OnCollisionExit(handleOther)
 end
 
 

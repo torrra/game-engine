@@ -265,7 +265,36 @@ ScriptObjectTypes.%s = %s\nreturn %s";
                 if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
                     LogLuaError();
             }
-        }     
+        }
+    }
+
+    void ScriptSystem::NotifyCollisionExit(EntityHandle entityA, EntityHandle entityB)
+    {
+        if (Entity* entityPtrA = GetInstance()->m_currentScene->GetEntity(entityA))
+        {
+            if (entityPtrA->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnCollisionExitScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
+
+        if (Entity* entityPtrB = GetInstance()->m_currentScene->GetEntity(entityB))
+        {
+            if (entityPtrB->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnCollisionExitScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
     }
 
     void ScriptSystem::LogLuaError(void)

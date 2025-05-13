@@ -53,6 +53,11 @@ function ScriptObject:OnCollisionEnter(otherEntity)
 	print("Parent class")
 end
 
+function ScriptObject:OnCollisionExit(otherEntity)
+
+	print("Lua collision exit")
+end
+
 -- Internal Start() caller
 function ScriptObject:_ExecuteStart()
 
