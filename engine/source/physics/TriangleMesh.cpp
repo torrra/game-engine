@@ -110,20 +110,22 @@ void engine::TriangleMesh::UpdateEntity(void)
         transform->CopyPosition(updatedTransform);
         transform->CopyRotation(updatedTransform);
 }
-                                m_model->GetStaticMeshes()[0].GetVertices();
+}
 
-    /*
-        triangles.count : The number of triangles
-        triangles.stride : The stride of the triangles
-        triangles.data : The data of the triangles
-    */
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.count = static_cast<physx::PxU32>(
-                                m_model->GetStaticMeshes()[0].GetIndexCount() / 3);
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.stride = 3 * sizeof(uint32);
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.data = 
-                                m_model->GetStaticMeshes()[0].GetIndices();
+void engine::TriangleMesh::UpdateTriangleMesh(void)
+{
+    if (m_triangleMeshImpl->m_actor != nullptr)
+    {
+        Transform worldTransform;
 
-    CookTriangleMesh();
+        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+
+        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
+        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+
+        // Update the transform of the rigid body in regard to the entity
+        m_triangleMeshImpl->m_actor->setGlobalPose(ToPxTransform(worldTransform));
+    }
 }
 
 void engine::TriangleMesh::CookTriangleMesh(void)

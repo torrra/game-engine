@@ -57,6 +57,9 @@ namespace engine
         ENGINE_API void                 CleanUpTriangleMesh(void);
 
         ENGINE_API void                 UpdateEntity(void);
+
+        ENGINE_API void                 UpdateTriangleMesh(void);
+
     private :
 
         /// Functions
