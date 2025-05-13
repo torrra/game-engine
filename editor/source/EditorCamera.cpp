@@ -19,6 +19,20 @@ void editor::EditorCamera::Update(f32 deltaTime)
     UpdateRotation();
 }
 
+void editor::EditorCamera::UpdateAspectRatio(const math::Vector2f& size)
+{
+    math::Vector2f newSize = size;
+
+    /*
+        When resizing the viewport it can sometimes cause the X or Y to become zero
+        therefore added these checks to avoid dividing by a negator number or zero
+    */
+    newSize.X() = (size.GetX() > 0.0f) ? size.GetX() : 1.0f;
+    newSize.Y() = (size.GetY() > 0.0f) ? size.GetY() : 1.0f;
+
+    m_aspectRatio = newSize.GetX() / newSize.GetY();
+}
+
 math::Matrix4f editor::EditorCamera::ViewProjection(void)
 {
     math::Matrix4f view{ 1.f };
@@ -78,12 +92,11 @@ void editor::EditorCamera::CalculateProjectionMatrix(void)
     constexpr f32 near = 0.005f;
     constexpr f32 far = 250.f;
     constexpr f32 fovRad = 1.0471976f;
-    constexpr f32 ratio = 1.77777777778f;
 
     const f32 tanAngle = tanf(fovRad * 0.5f);
     const f32 farMinusNearDenom = 1.0f / (far - near);
 
-    m_projectionMatrix[0][0] = 1.0f / (ratio * tanAngle);
+    m_projectionMatrix[0][0] = 1.0f / (m_aspectRatio * tanAngle);
     m_projectionMatrix[1][0] = 0.0f;
     m_projectionMatrix[2][0] = 0.0f;
     m_projectionMatrix[3][0] = 0.0f;

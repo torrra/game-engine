@@ -1,5 +1,4 @@
 #include "utility/FrameBuffer.h"
-
 #include <glad/glad.h>
 
 engine::FrameBuffer::FrameBuffer(void)

@@ -3,6 +3,7 @@
 #include <engine/game/GameScene.h>
 #include <engine/thread/ThreadManager.h>
 #include <engine/ui/UIComponent.h>
+#include <engine/input/Input.h>
 
 #define SIMULATION_VIEW_WINDOW "Simulation view"
 #define EDITOR_VIEW_WINDOW "Editor view"
@@ -30,27 +31,38 @@ namespace editor
         if (!m_currentScene)
             return;
 
+        // Render editor windows
         m_assetWnd.Render();
-        
         m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
 
+        // Get selected entity to dislay its components
         if (m_graphView.IsNewEntitySelected())
             m_properties.SetHandle(m_graphView.GetSelectedEntity());
 
         m_properties.Render();
 
+        // Simulation viewport
         if (m_currentScene->IsRunning())
-        {
             m_gameSimulationView->RenderToViewport();
-        }
-            m_gameSimulationView->Render();
+
+        m_gameSimulationView->Render();
+
+        // Editor camera
+        if (m_sceneEditorView->HasWindowResized())
+            m_editorViewCamera.UpdateAspectRatio(m_sceneEditorView->GetViewportSize());
 
         if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
 
+        // Editor viewport
+        m_sceneEditorView->RenderPickingPass(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->Render();
+
+        if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT) &&
+            ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
+            PickEntity();
     }
 
     void EditorApplication::Shutdown(void)
@@ -58,5 +70,16 @@ namespace editor
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         Application::Shutdown();
+    }
+
+    void EditorApplication::PickEntity(void)
+    {
+        engine::EntityHandle handle = m_sceneEditorView->GetPicking()->FindSelectedEntity(EDITOR_VIEW_WINDOW);
+
+        if (handle != engine::Entity::EHandleUtils::INVALID_HANDLE)
+        {
+            m_graphView.SelectEntity(handle);
+            m_properties.SetHandle(handle);
+        }
     }
 }
