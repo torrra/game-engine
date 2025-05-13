@@ -144,6 +144,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
         if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND)
         {
             listenerA->OnTriggerEnter(ownerB);
+
+            ScriptSystem::NotifyTriggerEnter(ownerA, ownerB);
         }
         if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
         {
