@@ -316,7 +316,8 @@ inline int16 engine::Engine::LoadEngineResources(void)
     ResourceManager::LoadShader(
         "Default", 
         ".\\shaders\\Default.vs", 
-        ".\\shaders\\Default.frag"
+        ".\\shaders\\Default.frag",
+        true, true
     );
 
     return SUCCESS;
