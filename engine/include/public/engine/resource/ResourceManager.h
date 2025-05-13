@@ -26,7 +26,8 @@ namespace engine
 		ENGINE_API static void		LoadShader(
 										const char* shaderProgramName, 
 										const char* vertShader, 
-										const char* fragShader);
+										const char* fragShader,
+                                        bool isVertAbsolute = false, bool isFragAbsolute = false);
 
         // Create a resource from data that already exists in memory instead
         // of loading a file from disk
@@ -86,10 +87,14 @@ namespace engine
             resourcePath = fileName;
 
         else if (Engine::HasEditor())
-            resourcePath = Engine::GetEngine()->GetProjectDir().string() + fileName;
+        {
+            resourcePath = Engine::GetEngine()->GetProjectDir().string();
+            resourcePath.push_back('\\');
+            resourcePath += fileName;
+        }
 
         else
-            resourcePath = "assets" + fileName;
+            resourcePath = "assets\\" + fileName;
         
 
         if (!newVal->LoadResource(resourcePath.c_str()))
