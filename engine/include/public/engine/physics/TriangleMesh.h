@@ -9,12 +9,15 @@
 #pragma region Physics
 
 #include "engine/physics/PhysicsEngine.h"
+#include "engine/physics/geometry/Geometry.hpp"
+#include "engine/physics/ICollisionListener.h"
 
 #pragma endregion
 
 #pragma region Engine
 
 #include "engine/EngineExport.h"
+#include "engine/CoreTypes.h"
 
 #pragma endregion
 
@@ -34,7 +37,7 @@ namespace engine
         ENGINE_API                      TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene);
 
         /// Destructor
-        ENGINE_API                      ~TriangleMesh(void);
+        ENGINE_API                      ~TriangleMesh(void) override {};
 
         /// Getters
         // Get the triangle mesh implementation pointer

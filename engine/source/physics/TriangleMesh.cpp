@@ -19,6 +19,12 @@
 
 #pragma endregion
 
+#pragma region Serialization
+
+#include "serialization/TextSerializer.h"
+
+#pragma endregion
+
 engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene)
 {
     // Initialize the triangle mesh implementation
