@@ -53,6 +53,8 @@ namespace engine
                                                       EntityHandle owner,
                                                       uint64 index) const override;
         ENGINE_API const char*          DeserializeText(const char* text, const char* end) override;
+
+        ENGINE_API void                 CleanUpTriangleMesh(void);
     private :
 
         /// Functions

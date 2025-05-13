@@ -85,7 +85,11 @@ const char* engine::TriangleMesh::DeserializeText(const char* text, const char* 
     return text::DeserializeInteger(text, m_flags);
 }
 
+void engine::TriangleMesh::CleanUpTriangleMesh(void)
 {
+    m_triangleMeshImpl->m_triangleMeshDesc.setToDefault();
+
+    PhysicsEngine::Get().GetImpl().m_scene->removeActor(*m_triangleMeshImpl->m_actor);
     // Release the triangle mesh
     PX_RELEASE(m_triangleMeshImpl->m_triangleMesh);
 
