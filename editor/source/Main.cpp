@@ -26,7 +26,7 @@ int appMain(void)
 
         if (engine::Input::IsInputPressed(KEY_SPACE))
         {
-            engine.GetGraph()->GetComponent<engine::RigidBodyDynamic>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->AddForce(math::Vector3f(0.f, 100.f, 0.f));
+            engine.GetGraph()->GetComponent<engine::RigidBodyDynamic>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->AddTorque({ 0.f, 10.f, 0.f });
         }
 
         if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||

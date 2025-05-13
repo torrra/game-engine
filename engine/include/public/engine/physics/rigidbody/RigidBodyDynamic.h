@@ -157,6 +157,10 @@ namespace engine
                                              EForceMode inForceMode = EForceMode::FORCE, 
                                              bool inAutoWake = true);
 
+        ENGINE_API void             AddTorque(const math::Vector3f& inTorque, 
+                                              EForceMode inForceMode = EForceMode::FORCE, 
+                                              bool inAutoWake = true);
+
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 
         RigidBodyData               m_data;
