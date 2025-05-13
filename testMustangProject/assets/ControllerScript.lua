@@ -39,17 +39,11 @@ function ControllerScript:Update(deltaTime)
         
         local direction = Vector3.new(0.0, 0.0, -1):Rotate(self.camera:GetRotation())
         local position = Vector3.new(self.camera:GetPosition())
-
-        print("direction: "..direction)
-        print("origin: "..position)
-
+        
         self.gunRay:SetOrigin(position)
         self.gunRay:SetDirection(direction)
 
         local result = self.gunRay:HasHit()
-
-        print(result.hasHit)
-
     end
 end
 
