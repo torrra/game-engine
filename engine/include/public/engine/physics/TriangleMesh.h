@@ -70,8 +70,11 @@ namespace engine
                                                                  uint32 inCollisionMask);
 
         /// Private members
-        const   Model*              m_model             = nullptr;
-                TriangleMeshImpl*   m_triangleMeshImpl  = nullptr;
+        const   Model*                      m_model             = nullptr;
+                TriangleMeshImpl*           m_triangleMeshImpl  = nullptr;
+                RigidBodyData               m_data;
+                uint64                      m_shape             = 0;
+                uint32                      m_type              = EShapeType::STATIC;
                 collision::ECollisionGroup  m_collisionGroup    = 
                                                 collision::ECollisionGroup::ENVIRONMENT_COLLISION;
 

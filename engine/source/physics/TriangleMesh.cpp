@@ -30,10 +30,18 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
     // Initialize the triangle mesh implementation
     m_triangleMeshImpl  = new TriangleMeshImpl();
 
+    m_data.m_index = 0;
+    m_data.m_type = EShapeType::STATIC;
+
     // Set the owner and the current scene
     m_owner             = inOwner;
     m_currentScene      = inScene;
 
+    
+}
+
+void engine::TriangleMesh::CreateTriangleMesh(void)
+{
     // Get the model and return if failed
     if (engine::Renderer* renderer = m_currentScene->GetComponent<engine::Renderer>(m_owner))
         m_model = renderer->GetModel();
@@ -159,14 +167,27 @@ void engine::TriangleMesh::CookTriangleMesh(void)
                                                                                            0.5f,
                                                                                            0.6f);
     // Create the static rigid body
-    physx::PxRigidStatic* actor =
+    m_triangleMeshImpl->m_actor =
         physx::PxCreateStatic(*PhysicsEngine::Get().GetImpl().m_physics,
             ToPxTransform(m_currentScene->GetComponent<engine::Transform>(
                 m_owner)->GetTransform()), physx::PxTriangleMeshGeometry(
                     m_triangleMeshImpl->m_triangleMesh), *material);
 
+    // Set the visualization of the rigid body to false by default
+    m_triangleMeshImpl->m_actor->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_triangleMeshImpl->m_actor->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), 
+                             collision::GetCollisionMask(m_collisionGroup));
+
     // Add the actor to the physics scene
-    PhysicsEngine::Get().GetImpl().m_scene->addActor(*actor);
+    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_triangleMeshImpl->m_actor);
+    m_shape = EGeometryType::TRIANGLE_MESH;
+}
 
 void engine::TriangleMesh::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
 {
