@@ -106,8 +106,7 @@ namespace engine
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
 
                     Transform&      CheckEntityTransform(void);
-                    void            SwitchShape(const EGeometryType& inGeometry);
-
+        ENGINE_API  void            SwitchShape(const EGeometryType& inGeometry);
         ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
         ENGINE_API  void            OnCollisionStay(EntityHandle inOther) override { inOther; }
         ENGINE_API  void            OnCollisionExit(EntityHandle inOther) override;
