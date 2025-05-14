@@ -147,6 +147,8 @@ namespace engine
 
 		RigidBodyStaticImpl*    m_rigidBodyStaticImpl   = nullptr;
         Material*               m_materialImpl          = nullptr;
+        math::Vector3f          m_halfExtents           = math::Vector3f(0.5f, 0.5f, 0.5f);
+        f32                     m_radius                = 0.5f;
 
 	}; // !Class RigidBodyStatic
 
