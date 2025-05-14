@@ -158,21 +158,26 @@ void engine::RigidBodyStatic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
     return;
 }
 
-void engine::RigidBodyStatic::SetSphereRadius(f32 inRadius) const
+void engine::RigidBodyStatic::SetSphereRadius(f32 inRadius)
 {
     // Set the sphere radius by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;
+
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
     if (shapes)
     {
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
         {
             shapes->setGeometry(physx::PxSphereGeometry(inRadius));
+                m_radius = inRadius;
             PrintLog(SuccessPreset(), "Successfully set sphere radius.");
             return;
         }
         PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
         return;
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
