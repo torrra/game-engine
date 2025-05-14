@@ -116,7 +116,22 @@ math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void) const
     return math::Vector2f(0.f);
 }
 
-void engine::RigidBodyStatic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
+const char* engine::RigidBodyStatic::GetGeometryName(void) const
+{
+    switch (m_shape)
+    {
+    case EGeometryType::BOX :
+        return "Box";
+    case EGeometryType::SPHERE:
+        return "Sphere";
+    case EGeometryType::CAPSULE:
+        return "Capsule";
+    case EGeometryType::PLANE:
+        return "Plane";
+    }
+    return "";
+}
+
 {
     // Set the box half extents by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;

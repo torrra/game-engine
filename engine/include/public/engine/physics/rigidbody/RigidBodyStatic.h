@@ -61,6 +61,8 @@ namespace engine
             <return> [out] the half height and radius
         */
         ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+
+        ENGINE_API  const char*     GetGeometryName(void) const;
         /// Setter
         /*
             Set the half extents of the box
