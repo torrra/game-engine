@@ -32,6 +32,7 @@
      @uint64 | shape=2
      @uint32 | collision group=1
      @vec2f32 | capsule format={0.5,0}
+     @uint32 | gravity=0
      @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera

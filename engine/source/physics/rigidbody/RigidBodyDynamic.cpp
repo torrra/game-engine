@@ -239,6 +239,8 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
         text::Serialize(output, "capsule format", m_capsuleFormat);
         output << "\n     ";
     }
+    text::Serialize(output, "gravity", static_cast<uint32>(m_isGravityDisabled));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -274,6 +276,11 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_capsuleFormat);
     }
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isGravityDisabled = 1;
+    text = text::DeserializeInteger(text, isGravityDisabled);
+    m_isGravityDisabled = static_cast<bool>(isGravityDisabled);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
