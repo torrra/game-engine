@@ -96,12 +96,9 @@ namespace engine
 
     void GameScene::Tick(void)
     {
- 
-
         if (m_state == EGameState::RUNNING)
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
-            m_graph.SyncRigidbodiesPrePhysics();
             PhysicsUpdate();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
         }
