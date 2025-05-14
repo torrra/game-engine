@@ -98,6 +98,9 @@ math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void) const
     // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
     // access the good geometry and retrive the good information about the capsule
     physx::PxShape* shapes = nullptr;
+
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
     if (shapes)
     {
@@ -111,6 +114,7 @@ math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void) const
         }
         PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
         return math::Vector2f(0.f);
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return math::Vector2f(0.f);
