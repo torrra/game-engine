@@ -144,7 +144,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
         false);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
     m_data.m_type = EShapeType::DYNAMIC;
