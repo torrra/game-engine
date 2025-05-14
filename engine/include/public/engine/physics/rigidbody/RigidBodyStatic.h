@@ -129,6 +129,7 @@ namespace engine
 
         void                        SetCollisionGroupAndMask(uint32 inCollisionGroup,
                                                              uint32 inCollisionMask);
+        void                        SetCapsuleBaseOrientation(void);
 
 		/// Functions
         /*

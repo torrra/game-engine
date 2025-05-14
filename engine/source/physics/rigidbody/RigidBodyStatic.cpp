@@ -366,6 +366,26 @@ void engine::RigidBodyStatic::SetCollisionGroupAndMask(uint32 inCollisionGroup, 
     }
 }
 
+void engine::RigidBodyStatic::SetCapsuleBaseOrientation(void)
+{
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
+        // Rotate the intiale position of the capsule to be at the vertical by default
+        // By using the local pose to not rotate the entity attach to it
+        physx::PxTransform currentPose = m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose();
+        physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+
+        // Update the local pose via the shape
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
+        if (shapes)
+        {
+            shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
+            );
+        }
+    }
+}
+
 void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 {
     // Create a new material with default values
@@ -447,6 +467,8 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         ToPxTransform(CheckEntityTransform()),
         physx::PxCapsuleGeometry(0.25f, 0.5f), 
         *m_materialImpl->GetImpl().m_material);
+
+            SetCapsuleBaseOrientation();
 
     // Set the visualization of the rigid body to false by default
             m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
