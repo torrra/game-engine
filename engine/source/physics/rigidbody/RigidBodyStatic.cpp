@@ -286,6 +286,18 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
     output << "\n     ";
     text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
     output << "\n     ";
+
+
+    if (m_shape == EGeometryType::BOX)
+    {
+        text::Serialize(output, "box half extents", m_halfExtents);
+        output << "\n     ";
+    }
+    else if (m_shape == EGeometryType::SPHERE)
+    {
+        text::Serialize(output, "sphere radius", m_radius);
+        output << "\n     ";
+    }
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -305,6 +317,18 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
     uint32 collisionGroup = 0;
     text = text::DeserializeInteger(text, collisionGroup);
     m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
+
+
+    if (m_shape == EGeometryType::BOX)
+    {
+    MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_halfExtents);
+    }
+    else if (m_shape == EGeometryType::SPHERE)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeReal(text, m_radius);
+    }
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
