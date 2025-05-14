@@ -223,6 +223,7 @@ exists. Attempting to open project file...");
     m_projectDir = pathObj.remove_filename().append("assets");
     std::filesystem::create_directory(pathObj);
 
+    m_activeScene.Reset(false);
     m_activeScene.EditPath(m_projectDir);
     m_activeScene.Rename("default");
 
@@ -234,10 +235,7 @@ exists. Attempting to open project file...");
 void engine::Engine::OpenProject(const std::filesystem::path& projFile)
 {
     constexpr wchar_t extension[] = L".mustang";
-    
-    m_projectFile = projFile;
-    m_projectName = projFile.filename().replace_extension().string();
-
+  
     if (memcmp(projFile.extension().c_str(), extension, sizeof(extension)) != 0)
     {
         PrintLog(ErrorPreset(), "Invalid project file");
@@ -251,6 +249,9 @@ void engine::Engine::OpenProject(const std::filesystem::path& projFile)
         PrintLog(ErrorPreset(), "Unable to open project file");
         return;
     }
+
+    m_projectFile = projFile;
+    m_projectName = projFile.filename().replace_extension().string();
 
     const char* cursor;
     const char* end;
@@ -373,7 +374,7 @@ void engine::Engine::SetDefaultEditorScene(const std::string& relativePath)
 void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
 {
     cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultGameScene);
-    if (memcmp(m_currentProject.m_defaultGameScene.c_str(), "0", 1) == 0)
+    if (m_currentProject.m_defaultGameScene.empty())
         PrintLog(WarningPreset(), "No default scene set for standalone mode");
 
     cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultEditorScene);
@@ -381,7 +382,7 @@ void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
 
     if (m_hasEditor)
     {
-        if (memcmp(m_currentProject.m_defaultEditorScene.c_str(), "0", 1) == 0)
+        if (m_currentProject.m_defaultEditorScene.empty())
             PrintLog(WarningPreset(), "No default scene set for editor mode");
 
         PrintLog(InfoPreset(), "Executable name: " + m_currentProject.m_executableName);
