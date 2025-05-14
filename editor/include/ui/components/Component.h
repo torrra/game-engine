@@ -22,7 +22,7 @@ namespace editor
         AUDIO,
         CAMERA,
         RENDERER,
-        RIGIDBODY,
+        RIGIDBODY_STATIC,
         SCRIPT,
         TRANSFORM
     };
