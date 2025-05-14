@@ -41,6 +41,8 @@ namespace engine::text
 
     const char* DeserializeString(const char* text, const char* end, std::string& val)
     {
+        val.clear();
+
         while(text != end && *text != '\"')
             ++text;
 
