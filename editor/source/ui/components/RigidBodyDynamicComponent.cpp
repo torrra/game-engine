@@ -40,6 +40,14 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         }
 
         DisplayUI(currentShape, rigidBodyDynamic);
+
+        bool isGravityEnabled = rigidBodyDynamic->IsGravityDisabled();
+        ui::Text("Disable gravity: ");
+        ui::SameLine(125.f);
+        if (ui::Checkbox("##Gravity", &isGravityEnabled))
+        {
+            rigidBodyDynamic->SetGravityDisabled(isGravityEnabled);
+        }
     }
 }
 
