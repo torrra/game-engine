@@ -55,7 +55,7 @@ namespace engine
             Get the radius of the sphere
             <return> [out] the radius
         */
-        ENGINE_API  f32             GetSphereRadius(void) const;
+        ENGINE_API  f32             GetSphereRadius(void);
         /*
             Get the half height and radius of the capsule
             <return> [out] the half height and radius

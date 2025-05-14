@@ -64,11 +64,14 @@ math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void)
     return math::Vector3f(0.f);
 }
 
-f32 engine::RigidBodyStatic::GetSphereRadius(void) const
+f32 engine::RigidBodyStatic::GetSphereRadius(void)
 {
     // Retrieve the sphere radius by getting the shape of the rigid body to access
     // the good geometry and retrive the good information about the sphere
     physx::PxShape* shapes = nullptr;
+
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
     if (shapes)
     {
@@ -78,10 +81,13 @@ f32 engine::RigidBodyStatic::GetSphereRadius(void) const
             const physx::PxSphereGeometry& sphereGeometry =
                 static_cast<const physx::PxSphereGeometry&>(*geometry);
 
+                m_radius = sphereGeometry.radius;
+
             return sphereGeometry.radius;
         }
         PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
         return 0.f;
+    }
     }
     PrintLog(ErrorPreset(), ("Invalid shapes"));
     return 0.f;
