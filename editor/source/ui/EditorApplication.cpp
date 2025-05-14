@@ -4,6 +4,7 @@
 #include <engine/thread/ThreadManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/input/Input.h>
+#include <engine/core/Entity.h>
 
 #define SIMULATION_VIEW_WINDOW "Simulation view"
 #define EDITOR_VIEW_WINDOW "Editor view"
@@ -79,6 +80,8 @@ namespace editor
         activeScene.Stop();
 
         m_graphView.ClearGraph();
+        m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+        activeScene.GetGraph()->CleanRigidBodies();
 
         activeScene.LoadNewScene(false, filePath);
 
