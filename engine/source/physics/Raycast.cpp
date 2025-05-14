@@ -10,12 +10,15 @@
 #pragma region Physics
 
 #include "engine/physics/PhysicsEngine.h"
+#include "engine/physics/rigidbody/RigidBodyDynamic.h"
+#include "engine/physics/rigidbody/RigidBodyStatic.h"
 
 #pragma endregion
 
 #pragma region Engine
 
 #include "engine/ConsoleLog.hpp"
+#include "engine/Engine.h"
 
 #pragma endregion
 
@@ -218,26 +221,34 @@ bool engine::Raycast::HasHit(HitData* outData)
 
     if (status && m_raycastImpl->m_hit->hasBlock)
     {
-        //PrintLog(SuccessPreset(), "Raycast hit something !");
-
         if (outData)
         {
             const physx::PxRaycastHit& block = m_raycastImpl->m_hit->block;
+            const RigidBodyData* actorData = reinterpret_cast<const RigidBodyData*>(&block.actor->userData);
 
-            // TODO: do stuff with that to retrieve entity handle
-            (void)block.actor->userData;
-            outData->m_hitEntity = Entity::INVALID_HANDLE;
+
+            if (actorData->m_type == EShapeType::DYNAMIC)
+            {
+                RigidBodyDynamic& rigidbody =
+                    *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + actorData->m_index);
+
+                outData->m_hitEntity = rigidbody.GetOwner();
+            }
+            else
+            {
+                RigidBodyDynamic& rigidbody =
+                    *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + actorData->m_index);
+
+                outData->m_hitEntity = rigidbody.GetOwner();
+            }
 
             outData->m_position = ToVector3f(block.position);
             outData->m_distance = block.distance;
-
-            //std::cout << "hit position: " << outData->m_position << "\nhit distance: " << outData->m_distance << '\n';
         }
 
         return true;
     }
 
-    //PrintLog(InfoPreset(), "Raycast hit nothing...");
     return false;
 }
 
