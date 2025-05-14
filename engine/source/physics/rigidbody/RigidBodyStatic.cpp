@@ -214,6 +214,11 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
 
 void engine::RigidBodyStatic::UpdateEntity(void)
 {
+    if (m_rigidBodyStaticImpl != nullptr)
+    {
+        if (m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
+            m_currentScene->GetEntity(m_owner)->HasComponent<Transform>())
+        {
     // Update the entity transform in regard to the rigid body
     Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
 
@@ -222,9 +227,16 @@ void engine::RigidBodyStatic::UpdateEntity(void)
     transform->CopyPosition(updatedTransform);
     transform->CopyRotation(updatedTransform);
 }
+    }
+}
 
 void engine::RigidBodyStatic::UpdateRigidBody(void)
 {
+    if (m_rigidBodyStaticImpl != nullptr)
+    {
+        if (m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
+            m_currentScene->GetEntity(m_owner)->HasComponent<Transform>())
+        {
     Transform worldTransform;
 
     Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
@@ -234,6 +246,8 @@ void engine::RigidBodyStatic::UpdateRigidBody(void)
 
     // Update the transform of the rigid body in regard to the entity
     m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));
+}
+    }
 }
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
