@@ -152,6 +152,12 @@ namespace engine
 
 	}; // !Class RigidBodyStatic
 
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<RigidBodyStatic>()
+    {
+        return RIGIDBODY_STATIC;
+    }
+
     class RigidBodyStaticFactory
     {
     public:
