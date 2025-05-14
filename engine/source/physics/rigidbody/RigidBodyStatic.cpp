@@ -189,7 +189,7 @@ void engine::RigidBodyStatic::SetSphereRadius(f32 inRadius)
     return;
 }
 
-void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const
+void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
 {
     // Set the capsule half height and radius by using the shape of rigid body to access the 
     // good geometry
@@ -203,6 +203,7 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
         {
             shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
+                m_capsuleFormat = math::Vector2f(inRadius, inHalfHeight);
             PrintLog(SuccessPreset(), "Successfully set capsule format.");
             return;
         }
