@@ -333,8 +333,10 @@ void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
     PrintLog(SuccessPreset(), "Successfully set gravity.");
 }
 
-void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
+void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Set the box half extents by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
@@ -344,11 +346,13 @@ void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) c
         {
             shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
                                 inHalfExtents.GetZ()));
+                m_halfExtents = math::Vector3f(inHalfExtents);
             PrintLog(SuccessPreset(), "Successfully set box half extents.");
             return;
         }
         PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
         return;
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;

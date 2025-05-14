@@ -86,7 +86,7 @@ namespace engine
             Set the half extents of the box
             <param> [in] inHalfExtents : the half extents
         */
-        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents) const;
+        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents);
         /*
             Set the radius of the sphere
             <param> [in] inRadius : the radius
@@ -185,6 +185,7 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
+        math::Vector3f          m_halfExtents   = math::Vector3f(0.5f, 0.5f, 0.5f);
         f32                     m_radius        = 0.5f;
         math::Vector2f          m_capsuleFormat = math::Vector2f(0.5f, 1.f);
 
