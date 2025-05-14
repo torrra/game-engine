@@ -465,7 +465,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
     m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
         *PhysicsEngine::Get().GetImpl().m_physics,
         ToPxTransform(CheckEntityTransform()),
-        physx::PxCapsuleGeometry(0.25f, 0.5f), 
+                physx::PxCapsuleGeometry(m_capsuleFormat.GetX(), m_capsuleFormat.GetY()),
         *m_materialImpl->GetImpl().m_material);
 
             SetCapsuleBaseOrientation();
