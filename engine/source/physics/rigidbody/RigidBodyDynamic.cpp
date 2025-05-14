@@ -55,6 +55,8 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 
 void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
+    {
     // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
@@ -84,9 +86,12 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::BOX;
 }
+}
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
+    {
     // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
@@ -115,9 +120,12 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::SPHERE;
 }
+}
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
+    {
     // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
@@ -149,9 +157,12 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::CAPSULE;
 }
+}
 
 void engine::RigidBodyDynamic::UpdateEntity()
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Update the entity transform in regard to the rigid body for exemple,
     // if the rigid body is under gravity then the rigid body fall so the entity fall
     Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
@@ -161,12 +172,15 @@ void engine::RigidBodyDynamic::UpdateEntity()
     transform->CopyPosition(updatedTransform);
     transform->CopyRotation(updatedTransform);
 }
+}
 
 void engine::RigidBodyDynamic::UpdateRigidBody()
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     Transform worldTransform;
 
-    Transform &entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
 
     worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
     worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
@@ -174,9 +188,12 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
     // Update the transform of the rigid body in regard to the entity
     m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
 }
+}
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Delete the pointer
     delete m_materialImpl;
     m_materialImpl = nullptr;
@@ -186,6 +203,7 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
     // Delete the pointer to the implementation structure
     delete m_rigidBodyImpl;
     m_rigidBodyImpl = nullptr;
+}
 }
 
 void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
@@ -325,12 +343,15 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void)
 
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Set the gravity disabled or enabled state
     // State by default is enabled
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
                                                       inIsGravityDisabled);
 
     PrintLog(SuccessPreset(), "Successfully set gravity.");
+}
 }
 
 void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
@@ -409,12 +430,17 @@ void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
 
 void engine::RigidBodyDynamic::SetDebugVisualization(bool inIsDebugVisualization)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
                                                       inIsDebugVisualization);
+}
 }
 
 void engine::RigidBodyDynamic::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     physx::PxFilterData filterData;
     filterData.word0 = inCollisionGroup;
     filterData.word1 = inCollisionMask;
@@ -425,6 +451,7 @@ void engine::RigidBodyDynamic::SetCollisionGroupAndMask(uint32 inCollisionGroup,
     {
         shape->setSimulationFilterData(filterData);
     }
+}
 }
 
 void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
@@ -454,6 +481,8 @@ void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCo
 
 void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     physx::PxShape* shape = nullptr;
     m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
     if (shape)
@@ -471,6 +500,7 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
             m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
         }
     }
+}
 }
 
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
