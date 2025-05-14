@@ -37,7 +37,7 @@ int appMain(void)
         {
             engine.BuildProjectExecutable("..\\testProjectBuildFolder");
         }
-
+        
         engine.UpdateApplicationWindow();
 	}
 
