@@ -28,9 +28,6 @@
 
 #include "serialization/TextSerializer.h"
 
-
-#include <iostream>
-
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene)
 {
     // Initialize the rigidbody implementation struct
@@ -65,7 +62,9 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
-                                            physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
+            physx::PxBoxGeometry(m_halfExtents.GetX(),
+                m_halfExtents.GetY(),
+                m_halfExtents.GetZ()),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
     // Set the gravity by default
@@ -237,8 +236,10 @@ bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
                 physx::PxActorFlag::eDISABLE_GRAVITY);
 }
 
-math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
+math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Retrieve the box half extents by getting the shape of the rigid body to access
     // the good geometry and retrive the good information about the box
     physx::PxShape* shapes = nullptr;
@@ -251,11 +252,15 @@ math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
             const physx::PxBoxGeometry& boxGeometry = 
                                     static_cast<const physx::PxBoxGeometry&>(*geometry);
 
+                m_halfExtents = math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
+                    boxGeometry.halfExtents.z);
+
             return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                                   boxGeometry.halfExtents.z);
         }
         PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
         return math::Vector3f(EErrorGeometryType_Invalid);
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shapes");
     return math::Vector3f(EErrorGeometryType_Invalid);
