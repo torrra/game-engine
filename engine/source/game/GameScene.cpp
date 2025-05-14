@@ -117,6 +117,10 @@ namespace engine
 
             // 'undo' physics tick (set physx transform back to pre-update values)
             m_graph.SyncRigidbodiesPrePhysics();
+
+            for (RigidBodyDynamic& rigidbody : m_graph.GetComponentArray<RigidBodyDynamic>())
+                rigidbody.SetLinearVelocity({ 0.f, 0.f, 0.f });
+
         }
 
         m_time.Update();
