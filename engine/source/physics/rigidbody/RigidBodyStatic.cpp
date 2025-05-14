@@ -252,6 +252,10 @@ void engine::RigidBodyStatic::UpdateRigidBody(void)
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
+    if (m_rigidBodyStaticImpl != nullptr)
+    {
+        if (m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+        {
     // Delete the pointer to the implementation structure
     delete m_materialImpl;
     m_materialImpl = nullptr;
@@ -260,6 +264,8 @@ void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 
     delete m_rigidBodyStaticImpl;
     m_rigidBodyStaticImpl = nullptr;
+}
+    }
 }
 
 void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
