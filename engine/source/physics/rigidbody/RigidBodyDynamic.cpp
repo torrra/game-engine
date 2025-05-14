@@ -535,6 +535,9 @@ void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
 
 void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
 {
+    if (m_rigidBodyImpl == nullptr)
+        m_rigidBodyImpl = new RigidBodyDynamicImpl();
+
     switch (inGeometry)
     {
     case EGeometryType::BOX:

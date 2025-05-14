@@ -131,7 +131,7 @@ namespace engine
                                                   uint64 index) const override;
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
-                    void            SwitchShape(/*RigidBodyDynamic* inRigidBody, */
+        /*ENGINE_API*/ void             SwitchShape(/*RigidBodyDynamic* inRigidBody, */
                                                 const EGeometryType& inGeometry);
 
         ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
