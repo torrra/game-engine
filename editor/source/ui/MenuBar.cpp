@@ -224,7 +224,10 @@ void editor::MenuBar::CreateProject(void)
                         if (engine->CreateProject(projectPath.string(), projectName))
                         {
                             // Open new project
-                            projectPath += (std::string("\\") + projectName);
+                            projectPath.append(projectName)
+                                       .append(projectName)
+                                       .replace_extension(".mustang");
+
                             engine->OpenProject(projectPath);
                             engine->LoadDefaultScene();
 
