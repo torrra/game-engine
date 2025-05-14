@@ -21,6 +21,12 @@
 
 #pragma endregion
 
+#pragma region Math
+
+#include "math/Vector3.hpp"
+
+#pragma endregion
+
 namespace engine
 {
 	struct RigidBodyStaticImpl;
@@ -44,7 +50,7 @@ namespace engine
             Get the half extents of the box
             <return> [out] the half extents
         */
-        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void) const;
+        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void);
         /*
             Get the radius of the sphere
             <return> [out] the radius

@@ -34,11 +34,13 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 	m_currentScene			= inScene;
 }
 
-math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
+math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void)
 {
     // Retrieve the box half extents by getting the shape of the rigid body to access
     // the good geometry and retrive the good information about the box
     physx::PxShape* shapes = nullptr;
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
     if (shapes)
     {
@@ -48,11 +50,15 @@ math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
             const physx::PxBoxGeometry& boxGeometry =
                 static_cast<const physx::PxBoxGeometry&>(*geometry);
 
+                m_halfExtents = math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
+                    boxGeometry.halfExtents.z);
+
             return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                                   boxGeometry.halfExtents.z);
         }
         PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
         return math::Vector3f(0.f);
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shapes");
     return math::Vector3f(0.f);
