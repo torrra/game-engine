@@ -403,20 +403,20 @@ void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
 {
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-    // Rotate the intiale position of the capsule to be at the vertical by default
-    // By using the local pose to not rotate the entity attach to it
-    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
-    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+        // Rotate the intiale position of the capsule to be at the vertical by default
+        // By using the local pose to not rotate the entity attach to it
+        physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+        physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
 
-    // Update the local pose via the shape
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
-    {
-        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
-        );
+        // Update the local pose via the shape
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
+        {
+            shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
+            );
+        }
     }
-}
 }
 
 void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
