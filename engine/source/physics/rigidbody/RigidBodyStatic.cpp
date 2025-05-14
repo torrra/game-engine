@@ -527,6 +527,10 @@ void engine::RigidBodyStatic::SetTrigger(bool inIsTrigger)
 
 void engine::RigidBodyStatic::SwitchShape(const EGeometryType& inGeometry)
 {
+    if (m_rigidBodyStaticImpl == nullptr)
+    {
+        m_rigidBodyStaticImpl = new RigidBodyStaticImpl();
+    }
     switch (inGeometry)
     {
     case EGeometryType::BOX:
