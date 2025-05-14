@@ -44,6 +44,8 @@
 #define FONT_PAYLOAD "font"
 #define VERTEX_SHADER_PAYLOAD "vertexShader"
 #define FRAGMENT_SHADER_PAYLOAD "fragmentShader"
+#define MATERIAL_PAYLOAD "material"
+#define SCENE_PAYLOAD "scene"
 
 namespace editor
 {
@@ -70,6 +72,19 @@ namespace editor
 
     class AssetsWnd final : public ::ui::UIWindow
     {
+    private:
+
+        enum class EAssetAction
+        {
+            NONE,
+            CREATE_SCENE,
+            CREATE_MATERIAL,
+            OPEN_ASSET,
+            DELETE_ASSET,
+            REFRESH_WINDOW
+        };
+
+
     public:
         AssetsWnd(void) = delete;
         AssetsWnd(const char* name, class EditorApplication* owner);
@@ -94,6 +109,17 @@ namespace editor
         std::string GetPayloadType(std::string const& extension) const;
 
         void SelectResource(void);
+        EAssetAction RenderRightClickMenu(void);
+        EAssetAction CreateAsset(EAssetAction action);
+
+        void SetNewAssetName(void);
+        bool IsAssetNameValid(void);
+        void CreateScene(void);
+        void CloseAssetCreationMenu(void);
+
+        ui::Table   m_assetCreationTable = ui::Table("createAssetLayout", 3, {0.f, 0.f});
+        std::string m_newAssetName;
+
 
         std::filesystem::path m_path;
         std::vector<Asset> m_assets;
@@ -104,7 +130,9 @@ namespace editor
         class EditorApplication* m_ownerApplication;
 
         ui::ListClipper m_clipper;
+        EAssetAction m_currentAction = EAssetAction::NONE;
         int16 m_selectedIndex;
+        bool m_isRightClickMenuOpen = false;
 
     };
 }
