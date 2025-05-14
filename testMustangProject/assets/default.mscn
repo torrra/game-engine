@@ -100,33 +100,28 @@
      @f32 | sphere radius=1.9
      @uint64 | flags=0
 [Entity]
-   @string 7 | name=Capsule
+   @string 5 | name=Plane
    @int64 | handle=4
+   @int64 | parent=-1
+   @uint64 | flags=0
+   @uint64 | components=16
+[Entity]
+   @string 7 | name=Capsule
+   @int64 | handle=5
    @int64 | parent=-1
    @uint64 | flags=0
    @uint64 | components=17
 [Transform]
     @uint64 | index=4
-    @int64 | owner=4
+    @int64 | owner=5
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={-2.55,1.7,-0.5}
+    @vec3f32 | position={-7.6,3.25,1}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [RigidBodyStatic]
-     @int64 | owner=4
+     @int64 | owner=5
      @uint32 | type=1
      @uint64 | shape=2
      @uint32 | collision group=3
-     @uint64 | flags=0
-[Entity]
-   @string 5 | name=Plane
-   @int64 | handle=5
-   @int64 | parent=-1
-   @uint64 | flags=0
-   @uint64 | components=16
-[RigidBodyStatic]
-     @int64 | owner=5
-     @uint32 | type=1
-     @uint64 | shape=3
-     @uint32 | collision group=3
+     @vec2f32 | capsule format={0.5,1}
      @uint64 | flags=0
