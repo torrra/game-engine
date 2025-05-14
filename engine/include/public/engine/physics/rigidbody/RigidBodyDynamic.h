@@ -59,7 +59,7 @@ namespace engine
             Get the gravity status of the rigid body
             <return> [out] the gravity status : true = disabled, false = enabled
         */
-        ENGINE_API  bool            IsGravityDisabled(void) const;
+        ENGINE_API  bool            IsGravityDisabled(void);
         /*
             Get the half extents of the box
             <return> [out] the half extents
@@ -188,6 +188,7 @@ namespace engine
         math::Vector3f          m_halfExtents   = math::Vector3f(0.5f, 0.5f, 0.5f);
         f32                     m_radius        = 0.5f;
         math::Vector2f          m_capsuleFormat = math::Vector2f(0.5f, 1.f);
+        bool                    m_isGravityDisabled = true;
 
     }; // !Class RigidBodyDynamic
 

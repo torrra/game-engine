@@ -279,11 +279,10 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     return text::DeserializeInteger(text, m_flags);
 }
 
-bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
+bool engine::RigidBodyDynamic::IsGravityDisabled(void)
 {
     // Retrieve the gravity state
-    return m_rigidBodyImpl->m_rigidBodyDynamic->getActorFlags().isSet(
-                physx::PxActorFlag::eDISABLE_GRAVITY);
+    return m_isGravityDisabled;
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void)
