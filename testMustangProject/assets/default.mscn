@@ -3,7 +3,7 @@
    @int64 | handle=0
    @int64 | parent=-1
    @uint64 | flags=0
-   @uint64 | components=7
+   @uint64 | components=15
 [Transform]
     @uint64 | index=1
     @int64 | owner=0
@@ -29,8 +29,9 @@
 [RigidBodyDynamic]
      @int64 | owner=0
      @uint32 | type=0
-     @uint64 | shape=0
+     @uint64 | shape=2
      @uint32 | collision group=1
+     @vec2f32 | capsule format={0.5,0}
      @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera
@@ -88,8 +89,8 @@
 [Transform]
     @uint64 | index=3
     @int64 | owner=3
-    @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={3.25,3.55,-2.4}
+    @quat32 | rotation={-0.955864,0.0222835,0.0752281,-0.283139}
+    @vec3f32 | position={3.25,3.9,-1.4}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [RigidBodyStatic]
@@ -97,7 +98,7 @@
      @uint32 | type=1
      @uint64 | shape=1
      @uint32 | collision group=3
-     @f32 | sphere radius=1.9
+     @f32 | sphere radius=2.2
      @uint64 | flags=0
 [Entity]
    @string 5 | name=Plane
@@ -114,14 +115,34 @@
 [Transform]
     @uint64 | index=4
     @int64 | owner=5
-    @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={-7.6,3.25,1}
-    @vec3f32 | scale={1,1,1}
+    @quat32 | rotation={0.999848,0,0,0.0174525}
+    @vec3f32 | position={-6.7,2.6,-0.95}
+    @vec3f32 | scale={1,0.001,0.001}
     @uint64 | flags=0
 [RigidBodyStatic]
      @int64 | owner=5
      @uint32 | type=1
      @uint64 | shape=2
      @uint32 | collision group=3
-     @vec2f32 | capsule format={0.5,1}
+     @vec2f32 | capsule format={0.65,0.95}
+     @uint64 | flags=0
+[Entity]
+   @string 4 | name=TEST
+   @int64 | handle=6
+   @int64 | parent=-1
+   @uint64 | flags=0
+   @uint64 | components=17
+[Transform]
+    @uint64 | index=5
+    @int64 | owner=6
+    @quat32 | rotation={1,0,0,0}
+    @vec3f32 | position={0,0,0}
+    @vec3f32 | scale={1,1,1}
+    @uint64 | flags=0
+[RigidBodyStatic]
+     @int64 | owner=6
+     @uint32 | type=1
+     @uint64 | shape=0
+     @uint32 | collision group=3
+     @vec3f32 | box half extents={0.5,0.5,0.5}
      @uint64 | flags=0
