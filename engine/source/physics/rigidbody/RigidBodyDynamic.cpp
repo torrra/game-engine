@@ -358,7 +358,9 @@ void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
     return;
 }
 
-void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius) const
+void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius)
+{
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
 {
     // Set the sphere radius by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;
@@ -368,11 +370,13 @@ void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius) const
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
         {
             shapes->setGeometry(physx::PxSphereGeometry(inRadius));
+                m_radius = inRadius;
             PrintLog(SuccessPreset(), "Successfully set sphere radius.");
             return;
         }
         PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
         return;
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;

@@ -91,7 +91,7 @@ namespace engine
             Set the radius of the sphere
             <param> [in] inRadius : the radius
         */
-        ENGINE_API  void            SetSphereRadius(f32 inRadius) const;
+        ENGINE_API  void            SetSphereRadius(f32 inRadius);
         /*
             Set the half height and radius of the capsule
             <param> [in] inRadius : the radius
