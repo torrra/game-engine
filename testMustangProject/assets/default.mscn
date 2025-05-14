@@ -106,6 +106,12 @@
    @int64 | parent=-1
    @uint64 | flags=0
    @uint64 | components=16
+[RigidBodyStatic]
+     @int64 | owner=4
+     @uint32 | type=1
+     @uint64 | shape=3
+     @uint32 | collision group=3
+     @uint64 | flags=0
 [Entity]
    @string 7 | name=Capsule
    @int64 | handle=5
