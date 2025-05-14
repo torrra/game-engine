@@ -188,6 +188,12 @@ namespace engine
 
     }; // !Class RigidBodyDynamic
 
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<RigidBodyDynamic>()
+    {
+        return RIGIDBODY_DYNAMIC;
+    }
+
     class RigidBodyDynamicFactory
     {
     public :
