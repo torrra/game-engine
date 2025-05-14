@@ -93,7 +93,7 @@ f32 engine::RigidBodyStatic::GetSphereRadius(void)
     return 0.f;
 }
 
-math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void) const
+math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void)
 {
     // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
     // access the good geometry and retrive the good information about the capsule
@@ -109,6 +109,8 @@ math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void) const
             const physx::PxGeometry* geometry = &shapes->getGeometry();
             const physx::PxCapsuleGeometry capsuleGeometry =
                 static_cast<const physx::PxCapsuleGeometry&>(*geometry);
+
+                m_capsuleFormat = math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
 
             return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
         }
