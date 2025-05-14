@@ -434,6 +434,10 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
     // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
+    if (m_rigidBodyStaticImpl != nullptr)
+    {
+        if (m_rigidBodyStaticImpl->m_rigidBodyStatic == nullptr)
+        {
     // Create a new static rigid body with capsule geometry and default values
     m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
         *PhysicsEngine::Get().GetImpl().m_physics,
@@ -442,7 +446,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+            m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
     m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
     m_data.m_type = EShapeType::STATIC;
@@ -454,6 +458,8 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_shape = EGeometryType::CAPSULE;
+}
+    }
 }
 
 void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
