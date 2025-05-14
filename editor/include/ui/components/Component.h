@@ -23,6 +23,7 @@ namespace editor
         CAMERA,
         RENDERER,
         RIGIDBODY_STATIC,
+        RIGIDBODY_DYNAMIC,
         SCRIPT,
         TRANSFORM
     };
