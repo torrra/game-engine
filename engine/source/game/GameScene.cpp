@@ -32,10 +32,15 @@ namespace engine
         m_state = EGameState::STOPPED;
     }
 
-    void GameScene::Reset(void)
+    void GameScene::Reset(bool reload)
     {
         m_graph.CleanRigidBodies();
-        DeserializeText();
+        
+        if (reload)
+            DeserializeText();
+        else
+            m_graph = SceneGraph();
+
         ScriptSystem::ResetState();
     }
 
@@ -76,7 +81,6 @@ namespace engine
 
     bool GameScene::DeserializeText(void)
     {
-        Raycast::CleanupRays();
         std::ifstream input(m_path, std::ios::in | std::ios::binary);
 
         if (!input)
