@@ -57,4 +57,11 @@ namespace engine
                 TriangleMeshImpl*   m_triangleMeshImpl  = nullptr;
 
     }; // !Class TriangleMesh
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<TriangleMesh>()
+    {
+        return TRIANGLE_MESH;
+    }
+
 } // !Namespace engine
