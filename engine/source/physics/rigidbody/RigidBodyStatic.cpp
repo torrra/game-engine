@@ -220,7 +220,8 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
 
 void engine::RigidBodyStatic::UpdateEntity(void)
 {
-    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
+        m_shape != EGeometryType::PLANE)
     {
         // Update the entity transform in regard to the rigid body
         Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
@@ -234,7 +235,8 @@ void engine::RigidBodyStatic::UpdateEntity(void)
 
 void engine::RigidBodyStatic::UpdateRigidBody(void)
 {
-    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr && 
+        m_shape != EGeometryType::PLANE)
     {
         Transform worldTransform;
 
