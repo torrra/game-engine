@@ -36,6 +36,8 @@ namespace ui
     {
     public:
         ENGINE_API Table(const char* name, uint16 columnCount, math::Vector2f const& size = {0.0f, 0.0f});
+        ENGINE_API Table(void) = default;
+        ENGINE_API Table(Table&&) = default;
         ENGINE_API ~Table(void) = default;
 
         ENGINE_API bool StartTable(void);
@@ -46,12 +48,15 @@ namespace ui
         ENGINE_API void SetFlags(uint32 flags);
         ENGINE_API void SetSize(math::Vector2f const& size);
         ENGINE_API uint16 GetMaxColumns(void) const noexcept;
+
+        ENGINE_API Table& operator=(Table&&) = default;
+
     private:
         std::string m_name;
-        math::Vector2f m_size;
-        uint32 m_flags;
-        uint16 m_columnCount;
-        uint16 m_columnIndex;
+        math::Vector2f m_size{ 0.f };
+        uint32 m_flags = 0;
+        uint16 m_columnCount = 0;
+        uint16 m_columnIndex = 0;
 
     };
 }
