@@ -3,16 +3,17 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/resource/shader/Shader.h>
+#include <engine/utility/GizmosTest.h>
 #include <math/Vector3.hpp>
 #include <math/Matrix4.hpp>
 #include <unordered_map>
+
 
 namespace editor
 {
     class PickableEntity
     {
     public:
-        // Never use this constructor, it is only here due to the umap in the picking class
         PickableEntity(void) = default;
         PickableEntity(int64 const& handle);
         ~PickableEntity(void) = default;
@@ -35,8 +36,9 @@ namespace editor
         Picking(engine::SceneGraph* graph);
         ~Picking(void);
 
-        engine::EntityHandle FindSelectedEntity(std::string const& wndName) const;
+        engine::EntityHandle FindSelectedEntity(std::string const& wndName);
         void InitEntities(engine::SceneGraph* graph);
+        void AddEntity(engine::EntityHandle const& handle);
         void RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection);
 
     private:
