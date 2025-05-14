@@ -125,7 +125,8 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
-                                            physx::PxCapsuleGeometry(0.25f, 0.25f),
+            physx::PxCapsuleGeometry(m_capsuleFormat.GetX(),
+                m_capsuleFormat.GetY()),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
     SetCapsuleBaseOrientation();
@@ -294,8 +295,10 @@ f32 engine::RigidBodyDynamic::GetSphereRadius(void)
     return EErrorGeometryType_Invalid;
 }
 
-math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
+math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
     // access the good geometry and retrive the good information about the capsule
     physx::PxShape* shapes = nullptr;
@@ -308,10 +311,13 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
             const physx::PxCapsuleGeometry capsuleGeometry = 
                                         static_cast<const physx::PxCapsuleGeometry&>(*geometry);
 
+                m_capsuleFormat = math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
+
             return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
         }
         PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
         return math::Vector2f(EErrorGeometryType_Invalid);
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return math::Vector2f(EErrorGeometryType_Invalid);

@@ -74,7 +74,7 @@ namespace engine
             Get the half height and radius of the capsule
             <return> [out] the half height and radius
         */
-        ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+        ENGINE_API  math::Vector2f  GetCapsuleFormat(void);
         /// Setter
         /*
             Set the gravity status of the rigid body
@@ -186,6 +186,7 @@ namespace engine
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
         f32                     m_radius        = 0.5f;
+        math::Vector2f          m_capsuleFormat = math::Vector2f(0.5f, 1.f);
 
     }; // !Class RigidBodyDynamic
 
