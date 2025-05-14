@@ -290,7 +290,6 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
     text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
     output << "\n     ";
 
-
     if (m_shape == EGeometryType::BOX)
     {
         text::Serialize(output, "box half extents", m_halfExtents);
@@ -299,6 +298,11 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
     else if (m_shape == EGeometryType::SPHERE)
     {
         text::Serialize(output, "sphere radius", m_radius);
+        output << "\n     ";
+    }
+    else if (m_shape == EGeometryType::CAPSULE)
+    {
+        text::Serialize(output, "capsule format", m_capsuleFormat);
         output << "\n     ";
     }
     text::Serialize(output, "flags", m_flags);
@@ -321,7 +325,6 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
     text = text::DeserializeInteger(text, collisionGroup);
     m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
-
     if (m_shape == EGeometryType::BOX)
     {
     MOVE_TEXT_CURSOR(text, end);
@@ -331,6 +334,11 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeReal(text, m_radius);
+    }
+    else if (m_shape == EGeometryType::CAPSULE)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_capsuleFormat);
     }
 
     MOVE_TEXT_CURSOR(text, end);
