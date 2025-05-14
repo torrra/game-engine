@@ -69,7 +69,7 @@ namespace engine
             Get the radius of the sphere
             <return> [out] the radius
         */
-        ENGINE_API  f32             GetSphereRadius(void) const;
+        ENGINE_API  f32             GetSphereRadius(void);
         /*
             Get the half height and radius of the capsule
             <return> [out] the half height and radius
@@ -185,6 +185,7 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
+        f32                     m_radius        = 0.5f;
 
     }; // !Class RigidBodyDynamic
 

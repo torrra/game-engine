@@ -94,7 +94,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
                                             *PhysicsEngine::Get().GetImpl().m_physics,
                                             ToPxTransform(CheckEntityTransform()),
-                                            physx::PxSphereGeometry(0.5f),
+            physx::PxSphereGeometry(m_radius),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
     // Set the gravity by default
@@ -266,8 +266,10 @@ math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void)
     return math::Vector3f(EErrorGeometryType_Invalid);
 }
 
-f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
+f32 engine::RigidBodyDynamic::GetSphereRadius(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Retrieve the sphere radius by getting the shape of the rigid body to access
     // the good geometry and retrive the good information about the sphere
     physx::PxShape* shapes = nullptr;
@@ -280,10 +282,13 @@ f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
             const physx::PxSphereGeometry& sphereGeometry = 
                                     static_cast<const physx::PxSphereGeometry&>(*geometry);
 
+                m_radius = sphereGeometry.radius;
+
             return sphereGeometry.radius;
         }
         PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
         return EErrorGeometryType_Invalid;
+    }
     }
     PrintLog(ErrorPreset(), ("Invalid shapes"));
     return EErrorGeometryType_Invalid;
