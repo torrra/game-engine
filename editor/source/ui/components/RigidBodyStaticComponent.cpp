@@ -3,8 +3,6 @@
 #pragma region Engine
 
 #include <engine/ui/UIComponent.h>
-#include <engine/physics/geometry/Geometry.hpp>
-#include <engine/physics/rigidbody/RigidBodyStatic.h>
 #include <engine/Engine.h>
 
 #pragma endregion
@@ -38,78 +36,164 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
 
         if (ui::DropDown("##Shape Type", currentIndex, shapeTypes))
         {
-            engine::EGeometryType newShape = static_cast<engine::EGeometryType>(currentIndex);
+            UpdateShapeGeometry(currentIndex, currentShape, shapeTypes, rigidBodyStatic);
+            //engine::EGeometryType newShape = static_cast<engine::EGeometryType>(currentIndex);
 
-            if (newShape != currentShape)
-            {
-                currentShape = newShape;
-                m_geometryName = shapeTypes[currentIndex];
+            //if (newShape != currentShape)
+            //{
+            //    currentShape = newShape;
+            //    m_geometryName = shapeTypes[currentIndex];
 
-                rigidBodyStatic->RigidBodyStaticCleanUp();
+            //    rigidBodyStatic->RigidBodyStaticCleanUp();
 
-                switch (currentShape)
-                {
-                case engine::EGeometryType::BOX:
-                    engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-                                                                 rigidBodyStatic->GetOwner(), 
-                                                                 engine::EGeometryType::BOX);                    
-                    break;
-                case engine::EGeometryType::SPHERE:
-                    engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-                                                                 rigidBodyStatic->GetOwner(),
-                                                                 engine::EGeometryType::SPHERE);
-                    break;
-                case engine::EGeometryType::CAPSULE:
-                    engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-                                                                 rigidBodyStatic->GetOwner(),
-                                                                 engine::EGeometryType::CAPSULE);
-                    break;
-                case engine::EGeometryType::PLANE:
-                    engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-                                                                 rigidBodyStatic->GetOwner(),
-                                                                 engine::EGeometryType::PLANE);
-                    break;
-                default:
-                    break;
-                }
-            }
+            //    switch (currentShape)
+            //    {
+            //    case engine::EGeometryType::BOX:
+            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            //                                                     rigidBodyStatic->GetOwner(), 
+            //                                                     engine::EGeometryType::BOX);                    
+            //        break;
+            //    case engine::EGeometryType::SPHERE:
+            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            //                                                     rigidBodyStatic->GetOwner(),
+            //                                                     engine::EGeometryType::SPHERE);
+            //        break;
+            //    case engine::EGeometryType::CAPSULE:
+            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            //                                                     rigidBodyStatic->GetOwner(),
+            //                                                     engine::EGeometryType::CAPSULE);
+            //        break;
+            //    case engine::EGeometryType::PLANE:
+            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            //                                                     rigidBodyStatic->GetOwner(),
+            //                                                     engine::EGeometryType::PLANE);
+            //        break;
+            //    default:
+            //        break;
+            //    }
+            //}
         }
 
-        switch (currentShape)
+        DisplayUI(currentShape, rigidBodyStatic);
+        //switch (currentShape)
+        //{
+        //case engine::EGeometryType::BOX:
+        //{
+        //    math::Vector3f halfExtents = rigidBodyStatic->GetBoxHalfExtents();
+        //    ui::Text("Box format: ");
+        //    InputField("##X", &halfExtents[0], 0.05f);
+        //    InputField("##Y", &halfExtents[1], 0.05f);
+        //    InputField("##Z", &halfExtents[2], 0.05f);
+        //    rigidBodyStatic->SetBoxHalfExtents(halfExtents);
+        //    ui::VerticalSpacing();
+        //    break;
+        //}
+        //case engine::EGeometryType::SPHERE:
+        //{
+        //    f32 radius = rigidBodyStatic->GetSphereRadius();
+        //    ui::Text("Sphere format: ");
+        //    InputField("##Radius", &radius, 0.05f);
+        //    rigidBodyStatic->SetSphereRadius(radius);
+        //    ui::VerticalSpacing();
+        //    break;
+        //}
+        //case engine::EGeometryType::CAPSULE:
+        //{
+        //    f32 radius = rigidBodyStatic->GetCapsuleFormat().GetX();
+        //    f32 height = rigidBodyStatic->GetCapsuleFormat().GetY();
+        //    ui::Text("Capsule format: ");
+        //    InputField("##Radius", &radius, 0.05f);
+        //    InputField("##Height", &height, 0.05f);
+        //    rigidBodyStatic->SetCapsuleFormat(radius, height);
+        //    ui::VerticalSpacing();
+        //    break;
+        //}
+        //default:
+        //    break;
+        //}
+    }
+}
+
+void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
+                                                   int inCurrentIndex, 
+                                                   engine::EGeometryType inGeometryType,
+                                                   std::vector<const char*> inShapeTypes,
+                                                   engine::RigidBodyStatic* inRigidBodyStatic)
+{
+    engine::EGeometryType newShape = static_cast<engine::EGeometryType>(inCurrentIndex);
+
+    if (newShape != inGeometryType)
+    {
+        inGeometryType = newShape;
+        m_geometryName = inShapeTypes[inCurrentIndex];
+
+        inRigidBodyStatic->RigidBodyStaticCleanUp();
+
+        switch (inGeometryType)
         {
         case engine::EGeometryType::BOX:
-        {
-            math::Vector3f halfExtents = rigidBodyStatic->GetBoxHalfExtents();
-            ui::Text("Box format: ");
-            InputField("##X", &halfExtents[0], 0.05f);
-            InputField("##Y", &halfExtents[1], 0.05f);
-            InputField("##Z", &halfExtents[2], 0.05f);
-            rigidBodyStatic->SetBoxHalfExtents(halfExtents);
-            ui::VerticalSpacing();
+            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+                inRigidBodyStatic->GetOwner(),
+                engine::EGeometryType::BOX);
             break;
-        }
         case engine::EGeometryType::SPHERE:
-        {
-            f32 radius = rigidBodyStatic->GetSphereRadius();
-            ui::Text("Sphere format: ");
-            InputField("##Radius", &radius, 0.05f);
-            rigidBodyStatic->SetSphereRadius(radius);
-            ui::VerticalSpacing();
+            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+                inRigidBodyStatic->GetOwner(),
+                engine::EGeometryType::SPHERE);
             break;
-        }
         case engine::EGeometryType::CAPSULE:
-        {
-            f32 radius = rigidBodyStatic->GetCapsuleFormat().GetX();
-            f32 height = rigidBodyStatic->GetCapsuleFormat().GetY();
-            ui::Text("Capsule format: ");
-            InputField("##Radius", &radius, 0.05f);
-            InputField("##Height", &height, 0.05f);
-            rigidBodyStatic->SetCapsuleFormat(radius, height);
-            ui::VerticalSpacing();
+            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+                inRigidBodyStatic->GetOwner(),
+                engine::EGeometryType::CAPSULE);
             break;
-        }
+        case engine::EGeometryType::PLANE:
+            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+                inRigidBodyStatic->GetOwner(),
+                engine::EGeometryType::PLANE);
+            break;
         default:
             break;
         }
+    }
+}
+
+void editor::RigidBodyStaticComponent::DisplayUI(engine::EGeometryType inGeometryType, 
+                                                 engine::RigidBodyStatic* inRigidBodyStatic)
+{
+    switch (inGeometryType)
+    {
+    case engine::EGeometryType::BOX:
+    {
+        math::Vector3f halfExtents = inRigidBodyStatic->GetBoxHalfExtents();
+        ui::Text("Box format: ");
+        InputField("##X", &halfExtents[0], 0.05f);
+        InputField("##Y", &halfExtents[1], 0.05f);
+        InputField("##Z", &halfExtents[2], 0.05f);
+        inRigidBodyStatic->SetBoxHalfExtents(halfExtents);
+        ui::VerticalSpacing();
+        break;
+    }
+    case engine::EGeometryType::SPHERE:
+    {
+        f32 radius = inRigidBodyStatic->GetSphereRadius();
+        ui::Text("Sphere format: ");
+        InputField("##Radius", &radius, 0.05f);
+        inRigidBodyStatic->SetSphereRadius(radius);
+        ui::VerticalSpacing();
+        break;
+    }
+    case engine::EGeometryType::CAPSULE:
+    {
+        f32 radius = inRigidBodyStatic->GetCapsuleFormat().GetX();
+        f32 height = inRigidBodyStatic->GetCapsuleFormat().GetY();
+        ui::Text("Capsule format: ");
+        InputField("##Radius", &radius, 0.05f);
+        InputField("##Height", &height, 0.05f);
+        inRigidBodyStatic->SetCapsuleFormat(radius, height);
+        ui::VerticalSpacing();
+        break;
+    }
+    default:
+        break;
     }
 }

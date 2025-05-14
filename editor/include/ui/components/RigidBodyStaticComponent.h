@@ -9,6 +9,8 @@
 #pragma region Engine
 
 #include <engine/CoreTypes.h>
+#include <engine/physics/geometry/Geometry.hpp>
+#include <engine/physics/rigidbody/RigidBodyStatic.h>
 
 #pragma endregion
 
@@ -41,6 +43,14 @@ namespace editor
 
     private :
 
+        /// Functions
+        void            UpdateShapeGeometry(int inCurrentIndex, engine::EGeometryType inGeometryType,
+                                            std::vector<const char*> inShapeTypes,
+                                            engine::RigidBodyStatic* inRigidBodyStatic);
+        void            DisplayUI(engine::EGeometryType inGeometryType,
+                                  engine::RigidBodyStatic* inRigidBodyStatic);
+
+        /// Private members
         std::string m_geometryName;
         engine::Engine* m_engine;
 
