@@ -4,6 +4,7 @@
 #include "ui/components/ScriptComponent.h"
 #include "ui/components/TransformComponent.h"
 #include "ui/components/RigidBodyStaticComponent.h"
+#include "ui/components/RigidBodyDynamicComponent.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/core/SceneGraph.h>
@@ -87,6 +88,10 @@ void editor::PropertyWnd::InitComponents(void)
     // RigidBodyStatic
     if (entity->HasComponent<engine::RigidBodyStatic>())
         InitComponent<RigidBodyStaticComponent, engine::RigidBodyStatic>();
+
+    // RigidBodyDynamic
+    if (entity->HasComponent<engine::RigidBodyDynamic>())
+        InitComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
     
     // Script
     if (entity->HasComponent<engine::Script>())
@@ -110,6 +115,9 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("RigidbodyStatic"))
                 AddComponent<RigidBodyStaticComponent, engine::RigidBodyStatic>();
+
+            else if (ui::MenuItem("RigidbodyDynamic"))
+                AddComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
             
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
@@ -145,6 +153,9 @@ void editor::PropertyWnd::ClearComponentArray(void)
             break;
         case editor::RIGIDBODY_STATIC:
             delete dynamic_cast<engine::RigidBodyStatic*>(component);
+            break;
+        case editor::RIGIDBODY_DYNAMIC:
+            delete dynamic_cast<engine::RigidBodyDynamic*>(component);
             break;
         case editor::SCRIPT:
             delete dynamic_cast<ScriptComponent*>(component);
