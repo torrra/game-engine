@@ -192,6 +192,9 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
     // Set the capsule half height and radius by using the shape of rigid body to access the 
     // good geometry
     physx::PxShape* shapes = nullptr;
+
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
     if (shapes)
     {
@@ -203,6 +206,7 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
         }
         PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
         return;
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
