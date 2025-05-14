@@ -382,7 +382,9 @@ void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius)
     return;
 }
 
-void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const
+void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
+{
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
 {
     // Set the capsule half height and radius by using the shape of rigid body to access the 
     // good geometry
@@ -393,11 +395,13 @@ void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) 
         if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
         {
             shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
+                m_capsuleFormat = math::Vector2f(inRadius, inHalfHeight);
             PrintLog(SuccessPreset(), "Successfully set capsule format.");
             return;
         }
         PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
         return;
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;

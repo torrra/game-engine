@@ -97,7 +97,7 @@ namespace engine
             <param> [in] inRadius : the radius
             <param> [in] inHalfHeight : the half height
         */
-        ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const;
+        ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight);
         /*
             Set the debug draw visualization status
             <param> [in] inIsDebugVisualization : the visualization status : true = enabled
