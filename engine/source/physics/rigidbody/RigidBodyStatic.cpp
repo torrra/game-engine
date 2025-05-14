@@ -368,11 +368,15 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     // Create a new material with default values
     m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
+    if (m_rigidBodyStaticImpl != nullptr)
+    {
+        if (m_rigidBodyStaticImpl->m_rigidBodyStatic == nullptr)
+        {
     // Create a new static rigid body with box geometry and default values
     m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
         *PhysicsEngine::Get().GetImpl().m_physics,
         ToPxTransform(CheckEntityTransform()),
-        physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
+                physx::PxBoxGeometry(m_halfExtents.GetX(), m_halfExtents.GetY(), m_halfExtents.GetZ()),
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
@@ -388,6 +392,8 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
     m_shape = EGeometryType::BOX;
+}
+    }
 }
 
 void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
