@@ -68,7 +68,7 @@ namespace engine
             Set the half extents of the box
             <param> [in] inHalfExtents : the half extents
         */
-        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents) const;
+        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents);
         /*
             Set the radius of the sphere
             <param> [in] inRadius : the radius

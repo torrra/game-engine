@@ -132,9 +132,13 @@ const char* engine::RigidBodyStatic::GetGeometryName(void) const
     return "";
 }
 
+void engine::RigidBodyStatic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
 {
     // Set the box half extents by using the shape of rigid body to access the good geometry
     physx::PxShape* shapes = nullptr;
+
+    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    {
     m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shapes, 1);
     if (shapes)
     {
@@ -142,11 +146,13 @@ const char* engine::RigidBodyStatic::GetGeometryName(void) const
         {
             shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
                 inHalfExtents.GetZ()));
+                m_halfExtents = math::Vector3f(inHalfExtents);
             PrintLog(SuccessPreset(), "Successfully set box half extents.");
             return;
         }
         PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
         return;
+    }
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
