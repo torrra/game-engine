@@ -401,6 +401,8 @@ void engine::RigidBodyDynamic::SetCollisionGroupAndMask(uint32 inCollisionGroup,
 
 void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
 {
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
     // Rotate the intiale position of the capsule to be at the vertical by default
     // By using the local pose to not rotate the entity attach to it
     physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
@@ -414,6 +416,7 @@ void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
         shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
         );
     }
+}
 }
 
 void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
