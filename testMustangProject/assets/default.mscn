@@ -7,8 +7,8 @@
 [Transform]
     @uint64 | index=1
     @int64 | owner=0
-    @quat32 | rotation={-0.99999,0.000180822,6.85836e-05,0.00438193}
-    @vec3f32 | position={0.00369447,4,-5.39989}
+    @quat32 | rotation={-0.991879,-0.00253249,0.127156,-0.000323931}
+    @vec3f32 | position={0,4,-5}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Renderer]

@@ -3,8 +3,6 @@
 #pragma region Engine
 
 #include <engine/ui/UIComponent.h>
-#include <engine/physics/geometry/Geometry.hpp>
-#include <engine/physics/rigidbody/RigidBodyDynamic.h>
 #include <engine/Engine.h>
 
 #pragma endregion
@@ -38,78 +36,92 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
 
         if (ui::DropDown("##Shape Type", currentIndex, shapeTypes))
         {
-            engine::EGeometryType newShape = static_cast<engine::EGeometryType>(currentIndex);
-
-            if (newShape != currentShape)
-            {
-                currentShape = newShape;
-                m_geometryName = shapeTypes[currentIndex];
-
-                rigidBodyDynamic->RigidBodyDynamicCleanUp();
-
-                switch (currentShape)
-                {
-                case engine::EGeometryType::BOX:
-                    engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
-                                                                   rigidBodyDynamic->GetOwner(),
-                                                                   engine::EGeometryType::BOX);
-                    break;
-                case engine::EGeometryType::SPHERE:
-                    engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
-                                                                   rigidBodyDynamic->GetOwner(),
-                                                                   engine::EGeometryType::SPHERE);
-                    break;
-                case engine::EGeometryType::CAPSULE:
-                    engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
-                                                                   rigidBodyDynamic->GetOwner(),
-                                                                   engine::EGeometryType::CAPSULE);
-                    break;
-                case engine::EGeometryType::PLANE:
-                    engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
-                                                                   rigidBodyDynamic->GetOwner(),
-                                                                   engine::EGeometryType::PLANE);
-                    break;
-                default:
-                    break;
-                }
-            }
+            UpdateShapeGeometry(currentIndex, currentShape, shapeTypes, rigidBodyDynamic);
         }
 
-        switch (currentShape)
+        DisplayUI(currentShape, rigidBodyDynamic);
+    }
+}
+
+void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
+                                        int inCurrentIndex, engine::EGeometryType inGeometryType,
+                                        std::vector<const char*> inShapeTypes,
+                                        engine::RigidBodyDynamic* inRigidBodyDynamic)
+{
+    engine::EGeometryType newShape = static_cast<engine::EGeometryType>(inCurrentIndex);
+
+    if (newShape != inGeometryType)
+    {
+        inGeometryType = newShape;
+        m_geometryName = inShapeTypes[inCurrentIndex];
+
+        inRigidBodyDynamic->RigidBodyDynamicCleanUp();
+
+        switch (inGeometryType)
         {
         case engine::EGeometryType::BOX:
-        {
-            math::Vector3f halfExtents = rigidBodyDynamic->GetBoxHalfExtents();
-            ui::Text("Box format: ");
-            InputField("##X", &halfExtents[0], 0.05f);
-            InputField("##Y", &halfExtents[1], 0.05f);
-            InputField("##Z", &halfExtents[2], 0.05f);
-            rigidBodyDynamic->SetBoxHalfExtents(halfExtents);
-            ui::VerticalSpacing();
+            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+                inRigidBodyDynamic->GetOwner(),
+                engine::EGeometryType::BOX);
             break;
-        }
         case engine::EGeometryType::SPHERE:
-        {
-            f32 radius = rigidBodyDynamic->GetSphereRadius();
-            ui::Text("Sphere format: ");
-            InputField("##Radius", &radius, 0.05f);
-            rigidBodyDynamic->SetSphereRadius(radius);
-            ui::VerticalSpacing();
+            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+                inRigidBodyDynamic->GetOwner(),
+                engine::EGeometryType::SPHERE);
             break;
-        }
         case engine::EGeometryType::CAPSULE:
-        {
-            f32 radius = rigidBodyDynamic->GetCapsuleFormat().GetX();
-            f32 height = rigidBodyDynamic->GetCapsuleFormat().GetY();
-            ui::Text("Capsule format: ");
-            InputField("##Radius", &radius, 0.05f);
-            InputField("##Height", &height, 0.05f);
-            rigidBodyDynamic->SetCapsuleFormat(radius, height);
-            ui::VerticalSpacing();
+            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+                inRigidBodyDynamic->GetOwner(),
+                engine::EGeometryType::CAPSULE);
             break;
-        }
+        case engine::EGeometryType::PLANE:
+            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+                inRigidBodyDynamic->GetOwner(),
+                engine::EGeometryType::PLANE);
+            break;
         default:
             break;
         }
+    }
+}
+
+void editor::RigidBodyDynamicComponent::DisplayUI(engine::EGeometryType inGeometryType,
+                                                  engine::RigidBodyDynamic* inRigidBodyDynamic)
+{
+    switch (inGeometryType)
+    {
+    case engine::EGeometryType::BOX:
+    {
+        math::Vector3f halfExtents = inRigidBodyDynamic->GetBoxHalfExtents();
+        ui::Text("Box format: ");
+        InputField("##X", &halfExtents[0], 0.05f);
+        InputField("##Y", &halfExtents[1], 0.05f);
+        InputField("##Z", &halfExtents[2], 0.05f);
+        inRigidBodyDynamic->SetBoxHalfExtents(halfExtents);
+        ui::VerticalSpacing();
+        break;
+    }
+    case engine::EGeometryType::SPHERE:
+    {
+        f32 radius = inRigidBodyDynamic->GetSphereRadius();
+        ui::Text("Sphere format: ");
+        InputField("##Radius", &radius, 0.05f);
+        inRigidBodyDynamic->SetSphereRadius(radius);
+        ui::VerticalSpacing();
+        break;
+    }
+    case engine::EGeometryType::CAPSULE:
+    {
+        f32 radius = inRigidBodyDynamic->GetCapsuleFormat().GetX();
+        f32 height = inRigidBodyDynamic->GetCapsuleFormat().GetY();
+        ui::Text("Capsule format: ");
+        InputField("##Radius", &radius, 0.05f);
+        InputField("##Height", &height, 0.05f);
+        inRigidBodyDynamic->SetCapsuleFormat(radius, height);
+        ui::VerticalSpacing();
+        break;
+    }
+    default:
+        break;
     }
 }
