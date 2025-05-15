@@ -16,6 +16,7 @@
 
 #pragma region Standard
 
+#include <vector>
 #include <string>
 
 #pragma endregion
@@ -45,12 +46,12 @@ namespace editor
 
         /// Functions
         void            UpdateShapeGeometry(int inCurrentIndex, engine::EGeometryType inGeometryType,
-                                            std::vector<const char*> inShapeTypes,
                                             engine::RigidBodyStatic* inRigidBodyStatic);
         void            DisplayUI(engine::EGeometryType inGeometryType,
                                   engine::RigidBodyStatic* inRigidBodyStatic);
 
         /// Private members
+        std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule", "Plane" };
         std::string m_geometryName;
         engine::Engine* m_engine;
 

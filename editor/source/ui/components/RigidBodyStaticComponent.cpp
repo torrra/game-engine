@@ -27,101 +27,28 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
     if (engine::RigidBodyStatic* rigidBodyStatic = GetData<engine::RigidBodyStatic>())
     {
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_shape);
-        std::vector<const char*> shapeTypes = { "Box", "Sphere", "Capsule", "Plane" };
+        
         int currentIndex = static_cast<int>(currentShape);
-
         currentShape = static_cast<engine::EGeometryType>(currentIndex);
-        m_geometryName = shapeTypes[currentIndex];
+        m_geometryName = m_shapeTypes[currentIndex];
 
         const char* text = "Collider type: "; // text for the label
         math::Vector2f textSize = ui::GetTextSize(text); // gets text size (in pixels)
         ui::Text(text); // render text
         ui::SameLine(textSize.GetX() + 5.0f);
 
-        if (ui::DropDown("##Shape Type", currentIndex, shapeTypes))
+        if (ui::DropDown("##Shape Type", currentIndex, m_shapeTypes))
         {
-            UpdateShapeGeometry(currentIndex, currentShape, shapeTypes, rigidBodyStatic);
-            //engine::EGeometryType newShape = static_cast<engine::EGeometryType>(currentIndex);
-
-            //if (newShape != currentShape)
-            //{
-            //    currentShape = newShape;
-            //    m_geometryName = shapeTypes[currentIndex];
-
-            //    rigidBodyStatic->RigidBodyStaticCleanUp();
-
-            //    switch (currentShape)
-            //    {
-            //    case engine::EGeometryType::BOX:
-            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-            //                                                     rigidBodyStatic->GetOwner(), 
-            //                                                     engine::EGeometryType::BOX);                    
-            //        break;
-            //    case engine::EGeometryType::SPHERE:
-            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-            //                                                     rigidBodyStatic->GetOwner(),
-            //                                                     engine::EGeometryType::SPHERE);
-            //        break;
-            //    case engine::EGeometryType::CAPSULE:
-            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-            //                                                     rigidBodyStatic->GetOwner(),
-            //                                                     engine::EGeometryType::CAPSULE);
-            //        break;
-            //    case engine::EGeometryType::PLANE:
-            //        engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
-            //                                                     rigidBodyStatic->GetOwner(),
-            //                                                     engine::EGeometryType::PLANE);
-            //        break;
-            //    default:
-            //        break;
-            //    }
-            //}
+            UpdateShapeGeometry(currentIndex, currentShape, rigidBodyStatic);
         }
 
         DisplayUI(currentShape, rigidBodyStatic);
-        //switch (currentShape)
-        //{
-        //case engine::EGeometryType::BOX:
-        //{
-        //    math::Vector3f halfExtents = rigidBodyStatic->GetBoxHalfExtents();
-        //    ui::Text("Box format: ");
-        //    InputField("##X", &halfExtents[0], 0.05f);
-        //    InputField("##Y", &halfExtents[1], 0.05f);
-        //    InputField("##Z", &halfExtents[2], 0.05f);
-        //    rigidBodyStatic->SetBoxHalfExtents(halfExtents);
-        //    ui::VerticalSpacing();
-        //    break;
-        //}
-        //case engine::EGeometryType::SPHERE:
-        //{
-        //    f32 radius = rigidBodyStatic->GetSphereRadius();
-        //    ui::Text("Sphere format: ");
-        //    InputField("##Radius", &radius, 0.05f);
-        //    rigidBodyStatic->SetSphereRadius(radius);
-        //    ui::VerticalSpacing();
-        //    break;
-        //}
-        //case engine::EGeometryType::CAPSULE:
-        //{
-        //    f32 radius = rigidBodyStatic->GetCapsuleFormat().GetX();
-        //    f32 height = rigidBodyStatic->GetCapsuleFormat().GetY();
-        //    ui::Text("Capsule format: ");
-        //    InputField("##Radius", &radius, 0.05f);
-        //    InputField("##Height", &height, 0.05f);
-        //    rigidBodyStatic->SetCapsuleFormat(radius, height);
-        //    ui::VerticalSpacing();
-        //    break;
-        //}
-        //default:
-        //    break;
-        //}
     }
 }
 
 void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
                                                    int inCurrentIndex, 
                                                    engine::EGeometryType inGeometryType,
-                                                   std::vector<const char*> inShapeTypes,
                                                    engine::RigidBodyStatic* inRigidBodyStatic)
 {
     engine::EGeometryType newShape = static_cast<engine::EGeometryType>(inCurrentIndex);
@@ -129,7 +56,7 @@ void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
     if (newShape != inGeometryType)
     {
         inGeometryType = newShape;
-        m_geometryName = inShapeTypes[inCurrentIndex];
+        m_geometryName = m_shapeTypes[inCurrentIndex];
 
         inRigidBodyStatic->RigidBodyStaticCleanUp();
 
