@@ -162,19 +162,28 @@ end
 function _OnCollisionEnterScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
-	component:_OnCollisionEnter(handleOther)
+
+	if component ~= nil then
+		component:_OnCollisionEnter(handleOther)
+	end
 end
 
 function _OnCollisionExitScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
-	component:_OnCollisionExit(handleOther)
+
+	if component ~= nil then
+		component:_OnCollisionExit(handleOther)
+	end
 end
 
 function _OnTriggerEnterScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
-	component:_OnTriggerEnter(handleOther)
+
+	if component ~= nil then
+		component:_OnTriggerEnter(handleOther)
+	end
 end
 
 function _OnTriggerExitScript(handleOwner, handleOther)
