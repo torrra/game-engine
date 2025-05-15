@@ -68,6 +68,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
     ThreadManager::Startup(threadCount);
 
     ScriptSystem::SetUserScriptLocation(m_projectDir.string().c_str());
+    ScriptSystem::SetCurrentScene(m_activeScene.GetGraph());
     ScriptSystem::Startup();
     PhysicsEngine::Get().Init();
 
