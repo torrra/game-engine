@@ -491,5 +491,8 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction acti
         ui::EndPopUp();
     }
 
+    if (!m_isRightClickMenuOpen)
+        m_currentAction = EAssetAction::NONE;
+
     return result;
 }
