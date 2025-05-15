@@ -313,19 +313,6 @@ ScriptObjectTypes.%s = %s\nreturn %s";
                     LogLuaError();
             }
         }
-
-        if (Entity* entityPtrB = GetInstance()->m_currentScene->GetEntity(entityB))
-        {
-            if (entityPtrB->HasComponent<Script>())
-            {
-                lua_getglobal(GetInstance()->m_luaState, "_OnTriggerEnterScript");
-                lua_pushinteger(GetInstance()->m_luaState, entityB);
-                lua_pushinteger(GetInstance()->m_luaState, entityA);
-
-                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
-                    LogLuaError();
-            }
-        }
     }
 
     void ScriptSystem::NotifyTriggerExit(EntityHandle entityA, EntityHandle entityB)
@@ -337,19 +324,6 @@ ScriptObjectTypes.%s = %s\nreturn %s";
                 lua_getglobal(GetInstance()->m_luaState, "_OnTriggerExitScript");
                 lua_pushinteger(GetInstance()->m_luaState, entityA);
                 lua_pushinteger(GetInstance()->m_luaState, entityB);
-
-                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
-                    LogLuaError();
-            }
-        }
-
-        if (Entity* entityPtrB = GetInstance()->m_currentScene->GetEntity(entityB))
-        {
-            if (entityPtrB->HasComponent<Script>())
-            {
-                lua_getglobal(GetInstance()->m_luaState, "_OnTriggerExitScript");
-                lua_pushinteger(GetInstance()->m_luaState, entityB);
-                lua_pushinteger(GetInstance()->m_luaState, entityA);
 
                 if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
                     LogLuaError();
