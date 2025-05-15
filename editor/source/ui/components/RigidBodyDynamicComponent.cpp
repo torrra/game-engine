@@ -27,11 +27,10 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
     if (engine::RigidBodyDynamic* rigidBodyDynamic = GetData<engine::RigidBodyDynamic>())
     {
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyDynamic->m_shape);
-        std::vector<const char*> shapeTypes = { "Box", "Sphere", "Capsule" };
+        
         int currentIndex = static_cast<int>(currentShape);
-
         currentShape = static_cast<engine::EGeometryType>(currentIndex);
-        m_geometryName = shapeTypes[currentIndex];
+        m_geometryName = m_shapeTypes[currentIndex];
 
         const char* text = "Collider type: "; // text for the label
         math::Vector2f textSize = ui::GetTextSize(text); // gets text size (in pixels)
@@ -39,9 +38,9 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         ui::SameLine(textSize.GetX() + 5.0f); // make next component on same line starting at the position of the width + 5 ( padding)
 
 
-        if (ui::DropDown("##Shape Type", currentIndex, shapeTypes))
+        if (ui::DropDown("##Shape Type", currentIndex, m_shapeTypes))
         {
-            UpdateShapeGeometry(currentIndex, currentShape, shapeTypes, rigidBodyDynamic);
+            UpdateShapeGeometry(currentIndex, currentShape, rigidBodyDynamic);
         }
 
         DisplayUI(currentShape, rigidBodyDynamic);
@@ -58,7 +57,6 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
 
 void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
                                         int inCurrentIndex, engine::EGeometryType inGeometryType,
-                                        std::vector<const char*> inShapeTypes,
                                         engine::RigidBodyDynamic* inRigidBodyDynamic)
 {
     engine::EGeometryType newShape = static_cast<engine::EGeometryType>(inCurrentIndex);
@@ -66,7 +64,7 @@ void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
     if (newShape != inGeometryType)
     {
         inGeometryType = newShape;
-        m_geometryName = inShapeTypes[inCurrentIndex];
+        m_geometryName = m_shapeTypes[inCurrentIndex];
 
         inRigidBodyDynamic->RigidBodyDynamicCleanUp();
 
@@ -86,11 +84,6 @@ void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
             engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
                 inRigidBodyDynamic->GetOwner(),
                 engine::EGeometryType::CAPSULE);
-            break;
-        case engine::EGeometryType::PLANE:
-            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
-                inRigidBodyDynamic->GetOwner(),
-                engine::EGeometryType::PLANE);
             break;
         default:
             break;

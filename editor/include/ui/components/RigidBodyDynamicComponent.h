@@ -46,12 +46,12 @@ namespace editor
 
         /// Functions
         void            UpdateShapeGeometry(int inCurrentIndex, engine::EGeometryType inGeometryType,
-                                            std::vector<const char*> inShapeTypes,
                                             engine::RigidBodyDynamic* inRigidBodyDynamic);
         void            DisplayUI(engine::EGeometryType inGeometryType,
                                   engine::RigidBodyDynamic* inRigidBodyDynamic);
 
         /// Private members
+        std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule" };
         std::string m_geometryName;
         engine::Engine* m_engine;
 
