@@ -65,10 +65,19 @@ function _NewScriptComponent(handle)
 	Script:_RegisterScriptComponent(handle)
 end
 
--- Add a new script o
+-- Add a new script object
 function _NewScriptObject(typename, handle)
 	local ownerComponent = ExistingScriptComponents[handle]
 	ScriptObject._Register(typename, handle, ownerComponent)	
+end
+
+-- Remove an existing script object
+function _RemoveScriptObject(typename, handle)
+	local ownerComponent = ExistingScriptComponents[handle]
+
+	if ownerComponent ~= nil then
+		ownerComponent[typename] = nil
+	end
 end
 
 -- Update script objects inside a script

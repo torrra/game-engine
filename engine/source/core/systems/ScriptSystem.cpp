@@ -139,6 +139,16 @@ namespace engine
             LogLuaError();
     }
 
+    void ScriptSystem::UnregisterScriptObject(const std::string& type, EntityHandle owner)
+    {
+        lua_getglobal(GetInstance()->m_luaState, "_RemoveScriptObject");
+        lua_pushstring(GetInstance()->m_luaState, type.c_str());
+        lua_pushinteger(GetInstance()->m_luaState, owner);
+
+        if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+            LogLuaError();
+    }
+
     std::string ScriptSystem::FindConfigScripts(void)
     {
         // scripts/ directory should either be in child or sibling folder
@@ -194,33 +204,44 @@ namespace engine
 
     void ScriptSystem::CreateUserScript(const char* dirRelativePath, const char* className)
     {
-        std::string fullPath = GetInstance()->m_userScriptsLocation +
-                              ((dirRelativePath) ? dirRelativePath : "") +
-                              ((className) ? className : "UserScript") + ".lua";
+        std::string luaName;
+        
+        if (className && (*className != '\0'))
+            luaName = className;
+        else
+            luaName = "NewUserScript";
+
+
+        std::string fullPath = GetInstance()->m_userScriptsLocation;
+
+        fullPath.push_back('/');
+
+        if (dirRelativePath)
+            fullPath.append(dirRelativePath);
+
+        fullPath.append(luaName);
+        fullPath.append(".lua");
 
         if (std::filesystem::exists(fullPath))
             return;
 
-        std::string formattedName = FormatLuaClassName(className);
-
-        if (formattedName.empty() || formattedName.size() >= 64)
+        if (luaName.empty() || luaName.size() >= 64)
             return;
 
-        std::ofstream newFile(fullPath,
-                             std::ios::out);
+        std::ofstream newFile(fullPath, std::ios::out);
 
         if (!newFile)
             return;
 
-        const char fileData[] = "%s = ScriptObject:_new()\n\n-- Define member variables \
-here\n\n-- Is executed once when the object becomes active\nfunction %s:Start()\n\nend\n\n\n\
+        const char fileData[] = "%s = ScriptObject:_new()\n\n-- Is executed once when the object becomes \
+active\nfunction %s:Start()\n\nend\n\n\n\
 -- Is executed every tick\nfunction %s:Update(deltaTime)\n\nend\n\n\n-- Engine definitions\n\
 ScriptObjectTypes.%s = %s\nreturn %s";
 
         char textBuffer[1024];
 
-        sprintf_s(textBuffer, fileData, className, className, className,
-                  formattedName.c_str(), className, className);
+        sprintf_s(textBuffer, fileData, luaName.c_str(), luaName.c_str(), luaName.c_str(),
+                  luaName.c_str(), luaName.c_str(), luaName.c_str());
 
         newFile << textBuffer;
         newFile.close();
