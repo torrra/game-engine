@@ -28,7 +28,7 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
     {
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_shape);
         
-        int currentIndex = static_cast<int>(currentShape);
+        int32 currentIndex = static_cast<int32>(currentShape);
         m_geometryName = m_shapeTypes[currentIndex];
 
         const char* text = "Collider type: "; // text for the label
@@ -46,7 +46,7 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
 }
 
 void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
-                                                   int inCurrentIndex, 
+                                                   int32 inCurrentIndex, 
                                                    engine::EGeometryType inGeometryType,
                                                    engine::RigidBodyStatic* inRigidBodyStatic)
 {

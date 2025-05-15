@@ -11,6 +11,7 @@
 #include <engine/CoreTypes.h>
 #include <engine/physics/geometry/Geometry.hpp>
 #include <engine/physics/rigidbody/RigidBodyStatic.h>
+#include <engine/CoreTypes.h>
 
 #pragma endregion
 
@@ -45,7 +46,7 @@ namespace editor
     private :
 
         /// Functions
-        void            UpdateShapeGeometry(int inCurrentIndex, engine::EGeometryType inGeometryType,
+        void            UpdateShapeGeometry(int32 inCurrentIndex, engine::EGeometryType inGeometryType,
                                             engine::RigidBodyStatic* inRigidBodyStatic);
         void            DisplayUI(engine::EGeometryType inGeometryType,
                                   engine::RigidBodyStatic* inRigidBodyStatic);
