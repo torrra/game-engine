@@ -88,51 +88,51 @@
 //}
 //
 //bool engine::GizmosAxis::OnSelectedRotation(math::Vector3f& rotation, math::Vector3f const& axis, f32 rotateIncrement)
-{
-    if (ImGui::IsKeyReleased(ImGuiKey_MouseLeft))
-        return false;
-
-    rotation += axis * rotateIncrement;
-
-    return true;
-}
+//{
+//    if (ImGui::IsKeyReleased(ImGuiKey_MouseLeft))
+//        return false;
 //
-//bool engine::GizmosAxis::OnSelectedScale(math::Vector3f& scale, math::Vector3f const& axis, f32 scaleIncrement)
-{
-    if (ImGui::IsKeyReleased(ImGuiKey_MouseLeft))
-    {
-
-        return false;
-    }
-
-    scale += axis * math::Clamp(scaleIncrement, -MAX_INCREMENT, MAX_INCREMENT);
-    scale = {
-        math::Clamp(scale.GetX(), 0.05f, FLT_MAX),
-        math::Clamp(scale.GetY(), 0.05f, FLT_MAX),
-        math::Clamp(scale.GetZ(), 0.05f, FLT_MAX)
-    };
-
-    return true;
-}
+//    rotation += axis * rotateIncrement;
 //
-//uint32 engine::GizmosAxis::GetPickingID(void) const
-{
-    return m_pickingID;
-}
+//    return true;
+//}
+////
+////bool engine::GizmosAxis::OnSelectedScale(math::Vector3f& scale, math::Vector3f const& axis, f32 scaleIncrement)
+//{
+//    if (ImGui::IsKeyReleased(ImGuiKey_MouseLeft))
+//    {
 //
-//void engine::GizmosAxis::SetPosition(math::Vector3f const& position)
-{
-    m_modelMatrix[3][0] = position.GetX();
-    m_modelMatrix[3][1] = position.GetY();
-    m_modelMatrix[3][2] = position.GetZ();
-}
+//        return false;
+//    }
 //
-//void engine::GizmosAxis::SetScale(math::Vector3f const& size)
-{
-    m_modelMatrix[0][0] = size.GetX();
-    m_modelMatrix[1][1] = size.GetY();
-    m_modelMatrix[2][2] = size.GetZ();
-}
+//    scale += axis * math::Clamp(scaleIncrement, -MAX_INCREMENT, MAX_INCREMENT);
+//    scale = {
+//        math::Clamp(scale.GetX(), 0.05f, FLT_MAX),
+//        math::Clamp(scale.GetY(), 0.05f, FLT_MAX),
+//        math::Clamp(scale.GetZ(), 0.05f, FLT_MAX)
+//    };
+//
+//    return true;
+//}
+////
+////uint32 engine::GizmosAxis::GetPickingID(void) const
+//{
+//    return m_pickingID;
+//}
+////
+////void engine::GizmosAxis::SetPosition(math::Vector3f const& position)
+//{
+//    m_modelMatrix[3][0] = position.GetX();
+//    m_modelMatrix[3][1] = position.GetY();
+//    m_modelMatrix[3][2] = position.GetZ();
+//}
+////
+////void engine::GizmosAxis::SetScale(math::Vector3f const& size)
+//{
+//    m_modelMatrix[0][0] = size.GetX();
+//    m_modelMatrix[1][1] = size.GetY();
+//    m_modelMatrix[2][2] = size.GetZ();
+//}
 //
 //void engine::GizmosAxis::SetColor(math::Vector3f const& color)
 //{
