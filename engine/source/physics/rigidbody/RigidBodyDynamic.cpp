@@ -247,6 +247,8 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
     }
     text::Serialize(output, "gravity", static_cast<uint32>(m_isGravityDisabled));
     output << "\n     ";
+    text::Serialize(output, "trigger", static_cast<uint32>(m_isTrigger));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -287,6 +289,11 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     uint32 isGravityDisabled = 1;
     text = text::DeserializeInteger(text, isGravityDisabled);
     m_isGravityDisabled = static_cast<bool>(isGravityDisabled);
+    
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isTrigger = 1;
+    text = text::DeserializeInteger(text, isTrigger);
+    m_isTrigger = static_cast<bool>(isTrigger);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
