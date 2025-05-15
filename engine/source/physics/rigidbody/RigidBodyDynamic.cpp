@@ -258,6 +258,12 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
     output << "\n     ";
     text::Serialize(output, "trigger", static_cast<uint32>(m_isTrigger));
     output << "\n     ";
+    text::Serialize(output, "lock X axis", static_cast<uint32>(m_isXLock));
+    output << "\n     ";
+    text::Serialize(output, "lock Y axis", static_cast<uint32>(m_isYLock));
+    output << "\n     ";
+    text::Serialize(output, "lock Z axis", static_cast<uint32>(m_isZLock));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -303,6 +309,19 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     uint32 isTrigger = 1;
     text = text::DeserializeInteger(text, isTrigger);
     m_isTrigger = static_cast<bool>(isTrigger);
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isXLock = 1;
+    text = text::DeserializeInteger(text, isXLock);
+    m_isXLock = static_cast<bool>(isXLock);
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isYLock = 1;
+    text = text::DeserializeInteger(text, isYLock);
+    m_isYLock = static_cast<bool>(isYLock);
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isZLock = 1;
+    text = text::DeserializeInteger(text, isZLock);
+    m_isZLock = static_cast<bool>(isZLock);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
