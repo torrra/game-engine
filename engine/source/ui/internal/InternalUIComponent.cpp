@@ -315,6 +315,26 @@ void ui::UnsetID(void)
     ImGui::PopID();
 }
 
+math::Vector2i ui::GetWindowCursorPos(std::string const& wndName)
+{
+    math::Vector2f mousePos = ImGui::GetMousePos();
+    math::Vector2i wndPos = GetInnerRectMinPos(wndName);
+    
+    return 
+    {
+        (int32) mousePos.GetX() - wndPos.GetX(),
+        (int32) mousePos.GetY() - wndPos.GetY()
+    };
+}
+
+math::Vector2f ui::GetWindowContentSize(std::string const& wndName)
+{
+    if (ImGuiWindow* window = ImGui::FindWindowByName(wndName.c_str()))
+        return window->ContentSize;
+    
+    return math::Vector2f::Zero();
+}
+
 void ui::SetKeyboardFocus(void)
 {
     ImGui::SetKeyboardFocusHere();

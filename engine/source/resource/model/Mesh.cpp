@@ -331,6 +331,9 @@ void engine::Mesh::Draw(bool useMaterial) const
     if (useMaterial)
         m_material.Use(0);
 
+    if (!m_indexCount)
+        return;
+
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

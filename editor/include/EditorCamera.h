@@ -17,6 +17,7 @@ namespace editor
        ~EditorCamera(void) = default;
 
        void             Update(f32 deltaTime);
+       void             UpdateAspectRatio(const math::Vector2f& size);
        math::Matrix4f   ViewProjection(void);
 
        EditorCamera& operator=(EditorCamera&&) noexcept = default;
@@ -33,6 +34,7 @@ namespace editor
        math::Vector3f   m_position = math::Vector3f::Zero();
        math::Vector2f   m_rotationEuler = math::Vector2f::Zero();
        f32              m_speed = 0.5f;
+       f32              m_aspectRatio = 1.77777777778f;
        
    };
 }

@@ -74,7 +74,12 @@ namespace engine
             Get the half height and radius of the capsule
             <return> [out] the half height and radius
         */
-        ENGINE_API  math::Vector2f  GetCapsuleFormat(void);
+        ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+
+        ENGINE_API  math::Vector3f  GetLinearVelocity(void) const;
+
+        ENGINE_API  math::Vector3f  GetAngularVelocity(void) const;
+
         /// Setter
         /*
             Set the gravity status of the rigid body
@@ -109,6 +114,12 @@ namespace engine
 
         ENGINE_API void             SetTrigger(bool inIsTrigger);
 
+        ENGINE_API void             SetLinearVelocity(math::Vector3f inLinearVelocity, 
+                                                      bool inAutoWake = true);
+
+        ENGINE_API void             SetAngularVelocity(math::Vector3f inAngularVelocity, 
+                                                       bool inAutoWake = true);
+
         /// Functions
         /*
             Update the entity transform in reference to the dynamic rigid body
@@ -141,6 +152,14 @@ namespace engine
         ENGINE_API  void            OnTriggerEnter(EntityHandle inOther) override;
         ENGINE_API  void            OnTriggerStay(EntityHandle inOther) override { inOther; }
         ENGINE_API  void            OnTriggerExit(EntityHandle inOther) override;
+
+        ENGINE_API void             AddForce(const math::Vector3f& inForce, 
+                                             EForceMode inForceMode = EForceMode::FORCE, 
+                                             bool inAutoWake = true);
+
+        ENGINE_API void             AddTorque(const math::Vector3f& inTorque, 
+                                              EForceMode inForceMode = EForceMode::FORCE, 
+                                              bool inAutoWake = true);
 
         RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
 

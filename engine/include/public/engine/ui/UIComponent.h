@@ -62,6 +62,8 @@ namespace ui
     ENGINE_API void UnsetID(void);
 
     // Misc...
+    ENGINE_API math::Vector2i GetWindowCursorPos(std::string const& wndName);
+    ENGINE_API math::Vector2f GetWindowContentSize(std::string const& wndName);
     ENGINE_API void SetKeyboardFocus(void);
     ENGINE_API bool IsItemSelected(void);
     ENGINE_API bool IsItemHovered(void);
