@@ -3,6 +3,7 @@
 #pragma region Engine
 
 #include <engine/ui/UIComponent.h>
+#include <engine/ui/UIStyle.h>
 #include <engine/Engine.h>
 
 #pragma endregion
@@ -32,7 +33,10 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
         currentShape = static_cast<engine::EGeometryType>(currentIndex);
         m_geometryName = shapeTypes[currentIndex];
 
-        /// TODO : Reduce code
+        const char* text = "Collider type: "; // text for the label
+        math::Vector2f textSize = ui::GetTextSize(text); // gets text size (in pixels)
+        ui::Text(text); // render text
+        ui::SameLine(textSize.GetX() + 5.0f);
 
         if (ui::DropDown("##Shape Type", currentIndex, shapeTypes))
         {
