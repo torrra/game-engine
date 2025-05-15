@@ -76,6 +76,9 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
+        SetXAxisLock(m_isXLock);
+        SetYAxisLock(m_isYLock);
+        SetZAxisLock(m_isZLock);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
         m_data.m_type = EShapeType::DYNAMIC;
@@ -112,6 +115,9 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
+        SetXAxisLock(m_isXLock);
+        SetYAxisLock(m_isYLock);
+        SetZAxisLock(m_isZLock);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
         m_data.m_type = EShapeType::DYNAMIC;
@@ -151,6 +157,9 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
+        SetXAxisLock(m_isXLock);
+        SetYAxisLock(m_isYLock);
+        SetZAxisLock(m_isZLock);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
         m_data.m_type = EShapeType::DYNAMIC;
@@ -594,6 +603,27 @@ void engine::RigidBodyDynamic::SetLinearVelocity(math::Vector3f inLinearVelocity
 void engine::RigidBodyDynamic::SetAngularVelocity(math::Vector3f inAngularVelocity, bool inAutoWake)
 {
     m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+}
+
+void engine::RigidBodyDynamic::SetXAxisLock(bool inAxisLock)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setRigidDynamicLockFlag(
+        physx::PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, inAxisLock);
+    m_isXLock = inAxisLock;
+}
+
+void engine::RigidBodyDynamic::SetYAxisLock(bool inAxisLock)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setRigidDynamicLockFlag(
+        physx::PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, inAxisLock);
+    m_isYLock = inAxisLock;
+}
+
+void engine::RigidBodyDynamic::SetZAxisLock(bool inAxisLock)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setRigidDynamicLockFlag(
+        physx::PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, inAxisLock);
+    m_isZLock = inAxisLock;
 }
 
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)

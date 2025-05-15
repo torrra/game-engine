@@ -123,6 +123,9 @@ namespace engine
 
         ENGINE_API void             SetAngularVelocity(math::Vector3f inAngularVelocity, 
                                                        bool inAutoWake = true);
+        ENGINE_API void             SetXAxisLock(bool inAxisLock);
+        ENGINE_API void             SetYAxisLock(bool inAxisLock);
+        ENGINE_API void             SetZAxisLock(bool inAxisLock);
 
         /// Functions
         /*
