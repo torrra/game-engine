@@ -63,6 +63,7 @@ namespace engine
         ENGINE_API  math::Vector2f  GetCapsuleFormat(void);
 
         ENGINE_API  const char*     GetGeometryName(void) const;
+        ENGINE_API  bool            GetIsTrigger(void) const;
         /// Setter
         /*
             Set the half extents of the box
@@ -151,6 +152,7 @@ namespace engine
         math::Vector3f          m_halfExtents           = math::Vector3f(0.5f, 0.5f, 0.5f);
         f32                     m_radius                = 0.5f;
         math::Vector2f          m_capsuleFormat         = math::Vector2f(0.5f, 1.f);
+        bool                    m_isTrigger             = false;
 
 	}; // !Class RigidBodyStatic
 
