@@ -80,6 +80,9 @@ namespace engine
 
         ENGINE_API  math::Vector3f  GetAngularVelocity(void) const;
         ENGINE_API  bool            GetIsTrigger(void) const;
+        ENGINE_API  bool            GetIsXAxisLock(void) const;
+        ENGINE_API  bool            GetIsYAxisLock(void) const;
+        ENGINE_API  bool            GetIsZAxisLock(void) const;
 
         /// Setter
         /*
@@ -210,6 +213,9 @@ namespace engine
         math::Vector2f          m_capsuleFormat = math::Vector2f(0.5f, 1.f);
         bool                    m_isGravityDisabled = true;
         bool                    m_isTrigger         = false;
+        bool                    m_isXLock           = false;
+        bool                    m_isYLock           = false;
+        bool                    m_isZLock           = false;
 
     }; // !Class RigidBodyDynamic
 

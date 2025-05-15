@@ -406,6 +406,21 @@ bool engine::RigidBodyDynamic::GetIsTrigger(void) const
     return m_isTrigger;
 }
 
+bool engine::RigidBodyDynamic::GetIsXAxisLock(void) const
+{
+    return m_isXLock;
+}
+
+bool engine::RigidBodyDynamic::GetIsYAxisLock(void) const
+{
+    return m_isYLock;
+}
+
+bool engine::RigidBodyDynamic::GetIsZAxisLock(void) const
+{
+    return m_isZLock;
+}
+
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
