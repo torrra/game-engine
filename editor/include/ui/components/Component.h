@@ -30,7 +30,7 @@ namespace editor
     class BaseComponent
     {
     public:
-        void RenderSection(engine::SceneGraph* graph, engine::EntityHandle const& handle);
+        virtual void RenderSection(engine::SceneGraph* graph, engine::EntityHandle const& handle);
         bool IsRemoved(void) const noexcept;
     
         template<CComponentType CType>
