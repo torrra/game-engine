@@ -8,8 +8,10 @@
 #include <engine/ui/UIStyle.h>
 #include <engine/ui/UIDragDrop.h>
 #include <engine/ConsoleLog.hpp>
+#include <engine/core/systems/ScriptSystem.h>
 
 #include <engine/utility/MemoryCheck.h>
+#include <engine/utility/Platform.h>
 #include <engine/input/Input.h>
 #include <engine/Engine.h>
 #include <filesystem>
@@ -108,16 +110,22 @@ void editor::AssetsWnd::RenderContents(void)
             if (m_currentAction == EAssetAction::NONE)
                 m_currentAction = rightClickMenu;
 
-            if (m_currentAction == EAssetAction::CREATE_SCENE ||
-                m_currentAction == EAssetAction::CREATE_MATERIAL)
+            switch (m_currentAction)
             {
-                
+            
+            case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
+            case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
+            case editor::AssetsWnd::EAssetAction::CREATE_SCRIPT:
+
                 ui::OpenModal("New asset");
 
                 if (CreateAsset(m_currentAction) == EAssetAction::REFRESH_WINDOW)
                     shouldRefresh = true;
-            }
+                break;
 
+            default:
+                break;
+            }
         }
     
         m_layout->EndTable();
@@ -357,6 +365,7 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
 void editor::AssetsWnd::SelectResource(void)
 {
     constexpr uint64 sceneStrLen = sizeof(SCENE_PAYLOAD) - 1;
+    constexpr uint64 scriptStrLen = sizeof(SCRIPT_PAYLOAD) - 1;
 
     Asset& selectedAsset = m_assets[m_selectedIndex];
 
@@ -368,6 +377,16 @@ void editor::AssetsWnd::SelectResource(void)
         scenePath += selectedAsset.m_path;
         m_ownerApplication->LoadNewScene(engine::Engine::GetEngine()->GetCurrentScene(),
             scenePath);
+    }
+
+    else if (selectedAsset.m_payloadType.size() == scriptStrLen &&
+        memcmp(selectedAsset.m_payloadType.c_str(), SCRIPT_PAYLOAD, scriptStrLen) == 0)
+    {
+        std::filesystem::path scriptPath = engine::Engine::GetEngine()->GetProjectDir();
+
+        scriptPath += selectedAsset.m_path;
+
+        engine::OpenFile(scriptPath.c_str());
     }
 }
 
@@ -392,6 +411,11 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::RenderRightClickMenu(void)
         //// Delete
         //if (::ui::MenuItem("Delete asset"))
         //    result = EAssetAction::DELETE_ASSET;
+
+        math::Vector3<bool> coucou;
+
+        if (::ui::MenuItem("Create script"))
+            result = EAssetAction::CREATE_SCRIPT;
 
         ::ui::EndPopUp();
         m_isRightClickMenuOpen = true;
@@ -447,6 +471,34 @@ void editor::AssetsWnd::CloseAssetCreationMenu(void)
     m_currentAction = EAssetAction::NONE;
 }
 
+editor::AssetsWnd::EAssetAction editor::AssetsWnd::SelectNewAssetType(EAssetAction action)
+{
+    EAssetAction result = EAssetAction::NONE;
+
+    switch (action)
+    {
+    case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
+        CreateScene();
+        result = EAssetAction::REFRESH_WINDOW;
+        break;
+    case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
+        break;
+
+    case editor::AssetsWnd::EAssetAction::CREATE_SCRIPT:
+
+        engine::ScriptSystem::CreateUserScript(
+            nullptr,
+            m_newAssetName.c_str()
+        );
+        result = EAssetAction::REFRESH_WINDOW;
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}
+
 editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction action)
 {
     EAssetAction result = EAssetAction::NONE;
@@ -466,18 +518,7 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction acti
 
             if (ui::Button("Create asset") && IsAssetNameValid())
             {
-                switch (action)
-                {
-                case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
-                    CreateScene();
-                    result = EAssetAction::REFRESH_WINDOW;
-                    break;
-                case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
-                    break;
-                default:
-                    break;
-                }
-
+                result = SelectNewAssetType(action);
                 CloseAssetCreationMenu();            
             }
             m_assetCreationTable.EndTable();

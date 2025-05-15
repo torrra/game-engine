@@ -79,6 +79,7 @@ namespace editor
             NONE,
             CREATE_SCENE,
             CREATE_MATERIAL,
+            CREATE_SCRIPT,
             OPEN_ASSET,
             DELETE_ASSET,
             REFRESH_WINDOW
@@ -116,6 +117,7 @@ namespace editor
         bool IsAssetNameValid(void);
         void CreateScene(void);
         void CloseAssetCreationMenu(void);
+        EAssetAction SelectNewAssetType(EAssetAction action);
 
         ui::Table   m_assetCreationTable = ui::Table("createAssetLayout", 3, {0.f, 0.f});
         std::string m_newAssetName;
