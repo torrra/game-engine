@@ -54,6 +54,7 @@ namespace engine
         ENGINE_API static bool StartUp(void);
         ENGINE_API static void ShutDown(void);
         ENGINE_API static void UpdateKeyState(void);
+        ENGINE_API static void SetCursorMode(ECursorMode mode);
 
         ENGINE_API static bool IsInputPressed(int32 keyCode);
         ENGINE_API static bool IsInputHeld(int32 keyCode);

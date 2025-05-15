@@ -44,6 +44,11 @@ void engine::InputHandler::UpdateKeyState(void)
     GetInstance()->m_prevMousePos = GetInstance()->m_mousePos;
 }
 
+void engine::InputHandler::SetCursorMode(ECursorMode mode)
+{
+    input::SetCursorMode(mode);
+}
+
 bool engine::InputHandler::IsInputPressed(int32 keyCode)
 {
     return GetInstance()->m_inputMap[keyCode].m_prevState == EInputState::STATE_PRESSED;
