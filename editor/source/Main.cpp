@@ -5,7 +5,6 @@
 
 #include "engine/ConsoleLog.hpp"
 
-
 // Use dedicated graphics card
 extern "C" 
 {
