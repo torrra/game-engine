@@ -79,6 +79,7 @@ namespace engine
         ENGINE_API  math::Vector3f  GetLinearVelocity(void) const;
 
         ENGINE_API  math::Vector3f  GetAngularVelocity(void) const;
+        ENGINE_API  bool            GetIsTrigger(void) const;
 
         /// Setter
         /*
@@ -208,6 +209,7 @@ namespace engine
         f32                     m_radius        = 0.5f;
         math::Vector2f          m_capsuleFormat = math::Vector2f(0.5f, 1.f);
         bool                    m_isGravityDisabled = true;
+        bool                    m_isTrigger         = false;
 
     }; // !Class RigidBodyDynamic
 

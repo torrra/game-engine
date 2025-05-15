@@ -75,6 +75,8 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
         // Set the visualization of the rigid body to false by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
+        SetTrigger(m_isTrigger);
+
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
         m_data.m_type = EShapeType::DYNAMIC;
         void** dataPtr = reinterpret_cast<void**>(&m_data);
@@ -108,6 +110,8 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
         // Set the visualization of the rigid body to false by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+
+        SetTrigger(m_isTrigger);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
         m_data.m_type = EShapeType::DYNAMIC;
@@ -145,6 +149,8 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 
         // Set the visualization of the rigid body to false by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+
+        SetTrigger(m_isTrigger);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
         m_data.m_type = EShapeType::DYNAMIC;
@@ -388,6 +394,11 @@ math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
     return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
 }
 
+bool engine::RigidBodyDynamic::GetIsTrigger(void) const
+{
+    return m_isTrigger;
+}
+
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
@@ -540,12 +551,14 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
                 shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
                 shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
                 m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
+                m_isTrigger = true;
             }
             else
             {
                 shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
                 shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
                 m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+                m_isTrigger = false;
             }
         }
     }
