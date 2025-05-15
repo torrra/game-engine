@@ -74,7 +74,7 @@ namespace engine
             Get the half height and radius of the capsule
             <return> [out] the half height and radius
         */
-        ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+        ENGINE_API  math::Vector2f  GetCapsuleFormat(void);
 
         ENGINE_API  math::Vector3f  GetLinearVelocity(void) const;
 
