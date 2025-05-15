@@ -4,3 +4,5 @@
 #include "scripting/CameraFunctions.h"
 #include "scripting/TransformFunctions.h"
 #include "scripting/InputFunctions.h"
+#include "scripting/vector/Vector2Functions.h"
+#include "scripting/vector/Vector3Functions.h"

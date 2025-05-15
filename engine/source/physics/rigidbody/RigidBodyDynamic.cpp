@@ -10,6 +10,7 @@
 #pragma region Core
 
 #include "core/SceneGraph.h"
+#include "core/ComponentArray.hpp"
 
 #pragma endregion
 
@@ -34,6 +35,7 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
 {
     // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
+    //m_data = new RigidBodyData();
     // Set the owner and the current scene
     m_owner			= inOwner;
     m_currentScene	= inScene;
@@ -45,7 +47,7 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
     if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
         // If true take the entity transform
-        PrintLog(SuccessPreset(), "Found transform component on entity.");
+        PrintLog(InfoPreset(), "Found transform component on entity.");
         return *temp;
     }
 
@@ -69,16 +71,19 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
-
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);    
 
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::DYNAMIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::BOX;
-    //m_type = EShapeType::DYNAMIC;
-    PrintLog(SuccessPreset(), "Created dynamic box rigid body.");
 }
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
@@ -95,16 +100,21 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
-        false);
+        true);
 
     // Set the visualization of the rigid body to false by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::DYNAMIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::SPHERE;
-    //m_type = EShapeType::DYNAMIC;
-    PrintLog(SuccessPreset(), "Created dynamic sphere rigid body.");
 }
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
@@ -119,47 +129,47 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
                                             physx::PxCapsuleGeometry(0.25f, 0.25f),
                                             *m_materialImpl->GetImpl().m_material, 1.0f);
 
-    // Rotate the intiale position of the capsule to be at the vertical by default
-    // By using the local pose to not rotate the entity attach to it
-    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
-    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
-
-    // Update the local pose via the shape
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
-    {
-        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
-                            );
-    }
+    SetCapsuleBaseOrientation();
 
     // Set the gravity by default
     m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
         false);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::DYNAMIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
     m_shape = EGeometryType::CAPSULE;
-    PrintLog(SuccessPreset(), "Created dynamic capsule rigid body.");
 }
 
 void engine::RigidBodyDynamic::UpdateEntity()
 {
     // Update the entity transform in regard to the rigid body for exemple,
     // if the rigid body is under gravity then the rigid body fall so the entity fall
-    *m_currentScene->GetComponent<Transform>(m_owner) = 
-                            ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+    Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+    Transform updatedTransform = ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+
+    transform->CopyPosition(updatedTransform);
+    transform->CopyRotation(updatedTransform);
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody()
 {
     Transform worldTransform;
 
-    worldTransform.SetPosition(Transform::ToWorldPosition(*m_currentScene->GetComponent<Transform>(m_owner)));
-    worldTransform.SetRotation(Transform::ToWorldRotation(*m_currentScene->GetComponent<Transform>(m_owner)));
+    Transform &entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+
+    worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
+    worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
 
     // Update the transform of the rigid body in regard to the entity
     m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
@@ -176,7 +186,6 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
     // Delete the pointer to the implementation structure
     delete m_rigidBodyImpl;
     m_rigidBodyImpl = nullptr;
-    PrintLog(SuccessPreset(), "Cleaned up dynamic rigid body.");
 }
 
 void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
@@ -195,6 +204,8 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
     output << "\n     ";
     text::Serialize(output, "shape", m_shape);
     output << "\n     ";
+    text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -210,25 +221,14 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     MOVE_TEXT_CURSOR(text, end);
     text = text::DeserializeInteger(text, m_shape);
 
-    //SwitchShape(this, static_cast<EGeometryType>(m_shape));
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 collisionGroup = 0;
+    text = text::DeserializeInteger(text, collisionGroup);
+    m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
 }
-
-//engine::RigidBodyDynamic::~RigidBodyDynamic(void)
-//{
-//    // Release all rigid body resources
-//    //RigidBodyDynamicCleanUp();
-//
-//    //// Delete the pointer to the implementation structure
-//    //if (m_rigidBodyImpl != nullptr)
-//    //{
-//    //    delete m_rigidBodyImpl;
-//    //    m_rigidBodyImpl = nullptr;
-//    //    PrintLog(SuccessPreset(), "Cleaned up dynamic rigid body.");
-//    //}
-//}
 
 bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
 {
@@ -305,6 +305,16 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return math::Vector2f(EErrorGeometryType_Invalid);
+}
+
+math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
+{
+    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+}
+
+math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
+{
+    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
 }
 
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
@@ -385,26 +395,205 @@ void engine::RigidBodyDynamic::SetDebugVisualization(bool inIsDebugVisualization
                                                       inIsDebugVisualization);
 }
 
-void engine::RigidBodyDynamic::SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry)
+void engine::RigidBodyDynamic::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
+{
+    physx::PxFilterData filterData;
+    filterData.word0 = inCollisionGroup;
+    filterData.word1 = inCollisionMask;
+
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setSimulationFilterData(filterData);
+    }
+}
+
+void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
+{
+    // Rotate the intiale position of the capsule to be at the vertical by default
+    // By using the local pose to not rotate the entity attach to it
+    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+
+    // Update the local pose via the shape
+    physx::PxShape* shapes = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+    if (shapes)
+    {
+        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
+        );
+    }
+}
+
+void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
+{
+    m_collisionGroup = inCollisionGroup;
+}
+
+void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
+{
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+    if (shape)
+    {
+        if (inIsTrigger)
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+            m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
+        }
+        else
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+            m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+        }
+    }
+}
+
+void engine::RigidBodyDynamic::SetLinearVelocity(math::Vector3f inLinearVelocity, bool inAutoWake)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+}
+
+void engine::RigidBodyDynamic::SetAngularVelocity(math::Vector3f inAngularVelocity, bool inAutoWake)
+{
+    m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+}
+
+void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
+                                  " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) + 
+                                  " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) + 
+                                " with wrong entity");
+}
+
+void engine::RigidBodyDynamic::OnCollisionExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyDynamic::OnTriggerEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyDynamic::AddForce(const math::Vector3f& inForce, EForceMode inForceMode, bool inAutoWake)
+{
+    switch (inForceMode)
+    {
+    case EForceMode::FORCE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eFORCE,
+                                                      inAutoWake);
+        break;
+    case EForceMode::IMPULSE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eIMPULSE,
+                                                      inAutoWake);
+        break;
+    case EForceMode::VELOCITY_CHANGE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eVELOCITY_CHANGE,
+                                                      inAutoWake);
+        break;
+    case EForceMode::ACCELERATION:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eACCELERATION,
+                                                      inAutoWake);
+        break;
+    default:
+        PrintLog(ErrorPreset(), "Invalid force mode, use force mode by default.");
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inForce), physx::PxForceMode::eFORCE,
+                                                      inAutoWake);
+        break;
+    }
+}
+
+void engine::RigidBodyDynamic::AddTorque(const math::Vector3f& inTorque, EForceMode inForceMode, bool inAutoWake)
+{
+    switch (inForceMode)
+    {
+    case EForceMode::FORCE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eFORCE,
+            inAutoWake);
+        break;
+    case EForceMode::IMPULSE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eIMPULSE,
+            inAutoWake);
+        break;
+    case EForceMode::VELOCITY_CHANGE:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eVELOCITY_CHANGE,
+            inAutoWake);
+        break;
+    case EForceMode::ACCELERATION:
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eACCELERATION,
+            inAutoWake);
+        break;
+    default:
+        PrintLog(ErrorPreset(), "Invalid force mode, use force mode by default.");
+        m_rigidBodyImpl->m_rigidBodyDynamic->addForce(ToPxVec3(inTorque), physx::PxForceMode::eFORCE,
+            inAutoWake);
+        break;
+    }
+}
+
+void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
 {
     switch (inGeometry)
     {
     case EGeometryType::BOX:
-        inRigidBody->CreateDynamicBoxRigidBody();
-        //return inRigidBody;
+        CreateDynamicBoxRigidBody();
         break;
     case EGeometryType::SPHERE:
-        inRigidBody->CreateDynamicSphereRigidBody();
-        //return inRigidBody;
+        CreateDynamicSphereRigidBody();
         break;
     case EGeometryType::CAPSULE:
-        inRigidBody->CreateDynamicCapsuleRigidBody();
-        //return inRigidBody;
+        CreateDynamicCapsuleRigidBody();
         break;
     default:
         PrintLog(ErrorPreset(), "Invalid geometry type, create box by default.");
-        inRigidBody->CreateDynamicBoxRigidBody();
-        //return inRigidBody;
+        CreateDynamicBoxRigidBody();
         break;
     }
 }
@@ -416,7 +605,7 @@ engine::RigidBodyDynamic* engine::RigidBodyDynamicFactory::CreateDynamic(SceneGr
     // Create dynamic rigid body in regard to the geometry and give it an owner and a scene
     if (RigidBodyDynamic* temp = inScene->CreateComponent<RigidBodyDynamic>(inOwner))
     {
-        temp->SwitchShape(temp, inGeometry);
+        temp->SwitchShape(inGeometry);
         return temp;
     }
     PrintLog(ErrorPreset(), "Failed to create dynamic rigid body.");

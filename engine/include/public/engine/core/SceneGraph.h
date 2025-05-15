@@ -19,6 +19,8 @@
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
 
+#include "engine/sounds/AudioPlayer.h"
+
 namespace engine
 {
     class SceneGraph
@@ -200,8 +202,8 @@ namespace engine
         ENGINE_API
         static int64 RandomNumber(void);
 
-    private:
-
+        template<CValidComponent TComponentType>
+        uint64 GetThisIndex(TComponentType* component) const;
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         ComponentArray<TComponentType>& GetComponentArray(void);
@@ -209,6 +211,9 @@ namespace engine
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         const ComponentArray<TComponentType>& GetComponentArray(void) const;
+
+    private:
+
 
         // Group the index and uid bits together in a 64-bit handle
         EntityHandle MakeHandle(int32 index, int32 uid);
@@ -259,6 +264,10 @@ namespace engine
 
         ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
 
+        // All sound components in the scene
+        ComponentArray<AudioPlayer>			m_sceneAudioPlayer;
+
+
          
 
         // All entities in the scene
@@ -286,6 +295,12 @@ namespace engine
             if (component.IsValid() && component.IsActive())
                 component.Update(std::forward<TVariadicArgs>(args)...);
         }
+    }
+
+    template<CValidComponent TComponentType>
+    inline uint64 SceneGraph::GetThisIndex(TComponentType* component) const
+    {
+        return GetComponentArray<TComponentType>().GetThisIndex(component);
     }
 
     template<>
@@ -318,7 +333,18 @@ namespace engine
     {
         return m_sceneStaticRigidBodies;
     }
+    
+    template<>
+    inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
+    {
+        return m_sceneAudioPlayer;
+    }
 
+    template<> inline
+    const ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void) const
+    {
+        return m_sceneAudioPlayer;
+    }
 
     template<> inline
     const ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void) const

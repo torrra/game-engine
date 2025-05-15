@@ -17,11 +17,17 @@ int appMain(void)
 {
 	engine::Engine engine;
     engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
+    engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
 
 	while (!engine.GetWindow()->ShouldWindowClose())
 	{
         engine.UpdateGameplay();
+
+        if (engine::Input::IsInputPressed(KEY_SPACE))
+        {
+            engine.GetGraph()->GetComponent<engine::RigidBodyDynamic>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->AddTorque({ 0.f, 10.f, 0.f });
+        }
 
         if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
             engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&

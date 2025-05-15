@@ -18,6 +18,7 @@
 
 #include "engine/physics/PhysicsMaterial.h"
 #include "engine/physics/geometry/Geometry.hpp"
+#include "engine/physics/ICollisionListener.h"
 
 #pragma endregion
 
@@ -32,7 +33,7 @@ namespace engine
     /// Forward declaration
     struct RigidBodyDynamicImpl;
 
-    class RigidBodyDynamic : public Component
+    class RigidBodyDynamic : public ICollisionListener, public Component
     {
     public :
 
@@ -74,6 +75,11 @@ namespace engine
             <return> [out] the half height and radius
         */
         ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+
+        ENGINE_API  math::Vector3f  GetLinearVelocity(void) const;
+
+        ENGINE_API  math::Vector3f  GetAngularVelocity(void) const;
+
         /// Setter
         /*
             Set the gravity status of the rigid body
@@ -103,6 +109,17 @@ namespace engine
                                                                              false = disabled
         */
         ENGINE_API  void            SetDebugVisualization(bool inIsDebugVisualization);
+
+        ENGINE_API void             SetCollisionGroup(collision::ECollisionGroup inCollisionGroup);
+
+        ENGINE_API void             SetTrigger(bool inIsTrigger);
+
+        ENGINE_API void             SetLinearVelocity(math::Vector3f inLinearVelocity, 
+                                                      bool inAutoWake = true);
+
+        ENGINE_API void             SetAngularVelocity(math::Vector3f inAngularVelocity, 
+                                                       bool inAutoWake = true);
+
         /// Functions
         /*
             Update the entity transform in reference to the dynamic rigid body
@@ -125,9 +142,32 @@ namespace engine
                                                   uint64 index) const override;
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
-                    void SwitchShape(RigidBodyDynamic* inRigidBody, const EGeometryType& inGeometry);
-        RigidBodyDynamic& operator=(RigidBodyDynamic&&) noexcept = default;
-        uint64                  m_shape         = 0;
+                    void            SwitchShape(/*RigidBodyDynamic* inRigidBody, */
+                                                const EGeometryType& inGeometry);
+
+        ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnCollisionStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnCollisionExit(EntityHandle inOther) override;
+
+        ENGINE_API  void            OnTriggerEnter(EntityHandle inOther) override;
+        ENGINE_API  void            OnTriggerStay(EntityHandle inOther) override { inOther; }
+        ENGINE_API  void            OnTriggerExit(EntityHandle inOther) override;
+
+        ENGINE_API void             AddForce(const math::Vector3f& inForce, 
+                                             EForceMode inForceMode = EForceMode::FORCE, 
+                                             bool inAutoWake = true);
+
+        ENGINE_API void             AddTorque(const math::Vector3f& inTorque, 
+                                              EForceMode inForceMode = EForceMode::FORCE, 
+                                              bool inAutoWake = true);
+
+        RigidBodyDynamic&           operator=(RigidBodyDynamic&&) noexcept = default;
+
+        RigidBodyData               m_data;
+        uint64                      m_shape             = 0;
+        uint32                      m_type              = EShapeType::DYNAMIC;
+        collision::ECollisionGroup  m_collisionGroup    = collision::ECollisionGroup::DEFAULT_COLLISION;
+
 
     private :
 
@@ -136,6 +176,12 @@ namespace engine
         /// Constructor
         // Delete the copy constructor
                                     RigidBodyDynamic(const RigidBodyDynamic& inOther) = delete;
+
+
+                    void            SetCollisionGroupAndMask(uint32 inCollisionGroup,
+                                                             uint32 inCollisionMask);
+
+                    void            SetCapsuleBaseOrientation(void);
 
         /// Functions
         /*
@@ -158,7 +204,6 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
-        uint64                  m_type          = EShapeType::DYNAMIC;
 
     }; // !Class RigidBodyDynamic
 

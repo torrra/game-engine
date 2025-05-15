@@ -34,15 +34,6 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 	m_currentScene			= inScene;
 }
 
-engine::RigidBodyStatic::~RigidBodyStatic(void)
-{
-    //if (m_rigidBodyStaticImpl != nullptr)
-    //{
-    //    delete m_rigidBodyStaticImpl;
-    //    m_rigidBodyStaticImpl = nullptr;
-    //}
-}
-
 math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void) const
 {
     // Retrieve the box half extents by getting the shape of the rigid body to access
@@ -175,20 +166,28 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) c
     return;
 }
 
-
 void engine::RigidBodyStatic::UpdateEntity(void)
 {
-    // Update the entity transform in regard to the rigid body for exemple,
-    // if the rigid body is under gravity then the rigid body fall so the entity fall
-    *m_currentScene->GetComponent<Transform>(m_owner) =
-        ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+    // Update the entity transform in regard to the rigid body
+    Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+
+    Transform updatedTransform = ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+
+    transform->CopyPosition(updatedTransform);
+    transform->CopyRotation(updatedTransform);
 }
 
 void engine::RigidBodyStatic::UpdateRigidBody(void)
 {
+    Transform worldTransform;
+
+    Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+
+    worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
+    worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+
     // Update the transform of the rigid body in regard to the entity
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(
-        *m_currentScene->GetComponent<Transform>(m_owner)));
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));
 }
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
@@ -219,6 +218,8 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
     output << "\n     ";
     text::Serialize(output, "shape", m_shape);
     output << "\n     ";
+    text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -233,6 +234,11 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
 
     MOVE_TEXT_CURSOR(text, end);
     text = text::DeserializeInteger(text, m_shape);
+    
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 collisionGroup = 0;
+    text = text::DeserializeInteger(text, collisionGroup);
+    m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
@@ -244,13 +250,27 @@ engine::Transform& engine::RigidBodyStatic::CheckEntityTransform(void)
     if (Transform* temp = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
         // If true take the entity transform
-        PrintLog(SuccessPreset(), "Found transform component on entity.");
+        PrintLog(InfoPreset(), "Found transform component on entity.");
         return *temp;
     }
 
     // If not create a new transform to the entity
     PrintLog(WarningPreset(), "No transform component found on entity create new one.");
     return *m_currentScene->CreateComponent<engine::Transform>(m_owner);
+}
+
+void engine::RigidBodyStatic::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
+{
+    physx::PxFilterData filterData;
+    filterData.word0 = inCollisionGroup;
+    filterData.word1 = inCollisionMask;
+
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setSimulationFilterData(filterData);
+    }
 }
 
 void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
@@ -266,13 +286,18 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);    
 
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+    
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::BOX;
-
-    PrintLog(SuccessPreset(), "Created static box rigid body.");
+    m_shape = EGeometryType::BOX;
 }
 
 void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
@@ -288,13 +313,18 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::SPHERE;
-
-    PrintLog(SuccessPreset(), "Created static sphere rigid body.");
+    m_shape = EGeometryType::SPHERE;
 }
 
 void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
@@ -310,13 +340,18 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     // Add the rigid body to the physics scene
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::CAPSULE;
-
-    PrintLog(SuccessPreset(), "Created static capsule rigid body.");
+    m_shape = EGeometryType::CAPSULE;
 }
 
 void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
@@ -331,12 +366,17 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
         *m_materialImpl->GetImpl().m_material);
 
     // Set the visualization of the rigid body to false by default
-    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
     PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    m_type = EGeometryType::PLANE;
-
-    PrintLog(SuccessPreset(), "Created static plane rigid body.");
+    m_shape = EGeometryType::PLANE;
 }
 
 void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
@@ -345,26 +385,112 @@ void engine::RigidBodyStatic::SetDebugVisualization(bool inIsDebugVisualization)
                                                            inIsDebugVisualization);
 }
 
-void engine::RigidBodyStatic::SwitchShape(RigidBodyStatic* inRigidBody, const EGeometryType& inGeometry)
+void engine::RigidBodyStatic::SetCollisionGroup(collision::ECollisionGroup inCollisionGroup)
+{
+    m_collisionGroup = inCollisionGroup;
+}
+
+void engine::RigidBodyStatic::SetTrigger(bool inIsTrigger)
+{
+    physx::PxShape* shape = nullptr;
+    m_rigidBodyStaticImpl->m_rigidBodyStatic->getShapes(&shape, 1);
+    if (shape)
+    {
+        if (inIsTrigger)
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+            m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
+        }
+        else
+        {
+            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
+            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+            m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+        }
+    }
+}
+
+void engine::RigidBodyStatic::SwitchShape(const EGeometryType& inGeometry)
 {
     switch (inGeometry)
     {
     case EGeometryType::BOX:
-        inRigidBody->CreateStaticBoxRigidBody();
+        CreateStaticBoxRigidBody();
         break;
     case EGeometryType::SPHERE:
-        inRigidBody->CreateStaticSphereRigidBody();
+        CreateStaticSphereRigidBody();
         break;
     case EGeometryType::CAPSULE:
-        inRigidBody->CreateStaticCapsuleRigidBody();
+        CreateStaticCapsuleRigidBody();
         break;
     case EGeometryType::PLANE:
-        inRigidBody->CreateStaticPlaneRigidBody();
+        CreateStaticPlaneRigidBody();
         break;
     default:
         PrintLog(ErrorPreset(), "Invalid geometry type");
         break;
     }
+}
+
+void engine::RigidBodyStatic::OnCollisionEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyStatic::OnCollisionExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyStatic::OnTriggerEnter(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
+}
+
+void engine::RigidBodyStatic::OnTriggerExit(EntityHandle inOther)
+{
+    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
+
+    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
+        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with static " + std::to_string(rbStatic->m_data.m_index));
+
+    else
+        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
+            " with wrong entity");
 }
 
 engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph* inScene, 
@@ -374,7 +500,7 @@ engine::RigidBodyStatic* engine::RigidBodyStaticFactory::CreateStatic(SceneGraph
     // Create static rigid body in regard to the geometry and give it an owner and a scene
     if (RigidBodyStatic* temp = inScene->CreateComponent<RigidBodyStatic>(inOwner))
     {
-        temp->SwitchShape(temp, inGeometry);
+        temp->SwitchShape(inGeometry);
         return temp;
     }
     PrintLog(ErrorPreset(), "Failed to create static rigid body.");

@@ -257,7 +257,7 @@ void engine::Engine::OpenProject(const std::filesystem::path& projFile)
 
     m_projectDir = projFile.parent_path();
     m_projectDir.append("assets");
-
+    ScriptSystem::SetUserScriptLocation(m_projectDir.string().c_str());
     DeserializeProjectFile(cursor, end);
     text::UnloadFileData(fileData);
 }
