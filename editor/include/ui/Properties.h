@@ -41,7 +41,7 @@ namespace editor
 
         // Allow to drag and drop scripts into window
         void ScriptInput(void);
-
+        void AddScript(engine::Script* script, const std::string& name);
 
         std::vector<BaseComponent*> m_components;
         engine::SceneGraph* m_graph;

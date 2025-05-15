@@ -141,19 +141,11 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
 void editor::PropertyWnd::ScriptInput(void)
 {
-    // Model input
-    //ui::Text("Add script");
-    //ui::SameLine(150.0f);
-    //ui::Button("Add script");
-    //
-    // Drag / drop
-    //::ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str())
     if (::ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str()))
     {
         // Check asset type
         if (const ui::Payload payload = ui::AcceptPayload(SCRIPT_PAYLOAD, 0))
         {
-
             if (payload.IsPreview())
             {
                 ::ui::DrawList drawList = ::ui::GetForegroundDrawList();
@@ -162,7 +154,6 @@ void editor::PropertyWnd::ScriptInput(void)
                 drawList.AddRectFilled(transform.m_min, transform.m_max, color);
             }
 
-
             Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
 
             if (payload.IsDelivery())
@@ -170,10 +161,10 @@ void editor::PropertyWnd::ScriptInput(void)
                 std::filesystem::path filename = payloadData->m_path.filename().replace_extension();
 
                 if (engine::Script* script = m_graph->GetComponent<engine::Script>(m_handle))
-                    script->AddScriptObject(filename.string());
+                    AddScript(script, filename.string());
 
                 else if (engine::Script* newScript = m_graph->CreateComponent<engine::Script>(m_handle))
-                    newScript->AddScriptObject(filename.string());
+                    AddScript(newScript, filename.string());
 
                 else
                     engine::PrintLog(engine::ErrorPreset(), "Unable to add script to entity");
@@ -181,12 +172,21 @@ void editor::PropertyWnd::ScriptInput(void)
                 InitComponents();
             }
         }
-
         ui::EndDragDropTarget();
     }
-
     // Formatting
     ui::VerticalSpacing();
+}
+
+void editor::PropertyWnd::AddScript(engine::Script* script, const std::string& name)
+{
+    for (const engine::ScriptObject& object : script->GetScripts())
+    {
+        if (object.IsValid() && name == object.GetName())
+            return;
+    }
+
+    script->AddScriptObject(name);
 }
 
 void editor::PropertyWnd::ClearComponentArray(void)
