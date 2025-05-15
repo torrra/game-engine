@@ -304,6 +304,8 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
         text::Serialize(output, "capsule format", m_capsuleFormat);
         output << "\n     ";
     }
+    text::Serialize(output, "trigger", m_isTrigger);
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -339,6 +341,11 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_capsuleFormat);
     }
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isTrigger = 1;
+    text = text::DeserializeInteger(text, isTrigger);
+    m_isTrigger = static_cast<bool>(isTrigger);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);

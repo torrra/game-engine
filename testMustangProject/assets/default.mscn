@@ -7,8 +7,8 @@
 [Transform]
     @uint64 | index=1
     @int64 | owner=0
-    @quat32 | rotation={-0.991879,-0.00253249,0.127156,-0.000323931}
-    @vec3f32 | position={0,4,-5}
+    @quat32 | rotation={-1,8.25683e-05,1.40735e-06,-0.000643951}
+    @vec3f32 | position={0,4,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Renderer]
@@ -30,9 +30,10 @@
      @int64 | owner=0
      @uint32 | type=0
      @uint64 | shape=2
-     @uint32 | collision group=1
+     @uint32 | collision group=3
      @vec2f32 | capsule format={0.5,0}
      @uint32 | gravity=0
+     @uint32 | trigger=0
      @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera
@@ -71,7 +72,7 @@
     @uint64 | index=2
     @int64 | owner=2
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={-0,0.95,-3.05}
+    @vec3f32 | position={0,0,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [RigidBodyStatic]
@@ -79,10 +80,11 @@
      @uint32 | type=1
      @uint64 | shape=0
      @uint32 | collision group=3
-     @vec3f32 | box half extents={10.7,0.5,5}
+     @vec3f32 | box half extents={5,0.5,5}
+     @bool | trigger=0
      @uint64 | flags=0
 [Entity]
-   @string 6 | name=Sphere
+   @string 7 | name=Trigger
    @int64 | handle=3
    @int64 | parent=-1
    @uint64 | flags=0
@@ -90,46 +92,15 @@
 [Transform]
     @uint64 | index=3
     @int64 | owner=3
-    @quat32 | rotation={-0.955864,0.0222835,0.0752281,-0.283139}
-    @vec3f32 | position={3.25,3.9,-1.4}
+    @quat32 | rotation={1,-7.7685e-08,-1.22174e-07,0}
+    @vec3f32 | position={0,1,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [RigidBodyStatic]
      @int64 | owner=3
      @uint32 | type=1
-     @uint64 | shape=1
-     @uint32 | collision group=3
-     @f32 | sphere radius=2.2
-     @uint64 | flags=0
-[Entity]
-   @string 5 | name=Plane
-   @int64 | handle=4
-   @int64 | parent=-1
-   @uint64 | flags=0
-   @uint64 | components=16
-[RigidBodyStatic]
-     @int64 | owner=4
-     @uint32 | type=1
-     @uint64 | shape=3
-     @uint32 | collision group=3
-     @uint64 | flags=0
-[Entity]
-   @string 7 | name=Capsule
-   @int64 | handle=5
-   @int64 | parent=-1
-   @uint64 | flags=0
-   @uint64 | components=17
-[Transform]
-    @uint64 | index=4
-    @int64 | owner=5
-    @quat32 | rotation={0.999848,0,0,0.0174525}
-    @vec3f32 | position={-6.7,2.6,-0.95}
-    @vec3f32 | scale={1,0.001,0.001}
-    @uint64 | flags=0
-[RigidBodyStatic]
-     @int64 | owner=5
-     @uint32 | type=1
-     @uint64 | shape=2
-     @uint32 | collision group=3
-     @vec2f32 | capsule format={0.65,0.95}
+     @uint64 | shape=0
+     @uint32 | collision group=4
+     @vec3f32 | box half extents={0.5,0.5,0.5}
+     @bool | trigger=1
      @uint64 | flags=0
