@@ -19,15 +19,29 @@
 
 #pragma endregion
 
+#pragma region Serialization
+
+#include "serialization/TextSerializer.h"
+
+#pragma endregion
+
 engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene)
 {
     // Initialize the triangle mesh implementation
     m_triangleMeshImpl  = new TriangleMeshImpl();
 
+    m_data.m_index = 0;
+    m_data.m_type = EShapeType::STATIC;
+
     // Set the owner and the current scene
     m_owner             = inOwner;
     m_currentScene      = inScene;
 
+    
+}
+
+void engine::TriangleMesh::CreateTriangleMesh(void)
+{
     // Get the model and return if failed
     if (engine::Renderer* renderer = m_currentScene->GetComponent<engine::Renderer>(m_owner))
         m_model = renderer->GetModel();
@@ -37,10 +51,75 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
 
     if (m_model == nullptr)
         return;
+
+    /*
+        Create the triangle mesh description
+        points.count : The number of points
+        points.stride : The stride of the points
+        points.data : The data of the points
+    */
+    physx::PxTriangleMeshDesc meshDesc;
+    if (m_model->CanRender() && !m_isDrawn)
+    {
+        m_triangleMeshImpl->m_triangleMeshDesc.points.count = 
+            m_model->GetStaticMeshes()[0].GetIndexCount();
+        m_triangleMeshImpl->m_triangleMeshDesc.points.stride = sizeof(math::Vector3f);
+        m_triangleMeshImpl->m_triangleMeshDesc.points.data =
+            m_model->GetStaticMeshes()[0].GetVertices();
+
+        CookTriangleMesh();
+
+        m_isDrawn = true;
+    }
 }
 
-engine::TriangleMesh::~TriangleMesh(void)
+void engine::TriangleMesh::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
 {
+    output << "[TriangleMesh]\n     ";
+
+    if constexpr (UpdateAfterParent<TriangleMesh>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
+    }
+
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+    text::Serialize(output, "type", m_type);
+    output << "\n     ";
+    text::Serialize(output, "shape", m_shape);
+    output << "\n     ";
+    text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
+const char* engine::TriangleMesh::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_type);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_shape);
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 collisionGroup = 0;
+    text = text::DeserializeInteger(text, collisionGroup);
+    m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
+}
+
+void engine::TriangleMesh::CleanUpTriangleMesh(void)
+{   
+    m_triangleMeshImpl->m_triangleMeshDesc.setToDefault();
+
+    PhysicsEngine::Get().GetImpl().m_scene->removeActor(*m_triangleMeshImpl->m_actor);
     // Release the triangle mesh
     PX_RELEASE(m_triangleMeshImpl->m_triangleMesh);
 
@@ -49,33 +128,34 @@ engine::TriangleMesh::~TriangleMesh(void)
     m_triangleMeshImpl = nullptr;
 }
 
-void engine::TriangleMesh::CreateTriangleMesh(void)
+void engine::TriangleMesh::UpdateEntity(void)
 {
-    /*
-        Create the triangle mesh description
-        points.count : The number of points
-        points.stride : The stride of the points
-        points.data : The data of the points
-    */
-    physx::PxTriangleMeshDesc meshDesc;
-    m_triangleMeshImpl->m_triangleMeshDesc.points.count = static_cast<physx::PxU32>(
-                                m_model->GetStaticMeshes()[0].GetIndexCount());
-    m_triangleMeshImpl->m_triangleMeshDesc.points.stride = sizeof(math::Vector3f);
-    m_triangleMeshImpl->m_triangleMeshDesc.points.data = 
-                                m_model->GetStaticMeshes()[0].GetVertices();
+    if (m_triangleMeshImpl->m_actor != nullptr)
+    {
+        // Update the entity transform in regard to the rigid body
+        Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
 
-    /*
-        triangles.count : The number of triangles
-        triangles.stride : The stride of the triangles
-        triangles.data : The data of the triangles
-    */
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.count = static_cast<physx::PxU32>(
-                                m_model->GetStaticMeshes()[0].GetIndexCount() / 3);
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.stride = 3 * sizeof(uint32);
-    m_triangleMeshImpl->m_triangleMeshDesc.triangles.data = 
-                                m_model->GetStaticMeshes()[0].GetIndices();
+        Transform updatedTransform = ToTransform(m_triangleMeshImpl->m_actor->getGlobalPose());
 
-    CookTriangleMesh();
+        transform->CopyPosition(updatedTransform);
+        transform->CopyRotation(updatedTransform);
+    }
+}
+
+void engine::TriangleMesh::UpdateTriangleMesh(void)
+{
+    if (m_triangleMeshImpl->m_actor != nullptr)
+    {
+        Transform worldTransform;
+
+        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+
+        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
+        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+
+        // Update the transform of the rigid body in regard to the entity
+        m_triangleMeshImpl->m_actor->setGlobalPose(ToPxTransform(worldTransform));
+    }
 }
 
 void engine::TriangleMesh::CookTriangleMesh(void)
@@ -109,14 +189,40 @@ void engine::TriangleMesh::CookTriangleMesh(void)
                                                                                            0.5f,
                                                                                            0.6f);
     // Create the static rigid body
-    physx::PxRigidStatic* actor =
+    m_triangleMeshImpl->m_actor =
         physx::PxCreateStatic(*PhysicsEngine::Get().GetImpl().m_physics,
             ToPxTransform(m_currentScene->GetComponent<engine::Transform>(
                 m_owner)->GetTransform()), physx::PxTriangleMeshGeometry(
                     m_triangleMeshImpl->m_triangleMesh), *material);
 
+    // Set the visualization of the rigid body to false by default
+    m_triangleMeshImpl->m_actor->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+
+    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+    m_data.m_type = EShapeType::STATIC;
+    void** dataPtr = reinterpret_cast<void**>(&m_data);
+    m_triangleMeshImpl->m_actor->userData = *dataPtr;
+
+    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), 
+                             collision::GetCollisionMask(m_collisionGroup));
+
     // Add the actor to the physics scene
-    PhysicsEngine::Get().GetImpl().m_scene->addActor(*actor);
+    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_triangleMeshImpl->m_actor);
+    m_shape = EGeometryType::TRIANGLE_MESH;
+}
+
+void engine::TriangleMesh::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
+{
+    physx::PxFilterData filterData;
+    filterData.word0 = inCollisionGroup;
+    filterData.word1 = inCollisionMask;
+
+    physx::PxShape* shape = nullptr;
+    reinterpret_cast<physx::PxRigidBody*>(m_triangleMeshImpl->m_actor)->getShapes(&shape, 1);
+    if (shape)
+    {
+        shape->setSimulationFilterData(filterData);
+    }
 }
 
 engine::TriangleMeshImpl* engine::TriangleMesh::GetTriangleMeshImpl(void)

@@ -20,7 +20,6 @@ int appMain(void)
 	engine::Engine engine;
     engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
 
-    //engine.OpenProject("C:\\Users\\noahd\\Bureau\\Mustang\\testMustangProject\\superSeriousGame.mustang");
     engine.Startup();
 
     

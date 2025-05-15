@@ -108,6 +108,11 @@ namespace engine
             // Update render cache
             ThreadManager::SynchronizeGameThread(&m_graph);
 
+            for (TriangleMesh& triangleMesh : m_graph.GetComponentArray<engine::TriangleMesh>())
+            {
+                triangleMesh.CreateTriangleMesh();
+            }
+
             // Execute a dummy physics tick to update debug draw 
             m_graph.SyncRigidbodiesPrePhysics();
             PhysicsEngine::Get().StepSimulation(0.0001f);
@@ -136,6 +141,11 @@ namespace engine
 
     void GameScene::PhysicsUpdate(void)
     {
+        for (TriangleMesh& triangleMesh : m_graph.GetComponentArray<engine::TriangleMesh>())
+        {
+            triangleMesh.CreateTriangleMesh();
+        }
+
         constexpr f32 physicsUpdateInterval = 0.02f;
 
         m_timeSincePhysicsTick += m_time.GetDeltaTime();

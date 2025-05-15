@@ -35,7 +35,8 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
 {
     // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
-    //m_data = new RigidBodyData();
+    m_data.m_index = 0;
+    m_data.m_type = EShapeType::DYNAMIC;
     // Set the owner and the current scene
     m_owner			= inOwner;
     m_currentScene	= inScene;

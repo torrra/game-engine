@@ -47,6 +47,26 @@ function ScriptObject:Update(deltaTime)
 
 end
 
+function ScriptObject:OnCollisionEnter(otherEntity)
+
+	print("LUA [collision] enter")
+end
+
+function ScriptObject:OnCollisionExit(otherEntity)
+
+	print("LUA [collision] exit")
+end
+
+function ScriptObject:OnTriggerEnter(otherEntity)
+
+	print("LUA [trigger] enter")
+end
+
+function ScriptObject:OnTriggerExit(otherEntity)
+
+	print("LUA [trigger] exit")
+end
+
 -- Internal Start() caller
 function ScriptObject:_ExecuteStart()
 

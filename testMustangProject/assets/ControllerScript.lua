@@ -47,6 +47,14 @@ function ControllerScript:Update(deltaTime)
     end
 end
 
+function ControllerScript:OnCollisionEnter(otherEntity)
+
+    print("override | otherEntity: "..otherEntity)
+
+end
+
+
+
 
 -- Engine definitions
 ScriptObjectTypes.ControllerScript = ControllerScript
