@@ -95,6 +95,10 @@ void editor::AssetsWnd::RenderContents(void)
 {
     bool shouldRefresh = false;
     math::Vector2f windowSize = ::ui::GetAvailSpace();
+
+    if (windowSize.GetX() <= 0.f || windowSize.GetY() <= 0.f)
+        return;
+
     m_layout->SetSize(windowSize);
 
     if (m_layout->StartTable())
