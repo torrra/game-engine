@@ -51,6 +51,14 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         {
             rigidBodyDynamic->SetGravityDisabled(isGravityEnabled);
         }
+
+        bool isTrigger = rigidBodyDynamic->GetIsTrigger();
+        ui::Text("Is trigger: ");
+        ui::SameLine(125.f);
+        if (ui::Checkbox("##Trigger", &isTrigger))
+        {
+            rigidBodyDynamic->SetTrigger(isTrigger);
+        }
     }
 }
 
