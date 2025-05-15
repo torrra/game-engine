@@ -1,12 +1,19 @@
 #include "ui/Properties.h"
+#include "ui/Assets.h"
 #include "ui/components/CameraComponent.h"
 #include "ui/components/RendererComponent.h"
 #include "ui/components/ScriptComponent.h"
 #include "ui/components/TransformComponent.h"
 
 #include <engine/ui/UIComponent.h>
+#include <engine/ui/UIDragDrop.h>
+#include <engine/ui/UIDraw.h>
+#include <engine/ui/UIStyle.h>
+#include <engine/ui/InternalUIWindow.h>
+
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/ConsoleLog.hpp>
 
 #define WINDOW_NAME "Properties"
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
@@ -60,6 +67,7 @@ void editor::PropertyWnd::RenderContents(void)
 
     }
 
+    ScriptInput();
 }
 
 void editor::PropertyWnd::InitComponents(void)
@@ -88,8 +96,16 @@ void editor::PropertyWnd::InitComponents(void)
     {
         engine::Script* scriptComponent = m_graph->GetComponent<engine::Script>(m_handle);
 
-        for (engine::ScriptObject script : scriptComponent->GetScripts())
-            m_components.emplace_back(new ScriptComponent(script.GetType()));
+        for (const engine::ScriptObject& script : scriptComponent->GetScripts())
+        {
+            if (!script.IsValid())
+                continue;
+
+            ScriptComponent* newScript = new ScriptComponent(script.GetType());
+            newScript->SetScript(script.GetIndex());
+            
+            m_components.emplace_back(newScript);
+        }
     }
 }
 
@@ -121,6 +137,56 @@ void editor::PropertyWnd::RenderMenuBar(void)
         ui::EndMenuBar();
     }
     ui::EndDisabledSection();
+}
+
+void editor::PropertyWnd::ScriptInput(void)
+{
+    // Model input
+    //ui::Text("Add script");
+    //ui::SameLine(150.0f);
+    //ui::Button("Add script");
+    //
+    // Drag / drop
+    //::ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str())
+    if (::ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str()))
+    {
+        // Check asset type
+        if (const ui::Payload payload = ui::AcceptPayload(SCRIPT_PAYLOAD, 0))
+        {
+
+            if (payload.IsPreview())
+            {
+                ::ui::DrawList drawList = ::ui::GetForegroundDrawList();
+                auto transform = this->GetWindowRect();
+                uint32 color = ::ui::GetColor(::ui::DRAG_DROP_TARGET_COLOR, 0.05f);
+                drawList.AddRectFilled(transform.m_min, transform.m_max, color);
+            }
+
+
+            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+
+            if (payload.IsDelivery())
+            {
+                std::filesystem::path filename = payloadData->m_path.filename().replace_extension();
+
+                if (engine::Script* script = m_graph->GetComponent<engine::Script>(m_handle))
+                    script->AddScriptObject(filename.string());
+
+                else if (engine::Script* newScript = m_graph->CreateComponent<engine::Script>(m_handle))
+                    newScript->AddScriptObject(filename.string());
+
+                else
+                    engine::PrintLog(engine::ErrorPreset(), "Unable to add script to entity");
+
+                InitComponents();
+            }
+        }
+
+        ui::EndDragDropTarget();
+    }
+
+    // Formatting
+    ui::VerticalSpacing();
 }
 
 void editor::PropertyWnd::ClearComponentArray(void)

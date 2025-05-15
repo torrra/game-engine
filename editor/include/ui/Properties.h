@@ -39,6 +39,9 @@ namespace editor
         // Menu bar
         void RenderMenuBar(void);
 
+        // Allow to drag and drop scripts into window
+        void ScriptInput(void);
+
 
         std::vector<BaseComponent*> m_components;
         engine::SceneGraph* m_graph;
