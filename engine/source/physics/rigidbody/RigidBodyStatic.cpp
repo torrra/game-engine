@@ -417,7 +417,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
             physx::PxBoxGeometry(m_halfExtents.GetX(), m_halfExtents.GetY(), m_halfExtents.GetZ()),
             *m_materialImpl->GetImpl().m_material);
 
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
@@ -449,7 +449,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
             physx::PxSphereGeometry(m_radius),
             *m_materialImpl->GetImpl().m_material);
 
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
@@ -483,7 +483,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 
         SetCapsuleBaseOrientation();
 
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
@@ -514,7 +514,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
             physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 0.f),
             *m_materialImpl->GetImpl().m_material);
 
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyStaticImpl->m_rigidBodyStatic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));

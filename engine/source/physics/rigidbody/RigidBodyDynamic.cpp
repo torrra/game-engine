@@ -72,7 +72,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
         // Set the gravity by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
             m_isGravityDisabled);
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
@@ -108,7 +108,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
             m_isGravityDisabled);
 
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
@@ -147,7 +147,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
             m_isGravityDisabled);
 
-        // Set the visualization of the rigid body to false by default
+        // Set the visualization of the rigid body to true by default
         m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         SetTrigger(m_isTrigger);
