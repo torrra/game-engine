@@ -20,15 +20,28 @@ void engine::InputHandler::ShutDown(void)
 
 void engine::InputHandler::UpdateKeyState(void)
 {
+    if (GetInstance()->m_scrollUpdated == EScrollState::FIRST_FRAME)
+        GetInstance()->m_scrollUpdated = EScrollState::SECOND_FRAME;
+
+    else if (GetInstance()->m_scrollUpdated == EScrollState::SECOND_FRAME)
+    {
+        GetInstance()->m_scrollDelta = math::Vector2d::Zero();
+        GetInstance()->m_scrollUpdated = EScrollState::NO_INPUT;
+    }
+
+
     for (auto& input : GetInstance()->m_inputMap)
     {
         input.second.m_prevState = input.second.m_state;
-        
+
         if (input.second.m_state == EInputState::STATE_PRESSED)
             input.second.m_state = EInputState::STATE_HELD;
         else if (input.second.m_state == EInputState::STATE_RELEASED)
             input.second.m_state = EInputState::STATE_UP;
     }
+
+    GetInstance()->m_mousePosDelta = GetInstance()->m_mousePos - GetInstance()->m_prevMousePos;
+    GetInstance()->m_prevMousePos = GetInstance()->m_mousePos;
 }
 
 void engine::InputHandler::KeyboardCallback(int32 key, int32 scanCode, int32 action, int32 mods)
@@ -65,6 +78,22 @@ void engine::InputHandler::MouseButtonCallback(int32 button, int32 action, int32
 
     GetInstance()->m_inputMap[button] = input;
 }
+
+void engine::InputHandler::MouseScrollCallback(f64 xOffset, f64 yOffset)
+{
+    GetInstance()->m_scrollDelta = math::Vector2d(xOffset, yOffset);
+    GetInstance()->m_scrollUpdated = EScrollState::FIRST_FRAME;
+}
+
+void engine::InputHandler::CursorPosCallback(f64 xPos, f64 yPos)
+{
+    GetInstance()->m_mousePos = {xPos, yPos};
+}
+
+engine::InputHandler::InputHandler(void)
+    : m_mousePos(0.00), m_prevMousePos(0.00), m_scrollDelta(0.00),
+    m_mousePosDelta(0.0), m_scrollUpdated(EScrollState::NO_INPUT)
+{}
 
 engine::InputHandler* engine::InputHandler::GetInstance(void)
 {

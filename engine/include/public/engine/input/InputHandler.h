@@ -3,6 +3,8 @@
 #include "engine/input/InputData.h"
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
+#include <math/MathGeneric.hpp>
+#include <math/Vector2.hpp>
 #include <unordered_map>
 #include <mutex>
 
@@ -55,6 +57,8 @@ namespace engine
 
         static void KeyboardCallback(int32 key, int32 scanCode, int32 action, int32 mods);
         static void MouseButtonCallback(int32 button, int32 action, int32 mods);
+        static void MouseScrollCallback(f64 xOffset, f64 yOffset);
+        static void CursorPosCallback(f64 xPos, f64 yPos);
     private:
         InputHandler(void);
         InputHandler(InputHandler const&) = delete;
@@ -64,6 +68,11 @@ namespace engine
         static std::mutex m_mutex;
         static InputHandler* m_instance;
         std::unordered_map<int32, InputState> m_inputMap;
+        math::Vector2d m_mousePos;
+        math::Vector2d m_prevMousePos;
+        math::Vector2d m_mousePosDelta;
+        math::Vector2d m_scrollDelta;
+        EScrollState m_scrollUpdated;
         
     };
 }

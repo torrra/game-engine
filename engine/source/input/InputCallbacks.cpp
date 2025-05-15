@@ -16,6 +16,20 @@ void engine::input::MouseButtonCallback(GLFWwindow* window, int32 button, int32 
     InputHandler::MouseButtonCallback(button, action, mods);
 }
 
+void engine::input::MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset)
+{
+    (void) window;
+
+    InputHandler::MouseScrollCallback(xOffset, yOffset);
+}
+
+void engine::input::CursorPosCallback(GLFWwindow* window, f64 xPos, f64 yPos)
+{
+    (void) window;
+
+    InputHandler::CursorPosCallback(xPos, yPos);
+}
+
 void engine::input::SetCursorMode(int32 mode)
 {
     glfwSetInputMode(glfwGetCurrentContext(), CURSOR, mode);
@@ -29,6 +43,8 @@ int32 engine::input::InitCallbacks(void)
     {
         glfwSetKeyCallback(window, KeyboardCallback);
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
+        glfwSetCursorPosCallback(window, CursorPosCallback);
+        glfwSetScrollCallback(window, MouseScrollCallback);
     }
     else
     {
