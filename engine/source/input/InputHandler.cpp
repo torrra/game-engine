@@ -44,6 +44,27 @@ void engine::InputHandler::UpdateKeyState(void)
     GetInstance()->m_prevMousePos = GetInstance()->m_mousePos;
 }
 
+bool engine::InputHandler::IsInputPressed(int32 keyCode)
+{
+    return GetInstance()->m_inputMap[keyCode].m_prevState == EInputState::STATE_PRESSED;
+}
+
+bool engine::InputHandler::IsInputHeld(int32 keyCode)
+{
+    return GetInstance()->m_inputMap[keyCode].m_state == EInputState::STATE_HELD;
+}
+
+bool engine::InputHandler::IsInputDown(int32 keyCode)
+{
+    return GetInstance()->m_inputMap[keyCode].m_state == EInputState::STATE_PRESSED ||
+        GetInstance()->m_inputMap[keyCode].m_state == EInputState::STATE_HELD;
+}
+
+bool engine::InputHandler::IsInputReleased(int32 keyCode)
+{
+    return GetInstance()->m_inputMap[keyCode].m_prevState == EInputState::STATE_RELEASED;
+}
+
 void engine::InputHandler::KeyboardCallback(int32 key, int32 scanCode, int32 action, int32 mods)
 {
     (void) scanCode; 

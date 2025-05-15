@@ -55,10 +55,26 @@ namespace engine
         ENGINE_API static void ShutDown(void);
         ENGINE_API static void UpdateKeyState(void);
 
+        ENGINE_API static bool IsInputPressed(int32 keyCode);
+        ENGINE_API static bool IsInputHeld(int32 keyCode);
+        ENGINE_API static bool IsInputDown(int32 keyCode);
+        ENGINE_API static bool IsInputReleased(int32 keyCode);
+
         static void KeyboardCallback(int32 key, int32 scanCode, int32 action, int32 mods);
         static void MouseButtonCallback(int32 button, int32 action, int32 mods);
         static void MouseScrollCallback(f64 xOffset, f64 yOffset);
         static void CursorPosCallback(f64 xPos, f64 yPos);
+
+        // Mouse getter functions
+        template <math::CScalarType TValueType>
+        static math::Vector2<TValueType> GetCursorPosition(void);
+
+        template <math::CScalarType TValueType>
+        static math::Vector2<TValueType> GetCursorDeltaPos(void);
+
+        template <math::CScalarType TValueType>
+        static math::Vector2<TValueType> GetScrollDelta(void);
+
     private:
         InputHandler(void);
         InputHandler(InputHandler const&) = delete;
@@ -73,6 +89,34 @@ namespace engine
         math::Vector2d m_mousePosDelta;
         math::Vector2d m_scrollDelta;
         EScrollState m_scrollUpdated;
-        
     };
+
+    template<math::CScalarType TValueType>
+    inline math::Vector2<TValueType> engine::InputHandler::GetCursorPosition(void)
+    {
+        return math::Vector2<TValueType>
+            (
+                static_cast<TValueType>(GetInstance()->m_mousePos.GetX()),
+                static_cast<TValueType>(GetInstance()->m_mousePos.GetY())
+            );
+    }
+
+    template<math::CScalarType TValueType>
+    inline math::Vector2<TValueType> engine::InputHandler::GetCursorDeltaPos(void)
+    {
+        return math::Vector2<TValueType>(
+            static_cast<TValueType>(GetInstance()->m_mousePosDelta.GetX()),
+            static_cast<TValueType>(GetInstance()->m_mousePosDelta.GetY())
+        );
+    }
+
+    template<math::CScalarType TValueType>
+    inline math::Vector2<TValueType> engine::InputHandler::GetScrollDelta(void)
+    {
+        return math::Vector2<TValueType>
+            (
+                static_cast<TValueType>(GetInstance()->m_scrollDelta.GetX()),
+                static_cast<TValueType>(GetInstance()->m_scrollDelta.GetY())
+            );
+    }
 }
