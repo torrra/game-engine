@@ -1,6 +1,6 @@
 #include <engine/Engine.h>
 #include <engine/utility/MemoryCheck.h>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include "ui/EditorApplication.h"
 
 #include "engine/ConsoleLog.hpp"
@@ -24,14 +24,14 @@ int appMain(void)
 	{
         engine.UpdateGameplay();
 
-        if (engine::Input::IsInputPressed(KEY_SPACE))
+        if (engine::InputHandler::IsInputPressed(KEY_SPACE))
         {
             engine.GetGraph()->GetComponent<engine::RigidBodyDynamic>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->AddTorque({ 0.f, 10.f, 0.f });
         }
 
-        if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
-            engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
-            engine::Input::IsInputPressed(KEY_B))
+        if ((engine::InputHandler::IsInputHeld(KEY_LEFT_CONTROL) ||
+            engine::InputHandler::IsInputHeld(KEY_RIGHT_CONTROL)) &&
+            engine::InputHandler::IsInputPressed(KEY_B))
         {
             engine.BuildProjectExecutable("..\\testProjectBuildFolder");
         }
