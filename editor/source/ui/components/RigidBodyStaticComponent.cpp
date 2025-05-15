@@ -42,6 +42,17 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
         }
 
         DisplayUI(currentShape, rigidBodyStatic);
+
+        if (currentShape != engine::EGeometryType::PLANE)
+        {
+            bool isTrigger = rigidBodyStatic->GetIsTrigger();
+            ui::Text("Is trigger: ");
+            ui::SameLine(125.f);
+            if (ui::Checkbox("##Trigger", &isTrigger))
+            {
+                rigidBodyStatic->SetTrigger(isTrigger);
+            }
+        }
     }
 }
 
