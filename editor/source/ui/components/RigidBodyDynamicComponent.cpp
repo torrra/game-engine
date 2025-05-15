@@ -27,7 +27,7 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
     if (engine::RigidBodyDynamic* rigidBodyDynamic = GetData<engine::RigidBodyDynamic>())
     {
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyDynamic->m_shape);
-        std::vector<const char*> shapeTypes = { "Box", "Sphere", "Capsule", "Plane" };
+        std::vector<const char*> shapeTypes = { "Box", "Sphere", "Capsule" };
         int currentIndex = static_cast<int>(currentShape);
 
         currentShape = static_cast<engine::EGeometryType>(currentIndex);
