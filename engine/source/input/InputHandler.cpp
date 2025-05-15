@@ -6,9 +6,7 @@ engine::InputHandler* engine::InputHandler::m_instance = nullptr;
 
 bool engine::InputHandler::StartUp(void)
 {
-    input::InitCallbacks();
-
-    return 0;
+    return input::InitCallbacks() != 0;
 }
 
 void engine::InputHandler::ShutDown(void)
@@ -35,10 +33,10 @@ void engine::InputHandler::UpdateKeyState(void)
 
 void engine::InputHandler::KeyboardCallback(int32 key, int32 scanCode, int32 action, int32 mods)
 {
-    key; scanCode; action; mods;
+    (void) scanCode; 
+    (void) mods;
 
     InputState input;
-
     input.m_state = static_cast<EInputState>(action);
 
     if (input.m_state == EInputState::STATE_PRESSED)
@@ -53,9 +51,9 @@ void engine::InputHandler::KeyboardCallback(int32 key, int32 scanCode, int32 act
 
 void engine::InputHandler::MouseButtonCallback(int32 button, int32 action, int32 mods)
 {
-    button; action; mods;
-    InputState input;
+    (void) mods;
 
+    InputState input;
     input.m_state = static_cast<EInputState>(action);
 
     if (input.m_state == EInputState::STATE_PRESSED)

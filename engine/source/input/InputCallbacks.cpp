@@ -1,7 +1,6 @@
 #include "input/InputCallbacks.h"
-
-#include "Window.h"
 #include "input/InputHandler.h"
+#include "Window.h"
 
 void engine::input::KeyboardCallback(GLFWwindow* window, int32 key, int32 scanCode, int32 action, int32 mods)
 {
@@ -34,7 +33,6 @@ int32 engine::input::InitCallbacks(void)
     else
     {
         printf("Failed to set input callbacks\n");
-
         return -1;
     }
 
