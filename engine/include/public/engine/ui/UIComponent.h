@@ -47,6 +47,8 @@ namespace ui
     ENGINE_API void SetAlignment(math::Vector2f const& gridIndex);
     ENGINE_API void SetScreenPosition(math::Vector2f const& position);
     ENGINE_API void UnsetAlignment(void);
+    ENGINE_API bool TreeNode(const char* sectionName);
+    ENGINE_API void TreePop(void);
 
     // Sections
     ENGINE_API bool StartSection(const char* name);
