@@ -43,7 +43,7 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         ui::Text(text); // render text
         ui::SameLine(textSize.GetX() + 5.0f); // make next component on same line starting at the position of the width + 5 ( padding)
 
-
+        
         if (ui::DropDown("##Shape Type", currentIndex, m_shapeTypes))
         {
             UpdateShapeGeometry(currentIndex, currentShape, rigidBodyDynamic);
@@ -53,8 +53,8 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         GravityUI(rigidBodyDynamic);
         TriggerUI(rigidBodyDynamic);
         LockAxisUI(rigidBodyDynamic);
-        }
-        }
+    }
+}
 
 void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
                                         int32 inCurrentIndex, engine::EGeometryType inGeometryType,
