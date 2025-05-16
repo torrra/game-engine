@@ -21,11 +21,12 @@ editor::RigidBodyDynamicComponent::RigidBodyDynamicComponent(void)
     SetType(RIGIDBODY_DYNAMIC);
 
     m_geometryName = "None##geometry";
-    m_engine = engine::Engine::GetEngine();
 }
 
 editor::RigidBodyDynamicComponent::~RigidBodyDynamicComponent(void)
 {
+    m_geometryName.clear();
+    m_shapeTypes.clear();
     SetData<engine::RigidBodyDynamic>(nullptr);
 }
 
@@ -33,7 +34,7 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
 {
     if (engine::RigidBodyDynamic* rigidBodyDynamic = GetData<engine::RigidBodyDynamic>())
     {
-        engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyDynamic->m_shape);
+        engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyDynamic->m_rigidBodyShape);
         
         int32 currentIndex = static_cast<int32>(currentShape);
         m_geometryName = m_shapeTypes[currentIndex];
@@ -72,17 +73,17 @@ void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
         switch (inGeometryType)
         {
         case engine::EGeometryType::BOX:
-            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+            engine::RigidBodyDynamicFactory::CreateDynamic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyDynamic->GetOwner(),
                 engine::EGeometryType::BOX);
             break;
         case engine::EGeometryType::SPHERE:
-            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+            engine::RigidBodyDynamicFactory::CreateDynamic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyDynamic->GetOwner(),
                 engine::EGeometryType::SPHERE);
             break;
         case engine::EGeometryType::CAPSULE:
-            engine::RigidBodyDynamicFactory::CreateDynamic(m_engine->GetGraph(),
+            engine::RigidBodyDynamicFactory::CreateDynamic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyDynamic->GetOwner(),
                 engine::EGeometryType::CAPSULE);
             break;

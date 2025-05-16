@@ -22,11 +22,6 @@
 
 #pragma endregion
 
-namespace engine
-{
-    class Engine;
-}
-
 namespace editor
 {
     class RigidBodyDynamicComponent : public BaseComponent
@@ -58,7 +53,6 @@ namespace editor
         /// Private members
         std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule" };
         std::string m_geometryName;
-        engine::Engine* m_engine;
         bool m_isClosed = false;
 
     }; // !Class RigidBodyDynamicComponent
