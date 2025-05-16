@@ -13,7 +13,7 @@
 
 #pragma endregion
 
-#pragma region engine
+#pragma region Engine
 
 #include "engine/ConsoleLog.hpp"
 
@@ -25,7 +25,11 @@
 
 #pragma endregion
 
+#pragma region Serialization
+
 #include "serialization/TextSerializer.h"
+
+#pragma endregion
 
 /// <summary>
 /// TODO :  Clean and comment
@@ -35,9 +39,11 @@
 /// <param name="inOwner"></param>
 /// <param name="inScene"></param>
 
-engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
+engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene) :
+    m_data{}
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
+
 	m_owner					= inOwner;
 	m_currentScene			= inScene;
 }
@@ -128,28 +134,12 @@ math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void)
     return math::Vector2f(0.f);
 }
 
-const char* engine::RigidBodyStatic::GetGeometryName(void) const
-{
-    switch (m_shape)
-    {
-    case EGeometryType::BOX :
-        return "Box";
-    case EGeometryType::SPHERE:
-        return "Sphere";
-    case EGeometryType::CAPSULE:
-        return "Capsule";
-    case EGeometryType::PLANE:
-        return "Plane";
-    }
-    return "";
-}
-
 bool engine::RigidBodyStatic::GetIsTrigger(void) const
 {
     return m_isTrigger;
 }
 
-void engine::RigidBodyStatic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
+void engine::RigidBodyStatic::SetBoxHalfExtents(const math::Vector3f& inHalfExtents)
 {
     // Set the box half extents by using the shape of rigid body to access the good geometry
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
@@ -226,7 +216,7 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
 void engine::RigidBodyStatic::UpdateEntity(void)
 {
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
-        m_shape != EGeometryType::PLANE)
+        m_rigidBodyShape != EGeometryType::PLANE)
     {
         // Update the entity transform in regard to the rigid body
         Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
@@ -241,7 +231,7 @@ void engine::RigidBodyStatic::UpdateEntity(void)
 void engine::RigidBodyStatic::UpdateRigidBody(void)
 {
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr && 
-        m_shape != EGeometryType::PLANE)
+        m_rigidBodyShape != EGeometryType::PLANE)
     {
         Transform worldTransform;
 
@@ -282,24 +272,24 @@ void engine::RigidBodyStatic::SerializeText(std::ostream& output, EntityHandle o
 
     text::Serialize(output, "owner", owner);
     output << "\n     ";
-    text::Serialize(output, "type", m_type);
+    text::Serialize(output, "type", m_rigidBodyType);
     output << "\n     ";
-    text::Serialize(output, "shape", m_shape);
+    text::Serialize(output, "shape", m_rigidBodyShape);
     output << "\n     ";
     text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
     output << "\n     ";
 
-    if (m_shape == EGeometryType::BOX)
+    if (m_rigidBodyShape == EGeometryType::BOX)
     {
         text::Serialize(output, "box half extents", m_halfExtents);
         output << "\n     ";
     }
-    else if (m_shape == EGeometryType::SPHERE)
+    else if (m_rigidBodyShape == EGeometryType::SPHERE)
     {
         text::Serialize(output, "sphere radius", m_radius);
         output << "\n     ";
     }
-    else if (m_shape == EGeometryType::CAPSULE)
+    else if (m_rigidBodyShape == EGeometryType::CAPSULE)
     {
         text::Serialize(output, "capsule format", m_capsuleFormat);
         output << "\n     ";
@@ -316,27 +306,27 @@ const char* engine::RigidBodyStatic::DeserializeText(const char* text, const cha
     text = text::DeserializeInteger(text, m_owner);
 
     MOVE_TEXT_CURSOR(text, end);
-    text = text::DeserializeInteger(text, m_type);
+    text = text::DeserializeInteger(text, m_rigidBodyType);
 
     MOVE_TEXT_CURSOR(text, end);
-    text = text::DeserializeInteger(text, m_shape);
+    text = text::DeserializeInteger(text, m_rigidBodyShape);
     
     MOVE_TEXT_CURSOR(text, end);
     uint32 collisionGroup = 0;
     text = text::DeserializeInteger(text, collisionGroup);
     m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
-    if (m_shape == EGeometryType::BOX)
+    if (m_rigidBodyShape == EGeometryType::BOX)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_halfExtents);
     }
-    else if (m_shape == EGeometryType::SPHERE)
+    else if (m_rigidBodyShape == EGeometryType::SPHERE)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeReal(text, m_radius);
     }
-    else if (m_shape == EGeometryType::CAPSULE)
+    else if (m_rigidBodyShape == EGeometryType::CAPSULE)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_capsuleFormat);
@@ -431,7 +421,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
 
         // Add the rigid body to the physics scene
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-        m_shape = EGeometryType::BOX;
+        m_rigidBodyShape = EGeometryType::BOX;
     }
 }
 
@@ -463,7 +453,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
 
         // Add the rigid body to the physics scene
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-        m_shape = EGeometryType::SPHERE;
+        m_rigidBodyShape = EGeometryType::SPHERE;
     }
 }
 
@@ -497,7 +487,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
 
         // Add the rigid body to the physics scene
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-        m_shape = EGeometryType::CAPSULE;
+        m_rigidBodyShape = EGeometryType::CAPSULE;
     }
 }
 
@@ -525,7 +515,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
         SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
 
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyStaticImpl->m_rigidBodyStatic);
-        m_shape = EGeometryType::PLANE;
+        m_rigidBodyShape = EGeometryType::PLANE;
     }
 }
 
