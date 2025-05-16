@@ -4,7 +4,9 @@
 #include "engine/core/SceneGraph.h"
 #include "engine/physics/geometry/Geometry.hpp"
 
-void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, const physx::PxContactPair* inPairs, physx::PxU32 inNbPairs)
+void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, 
+                                                const physx::PxContactPair* inPairs, 
+                                                physx::PxU32 inNbPairs)
 {
     RigidBodyData* data0 = reinterpret_cast<RigidBodyData*>(&inPairHeader.actors[0]->userData);
     RigidBodyData* data1 = reinterpret_cast<RigidBodyData*>(&inPairHeader.actors[1]->userData);
@@ -18,7 +20,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
     if (data0->m_type == EShapeType::DYNAMIC)
     {
         RigidBodyDynamic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + data0->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + 
+              data0->m_index);
 
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -26,7 +29,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
     else
     {
         RigidBodyStatic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + data0->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + 
+              data0->m_index);
 
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -35,7 +39,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
     if (data1->m_type == EShapeType::DYNAMIC)
     {
         RigidBodyDynamic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + data1->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + 
+              data1->m_index);
 
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -43,7 +48,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
     else
     {
         RigidBodyStatic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + data1->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() +
+              data1->m_index);
 
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -76,7 +82,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
     }
 }
 
-void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, physx::PxU32 inNbPairs)
+void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, 
+                                                physx::PxU32 inNbPairs)
 {
     RigidBodyData* data0 = reinterpret_cast<RigidBodyData*>(&inPairs->triggerActor->userData);
     RigidBodyData* data1 = reinterpret_cast<RigidBodyData*>(&inPairs->otherActor->userData);
@@ -90,7 +97,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
     if (data0->m_type == EShapeType::DYNAMIC)
     {
         RigidBodyDynamic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + data0->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + 
+              data0->m_index);
 
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -98,7 +106,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
     else
     {
         RigidBodyStatic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + data0->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + 
+              data0->m_index);
 
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -107,7 +116,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
     if (data1->m_type == EShapeType::DYNAMIC)
     {
         RigidBodyDynamic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + data1->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() +
+              data1->m_index);
 
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -115,7 +125,8 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
     else
     {
         RigidBodyStatic& rigidbody =
-            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + data1->m_index);
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() +
+              data1->m_index);
 
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
@@ -150,27 +161,21 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs, p
     }
 }
 
-void engine::SimulationEventCallback::onAdvance(const physx::PxRigidBody* const* bodyBuffer, const physx::PxTransform* poseBuffer, const physx::PxU32 count)
-{
-    (void)bodyBuffer;
-    (void)poseBuffer;
-    (void)count;
-}
+void engine::SimulationEventCallback::onAdvance(
+    [[maybe_unused]] const physx::PxRigidBody* const* bodyBuffer, 
+    [[maybe_unused]] const physx::PxTransform* poseBuffer, 
+    [[maybe_unused]] const physx::PxU32 count)
+{}
 
-void engine::SimulationEventCallback::onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count)
-{
-    (void)constraints;
-    (void)count;
-}
+void engine::SimulationEventCallback::onConstraintBreak(
+    [[maybe_unused]] physx::PxConstraintInfo* constraints, 
+    [[maybe_unused]] physx::PxU32 count)
+{}
 
-void engine::SimulationEventCallback::onWake(physx::PxActor** actors, physx::PxU32 count)
-{
-    (void)actors;
-    (void)count;
-}
+void engine::SimulationEventCallback::onWake([[maybe_unused]] physx::PxActor** actors, 
+    [[maybe_unused]] physx::PxU32 count)
+{}
 
-void engine::SimulationEventCallback::onSleep(physx::PxActor** actors, physx::PxU32 count)
-{
-    (void)actors;
-    (void)count;
-}
+void engine::SimulationEventCallback::onSleep([[maybe_unused]] physx::PxActor** actors, 
+                                              [[maybe_unused]] physx::PxU32 count)
+{}
