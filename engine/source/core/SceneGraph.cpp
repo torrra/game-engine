@@ -497,7 +497,7 @@ namespace engine
         }
         for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
         {
-            rbStatic.SwitchShape(static_cast<EGeometryType>(rbStatic.m_shape));
+            rbStatic.SwitchShape(static_cast<EGeometryType>(rbStatic.m_rigidBodyShape));
         }
     }
 

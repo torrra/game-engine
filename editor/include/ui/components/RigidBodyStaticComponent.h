@@ -54,7 +54,6 @@ namespace editor
         /// Private members
         std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule", "Plane" };
         std::string m_geometryName;
-        engine::Engine* m_engine;
 
     }; // !Class RigidBodyStaticComponent
 } // !Namespace editor

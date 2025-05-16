@@ -154,10 +154,10 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs,
         {
             listenerA->OnTriggerExit(ownerB);
         }
-        if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
-        {
-            listenerA->OnTriggerStay(ownerB);
-        }
+        //if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
+        //{
+        //    listenerA->OnTriggerStay(ownerB);
+        //}
     }
 }
 

@@ -70,7 +70,7 @@ math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void)
                 return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                     boxGeometry.halfExtents.z);
             }
-            PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
+            PrintLog(WarningPreset(), "Invalid geometry type : type is not box");
             return math::Vector3f(0.f);
         }
     }
@@ -98,7 +98,7 @@ f32 engine::RigidBodyStatic::GetSphereRadius(void)
 
                 return sphereGeometry.radius;
             }
-            PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
+            PrintLog(WarningPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
             return 0.f;
         }
     }
@@ -126,7 +126,7 @@ math::Vector2f engine::RigidBodyStatic::GetCapsuleFormat(void)
 
                 return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
             }
-            PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
+            PrintLog(WarningPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
             return math::Vector2f(0.f);
         }
     }
@@ -153,10 +153,9 @@ void engine::RigidBodyStatic::SetBoxHalfExtents(const math::Vector3f& inHalfExte
                 shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
                     inHalfExtents.GetZ()));
                 m_halfExtents = math::Vector3f(inHalfExtents);
-                PrintLog(SuccessPreset(), "Successfully set box half extents.");
                 return;
             }
-            PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
+            PrintLog(WarningPreset(), "Set box half extents : Invalid geometry type : type is not box.");
             return;
         }
     }
@@ -177,10 +176,9 @@ void engine::RigidBodyStatic::SetSphereRadius(f32 inRadius)
             {
                 shapes->setGeometry(physx::PxSphereGeometry(inRadius));
                 m_radius = inRadius;
-                PrintLog(SuccessPreset(), "Successfully set sphere radius.");
                 return;
             }
-            PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
+            PrintLog(WarningPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
             return;
         }
     }
@@ -202,10 +200,9 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
             {
                 shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
                 m_capsuleFormat = math::Vector2f(inRadius, inHalfHeight);
-                PrintLog(SuccessPreset(), "Successfully set capsule format.");
                 return;
             }
-            PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
+            PrintLog(WarningPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
             return;
         }
     }
@@ -550,8 +547,8 @@ void engine::RigidBodyStatic::SetTrigger(bool inIsTrigger)
             }
             else
             {
-                shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
                 shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+                shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
                 m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
                 m_isTrigger = false;
             }
