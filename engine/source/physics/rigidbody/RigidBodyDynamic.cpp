@@ -14,7 +14,7 @@
 
 #pragma endregion
 
-#pragma region engine
+#pragma region Engine
 
 #include "engine/ConsoleLog.hpp"
 
@@ -26,9 +26,14 @@
 
 #pragma endregion
 
+#pragma region Serialization
+
 #include "serialization/TextSerializer.h"
 
-engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene)
+#pragma endregion
+
+engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene) :
+    m_data{}
 {
     // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
@@ -462,7 +467,7 @@ void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
     }
 }
 
-void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
+void engine::RigidBodyDynamic::SetBoxHalfExtents(const math::Vector3f& inHalfExtents)
 {
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
@@ -613,12 +618,12 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
     }
 }
 
-void engine::RigidBodyDynamic::SetLinearVelocity(math::Vector3f inLinearVelocity, bool inAutoWake)
+void engine::RigidBodyDynamic::SetLinearVelocity(const math::Vector3f& inLinearVelocity, bool inAutoWake)
 {
     m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
 }
 
-void engine::RigidBodyDynamic::SetAngularVelocity(math::Vector3f inAngularVelocity, bool inAutoWake)
+void engine::RigidBodyDynamic::SetAngularVelocity(const math::Vector3f& inAngularVelocity, bool inAutoWake)
 {
     m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
 }

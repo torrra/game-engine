@@ -25,6 +25,7 @@
 #pragma region MathLib
 
 #include <math/Vector3.hpp>
+#include <math/Vector2.hpp>
 
 #pragma endregion
 
@@ -136,7 +137,7 @@ namespace engine
             <param> [in] inHalfExtents : the half extents
         */
         ENGINE_API  
-            void                SetBoxHalfExtents(math::Vector3f inHalfExtents);
+            void                SetBoxHalfExtents(const math::Vector3f& inHalfExtents);
         /*
             Set the radius of the sphere
             <param> [in] inRadius : the radius
@@ -183,7 +184,7 @@ namespace engine
             <param> [in] bool (optional)    : Wake the object if it is asleep
         */
         ENGINE_API  
-            void                SetLinearVelocity(math::Vector3f inLinearVelocity, 
+            void                SetLinearVelocity(const math::Vector3f& inLinearVelocity, 
                                                   bool inAutoWake = true);
         /*
             Set the angular velocity of the rigidbody
@@ -191,7 +192,7 @@ namespace engine
             <param> [in] bool (optional)    : Wake the object if it is asleep
         */
         ENGINE_API  
-            void                SetAngularVelocity(math::Vector3f inAngularVelocity, 
+            void                SetAngularVelocity(const math::Vector3f& inAngularVelocity, 
                                                    bool inAutoWake = true);
         /*
             Set the rotation lock or unlock around X axis
@@ -334,6 +335,10 @@ namespace engine
         // Delete the copy constructor
                                     RigidBodyDynamic(const RigidBodyDynamic& inOther) = delete;
 
+        /// Operator
+        // Copy assignement deleted
+            RigidBodyDynamic&       operator=(const RigidBodyDynamic& inOther) = delete;
+
         /// Setter
         /*
             Set the group and mask collision to determine with which object this will collide
@@ -345,36 +350,29 @@ namespace engine
             <param> [in] inCollisionMask  : Determine by GetCollisionMask() function in regard to 
                                             the group of this object
         */
-                    void            SetCollisionGroupAndMask(uint32 inCollisionGroup,
+            void                    SetCollisionGroupAndMask(uint32 inCollisionGroup,
                                                              uint32 inCollisionMask);
-        /*
-            Set the capsule orientation to the vertical by default
-        */
-                    void            SetCapsuleBaseOrientation(void);
-
-        /// Operator
-        // Copy assignement deleted
-                    RigidBodyDynamic& operator=(const RigidBodyDynamic& inOther) = delete;
-
+         // Set the capsule orientation to the vertical by default
+            void                    SetCapsuleBaseOrientation(void);
 
         /// Functions
         /*
             Check if the entity has a transform component if not create one
             <return> the entity transform
         */
-                    Transform&	    CheckEntityTransform(void);
+            Transform&	            CheckEntityTransform(void);
 
         // Preset of a box dynamic rigid body
-                    void            CreateDynamicBoxRigidBody(void);
+            void                    CreateDynamicBoxRigidBody(void);
         // Preset of a sphere dynamic rigid body
-                    void            CreateDynamicSphereRigidBody(void);
+            void                    CreateDynamicSphereRigidBody(void);
         // Preset of a capsule dynamic rigid body
-                    void            CreateDynamicCapsuleRigidBody(void);
+            void                    CreateDynamicCapsuleRigidBody(void);
 
         /// Private members
+        math::Vector3f          m_halfExtents       = math::Vector3f(0.5f, 0.5f, 0.5f);
         RigidBodyDynamicImpl*	m_rigidBodyImpl     = nullptr;
         Material*				m_materialImpl	    = nullptr;
-        math::Vector3f          m_halfExtents       = math::Vector3f(0.5f, 0.5f, 0.5f);
         math::Vector2f          m_capsuleFormat     = math::Vector2f(0.5f, 1.f);
         f32                     m_radius            = 0.5f;
         bool                    m_isGravityDisabled = true;
