@@ -32,7 +32,6 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
 {
     // Initialize the rigidbody implementation struct
     m_rigidBodyImpl = new RigidBodyDynamicImpl();
-    //m_data = new RigidBodyData();
     // Set the owner and the current scene
     m_owner			= inOwner;
     m_currentScene	= inScene;
@@ -89,7 +88,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 
         // Add the rigid body to the physics scene
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-        m_shape = EGeometryType::BOX;
+        m_rigidBodyShape = EGeometryType::BOX;
     }
 }
 
@@ -128,7 +127,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 
         // Add the rigid body to the physics scene
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-        m_shape = EGeometryType::SPHERE;
+        m_rigidBodyShape = EGeometryType::SPHERE;
     }
 }
 
@@ -170,7 +169,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 
         // Add the rigid body to the physics scene
         PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-        m_shape = EGeometryType::CAPSULE;
+        m_rigidBodyShape = EGeometryType::CAPSULE;
     }
 }
 
@@ -233,23 +232,23 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
 
     text::Serialize(output, "owner", owner);
     output << "\n     ";
-    text::Serialize(output, "type", m_type);
+    text::Serialize(output, "type", m_rigidBodyType);
     output << "\n     ";
-    text::Serialize(output, "shape", m_shape);
+    text::Serialize(output, "shape", m_rigidBodyShape);
     output << "\n     ";
     text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
     output << "\n     ";
-    if (m_shape == EGeometryType::BOX)
+    if (m_rigidBodyShape == EGeometryType::BOX)
     {
         text::Serialize(output, "box half extents", m_halfExtents);
         output << "\n     ";
     }
-    else if (m_shape == EGeometryType::SPHERE)
+    else if (m_rigidBodyShape == EGeometryType::SPHERE)
     {
         text::Serialize(output, "sphere radius", m_radius);
         output << "\n     ";
     }
-    else if (m_shape == EGeometryType::CAPSULE)
+    else if (m_rigidBodyShape == EGeometryType::CAPSULE)
     {
         text::Serialize(output, "capsule format", m_capsuleFormat);
         output << "\n     ";
@@ -274,27 +273,27 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     text = text::DeserializeInteger(text, m_owner);
 
     MOVE_TEXT_CURSOR(text, end);
-    text = text::DeserializeInteger(text, m_type);
+    text = text::DeserializeInteger(text, m_rigidBodyType);
 
     MOVE_TEXT_CURSOR(text, end);
-    text = text::DeserializeInteger(text, m_shape);
+    text = text::DeserializeInteger(text, m_rigidBodyShape);
 
     MOVE_TEXT_CURSOR(text, end);
     uint32 collisionGroup = 0;
     text = text::DeserializeInteger(text, collisionGroup);
     m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
-    if (m_shape == EGeometryType::BOX)
+    if (m_rigidBodyShape == EGeometryType::BOX)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_halfExtents);
     }
-    else if (m_shape == EGeometryType::SPHERE)
+    else if (m_rigidBodyShape == EGeometryType::SPHERE)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeReal(text, m_radius);
     }
-    else if (m_shape == EGeometryType::CAPSULE)
+    else if (m_rigidBodyShape == EGeometryType::CAPSULE)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_capsuleFormat);
@@ -327,7 +326,7 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     return text::DeserializeInteger(text, m_flags);
 }
 
-bool engine::RigidBodyDynamic::IsGravityDisabled(void)
+bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
 {
     // Retrieve the gravity state
     return m_isGravityDisabled;
@@ -763,6 +762,8 @@ void engine::RigidBodyDynamic::AddTorque(const math::Vector3f& inTorque, EForceM
 
 void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
 {
+    RigidBodyDynamicCleanUp();
+
     if (m_rigidBodyImpl == nullptr)
         m_rigidBodyImpl = new RigidBodyDynamicImpl();
 
@@ -778,7 +779,7 @@ void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
         CreateDynamicCapsuleRigidBody();
         break;
     default:
-        PrintLog(ErrorPreset(), "Invalid geometry type, create box by default.");
+        PrintLog(WarningPreset(), "Invalid geometry type, create box by default.");
         CreateDynamicBoxRigidBody();
         break;
     }
