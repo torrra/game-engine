@@ -7,7 +7,7 @@
 [Transform]
     @uint64 | index=1
     @int64 | owner=0
-    @quat32 | rotation={-1,8.25683e-05,1.40735e-06,-0.000643951}
+    @quat32 | rotation={1,1.4813e-08,-1.47573e-08,-1.86265e-09}
     @vec3f32 | position={0,4,0}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
@@ -34,6 +34,9 @@
      @vec2f32 | capsule format={0.5,0}
      @uint32 | gravity=0
      @uint32 | trigger=0
+     @uint32 | lock X axis=0
+     @uint32 | lock Y axis=0
+     @uint32 | lock Z axis=0
      @uint64 | flags=0
 [Entity]
    @string 6 | name=Camera
@@ -45,7 +48,7 @@
     @uint64 | index=0
     @int64 | owner=1
     @quat32 | rotation={1,0,0,0}
-    @vec3f32 | position={0,3.2,20}
+    @vec3f32 | position={0,3.2,10}
     @vec3f32 | scale={1,1,1}
     @uint64 | flags=0
 [Camera]
@@ -82,25 +85,4 @@
      @uint32 | collision group=3
      @vec3f32 | box half extents={5,0.5,5}
      @bool | trigger=0
-     @uint64 | flags=0
-[Entity]
-   @string 7 | name=Trigger
-   @int64 | handle=3
-   @int64 | parent=-1
-   @uint64 | flags=0
-   @uint64 | components=17
-[Transform]
-    @uint64 | index=3
-    @int64 | owner=3
-    @quat32 | rotation={1,-7.7685e-08,-1.22174e-07,0}
-    @vec3f32 | position={0,1,0}
-    @vec3f32 | scale={1,1,1}
-    @uint64 | flags=0
-[RigidBodyStatic]
-     @int64 | owner=3
-     @uint32 | type=1
-     @uint64 | shape=0
-     @uint32 | collision group=4
-     @vec3f32 | box half extents={0.5,0.5,0.5}
-     @bool | trigger=1
      @uint64 | flags=0
