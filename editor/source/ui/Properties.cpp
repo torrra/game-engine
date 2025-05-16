@@ -152,10 +152,10 @@ void editor::PropertyWnd::ClearComponentArray(void)
             delete dynamic_cast<RendererComponent*>(component);
             break;
         case editor::RIGIDBODY_STATIC:
-            delete dynamic_cast<engine::RigidBodyStatic*>(component);
+            delete dynamic_cast<RigidBodyDynamicComponent*>(component);
             break;
         case editor::RIGIDBODY_DYNAMIC:
-            delete dynamic_cast<engine::RigidBodyDynamic*>(component);
+            delete dynamic_cast<RigidBodyDynamicComponent*>(component);
             break;
         case editor::SCRIPT:
             delete dynamic_cast<ScriptComponent*>(component);
