@@ -8,6 +8,13 @@
 
 #pragma endregion
 
+#pragma region Math
+
+#include <math/Vector3.hpp>
+
+#pragma endregion
+
+
 editor::RigidBodyDynamicComponent::RigidBodyDynamicComponent(void)
 {
     SetName("RigidbodyDynamic");
@@ -43,24 +50,11 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         }
 
         DisplayUI(currentShape, rigidBodyDynamic);
-
-        bool isGravityEnabled = rigidBodyDynamic->IsGravityDisabled();
-        ui::Text("Disable gravity: ");
-        ui::SameLine(125.f);
-        if (ui::Checkbox("##Gravity", &isGravityEnabled))
-        {
-            rigidBodyDynamic->SetGravityDisabled(isGravityEnabled);
+        GravityUI(rigidBodyDynamic);
+        TriggerUI(rigidBodyDynamic);
+        LockAxisUI(rigidBodyDynamic);
         }
-
-        bool isTrigger = rigidBodyDynamic->GetIsTrigger();
-        ui::Text("Is trigger: ");
-        ui::SameLine(125.f);
-        if (ui::Checkbox("##Trigger", &isTrigger))
-        {
-            rigidBodyDynamic->SetTrigger(isTrigger);
         }
-    }
-}
 
 void editor::RigidBodyDynamicComponent::UpdateShapeGeometry(
                                         int32 inCurrentIndex, engine::EGeometryType inGeometryType,
@@ -136,5 +130,72 @@ void editor::RigidBodyDynamicComponent::DisplayUI(engine::EGeometryType inGeomet
     }
     default:
         break;
+    }
+}
+
+void editor::RigidBodyDynamicComponent::GravityUI(engine::RigidBodyDynamic* inRigidBodyDynamic)
+{
+    bool isGravityEnabled = inRigidBodyDynamic->IsGravityDisabled();
+    const char* textGravity = "Disable gravity: ";
+    math::Vector2f textGravitySize = ui::GetTextSize(textGravity); // gets text size (in pixels)
+    ui::Text(textGravity);
+    ui::SameLine(textGravitySize.GetX() + 5.0f);
+    if (ui::Checkbox("##Gravity", &isGravityEnabled))
+    {
+        inRigidBodyDynamic->SetGravityDisabled(isGravityEnabled);
+    }
+}
+
+void editor::RigidBodyDynamicComponent::TriggerUI(engine::RigidBodyDynamic* inRigidBodyDynamic)
+{
+    bool isTrigger = inRigidBodyDynamic->GetIsTrigger();
+    const char* textTrigger = "Is trigger: ";
+    math::Vector2f textTriggerSize = ui::GetTextSize(textTrigger);
+    ui::Text(textTrigger);
+    ui::SameLine(textTriggerSize.GetX() + 5.f);
+    if (ui::Checkbox("##Trigger", &isTrigger))
+    {
+        inRigidBodyDynamic->SetTrigger(isTrigger);
+    }
+}
+
+void editor::RigidBodyDynamicComponent::LockAxisUI(engine::RigidBodyDynamic* inRigidBodyDynamic)
+{
+    bool isXLock = inRigidBodyDynamic->GetIsXAxisLock();
+    bool isYLock = inRigidBodyDynamic->GetIsYAxisLock();
+    bool isZLock = inRigidBodyDynamic->GetIsZAxisLock();
+
+    if (ui::TreeNode("Lock axis :"))
+    {
+        ui::StartSection("##Lock");
+        const char* xAxis = "X Axis: ";
+        math::Vector2f xAxisSize = ui::GetTextSize(xAxis);
+        ui::Text(xAxis);
+        ui::SameLine(xAxisSize.GetX() + 15.f);
+        if (ui::Checkbox("##XLock", &isXLock))
+        {
+            inRigidBodyDynamic->SetXAxisLock(isXLock);
+        }
+
+        const char* yAxis = "Y Axis: ";
+        math::Vector2f yAxisSize = ui::GetTextSize(yAxis);
+        ui::Text(yAxis);
+        ui::SameLine(yAxisSize.GetX() + 15.f);
+        if (ui::Checkbox("##YLock", &isYLock))
+        {
+            inRigidBodyDynamic->SetYAxisLock(isYLock);
+        }
+
+        const char* zAxis = "Z Axis: ";
+        math::Vector2f zAxisSize = ui::GetTextSize(zAxis);
+        ui::Text(zAxis);
+        ui::SameLine(zAxisSize.GetX() + 15.f);
+        if (ui::Checkbox("##ZLock", &isZLock))
+        {
+            inRigidBodyDynamic->SetZAxisLock(isZLock);
+        }
+        ui::EndSection();
+
+        ui::TreePop();
     }
 }

@@ -51,6 +51,9 @@ namespace editor
                                             engine::RigidBodyDynamic* inRigidBodyDynamic);
         void            DisplayUI(engine::EGeometryType inGeometryType,
                                   engine::RigidBodyDynamic* inRigidBodyDynamic);
+        void            GravityUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
+        void            TriggerUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
+        void            LockAxisUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
 
         /// Private members
         std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule" };
