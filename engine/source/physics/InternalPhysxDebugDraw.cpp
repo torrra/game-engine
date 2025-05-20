@@ -56,7 +56,9 @@ void engine::DebugDraw::InitDebugDraw(void)
 
 
     // Load the debug draw shader
-    ResourceManager::LoadShader("DebugDrawShader", ".\\shaders\\DebugShader.vs", ".\\shaders\\DebugShader.frag");
+    ResourceManager::LoadShader("DebugDrawShader",
+                                ".\\shaders\\DebugShader.vs",
+                                ".\\shaders\\DebugShader.frag", true, true);
 
     // Store the debug draw program
     m_debugDrawProgram = ResourceManager::GetResource<engine::ShaderProgram>("DebugDrawShader");

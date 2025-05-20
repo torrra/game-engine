@@ -3,16 +3,30 @@
 
 namespace engine::text
 {
+
     void Serialize(std::ostream& file, const char* name, const std::string& val)
     {
         const char* valName((name) ? name : "unnamed val");
-        file << "@string " << val.size() << " | " << valName << '=' << val;
+
+        std::string toWrite;
+        toWrite.reserve(val.size());
+
+        for (uint64 index = 0; index < val.size(); ++index)
+        {
+            if (val[index] == '"')
+                toWrite.push_back('\\');
+
+            toWrite.push_back(val[index]);
+        }
+
+        file << "string | " << valName << "=\"" << toWrite << "\"";
     }
 
     void Serialize(std::ostream& file, const char* name, const char* val, uint64 length)
     {
-        const char* valName((name) ? name : "unnamed val");
-        file << "@string " << length << " | " << valName << '=' << val;
+        std::string toWrite(val, length);
+        
+        Serialize(file, name, toWrite);
     }
 
     void MoveCursorToVal(uint64& pos, const std::string& line)
@@ -27,18 +41,35 @@ namespace engine::text
 
     const char* DeserializeString(const char* text, const char* end, std::string& val)
     {
-        while (!parser::IsDigit(*text) && text != end)
+        val.clear();
+
+        while(text != end && *text != '\"')
             ++text;
 
-        uint64 size;
-        text = DeserializeInteger<uint64>(text, size);
+        if (text != end)
+            ++text;
 
-        val.resize(size);
+        else
+            return text;
 
-        MOVE_TEXT_CURSOR(text, end);
-        memcpy(val.data(), text, size);
+    readString:
 
-        return text += size;
+        while(text != end && *text != '\"')
+        {
+            val.push_back(*text);
+            ++text;
+        }
+
+        if (text[-1] == '\\')
+        {
+            ++text;
+            goto readString;
+        }
+
+        if (text != end)
+            ++text;
+
+        return text;
     }
 
     const char* LoadFileData(std::ifstream& file, const char*& start, const char*& end)

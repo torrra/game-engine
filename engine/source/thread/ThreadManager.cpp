@@ -1,5 +1,6 @@
 #include "engine/thread/ThreadManager.h"
 #include "engine/core/SceneGraph.h"
+#include "InternalOpenGLError.hpp"
 
 engine::ThreadManager* engine::ThreadManager::m_instance = nullptr;
 std::once_flag			engine::ThreadManager::m_instanceCreatedFlag;
@@ -82,6 +83,7 @@ void engine::ThreadManager::ExecuteRenderThreadTasks(void)
 
         function();
         tasks.pop();
+        OpenGLError();
     }
 
     instance->m_poolMutex.unlock();

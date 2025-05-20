@@ -70,6 +70,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
     ThreadManager::Startup(threadCount);
 
     ScriptSystem::SetUserScriptLocation(m_projectDir.string().c_str());
+    ScriptSystem::SetCurrentScene(m_activeScene.GetGraph());
     ScriptSystem::Startup();
     PhysicsEngine::Get().Init();
 
@@ -174,10 +175,11 @@ void engine::Engine::LoadDefaultScene(void)
 
     if (m_hasEditor)
         scenePath.append(m_currentProject.m_defaultEditorScene);
+    
     else
         scenePath.append(m_currentProject.m_defaultGameScene);
-
-    m_activeScene.LoadNewScene(false, scenePath);
+  
+   m_application->LoadNewScene(m_activeScene, scenePath);
 }
 
 bool engine::Engine::CreateProject(const std::string & dir, const std::string& name)
@@ -224,6 +226,7 @@ exists. Attempting to open project file...");
     m_projectDir = pathObj.remove_filename().append("assets");
     std::filesystem::create_directory(pathObj);
 
+    m_activeScene.Reset(false);
     m_activeScene.EditPath(m_projectDir);
     m_activeScene.Rename("default");
 
@@ -235,10 +238,7 @@ exists. Attempting to open project file...");
 void engine::Engine::OpenProject(const std::filesystem::path& projFile)
 {
     constexpr wchar_t extension[] = L".mustang";
-    
-    m_projectFile = projFile;
-    m_projectName = projFile.filename().replace_extension().string();
-
+  
     if (memcmp(projFile.extension().c_str(), extension, sizeof(extension)) != 0)
     {
         PrintLog(ErrorPreset(), "Invalid project file");
@@ -252,6 +252,9 @@ void engine::Engine::OpenProject(const std::filesystem::path& projFile)
         PrintLog(ErrorPreset(), "Unable to open project file");
         return;
     }
+
+    m_projectFile = projFile;
+    m_projectName = projFile.filename().replace_extension().string();
 
     const char* cursor;
     const char* end;
@@ -318,7 +321,8 @@ inline int16 engine::Engine::LoadEngineResources(void)
     ResourceManager::LoadShader(
         "Default", 
         ".\\shaders\\Default.vs", 
-        ".\\shaders\\Default.frag"
+        ".\\shaders\\Default.frag",
+        true, true
     );
 
     return SUCCESS;
@@ -373,7 +377,7 @@ void engine::Engine::SetDefaultEditorScene(const std::string& relativePath)
 void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
 {
     cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultGameScene);
-    if (memcmp(m_currentProject.m_defaultGameScene.c_str(), "0", 1) == 0)
+    if (m_currentProject.m_defaultGameScene.empty())
         PrintLog(WarningPreset(), "No default scene set for standalone mode");
 
     cursor = text::DeserializeString(cursor, end, m_currentProject.m_defaultEditorScene);
@@ -381,7 +385,7 @@ void engine::Engine::DeserializeProjectFile(const char* cursor, const char* end)
 
     if (m_hasEditor)
     {
-        if (memcmp(m_currentProject.m_defaultEditorScene.c_str(), "0", 1) == 0)
+        if (m_currentProject.m_defaultEditorScene.empty())
             PrintLog(WarningPreset(), "No default scene set for editor mode");
 
         PrintLog(InfoPreset(), "Executable name: " + m_currentProject.m_executableName);
@@ -393,6 +397,12 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
     using TimePoint = std::chrono::system_clock::time_point;
 
     SaveProject();
+
+    if (!std::filesystem::exists(m_projectFile))
+    {
+        PrintLog(ErrorPreset(), "Cannot build invalid project");
+        return;
+    }
 
     std::filesystem::path buildDir = destination;
 
@@ -437,12 +447,13 @@ void engine::Engine::BuildProjectExecutable(const std::filesystem::path& destina
     std::filesystem::copy(currentPath, buildDir.parent_path(), copyOptions);
 
     std::filesystem::path exePath = currentPath = buildDir.replace_filename("defaultExecutable.exe");
+
     std::filesystem::rename(currentPath,
-    exePath.replace_filename(m_currentProject.m_executableName).replace_extension(".exe"));
+              exePath.replace_filename(m_currentProject.m_executableName).replace_extension(".exe"));
 
     // Directly execute .exe
     OpenFile(std::filesystem::absolute(exePath).c_str(),
-             std::filesystem::absolute(buildDir.parent_path()).c_str());
+        std::filesystem::absolute(buildDir.parent_path()).c_str());
 
 }
 

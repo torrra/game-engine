@@ -7,6 +7,8 @@
 #include "thread/ThreadManager.h"
 #include "InternalOpenGLError.hpp"
 
+#include "physics/Raycast.h"
+
 namespace engine
 {
     thread_local SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
@@ -413,6 +415,7 @@ namespace engine
 
     void SceneGraph::CleanRigidBodies(void)
     {
+        Raycast::CleanupRays();
         for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {
             rbDynamic.RigidBodyDynamicCleanUp();

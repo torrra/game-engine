@@ -8,10 +8,18 @@
 
 #pragma region Engine
 
+#include "engine/core/Entity.h"
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 
 #pragma endregion
+
+#pragma region STL
+
+#include <vector>
+
+#pragma endregion
+
 
 namespace engine
 {
@@ -28,7 +36,23 @@ namespace engine
 
     class Raycast
     {
+    private:
+
+        enum ERayIndices : int32
+        {
+            INVALID_INDEX = -1
+        };
+
+
     public :
+
+        struct HitData
+        {
+            EntityHandle    m_hitEntity = Entity::INVALID_HANDLE;
+            math::Vector3f  m_position{0.f};
+            f32             m_distance = 0.f;
+
+        };
 
         /// Constructor
         /*
@@ -41,7 +65,7 @@ namespace engine
         // Delete copy constructor
                                             Raycast(const Raycast& inRaycast)   = delete;
         // Delete move constructor
-                                            Raycast(Raycast&& inRaycast)        = delete;
+        ENGINE_API                          Raycast(Raycast&& inRaycast) noexcept;
         /*
             Constructor with given parameters
             <param> [in] inOrigin       : The origin of the ray     : math::Vector3f
@@ -114,13 +138,32 @@ namespace engine
         /*
             Perform a check to see if the raycast hit an object
             <param> [in] inOutHit   : Used to report raycast hit : PxHitCallback<PxRaycastHit>
-            <param> [out] status    : Return                     : true     : If there is a hit
+            <param> [out] outData   : The actor that was hit (if there is one),
+                                      the hit's world position, and its distance 
+                                      to the ray's origin          : HitData*
+
+
+            <return> [out] status    : Return                     : true    : If there is a hit
                                                                             : false If there is no 
                                                                                 hit
         */
-        ENGINE_API  bool                    HasHit(void);
+        ENGINE_API  bool                    HasHit(HitData* outData = nullptr);
         // Draw the raycast into the pvd and the openGL scene
         ENGINE_API  void                    DrawRay(void);
+
+
+        ENGINE_API  Raycast&                operator=(Raycast&& inOther) noexcept;
+
+
+        ENGINE_API static int32             CreateRaycast(const math::Vector3f& inOrigin,
+                                                           const math::Vector3f& inDirection,
+                                                           f32 inDistance = 10.f);
+
+        ENGINE_API static void              DestroyRay(int32 index);
+
+        ENGINE_API static Raycast*          GetRay(int32 inIndex);
+        ENGINE_API static void              DrawAllRays(void);
+        ENGINE_API static void              CleanupRays(void);
 
     private :
 
@@ -133,6 +176,11 @@ namespace engine
         RaycastImpl*    m_raycastImpl   = nullptr;
         // The distance of the ray
         f32             m_distance      = 0.f;
+        int32           m_index         = INVALID_INDEX;
 
+
+
+        static std::vector<Raycast>     m_existingRays;
+        friend class PhysicsEngine;
     }; // !Class Raycast
 } // !Namespace engine

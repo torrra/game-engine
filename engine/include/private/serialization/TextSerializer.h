@@ -149,7 +149,7 @@ namespace engine::text
         using TNameType = std::remove_reference_t<std::remove_const_t<TValueType>>;
 
         const char* valName((name) ? name : "unnamed val");
-        file << "@" <<  types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
+        file << types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
     }
 
     template<math::CIntegralType TValueType>
