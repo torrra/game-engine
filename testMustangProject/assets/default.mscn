@@ -26,18 +26,6 @@
    uint64 | count=1
    string | scriptObject="ControllerScript"
    uint64 | flags=0
-[RigidBodyDynamic]
-     @int64 | owner=0
-     @uint32 | type=0
-     @uint64 | shape=2
-     @uint32 | collision group=4
-     @vec2f32 | capsule format={0.5,0}
-     @uint32 | gravity=0
-     @uint32 | trigger=1
-     @uint32 | lock X axis=0
-     @uint32 | lock Y axis=0
-     @uint32 | lock Z axis=0
-     @uint64 | flags=0
 [Entity]
    string | name="Camera"
    int64 | handle=1
@@ -78,42 +66,24 @@
     vec3f32 | position={0,2,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
-[RigidBodyStatic]
-     @int64 | owner=2
-     @uint32 | type=1
-     @uint64 | shape=0
-     @uint32 | collision group=3
-     @vec3f32 | box half extents={5,0.5,5}
-     @bool | trigger=0
-     @uint64 | flags=0
 [Entity]
-   string | name="Test"
+   string | name="Trigger"
    int64 | handle=3
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=1
+   uint64 | components=17
 [Transform]
     uint64 | index=2
     int64 | owner=3
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,4,-5}
+    vec3f32 | position={0,3,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
-[Entity]
-   string | name="New Entity 1"
-   int64 | handle=4
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=0
-[Entity]
-   string | name="New Entity 2"
-   int64 | handle=5
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=0
-[Entity]
-   string | name="New Entity 3"
-   int64 | handle=6
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=0
+[RigidBodyStatic]
+     int64 | owner=3
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={1,0.1,1}
+     bool | trigger=1
+     uint64 | flags=0
