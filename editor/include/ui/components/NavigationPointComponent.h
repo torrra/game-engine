@@ -6,6 +6,12 @@
 
 #pragma endregion
 
+#pragma region Engine
+
+#include <engine/core/components/NavigationPoint.h>
+
+#pragma endregion
+
 namespace editor
 {
     class NavigationPointComponent : public BaseComponent
