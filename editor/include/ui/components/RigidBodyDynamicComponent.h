@@ -34,6 +34,8 @@ namespace editor
         /// Destructor
                         ~RigidBodyDynamicComponent(void);
 
+        //static void     ReleaseStaticData(void);
+
     protected:
 
         virtual void    SectionContent(void) override;
@@ -51,7 +53,7 @@ namespace editor
         void            LockAxisUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
 
         /// Private members
-        static  std::vector<const char*>    m_shapeTypes/* = { "Box", "Sphere", "Capsule" }*/;
+        /*static*/  std::vector<const char*>    m_shapeTypes = { "Box", "Sphere", "Capsule" };
                 std::string                 m_geometryName;
                 bool                        m_isClosed      = false;
 
