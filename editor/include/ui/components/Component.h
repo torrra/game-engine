@@ -38,7 +38,7 @@ namespace editor
         //template<CComponentType CType>
 
 
-        void SetData(engine::SceneGraph* graph, engine::EntityHandle owner);
+        virtual void SetData(engine::SceneGraph* graph, engine::EntityHandle owner);
 
         EComponentType GetType(void) const noexcept;
 
