@@ -25,12 +25,16 @@ namespace engine
     public :
 
         /// Constructor
-        // Component constructor
+        /*
+            Component constructor
+            <param> [in] inOwner : EntityHandle : The owner of this component
+            <param> [in] inScene : SceneGraph   : The current scene
+        */
         ENGINE_API 
                                 NavigationPoint(EntityHandle inOwner, class SceneGraph* inScene);
         // Move constructor
         ENGINE_API 
-                                NavigationPoint(NavigationPoint&& inOther) = default;
+                                NavigationPoint(NavigationPoint&& inOther) noexcept = default;
 
         /// Destructor
         ENGINE_API 
@@ -42,10 +46,15 @@ namespace engine
             NavigationPoint&    operator=(NavigationPoint&& inOther) = default;
 
         /// Getter
-        ENGINE_API
+        // Get the navigation point position
+        ENGINE_API [[nodiscard]]
             math::Vector3f      GetPosition(void) const;
 
         /// Setter
+        /*
+            Set the position of the navigation point
+            <param> [in] inPosition : Vector3f : Position to set the navigation point
+        */
         ENGINE_API
             void                SetPosition(const math::Vector3f& inPosition);
 
@@ -68,6 +77,10 @@ namespace engine
         ENGINE_API
             const char*         DeserializeText(const char* text, const char* end) override;
 
+        ENGINE_API 
+            void		        Register(void) override {}
+
+
     private :
 
         /// Constructor
@@ -84,4 +97,11 @@ namespace engine
         math::Vector3f m_position = math::Vector3f::Zero();
 
     }; // !Class NavigationPoint
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<NavigationPoint>()
+    {
+        return NAVIGATION_POINT;
+    }
+
 } // !Namespace engine
