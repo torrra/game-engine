@@ -25,12 +25,13 @@ void editor::EditorCamera::UpdateAspectRatio(const math::Vector2f& size)
 
     /*
         When resizing the viewport it can sometimes cause the X or Y to become zero
-        therefore added these checks to avoid dividing by a negator number or zero
+        therefore added these checks to avoid dividing by a negative number or zero
     */
     newSize.X() = (size.GetX() > 0.0f) ? size.GetX() : 1.0f;
     newSize.Y() = (size.GetY() > 0.0f) ? size.GetY() : 1.0f;
 
     m_aspectRatio = newSize.GetX() / newSize.GetY();
+    CalculateProjectionMatrix();
 }
 
 math::Matrix4f editor::EditorCamera::ViewProjection(void)
