@@ -16,6 +16,7 @@ namespace editor
         Startup(title);
         m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
         m_sceneEditorView = new Viewport(EDITOR_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_gizmosUI = new GizmosUI();
     }
 
     void EditorApplication::SetCurrentScene(::engine::GameScene* scene)
@@ -60,6 +61,8 @@ namespace editor
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->Render();
 
+        m_gizmosUI->Render();
+
         if (engine::InputHandler::IsInputPressed(MOUSE_BUTTON_LEFT) &&
             ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             PickEntity();
@@ -69,6 +72,7 @@ namespace editor
     {
         delete m_gameSimulationView;
         delete m_sceneEditorView;
+        delete m_gizmosUI;
         Application::Shutdown();
     }
 
