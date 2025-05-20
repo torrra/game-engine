@@ -7,7 +7,7 @@
 #include <engine/game/GameScene.h>
 #include <engine/utility/MemoryCheck.h>
 #include <engine/ConsoleLog.hpp>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 
 #define CREATE_PROJECT_IN_PROGRESS 0
 #define CREATE_PROJECT_SUCCESS 1
@@ -190,7 +190,7 @@ void editor::MenuBar::CreateProject(void)
         static ui::Table table("modalLayout", 3, ui::GetAvailSpace());
         static uint8 createProjectStatus = CREATE_PROJECT_IN_PROGRESS;
 
-        if (engine::Input::IsInputPressed(KEY_ESCAPE))
+        if (engine::InputHandler::IsInputPressed(KEY_ESCAPE))
             CloseCreateMenu(projectName, projectPath, createProjectStatus);
 
         // Use table for alignment
