@@ -24,8 +24,11 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
         case editor::RENDERER:
             graph->DestroyComponent<engine::Renderer>(handle);
             break;
-        case editor::RIGIDBODY:
-            // TODO: add rigidbody class
+        case editor::RIGIDBODY_STATIC:
+            graph->DestroyComponent<engine::RigidBodyStatic>(handle);
+            break;
+        case editor::RIGIDBODY_DYNAMIC:
+            graph->DestroyComponent<engine::RigidBodyDynamic>(handle);
             break;
         case editor::SCRIPT:
             graph->DestroyComponent<engine::Script>(handle);

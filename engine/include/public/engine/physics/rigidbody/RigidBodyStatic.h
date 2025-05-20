@@ -21,6 +21,12 @@
 
 #pragma endregion
 
+#pragma region Math
+
+#include "math/Vector3.hpp"
+
+#pragma endregion
+
 namespace engine
 {
 	struct RigidBodyStaticImpl;
@@ -44,34 +50,37 @@ namespace engine
             Get the half extents of the box
             <return> [out] the half extents
         */
-        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void) const;
+        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void);
         /*
             Get the radius of the sphere
             <return> [out] the radius
         */
-        ENGINE_API  f32             GetSphereRadius(void) const;
+        ENGINE_API  f32             GetSphereRadius(void);
         /*
             Get the half height and radius of the capsule
             <return> [out] the half height and radius
         */
-        ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+        ENGINE_API  math::Vector2f  GetCapsuleFormat(void);
+
+        ENGINE_API  const char*     GetGeometryName(void) const;
+        ENGINE_API  bool            GetIsTrigger(void) const;
         /// Setter
         /*
             Set the half extents of the box
             <param> [in] inHalfExtents : the half extents
         */
-        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents) const;
+        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents);
         /*
             Set the radius of the sphere
             <param> [in] inRadius : the radius
         */
-        ENGINE_API  void            SetSphereRadius(f32 inRadius) const;
+        ENGINE_API  void            SetSphereRadius(f32 inRadius);
         /*
             Set the half height and radius of the capsule
             <param> [in] inRadius : the radius
             <param> [in] inHalfHeight : the half height
         */
-        ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const;
+        ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight);
         /*
             Set the debug draw visualization status
             <param> [in] inIsDebugVisualization : the visualization status : true = enabled
@@ -98,8 +107,7 @@ namespace engine
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
 
                     Transform&      CheckEntityTransform(void);
-                    void            SwitchShape(const EGeometryType& inGeometry);
-
+        ENGINE_API  void            SwitchShape(const EGeometryType& inGeometry);
         ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
         ENGINE_API  void            OnCollisionStay(EntityHandle inOther) override { inOther; }
         ENGINE_API  void            OnCollisionExit(EntityHandle inOther) override;
@@ -122,6 +130,7 @@ namespace engine
 
         void                        SetCollisionGroupAndMask(uint32 inCollisionGroup,
                                                              uint32 inCollisionMask);
+        void                        SetCapsuleBaseOrientation(void);
 
 		/// Functions
         /*
@@ -140,8 +149,18 @@ namespace engine
 
 		RigidBodyStaticImpl*    m_rigidBodyStaticImpl   = nullptr;
         Material*               m_materialImpl          = nullptr;
+        math::Vector3f          m_halfExtents           = math::Vector3f(0.5f, 0.5f, 0.5f);
+        f32                     m_radius                = 0.5f;
+        math::Vector2f          m_capsuleFormat         = math::Vector2f(0.5f, 1.f);
+        bool                    m_isTrigger             = false;
 
 	}; // !Class RigidBodyStatic
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<RigidBodyStatic>()
+    {
+        return RIGIDBODY_STATIC;
+    }
 
     class RigidBodyStaticFactory
     {

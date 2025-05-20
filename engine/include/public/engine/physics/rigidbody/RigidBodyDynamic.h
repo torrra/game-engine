@@ -59,26 +59,27 @@ namespace engine
             Get the gravity status of the rigid body
             <return> [out] the gravity status : true = disabled, false = enabled
         */
-        ENGINE_API  bool            IsGravityDisabled(void) const;
+        ENGINE_API  bool            IsGravityDisabled(void);
         /*
             Get the half extents of the box
             <return> [out] the half extents
         */
-        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void) const;
+        ENGINE_API  math::Vector3f  GetBoxHalfExtents(void);
         /*
             Get the radius of the sphere
             <return> [out] the radius
         */
-        ENGINE_API  f32             GetSphereRadius(void) const;
+        ENGINE_API  f32             GetSphereRadius(void);
         /*
             Get the half height and radius of the capsule
             <return> [out] the half height and radius
         */
-        ENGINE_API  math::Vector2f  GetCapsuleFormat(void) const;
+        ENGINE_API  math::Vector2f  GetCapsuleFormat(void);
 
         ENGINE_API  math::Vector3f  GetLinearVelocity(void) const;
 
         ENGINE_API  math::Vector3f  GetAngularVelocity(void) const;
+        ENGINE_API  bool            GetIsTrigger(void) const;
 
         /// Setter
         /*
@@ -91,18 +92,18 @@ namespace engine
             Set the half extents of the box
             <param> [in] inHalfExtents : the half extents
         */
-        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents) const;
+        ENGINE_API  void            SetBoxHalfExtents(math::Vector3f inHalfExtents);
         /*
             Set the radius of the sphere
             <param> [in] inRadius : the radius
         */
-        ENGINE_API  void            SetSphereRadius(f32 inRadius) const;
+        ENGINE_API  void            SetSphereRadius(f32 inRadius);
         /*
             Set the half height and radius of the capsule
             <param> [in] inRadius : the radius
             <param> [in] inHalfHeight : the half height
         */
-        ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const;
+        ENGINE_API  void            SetCapsuleFormat(f32 inRadius, f32 inHalfHeight);
         /*
             Set the debug draw visualization status
             <param> [in] inIsDebugVisualization : the visualization status : true = enabled
@@ -142,7 +143,7 @@ namespace engine
                                                   uint64 index) const override;
         ENGINE_API const char*      DeserializeText(const char* text, const char* end) override;
         ENGINE_API
-                    void            SwitchShape(/*RigidBodyDynamic* inRigidBody, */
+        /*ENGINE_API*/ void             SwitchShape(/*RigidBodyDynamic* inRigidBody, */
                                                 const EGeometryType& inGeometry);
 
         ENGINE_API  void            OnCollisionEnter(EntityHandle inOther) override;
@@ -204,8 +205,19 @@ namespace engine
         /// Private members
         RigidBodyDynamicImpl*	m_rigidBodyImpl = nullptr;
         Material*				m_materialImpl	= nullptr;
+        math::Vector3f          m_halfExtents   = math::Vector3f(0.5f, 0.5f, 0.5f);
+        f32                     m_radius        = 0.5f;
+        math::Vector2f          m_capsuleFormat = math::Vector2f(0.5f, 1.f);
+        bool                    m_isGravityDisabled = true;
+        bool                    m_isTrigger         = false;
 
     }; // !Class RigidBodyDynamic
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<RigidBodyDynamic>()
+    {
+        return RIGIDBODY_DYNAMIC;
+    }
 
     class RigidBodyDynamicFactory
     {

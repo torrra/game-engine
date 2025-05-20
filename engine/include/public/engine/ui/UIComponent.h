@@ -15,6 +15,7 @@ namespace ui
     ENGINE_API bool InputBox(const char* id, const char* hint, std::string& outStr, bool enterReturnTrue = true);
     ENGINE_API bool InputBox(const char* id, f32* value, f32 increment, bool returnOnComplete = false);
     ENGINE_API bool Selectable(const char* text, bool* selected, math::Vector2f const& size);
+    ENGINE_API bool Checkbox(const char* text, bool* value);
 
     // Menus
     ENGINE_API bool StartMenuBar(void);

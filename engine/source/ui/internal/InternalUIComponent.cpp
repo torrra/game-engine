@@ -61,6 +61,11 @@ bool ui::Selectable(const char* text, bool* selected, math::Vector2f const& size
     return ImGui::Selectable(text, selected, ImGuiMultiSelectFlags_SingleSelect, size);
 }
 
+bool ui::Checkbox(const char* text, bool* value)
+{
+    return ImGui::Checkbox(text, value);
+}
+
 bool ui::StartMenuBar(void)
 {
     return ImGui::BeginMenuBar();

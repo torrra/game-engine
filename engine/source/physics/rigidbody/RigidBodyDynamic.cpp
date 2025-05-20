@@ -28,9 +28,6 @@
 
 #include "serialization/TextSerializer.h"
 
-
-#include <iostream>
-
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene)
 {
     // Initialize the rigidbody implementation struct
@@ -59,134 +56,161 @@ engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 
 void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
 {
-    // Create a new material with default values
-    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
+    {
+        // Create a new material with default values
+        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
-    // Create a new dynamic rigid body with box geometry and default values
-    m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
-                                            *PhysicsEngine::Get().GetImpl().m_physics,
-                                            ToPxTransform(CheckEntityTransform()),
-                                            physx::PxBoxGeometry(0.5f, 0.5f, 0.5f), 
-                                            *m_materialImpl->GetImpl().m_material, 1.0f);
+        // Create a new dynamic rigid body with box geometry and default values
+        m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+            *PhysicsEngine::Get().GetImpl().m_physics,
+            ToPxTransform(CheckEntityTransform()),
+            physx::PxBoxGeometry(m_halfExtents.GetX(),
+                m_halfExtents.GetY(),
+                m_halfExtents.GetZ()),
+            *m_materialImpl->GetImpl().m_material, 1.0f);
 
-    // Set the gravity by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
-        false);
-    // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);    
+        // Set the gravity by default
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+            m_isGravityDisabled);
+        // Set the visualization of the rigid body to true by default
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data.m_type = EShapeType::DYNAMIC;
-    void** dataPtr = reinterpret_cast<void**>(&m_data);
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
+        SetTrigger(m_isTrigger);
 
-    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+        m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+        m_data.m_type = EShapeType::DYNAMIC;
+        void** dataPtr = reinterpret_cast<void**>(&m_data);
+        m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
 
-    // Add the rigid body to the physics scene
-    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-    m_shape = EGeometryType::BOX;
+        SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
+        // Add the rigid body to the physics scene
+        PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+        m_shape = EGeometryType::BOX;
+    }
 }
 
 void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
 {
-    // Create a new material with default values
-    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
+    {
+        // Create a new material with default values
+        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
-    // Create a new dynamic rigid body with sphere geometry and default values
-    m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
-                                            *PhysicsEngine::Get().GetImpl().m_physics,
-                                            ToPxTransform(CheckEntityTransform()),
-                                            physx::PxSphereGeometry(0.5f),
-                                            *m_materialImpl->GetImpl().m_material, 1.0f);
+        // Create a new dynamic rigid body with sphere geometry and default values
+        m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+            *PhysicsEngine::Get().GetImpl().m_physics,
+            ToPxTransform(CheckEntityTransform()),
+            physx::PxSphereGeometry(m_radius),
+            *m_materialImpl->GetImpl().m_material, 1.0f);
 
-    // Set the gravity by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
-        true);
+        // Set the gravity by default
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+            m_isGravityDisabled);
 
-    // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+        // Set the visualization of the rigid body to true by default
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data.m_type = EShapeType::DYNAMIC;
-    void** dataPtr = reinterpret_cast<void**>(&m_data);
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
+        SetTrigger(m_isTrigger);
 
-    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+        m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+        m_data.m_type = EShapeType::DYNAMIC;
+        void** dataPtr = reinterpret_cast<void**>(&m_data);
+        m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
 
-    // Add the rigid body to the physics scene
-    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-    m_shape = EGeometryType::SPHERE;
+        SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
+        // Add the rigid body to the physics scene
+        PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+        m_shape = EGeometryType::SPHERE;
+    }
 }
 
 void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
 {
-    // Create a new material with default values
-    m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
+    {
+        // Create a new material with default values
+        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
 
-    // Create a new dynamic rigid body with capsule geometry and default values
-    m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
-                                            *PhysicsEngine::Get().GetImpl().m_physics,
-                                            ToPxTransform(CheckEntityTransform()),
-                                            physx::PxCapsuleGeometry(0.25f, 0.25f),
-                                            *m_materialImpl->GetImpl().m_material, 1.0f);
+        // Create a new dynamic rigid body with capsule geometry and default values
+        m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
+            *PhysicsEngine::Get().GetImpl().m_physics,
+            ToPxTransform(CheckEntityTransform()),
+            physx::PxCapsuleGeometry(m_capsuleFormat.GetX(),
+                m_capsuleFormat.GetY()),
+            *m_materialImpl->GetImpl().m_material, 1.0f);
 
-    SetCapsuleBaseOrientation();
+        SetCapsuleBaseOrientation();
 
-    // Set the gravity by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
-        false);
+        // Set the gravity by default
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+            m_isGravityDisabled);
 
-    // Set the visualization of the rigid body to false by default
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, false);
+        // Set the visualization of the rigid body to true by default
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data.m_type = EShapeType::DYNAMIC;
-    void** dataPtr = reinterpret_cast<void**>(&m_data);
-    m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
+        SetTrigger(m_isTrigger);
 
-    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+        m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+        m_data.m_type = EShapeType::DYNAMIC;
+        void** dataPtr = reinterpret_cast<void**>(&m_data);
+        m_rigidBodyImpl->m_rigidBodyDynamic->userData = *dataPtr;
 
-    // Add the rigid body to the physics scene
-    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
-    m_shape = EGeometryType::CAPSULE;
+        SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), collision::GetCollisionMask(m_collisionGroup));
+
+        // Add the rigid body to the physics scene
+        PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_rigidBodyImpl->m_rigidBodyDynamic);
+        m_shape = EGeometryType::CAPSULE;
+    }
 }
 
 void engine::RigidBodyDynamic::UpdateEntity()
 {
-    // Update the entity transform in regard to the rigid body for exemple,
-    // if the rigid body is under gravity then the rigid body fall so the entity fall
-    Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        // Update the entity transform in regard to the rigid body for exemple,
+        // if the rigid body is under gravity then the rigid body fall so the entity fall
+        Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
 
-    Transform updatedTransform = ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
+        Transform updatedTransform = ToTransform(m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose());
 
-    transform->CopyPosition(updatedTransform);
-    transform->CopyRotation(updatedTransform);
+        transform->CopyPosition(updatedTransform);
+        transform->CopyRotation(updatedTransform);
+    }
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody()
 {
-    Transform worldTransform;
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        Transform worldTransform;
 
-    Transform &entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
 
-    worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-    worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
+        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
 
-    // Update the transform of the rigid body in regard to the entity
-    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
+        // Update the transform of the rigid body in regard to the entity
+        m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
+    }
 }
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
-    // Delete the pointer
-    delete m_materialImpl;
-    m_materialImpl = nullptr;
-    // Release the rigid body
-    PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        // Delete the pointer
+        delete m_materialImpl;
+        m_materialImpl = nullptr;
+        // Release the rigid body
+        PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
 
-    // Delete the pointer to the implementation structure
-    delete m_rigidBodyImpl;
-    m_rigidBodyImpl = nullptr;
+        // Delete the pointer to the implementation structure
+        delete m_rigidBodyImpl;
+        m_rigidBodyImpl = nullptr;
+    }
 }
 
 void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
@@ -206,6 +230,25 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
     text::Serialize(output, "shape", m_shape);
     output << "\n     ";
     text::Serialize(output, "collision group", static_cast<uint32>(m_collisionGroup));
+    output << "\n     ";
+    if (m_shape == EGeometryType::BOX)
+    {
+        text::Serialize(output, "box half extents", m_halfExtents);
+        output << "\n     ";
+    }
+    else if (m_shape == EGeometryType::SPHERE)
+    {
+        text::Serialize(output, "sphere radius", m_radius);
+        output << "\n     ";
+    }
+    else if (m_shape == EGeometryType::CAPSULE)
+    {
+        text::Serialize(output, "capsule format", m_capsuleFormat);
+        output << "\n     ";
+    }
+    text::Serialize(output, "gravity", static_cast<uint32>(m_isGravityDisabled));
+    output << "\n     ";
+    text::Serialize(output, "trigger", static_cast<uint32>(m_isTrigger));
     output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
@@ -227,82 +270,123 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     text = text::DeserializeInteger(text, collisionGroup);
     m_collisionGroup = static_cast<collision::ECollisionGroup>(collisionGroup);
 
+    if (m_shape == EGeometryType::BOX)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_halfExtents);
+    }
+    else if (m_shape == EGeometryType::SPHERE)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeReal(text, m_radius);
+    }
+    else if (m_shape == EGeometryType::CAPSULE)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_capsuleFormat);
+    }
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isGravityDisabled = 1;
+    text = text::DeserializeInteger(text, isGravityDisabled);
+    m_isGravityDisabled = static_cast<bool>(isGravityDisabled);
+    
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isTrigger = 1;
+    text = text::DeserializeInteger(text, isTrigger);
+    m_isTrigger = static_cast<bool>(isTrigger);
+
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
 }
 
-bool engine::RigidBodyDynamic::IsGravityDisabled(void) const
+bool engine::RigidBodyDynamic::IsGravityDisabled(void)
 {
     // Retrieve the gravity state
-    return m_rigidBodyImpl->m_rigidBodyDynamic->getActorFlags().isSet(
-                physx::PxActorFlag::eDISABLE_GRAVITY);
+    return m_isGravityDisabled;
 }
 
-math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void) const
+math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void)
 {
-    // Retrieve the box half extents by getting the shape of the rigid body to access
-    // the good geometry and retrive the good information about the box
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        // Retrieve the box half extents by getting the shape of the rigid body to access
+        // the good geometry and retrive the good information about the box
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
         {
-            const physx::PxGeometry* geometry = &shapes->getGeometry();
-            const physx::PxBoxGeometry& boxGeometry = 
-                                    static_cast<const physx::PxBoxGeometry&>(*geometry);
+            if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+            {
+                const physx::PxGeometry* geometry = &shapes->getGeometry();
+                const physx::PxBoxGeometry& boxGeometry =
+                    static_cast<const physx::PxBoxGeometry&>(*geometry);
 
-            return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
-                                  boxGeometry.halfExtents.z);
+                m_halfExtents = math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
+                    boxGeometry.halfExtents.z);
+
+                return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
+                    boxGeometry.halfExtents.z);
+            }
+            PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
+            return math::Vector3f(EErrorGeometryType_Invalid);
         }
-        PrintLog(ErrorPreset(), "Invalid geometry type : type is not box");
-        return math::Vector3f(EErrorGeometryType_Invalid);
     }
     PrintLog(ErrorPreset(), "Invalid shapes");
     return math::Vector3f(EErrorGeometryType_Invalid);
 }
 
-f32 engine::RigidBodyDynamic::GetSphereRadius(void) const
+f32 engine::RigidBodyDynamic::GetSphereRadius(void)
 {
-    // Retrieve the sphere radius by getting the shape of the rigid body to access
-    // the good geometry and retrive the good information about the sphere
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+        // Retrieve the sphere radius by getting the shape of the rigid body to access
+        // the good geometry and retrive the good information about the sphere
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
         {
-            const physx::PxGeometry* geometry = &shapes->getGeometry();
-            const physx::PxSphereGeometry& sphereGeometry = 
-                                    static_cast<const physx::PxSphereGeometry&>(*geometry);
+            if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+            {
+                const physx::PxGeometry* geometry = &shapes->getGeometry();
+                const physx::PxSphereGeometry& sphereGeometry =
+                    static_cast<const physx::PxSphereGeometry&>(*geometry);
 
-            return sphereGeometry.radius;
+                m_radius = sphereGeometry.radius;
+
+                return sphereGeometry.radius;
+            }
+            PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
+            return EErrorGeometryType_Invalid;
         }
-        PrintLog(ErrorPreset(), "Get sphere radius : Invalid geometry type : type is not sphere");
-        return EErrorGeometryType_Invalid;
     }
     PrintLog(ErrorPreset(), ("Invalid shapes"));
     return EErrorGeometryType_Invalid;
 }
 
-math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
+math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void)
 {
-    // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
-    // access the good geometry and retrive the good information about the capsule
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+        // Retrieve the capsule half height and radius by getting the shape of the rigid body to 
+        // access the good geometry and retrive the good information about the capsule
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
         {
-            const physx::PxGeometry* geometry = &shapes->getGeometry();
-            const physx::PxCapsuleGeometry capsuleGeometry = 
-                                        static_cast<const physx::PxCapsuleGeometry&>(*geometry);
+            if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+            {
+                const physx::PxGeometry* geometry = &shapes->getGeometry();
+                const physx::PxCapsuleGeometry capsuleGeometry =
+                    static_cast<const physx::PxCapsuleGeometry&>(*geometry);
 
-            return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
+                m_capsuleFormat = math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
+
+                return math::Vector2f(capsuleGeometry.radius, capsuleGeometry.halfHeight);
+            }
+            PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
+            return math::Vector2f(EErrorGeometryType_Invalid);
         }
-        PrintLog(ErrorPreset(), "Get capsule format : Invalid geometry type : type is not capsule");
-        return math::Vector2f(EErrorGeometryType_Invalid);
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return math::Vector2f(EErrorGeometryType_Invalid);
@@ -310,81 +394,108 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void) const
 
 math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
 {
-    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+    }
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
 {
-    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+    }
+}
+
+bool engine::RigidBodyDynamic::GetIsTrigger(void) const
+{
+    return m_isTrigger;
 }
 
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
 {
-    // Set the gravity disabled or enabled state
-    // State by default is enabled
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, 
-                                                      inIsGravityDisabled);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        // Set the gravity disabled or enabled state
+        // State by default is enabled
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY,
+            inIsGravityDisabled);
+        m_isGravityDisabled = inIsGravityDisabled;
 
-    PrintLog(SuccessPreset(), "Successfully set gravity.");
+        PrintLog(SuccessPreset(), "Successfully set gravity.");
+    }
 }
 
-void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents) const
+void engine::RigidBodyDynamic::SetBoxHalfExtents(math::Vector3f inHalfExtents)
 {
-    // Set the box half extents by using the shape of rigid body to access the good geometry
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+        // Set the box half extents by using the shape of rigid body to access the good geometry
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
         {
-            shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
-                                inHalfExtents.GetZ()));
-            PrintLog(SuccessPreset(), "Successfully set box half extents.");
+            if (shapes->getGeometry().getType() == physx::PxGeometryType::eBOX)
+            {
+                shapes->setGeometry(physx::PxBoxGeometry(inHalfExtents.GetX(), inHalfExtents.GetY(),
+                    inHalfExtents.GetZ()));
+                m_halfExtents = math::Vector3f(inHalfExtents);
+                PrintLog(SuccessPreset(), "Successfully set box half extents.");
+                return;
+            }
+            PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
             return;
         }
-        PrintLog(ErrorPreset(), "Set box half extents : Invalid geometry type : type is not box.");
-        return;
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
 }
 
-void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius) const
+void engine::RigidBodyDynamic::SetSphereRadius(f32 inRadius)
 {
-    // Set the sphere radius by using the shape of rigid body to access the good geometry
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+        // Set the sphere radius by using the shape of rigid body to access the good geometry
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
         {
-            shapes->setGeometry(physx::PxSphereGeometry(inRadius));
-            PrintLog(SuccessPreset(), "Successfully set sphere radius.");
+            if (shapes->getGeometry().getType() == physx::PxGeometryType::eSPHERE)
+            {
+                shapes->setGeometry(physx::PxSphereGeometry(inRadius));
+                m_radius = inRadius;
+                PrintLog(SuccessPreset(), "Successfully set sphere radius.");
+                return;
+            }
+            PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
             return;
         }
-        PrintLog(ErrorPreset(), "Set sphere radius : Invalid geometry type : type is not sphere.");
-        return;
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
 }
 
-void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) const
+void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
 {
-    // Set the capsule half height and radius by using the shape of rigid body to access the 
-    // good geometry
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+        // Set the capsule half height and radius by using the shape of rigid body to access the 
+        // good geometry
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
         {
-            shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
-            PrintLog(SuccessPreset(), "Successfully set capsule format.");
+            if (shapes->getGeometry().getType() == physx::PxGeometryType::eCAPSULE)
+            {
+                shapes->setGeometry(physx::PxCapsuleGeometry(inRadius, inHalfHeight));
+                m_capsuleFormat = math::Vector2f(inRadius, inHalfHeight);
+                PrintLog(SuccessPreset(), "Successfully set capsule format.");
+                return;
+            }
+            PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
             return;
         }
-        PrintLog(ErrorPreset(), "Set capsule : Invalid geometry type : type is not capsule.");
-        return;
     }
     PrintLog(ErrorPreset(), "Invalid shape");
     return;
@@ -392,38 +503,47 @@ void engine::RigidBodyDynamic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight) 
 
 void engine::RigidBodyDynamic::SetDebugVisualization(bool inIsDebugVisualization)
 {
-    m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION, 
-                                                      inIsDebugVisualization);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        m_rigidBodyImpl->m_rigidBodyDynamic->setActorFlag(physx::PxActorFlag::eVISUALIZATION,
+            inIsDebugVisualization);
+    }
 }
 
 void engine::RigidBodyDynamic::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)
 {
-    physx::PxFilterData filterData;
-    filterData.word0 = inCollisionGroup;
-    filterData.word1 = inCollisionMask;
-
-    physx::PxShape* shape = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
-    if (shape)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        shape->setSimulationFilterData(filterData);
+        physx::PxFilterData filterData;
+        filterData.word0 = inCollisionGroup;
+        filterData.word1 = inCollisionMask;
+
+        physx::PxShape* shape = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+        if (shape)
+        {
+            shape->setSimulationFilterData(filterData);
+        }
     }
 }
 
 void engine::RigidBodyDynamic::SetCapsuleBaseOrientation(void)
 {
-    // Rotate the intiale position of the capsule to be at the vertical by default
-    // By using the local pose to not rotate the entity attach to it
-    physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
-    physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
-
-    // Update the local pose via the shape
-    physx::PxShape* shapes = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
-    if (shapes)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
-        );
+        // Rotate the intiale position of the capsule to be at the vertical by default
+        // By using the local pose to not rotate the entity attach to it
+        physx::PxTransform currentPose = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+        physx::PxQuat rotation(physx::PxHalfPi, physx::PxVec3(0, 0, 1));
+
+        // Update the local pose via the shape
+        physx::PxShape* shapes = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shapes, 1);
+        if (shapes)
+        {
+            shapes->setLocalPose(physx::PxTransform(physx::PxVec3(0, 0, 0), -rotation * currentPose.q)
+            );
+        }
     }
 }
 
@@ -434,33 +554,44 @@ void engine::RigidBodyDynamic::SetCollisionGroup(collision::ECollisionGroup inCo
 
 void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
 {
-    physx::PxShape* shape = nullptr;
-    m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
-    if (shape)
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
     {
-        if (inIsTrigger)
+        physx::PxShape* shape = nullptr;
+        m_rigidBodyImpl->m_rigidBodyDynamic->getShapes(&shape, 1);
+        if (shape)
         {
-            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
-            m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
-        }
-        else
-        {
-            shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
-            shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
-            m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+            if (inIsTrigger)
+            {
+                shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+                shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+                m_collisionGroup = collision::ECollisionGroup::TRIGGER_COLLISION;
+                m_isTrigger = true;
+            }
+            else
+            {
+                shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, true);
+                shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+                m_collisionGroup = collision::ECollisionGroup::ENVIRONMENT_COLLISION;
+                m_isTrigger = false;
+            }
         }
     }
 }
 
 void engine::RigidBodyDynamic::SetLinearVelocity(math::Vector3f inLinearVelocity, bool inAutoWake)
 {
-    m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+    }
 }
 
 void engine::RigidBodyDynamic::SetAngularVelocity(math::Vector3f inAngularVelocity, bool inAutoWake)
 {
-    m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+    }
 }
 
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
@@ -581,6 +712,9 @@ void engine::RigidBodyDynamic::AddTorque(const math::Vector3f& inTorque, EForceM
 
 void engine::RigidBodyDynamic::SwitchShape(const EGeometryType& inGeometry)
 {
+    if (m_rigidBodyImpl == nullptr)
+        m_rigidBodyImpl = new RigidBodyDynamicImpl();
+
     switch (inGeometry)
     {
     case EGeometryType::BOX:
