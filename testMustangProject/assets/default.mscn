@@ -3,7 +3,7 @@
    int64 | handle=0
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=7
+   uint64 | components=15
 [Transform]
     uint64 | index=3
     int64 | owner=0
@@ -26,6 +26,18 @@
    uint64 | count=1
    string | scriptObject="ControllerScript"
    uint64 | flags=0
+[RigidBodyDynamic]
+     int64 | owner=0
+     uint32 | type=0
+     uint64 | shape=2
+     uint32 | collision group=3
+     vec2f32 | capsule format={0.5,0}
+     uint32 | gravity=0
+     uint32 | trigger=0
+     uint32 | lock X axis=0
+     uint32 | lock Y axis=0
+     uint32 | lock Z axis=0
+     uint64 | flags=0
 [Entity]
    string | name="Camera"
    int64 | handle=1
@@ -58,7 +70,7 @@
    int64 | handle=2
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=1
+   uint64 | components=17
 [Transform]
     uint64 | index=1
     int64 | owner=2
@@ -66,6 +78,14 @@
     vec3f32 | position={0,2,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=2
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=3
+     vec3f32 | box half extents={5,0.5,5}
+     bool | trigger=0
+     uint64 | flags=0
 [Entity]
    string | name="Trigger"
    int64 | handle=3

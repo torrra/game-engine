@@ -425,12 +425,20 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void)
 
 math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
 {
-    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+    }
+    return{};
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
 {
-    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+    }
+    return {};
 }
 
 bool engine::RigidBodyDynamic::GetIsTrigger(void) const
@@ -617,12 +625,18 @@ void engine::RigidBodyDynamic::SetTrigger(bool inIsTrigger)
 
 void engine::RigidBodyDynamic::SetLinearVelocity(const math::Vector3f& inLinearVelocity, bool inAutoWake)
 {
-    m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        m_rigidBodyImpl->m_rigidBodyDynamic->setLinearVelocity(ToPxVec3(inLinearVelocity), inAutoWake);
+    }
 }
 
 void engine::RigidBodyDynamic::SetAngularVelocity(const math::Vector3f& inAngularVelocity, bool inAutoWake)
 {
-    m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        m_rigidBodyImpl->m_rigidBodyDynamic->setAngularVelocity(ToPxVec3(inAngularVelocity), inAutoWake);
+    }
 }
 
 void engine::RigidBodyDynamic::SetXAxisLock(bool inAxisLock)
