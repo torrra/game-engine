@@ -338,6 +338,9 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
         update their position
         <param> [in] DebugDrawImpl : the pointeur to the structure impl
     */
+
+    Raycast::DrawAllRays();
+
     m_debugDraw->UpdateDebugDraw(*m_debugDraw->GetDebugDrawImpl());
     /*
         Display the lines of the render buffer into the openGL scene
@@ -347,7 +350,6 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
                                point is the start and the end of a line)
     */
 
-    Raycast::DrawAllRays();
     math::Vector4f color = math::Vector4f(1.f, 0.f, 0.f, 1.f);
 
     if (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines() != nullptr)
@@ -366,6 +368,8 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
     {
         m_debugDraw->RenderDebugDraw(inProjViewMatrix, m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() * 2, color);
     }
+
+    m_debugDraw->m_debugDrawImpl->m_customLines.clear();
 }
 
 void engine::PhysicsEngine::CleanUp(void)
