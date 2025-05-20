@@ -398,6 +398,8 @@ math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
     {
         return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
     }
+    else
+        return math::Vector3f::Zero();
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
@@ -406,6 +408,8 @@ math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
     {
         return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
     }
+    else
+        return math::Vector3f::Zero();
 }
 
 bool engine::RigidBodyDynamic::GetIsTrigger(void) const
