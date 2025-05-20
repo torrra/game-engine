@@ -3,7 +3,7 @@
 #include <engine/resource/model/Model.h>
 #include <engine/core/components/Transform.h>
 #include <engine/utility/GraphicsHelperFunctions.h>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include <engine/ui/UIComponent.h>
 
 #define ROTATION_GIZMOS_MODEL ".\\assets\\RotationGizmosAxis.obj"
@@ -42,7 +42,7 @@ void editor::RotationGizmos::IsAxisSelected(std::string const& wndName, engine::
 
     uint32 gizmosID = uint32(data[0] + data[1] * 256 + data[2] * 256 * 256);
 
-    if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT) && m_selectedAxis == 0)
+    if (engine::InputHandler::IsInputPressed(MOUSE_BUTTON_LEFT) && m_selectedAxis == 0)
     {
         if (gizmosID == m_xAxis.GetPickingID())
             m_selectedAxis = X_AXIS;
@@ -52,7 +52,7 @@ void editor::RotationGizmos::IsAxisSelected(std::string const& wndName, engine::
             m_selectedAxis = Z_AXIS;
     }
 
-    math::Vector2f cursorPos = engine::Input::GetCursorPosition<f32>();
+    math::Vector2f cursorPos = engine::InputHandler::GetCursorPosition<f32>();
     math::Vector2f deltaCursorPos = cursorPos - m_prevCursorPos;
 
     math::Vector3f deltaRotation(0.0f);

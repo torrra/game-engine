@@ -1,5 +1,5 @@
 #include "ui/gizmos/Gizmos.h"
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include <engine/utility/GraphicsHelperFunctions.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/resource/model/Model.h>
@@ -134,7 +134,7 @@ void editor::GizmosAxis::RenderPickingPass(const math::Matrix4f& projViewMatrix)
 
 bool editor::GizmosAxis::OnSelectedPosition(math::Vector3f& position, math::Vector3f const& axis, f32 moveIncrement)
 {
-    if (engine::Input::IsInputReleased(MOUSE_BUTTON_LEFT))
+    if (engine::InputHandler::IsInputReleased(MOUSE_BUTTON_LEFT))
         return false;
 
     position += axis * math::Clamp(moveIncrement, -MAX_INCREMENT, MAX_INCREMENT);
@@ -144,7 +144,7 @@ bool editor::GizmosAxis::OnSelectedPosition(math::Vector3f& position, math::Vect
 
 bool editor::GizmosAxis::OnSelectedRotation(math::Vector3f& rotation, math::Vector3f const& axis, f32 rotateIncrement)
 {
-    if (engine::Input::IsInputReleased(MOUSE_BUTTON_LEFT))
+    if (engine::InputHandler::IsInputReleased(MOUSE_BUTTON_LEFT))
         return false;
 
     rotation += axis * rotateIncrement;
@@ -154,7 +154,7 @@ bool editor::GizmosAxis::OnSelectedRotation(math::Vector3f& rotation, math::Vect
 
 bool editor::GizmosAxis::OnSelectedScale(math::Vector3f& scale, math::Vector3f const& axis, f32 scaleIncrement)
 {
-    if (engine::Input::IsInputReleased(MOUSE_BUTTON_LEFT))
+    if (engine::InputHandler::IsInputReleased(MOUSE_BUTTON_LEFT))
         return false;
 
     scale += axis * math::Clamp(scaleIncrement, -MAX_INCREMENT, MAX_INCREMENT);
