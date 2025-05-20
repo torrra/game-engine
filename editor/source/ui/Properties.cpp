@@ -5,6 +5,7 @@
 #include "ui/components/TransformComponent.h"
 #include "ui/components/RigidBodyStaticComponent.h"
 #include "ui/components/RigidBodyDynamicComponent.h"
+#include "ui/components/NavigationPointComponent.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/core/SceneGraph.h>
@@ -101,6 +102,10 @@ void editor::PropertyWnd::InitComponents(void)
         for (engine::ScriptObject script : scriptComponent->GetScripts())
             m_components.emplace_back(new ScriptComponent(script.GetType()));
     }
+
+    // Navigation point
+    if (entity->HasComponent<engine::NavigationPoint>())
+        InitComponent<NavigationPointComponent, engine::NavigationPoint>();
 }
 
 void editor::PropertyWnd::RenderMenuBar(void)
@@ -110,7 +115,7 @@ void editor::PropertyWnd::RenderMenuBar(void)
     {
         if (ui::StartMenu("Add Component"))
         {
-                 if (ui::MenuItem("Renderer"))
+            if (ui::MenuItem("Renderer"))
                 AddComponent<RendererComponent, engine::Renderer>();
 
             else if (ui::MenuItem("RigidbodyStatic"))
@@ -118,15 +123,18 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("RigidbodyDynamic"))
                 AddComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
-            
+
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
-            
-             else if (ui::MenuItem("Script"))
+
+            else if (ui::MenuItem("Script"))
                 printf("Adding script...\n"); // TODO: implement for script object
-            
-             else if (ui::MenuItem("Transform"))
+
+            else if (ui::MenuItem("Transform"))
                 AddComponent<TransformComponent, engine::Transform>();
+
+            else if (ui::MenuItem("NavigationPoint"))
+                AddComponent<NavigationPointComponent, engine::NavigationPoint>();
 
             ui::EndMenu();
         }
@@ -162,6 +170,9 @@ void editor::PropertyWnd::ClearComponentArray(void)
             break;
         case editor::TRANSFORM:
             delete dynamic_cast<TransformComponent*>(component);
+            break;
+        case editor::NAVIGATION_POINT:
+            delete dynamic_cast<NavigationPointComponent*>(component);
             break;
         case editor::INVALID_COMPONENT_TYPE:
         default:
