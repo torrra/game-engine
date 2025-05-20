@@ -9,7 +9,7 @@ extern "C"
 #include "core/SceneGraph.h"
 #include "core/components/Camera.h"
 #include "core/systems/ScriptSystem.h"
-#include "scripting/CameraFunctions.h"
+#include "scripting/ecs/CameraFunctions.h"
 
 int script_GetCameraRef(lua_State* luaState)
 {
@@ -103,9 +103,9 @@ int script_GetCameraRotation(lua_State* luaState)
     {
         math::Vector3f camEulers = camera->GetRotation();
 
-        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetX()).Deg()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetY()).Deg()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetZ()).Deg()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetX()).Rad()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetY()).Rad()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(math::Degree(camEulers.GetZ()).Rad()));
     }
 
     return 3;

@@ -7,7 +7,7 @@ extern "C"
 
 #include "core/SceneGraph.h"
 #include "core/systems/ScriptSystem.h"
-#include "scripting/EntityScriptFunctions.h"
+#include "scripting/ecs/EntityScriptFunctions.h"
 
 #include <iostream>
 

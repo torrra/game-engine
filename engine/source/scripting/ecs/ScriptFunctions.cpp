@@ -7,7 +7,7 @@ extern "C"
 
 #include "core/SceneGraph.h"
 #include "core/systems/ScriptSystem.h"
-#include "scripting/ScriptFunctions.h"
+#include "scripting/ecs/ScriptFunctions.h"
 
 #include <iostream>
 
