@@ -161,3 +161,7 @@ function GetCursorDeltaPos()
 
     return Input.GetCursorDeltaPos()
 end
+
+function GetScrollDelta()
+    return Input.GetScrollDelta()
+end

@@ -3,8 +3,7 @@
 #include <engine/game/GameScene.h>
 #include <engine/thread/ThreadManager.h>
 #include <engine/ui/UIComponent.h>
-#include <engine/input/Input.h>
-#include <engine/core/Entity.h>
+#include <engine/input/InputHandler.h>
 
 #define SIMULATION_VIEW_WINDOW "Simulation view"
 #define EDITOR_VIEW_WINDOW "Editor view"
@@ -58,7 +57,7 @@ namespace editor
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->Render();
 
-        if (engine::Input::IsInputPressed(MOUSE_BUTTON_LEFT) &&
+        if (engine::InputHandler::IsInputPressed(MOUSE_BUTTON_LEFT) &&
             ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             PickEntity();
     }

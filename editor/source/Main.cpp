@@ -1,6 +1,6 @@
 #include <engine/Engine.h>
 #include <engine/utility/MemoryCheck.h>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include "ui/EditorApplication.h"
 
 #include "engine/ConsoleLog.hpp"
