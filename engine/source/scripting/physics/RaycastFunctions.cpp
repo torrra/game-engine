@@ -136,8 +136,10 @@ int script_SetRaycastDirection(lua_State* luaState)
             static_cast<f32>(lua_tonumber(luaState, 3)),
             static_cast<f32>(lua_tonumber(luaState, 4))
         };
-
-        direction.Normalize();
+   
+        if (direction.MagnitudeSquared() > 1.f)
+            direction.Normalize();
+ 
         ray->SetDirection(direction);
 
     }
