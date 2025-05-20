@@ -2,13 +2,14 @@
 #include "resource/shader/ShaderResource.h"
 #include "resource/ResourceManager.h"
 #include "utility/MemoryCheck.h"
+#include "ConsoleLog.hpp"
 
 #include <glad/glad.h>
 
 engine::ShaderProgram::ShaderProgram(const char* vertexShader, const char* fragShader)
 	: m_vertexShader(vertexShader), m_fragShader(fragShader), m_programID(0)
 {
-	CreateProgram();
+	CreateProgram(false, false);
 }
 
 bool engine::ShaderProgram::LoadResource(const char* filePath)
@@ -150,18 +151,24 @@ const std::string& engine::ShaderProgram::GetFragmentShaderName(void) const
     return m_fragShader;
 }
 
-void engine::ShaderProgram::CreateProgram(void)
+void engine::ShaderProgram::CreateProgram(bool isVertAbsolute, bool isFragAbsolute)
 {
     // Don't create OpenGL program twice
     if (m_programID)
         return;
      
 	// Resource manager will only load if resource does not exist
-	ResourceManager::Load<Shader>(m_vertexShader);
-	ResourceManager::Load<Shader>(m_fragShader);
+	ResourceManager::Load<Shader>(m_vertexShader, isVertAbsolute);
+	ResourceManager::Load<Shader>(m_fragShader, isFragAbsolute);
 	
 	const Shader* vShader = ResourceManager::GetResource<Shader>(m_vertexShader);
 	const Shader* fShader = ResourceManager::GetResource<Shader>(m_fragShader);
+
+    if (!vShader || !fShader)
+    {
+        PrintLog(ErrorPreset(), "Failed to compute shader");
+        return;
+    }
 
 	if (!vShader->GetShaderType() ||
 		!fShader->GetShaderType())

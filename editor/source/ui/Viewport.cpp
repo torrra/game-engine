@@ -54,7 +54,7 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     if (m_graph)
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
-    engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
+   engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
 
     m_fbo.Unbind();
 }
@@ -109,8 +109,8 @@ void editor::Viewport::RenderContents(void)
     m_size = ::ui::GetAvailSpace();
     m_sizeUpdated = (m_size != m_prevSize);
     math::Vector2i sizePx(
-        static_cast<int32>(m_size.GetX()),
-        static_cast<int32>(m_size.GetY())
+        math::Max(static_cast<int32>(m_size.GetX()), 1),
+        math::Max(static_cast<int32>(m_size.GetY()), 1)
     ); 
     
     SetViewportTransform({0, 0}, sizePx);
