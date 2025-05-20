@@ -35,6 +35,26 @@ void engine::NavigationPoint::SetPosition(const math::Vector3f& inPosition)
     m_position = inPosition;
 }
 
+void engine::NavigationPoint::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
+{
+    output << "[NavigationPoint]\n     ";
+
+    if constexpr (UpdateAfterParent<NavigationPoint>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
+    }
+
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+
+    text::Serialize(output, "position", m_position);
+    output << "\n     ";
+
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
 const char* engine::NavigationPoint::DeserializeText(const char* text, const char* end)
 {
     MOVE_TEXT_CURSOR(text, end);
@@ -46,3 +66,4 @@ const char* engine::NavigationPoint::DeserializeText(const char* text, const cha
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
 }
+
