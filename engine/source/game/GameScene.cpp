@@ -4,9 +4,10 @@
 #include "Engine.h"
 
 #include "physics/PhysicsEngine.h"
+#include "physics/Raycast.h"
 
 #include <fstream>
- 
+
 namespace engine
 {
     GameScene::GameScene(const std::filesystem::path& path, const std::string& name)
@@ -19,7 +20,7 @@ namespace engine
     void GameScene::Start(void)
     {
         m_timeSincePhysicsTick = 0.f;
-        m_time.Reset();
+        //m_time.Reset();
         SerializeText();
         ScriptSystem::ResetState(&m_graph);
         m_graph.StartAllScripts();
@@ -31,10 +32,15 @@ namespace engine
         m_state = EGameState::STOPPED;
     }
 
-    void GameScene::Reset(void)
+    void GameScene::Reset(bool reload)
     {
         m_graph.CleanRigidBodies();
-        DeserializeText();
+        
+        if (reload)
+            DeserializeText();
+        else
+            m_graph = SceneGraph();
+
         ScriptSystem::ResetState();
     }
 
@@ -90,12 +96,9 @@ namespace engine
 
     void GameScene::Tick(void)
     {
- 
-
         if (m_state == EGameState::RUNNING)
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
-            m_graph.SyncRigidbodiesPrePhysics();
             PhysicsUpdate();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
         }
@@ -116,6 +119,10 @@ namespace engine
 
             // 'undo' physics tick (set physx transform back to pre-update values)
             m_graph.SyncRigidbodiesPrePhysics();
+
+            for (RigidBodyDynamic& rigidbody : m_graph.GetComponentArray<RigidBodyDynamic>())
+                rigidbody.SetLinearVelocity({ 0.f, 0.f, 0.f });
+
         }
 
         m_time.Update();
@@ -142,19 +149,13 @@ namespace engine
         constexpr f32 physicsUpdateInterval = 0.02f;
 
         m_timeSincePhysicsTick += m_time.GetDeltaTime();
-        if (m_timeSincePhysicsTick <= 0.f)
-        {
-            return;
-        }
+
         int32 numPhysicsUpdate = static_cast<int32>(m_timeSincePhysicsTick / physicsUpdateInterval);
 
         if (numPhysicsUpdate < 1)
             return;
 
-        //f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
-        f32 interval = m_time.GetDeltaTime();
-
-        m_graph.SyncRigidbodiesPrePhysics();
+        f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
 
         for (int32 updateNum = 0; updateNum < numPhysicsUpdate; ++updateNum)
             PhysicsEngine::Get().StepSimulation(interval);

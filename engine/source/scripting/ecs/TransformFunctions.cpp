@@ -9,7 +9,7 @@ extern "C"
 #include "core/SceneGraph.h"
 #include "core/components/Transform.h"
 #include "core/systems/ScriptSystem.h"
-#include "scripting/TransformFunctions.h"
+#include "scripting/ecs/TransformFunctions.h"
 
 int script_GetTransformRef(lua_State* luaState)
 {

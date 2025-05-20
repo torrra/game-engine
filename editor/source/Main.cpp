@@ -5,6 +5,9 @@
 
 #include "engine/ConsoleLog.hpp"
 
+#include <engine/ui/Canvas.h>
+
+
 // Use dedicated graphics card
 extern "C" 
 {
@@ -16,24 +19,38 @@ int appMain(void)
 {
 	engine::Engine engine;
     engine.SetEditorApplication(new editor::EditorApplication("Mustang Editor", engine.GetGraph()));
-    engine.OpenProject("..\\testMustangProject\\superSeriousGame.mustang");
+
     engine.Startup();
+
+    
 
 	while (!engine.GetWindow()->ShouldWindowClose())
 	{
         engine.UpdateGameplay();
 
-        if (engine::Input::IsInputPressed(KEY_SPACE))
+        if (engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
+            engine::Input::IsInputDown(KEY_RIGHT_CONTROL))
+
         {
-            engine.GetGraph()->GetComponent<engine::RigidBodyDynamic>(engine.GetGraph()->GetEntity("Padoru")->GetHandle())->AddTorque({ 0.f, 10.f, 0.f });
+            if (engine::Input::IsInputReleased(KEY_B))
+            {
+                engine.BuildProjectExecutable("..\\testProjectBuildFolder");
+            }
+
+            else if (engine::Input::IsInputReleased(KEY_S))
+                engine.SaveProject();
         }
 
-        if ((engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
-            engine::Input::IsInputDown(KEY_RIGHT_CONTROL)) &&
-            engine::Input::IsInputPressed(KEY_B))
+        /*if (engine::Input::IsInputDown(KEY_R))
         {
-            engine.BuildProjectExecutable("..\\testProjectBuildFolder");
-        }
+            auto size = engine.GetWindow()->GetSize<f32>();
+
+            engine::Canvas* sceneCanvas = new engine::Canvas(size, math::Vector4f::Zero());
+
+            auto rec = sceneCanvas->AddRectangle(size / 2.f, { 2.f, 2.f });
+
+            rec->SetColor(1.f, 1.f, 1.f, 1.f);
+        }*/
 
         engine.UpdateApplicationWindow();
 	}

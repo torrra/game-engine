@@ -37,9 +37,9 @@ void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rot
         m_rotation[0] = -90.0f;
 
     m_rotQuat = math::Quaternion<f32>(
-        math::Radian(m_rotation[0] * DEG2RAD),
-        math::Radian(m_rotation[1] * DEG2RAD),
-        math::Radian(m_rotation[2] * DEG2RAD)
+        math::Degree(m_rotation[0]),
+        math::Degree(m_rotation[1]),
+        math::Degree(m_rotation[2])
     );
 }
 
@@ -65,7 +65,11 @@ void engine::Camera::Unregister(void)
 
 math::Vector3f engine::Camera::GetPosition(void) const noexcept
 {
-    return m_transform->SetPosition();
+    if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+        return transform->GetPosition();
+
+    else
+        return math::Vector3f();
 }
 
 math::Vector3f engine::Camera::GetRotation(void) const noexcept
@@ -95,6 +99,7 @@ f32 engine::Camera::GetFarPlane(void) const noexcept
 
 math::Vector3f& engine::Camera::Position(void)
 {
+    m_transform = m_currentScene->GetComponent<Transform>(m_owner);
     return m_transform->SetPosition();
 }
 
@@ -173,9 +178,11 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 	MOVE_TEXT_CURSOR(text, end);
 	text = text::DeserializeVector(text, m_rotation);
 
-	//MOVE_TEXT_CURSOR(text, end);
-	//text = text::DeserializeVector(text, m_transform->SetPosition());
-    //text = text::GetNewLine(text, end);
+    m_rotQuat = math::Quaternion<f32>(
+        math::Degree(m_rotation[0]),
+        math::Degree(m_rotation[1]),
+        math::Degree(m_rotation[2])
+    );
 
 	MOVE_TEXT_CURSOR(text, end);
 	return text::DeserializeInteger(text, m_flags);

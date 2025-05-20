@@ -6,7 +6,7 @@ extern "C"
 }
 
 #include "core/Component.h"
-#include "scripting/ComponentFunctions.h"
+#include "scripting/ecs/ComponentFunctions.h"
 
 int script_IsComponentValid(lua_State* luaState)
 {

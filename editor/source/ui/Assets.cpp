@@ -1,14 +1,19 @@
 #include "ui/Assets.h"
 #include "ui/components/Component.h"
+#include "ui/EditorApplication.h"
+
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDraw.h>
 #include <engine/ui/UITree.h>
 #include <engine/ui/UIStyle.h>
 #include <engine/ui/UIDragDrop.h>
+#include <engine/ConsoleLog.hpp>
 
 #include <engine/utility/MemoryCheck.h>
 #include <engine/input/Input.h>
+#include <engine/Engine.h>
 #include <filesystem>
+#include <fstream>
 
 #define ASSET_WIDTH 120.0f
 #define ASSET_HEIGHT 130.0f
@@ -40,7 +45,8 @@ editor::Asset::Asset(std::filesystem::path const& path, std::string const& paylo
 }
 
 // Asset window implementation
-editor::AssetsWnd::AssetsWnd(const char* name)
+editor::AssetsWnd::AssetsWnd(const char* name, EditorApplication* owner)
+    : m_ownerApplication(owner)
 {
     SetName(name);
 
@@ -85,6 +91,7 @@ void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
 
 void editor::AssetsWnd::RenderContents(void)
 {
+    bool shouldRefresh = false;
     math::Vector2f windowSize = ::ui::GetAvailSpace();
     m_layout->SetSize(windowSize);
 
@@ -96,10 +103,28 @@ void editor::AssetsWnd::RenderContents(void)
         if (m_layout->NextColumn())
         {
             RenderAssets();
+            EAssetAction rightClickMenu = RenderRightClickMenu();
+
+            if (m_currentAction == EAssetAction::NONE)
+                m_currentAction = rightClickMenu;
+
+            if (m_currentAction == EAssetAction::CREATE_SCENE ||
+                m_currentAction == EAssetAction::CREATE_MATERIAL)
+            {
+                
+                ui::OpenModal("New asset");
+
+                if (CreateAsset(m_currentAction) == EAssetAction::REFRESH_WINDOW)
+                    shouldRefresh = true;
+            }
+
         }
     
         m_layout->EndTable();
     }
+
+    if (shouldRefresh)
+        OnSelectDir();
 }
 
 void editor::AssetsWnd::RenderDirectorySection(math::Vector2f const& windowSize)
@@ -162,8 +187,11 @@ void editor::AssetsWnd::RenderAssets(void)
 {
     const math::Vector2f& regionSize = ui::GetAvailSpace();
 
+       
+
     if (ui::StartSection("AssetSection", regionSize))
     {
+
         ui::SetWindowFontScale(0.8f);
 
         // Asset variables
@@ -209,7 +237,10 @@ void editor::AssetsWnd::RenderAssets(void)
                     bool isSelected = index == m_selectedIndex; // TODO: use index to get selected value from asset struct
 
                     if (ui::Selectable("", &isSelected, assetSize))
+                    {
                         m_selectedIndex = index;
+                        SelectResource();
+                    }
 
                     // Create drag & drop payload 
                     if (::ui::StartDragDropSource(0))
@@ -267,8 +298,7 @@ void editor::AssetsWnd::OnSelectDir(void)
         if (IsSupportedExtension(filePath.extension().string(), payloadType))
         {
             uint64 offset = m_path.string().length();
-            std::string relativeFilePath(".");
-            relativeFilePath += filePath.string().substr(offset);
+            std::string relativeFilePath = filePath.string().substr(offset);
 
             m_assets.emplace_back(Asset(relativeFilePath, payloadType));
         }
@@ -316,6 +346,153 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
         payloadType = VERTEX_SHADER_PAYLOAD;
     else if (extension == supportedExtensions[7])
         payloadType = FRAGMENT_SHADER_PAYLOAD;
+    else if (extension == supportedExtensions[8])
+        payloadType = MATERIAL_PAYLOAD;
+    else if (extension == supportedExtensions[9])
+        payloadType = SCENE_PAYLOAD;
 
     return payloadType;
+}
+
+void editor::AssetsWnd::SelectResource(void)
+{
+    constexpr uint64 sceneStrLen = sizeof(SCENE_PAYLOAD) - 1;
+
+    Asset& selectedAsset = m_assets[m_selectedIndex];
+
+    if (selectedAsset.m_payloadType.size() == sceneStrLen &&
+        memcmp(selectedAsset.m_payloadType.c_str(), SCENE_PAYLOAD, sceneStrLen) == 0)
+    {
+        std::filesystem::path scenePath = engine::Engine::GetEngine()->GetProjectDir();
+
+        scenePath += selectedAsset.m_path;
+        m_ownerApplication->LoadNewScene(engine::Engine::GetEngine()->GetCurrentScene(),
+            scenePath);
+    }
+}
+
+
+
+editor::AssetsWnd::EAssetAction editor::AssetsWnd::RenderRightClickMenu(void)
+{
+
+    EAssetAction result = EAssetAction::NONE;
+
+    // Scene graph right click menu
+    if (::ui::StartPopUp("Asset options"))
+    {
+        // Add scene
+        if (::ui::MenuItem("Create scene"))
+            result = EAssetAction::CREATE_SCENE;
+
+        //// Add material
+        //if (::ui::MenuItem("Create material"))
+        //    result = EAssetAction::CREATE_MATERIAL;
+
+        //// Delete
+        //if (::ui::MenuItem("Delete asset"))
+        //    result = EAssetAction::DELETE_ASSET;
+
+        ::ui::EndPopUp();
+        m_isRightClickMenuOpen = true;
+    }
+    return result;
+}
+
+void editor::AssetsWnd::SetNewAssetName(void)
+{
+    ui::VerticalSpacing();
+
+    // Display text + format layout
+    m_assetCreationTable.NextRow();
+    m_assetCreationTable.NextColumn();
+    ui::Text("Asset name: ");
+    ui::VerticalSpacing();
+
+    // Add interactable input field for user to write the project name + format layout 
+    m_assetCreationTable.NextColumn(500.0f);
+    ui::ItemWidth(150.0f);
+    ui::InputBox("##AssetName", "Asset name", m_newAssetName, false);
+    ui::VerticalSpacing();
+
+    //// Display current name
+    m_assetCreationTable.NextColumn();
+    ui::Text(m_newAssetName.c_str());
+    ui::VerticalSpacing();
+}
+
+bool editor::AssetsWnd::IsAssetNameValid(void)
+{
+    return (!m_newAssetName.empty()) && m_newAssetName.size() < 64;
+}
+
+void editor::AssetsWnd::CreateScene(void)
+{
+    std::filesystem::path assetPath = m_selectedDirectory->m_path;
+
+    assetPath.append(m_newAssetName).replace_extension(".mscn");
+
+    if (std::filesystem::exists(assetPath))
+        engine::PrintLog(engine::ErrorPreset(), "Scene file already exists");
+
+    else
+        std::ofstream newScene(assetPath, std::ios::out);
+
+}
+
+void editor::AssetsWnd::CloseAssetCreationMenu(void)
+{
+    m_isRightClickMenuOpen = false;
+    m_newAssetName.clear();
+    m_currentAction = EAssetAction::NONE;
+}
+
+editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction action)
+{
+    EAssetAction result = EAssetAction::NONE;
+
+    if (ui::StartModal("New asset", m_isRightClickMenuOpen))
+    {
+        m_assetCreationTable.SetSize(ui::GetAvailSpace());
+
+        if (engine::Input::IsInputPressed(KEY_ESCAPE))
+            CloseAssetCreationMenu();            
+
+        if (m_assetCreationTable.StartTable())
+        {
+            ui::SameLine(160.f);
+            SetNewAssetName();
+            ui::VerticalSpacing();
+
+            if (ui::Button("Create asset") && IsAssetNameValid())
+            {
+                switch (action)
+                {
+                case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
+                    CreateScene();
+                    result = EAssetAction::REFRESH_WINDOW;
+                    break;
+                case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
+                    break;
+                default:
+                    break;
+                }
+
+                CloseAssetCreationMenu();            
+            }
+            m_assetCreationTable.EndTable();
+        }
+        else
+        {
+            ui::SameLine(160.f);
+            ui::Text("Failed");
+        }
+
+        ui::EndPopUp();
+    }
+
+    if (!m_isRightClickMenuOpen)
+        m_currentAction = EAssetAction::NONE;
+
+    return result;
 }

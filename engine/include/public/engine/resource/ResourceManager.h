@@ -8,6 +8,7 @@
 
 //#include "engine/utility/MemoryCheck.h"
 #include "engine/EngineExport.h"
+#include "engine/Engine.h"
 
 /*
 *	-------- Resource Manager --------
@@ -21,11 +22,12 @@ namespace engine
 	{
 	public:
 		template<typename TResourceType>
-		static void					Load(std::string const& fileName);
+		static void					Load(std::string const& fileName, bool absolute = false);
 		ENGINE_API static void		LoadShader(
 										const char* shaderProgramName, 
 										const char* vertShader, 
-										const char* fragShader);
+										const char* fragShader,
+                                        bool isVertAbsolute = false, bool isFragAbsolute = false);
 
         // Create a resource from data that already exists in memory instead
         // of loading a file from disk
@@ -61,7 +63,7 @@ namespace engine
 
 	// Template function definitions
 	template<typename TResourceType>
-	inline void engine::ResourceManager::Load(std::string const& fileName)
+	inline void engine::ResourceManager::Load(std::string const& fileName, bool absolute)
 	{
         TResourceType* newVal = nullptr;
 
@@ -71,7 +73,7 @@ namespace engine
             // Check if resource exists
             if (HasResource(fileName))
             {
-                //std::printf("Resource '%s' already loaded\n", fileName.c_str());
+                std::printf("Resource '%s' already loaded\n", fileName.c_str());
                 return;
             }
 
@@ -79,7 +81,23 @@ namespace engine
             GetInstance()->m_resources[fileName] = newVal;
         }
 
-        if (!newVal->LoadResource(fileName.c_str()))
+        std::string resourcePath;
+        
+        if (absolute)
+            resourcePath = fileName;
+
+        else if (Engine::HasEditor())
+        {
+            resourcePath = Engine::GetEngine()->GetProjectDir().string();
+            resourcePath.push_back('\\');
+            resourcePath += fileName;
+        }
+
+        else
+            resourcePath = "assets\\" + fileName;
+        
+
+        if (!newVal->LoadResource(resourcePath.c_str()))
         {
             m_mutex.lock();
             GetInstance()->m_resources.erase(fileName);

@@ -147,21 +147,21 @@ namespace engine
         text::Serialize(output, "fragmentShader", m_shader->GetFragmentShaderName());
         output << "\n    ";
 
-        std::vector<const MeshMaterial*> validMeshMaterials;
+        std::vector<const std::string*> validMeshMaterials;
         validMeshMaterials.reserve(m_materials.size());
 
         for (const MeshMaterial* mat : m_materials)
         {
             if (mat)
-                validMeshMaterials.push_back(mat);
+                validMeshMaterials.push_back(ResourceManager::FindKeyByVal(mat));
         }
 
         text::Serialize(output, "materialCount", validMeshMaterials.size());
         output << "\n    ";
 
-        for (const MeshMaterial* mat : validMeshMaterials)
+        for (const std::string* matKey : validMeshMaterials)
         {
-            text::Serialize(output, "material", mat->GetFilePath().string());
+            text::Serialize(output, "material", *matKey);
             output << "\n    ";
         }
         text::Serialize(output, "flags", m_flags);
