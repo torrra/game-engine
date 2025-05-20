@@ -25,5 +25,8 @@ engine::NavigationPoint::NavigationPoint(EntityHandle inOwner, SceneGraph* inSce
     inScene = m_currentScene;
 }
 
+math::Vector3f engine::NavigationPoint::GetPosition(void) const
+{
+    return m_position;
 }
 
