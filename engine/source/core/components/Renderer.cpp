@@ -187,7 +187,7 @@ namespace engine
         text = text::DeserializeString(text, end, vertShader);
         text = text::DeserializeString(text, end, fragShader);
 
-        ResourceManager::LoadShader(key.c_str(), vertShader.c_str(), fragShader.c_str());
+        ResourceManager::LoadShader(key.c_str(), vertShader.c_str(), fragShader.c_str(), true);
         m_shader = ResourceManager::GetResource<ShaderProgram>(key);
 
 
