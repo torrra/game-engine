@@ -526,12 +526,12 @@ namespace engine
         text::UnloadFileData(data);
         for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {
-            rbDynamic.SwitchShape(static_cast<EGeometryType>(rbDynamic.m_shape));
+            rbDynamic.SwitchShape(static_cast<EGeometryType>(rbDynamic.m_rigidBodyShape));
         }
         for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
         {
-            rbStatic.SwitchShape(static_cast<EGeometryType>(rbStatic.m_shape));
-        }        
+            rbStatic.SwitchShape(static_cast<EGeometryType>(rbStatic.m_rigidBodyShape));
+        }
     }
 
 }

@@ -84,16 +84,16 @@
     bool | trigger=1
     uint64 | flags=0
 [Entity]
-   string | name="Test"
+   string | name="Trigger"
    int64 | handle=3
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=1
+   uint64 | components=17
 [Transform]
     uint64 | index=2
     int64 | owner=3
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,4,-5}
+    vec3f32 | position={0,3,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Entity]

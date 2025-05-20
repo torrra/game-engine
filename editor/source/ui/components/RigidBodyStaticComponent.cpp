@@ -14,7 +14,6 @@ editor::RigidBodyStaticComponent::RigidBodyStaticComponent(void)
     SetType(RIGIDBODY_STATIC);
 
     m_geometryName = "None##geometry";
-    m_engine = engine::Engine::GetEngine();
 }
 
 editor::RigidBodyStaticComponent::~RigidBodyStaticComponent(void)
@@ -25,7 +24,7 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
 {
     if (engine::RigidBodyStatic* rigidBodyStatic = GetData<engine::RigidBodyStatic>())
     {
-        engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_shape);
+        engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_rigidBodyShape);
         
         int32 currentIndex = static_cast<int32>(currentShape);
         m_geometryName = m_shapeTypes[currentIndex];
@@ -72,22 +71,22 @@ void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
         switch (inGeometryType)
         {
         case engine::EGeometryType::BOX:
-            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::BOX);
             break;
         case engine::EGeometryType::SPHERE:
-            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::SPHERE);
             break;
         case engine::EGeometryType::CAPSULE:
-            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::CAPSULE);
             break;
         case engine::EGeometryType::PLANE:
-            engine::RigidBodyStaticFactory::CreateStatic(m_engine->GetGraph(),
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::PLANE);
             break;

@@ -199,8 +199,8 @@ physx::PxFilterFlags CustomFilterShader(
     // To enable contact generation
     pairFlags = physx::PxPairFlag::eCONTACT_DEFAULT |
         physx::PxPairFlag::eNOTIFY_TOUCH_FOUND |
-        physx::PxPairFlag::eNOTIFY_TOUCH_LOST |
-        physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS;
+        physx::PxPairFlag::eNOTIFY_TOUCH_LOST /*|
+        physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS*/;
 
     return physx::PxFilterFlag::eDEFAULT;
 }

@@ -234,6 +234,16 @@ void ui::UnsetAlignment(void)
     return ImGui::PopStyleVar();
 }
 
+bool ui::TreeNode(const char* sectionName)
+{
+    return ImGui::TreeNode(sectionName);
+}
+
+void ui::TreePop(void)
+{
+    ImGui::TreePop();
+}
+
 bool ui::StartSection(const char* name)
 {
     constexpr int32 flags = 
