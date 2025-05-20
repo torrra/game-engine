@@ -394,12 +394,18 @@ math::Vector2f engine::RigidBodyDynamic::GetCapsuleFormat(void)
 
 math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
 {
-    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
+    }
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
 {
-    return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+    {
+        return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
+    }
 }
 
 bool engine::RigidBodyDynamic::GetIsTrigger(void) const
