@@ -51,6 +51,12 @@ bool editor::BaseComponent::IsRemoved(void) const noexcept
     return m_isClosed;
 }
 
+void editor::BaseComponent::SetData(engine::SceneGraph* graph, engine::EntityHandle owner)
+{
+    m_graph = graph;
+    m_owner = owner;
+}
+
 editor::EComponentType editor::BaseComponent::GetType(void) const noexcept
 {
     return m_componentType;

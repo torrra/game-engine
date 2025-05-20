@@ -10,8 +10,6 @@ editor::CameraComponent::CameraComponent(void)
 
 editor::CameraComponent::~CameraComponent(void)
 {
-    SetData<engine::Camera>(nullptr);
-
     m_rotationSynced = false;
 }
 

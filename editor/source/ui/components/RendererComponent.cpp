@@ -21,7 +21,6 @@ editor::RendererComponent::RendererComponent(void)
 
 editor::RendererComponent::~RendererComponent(void)
 {
-    SetData<engine::Renderer>(nullptr);
 }
 
 void editor::RendererComponent::SectionContent(void)

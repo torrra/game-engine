@@ -49,7 +49,7 @@ namespace editor
     inline void editor::PropertyWnd::InitComponent(void)
     {
         CUIType* component = new CUIType;
-        dynamic_cast<BaseComponent*>(component)->SetData(m_graph->GetComponent<CType>(m_handle));
+        dynamic_cast<BaseComponent*>(component)->SetData(m_graph, m_handle);
         m_components.emplace_back(component);
     }
 

@@ -19,7 +19,6 @@ editor::RigidBodyDynamicComponent::RigidBodyDynamicComponent(void)
 
 editor::RigidBodyDynamicComponent::~RigidBodyDynamicComponent(void)
 {
-    SetData<engine::RigidBodyDynamic>(nullptr);
 }
 
 void editor::RigidBodyDynamicComponent::SectionContent(void)
