@@ -1,6 +1,6 @@
 #include <engine/Engine.h>
 #include <engine/utility/MemoryCheck.h>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include "ui/EditorApplication.h"
 
 #include "engine/ConsoleLog.hpp"
@@ -28,16 +28,16 @@ int appMain(void)
 	{
         engine.UpdateGameplay();
 
-        if (engine::Input::IsInputDown(KEY_LEFT_CONTROL) ||
-            engine::Input::IsInputDown(KEY_RIGHT_CONTROL))
+        if (engine::InputHandler::IsInputDown(KEY_LEFT_CONTROL) ||
+            engine::InputHandler::IsInputDown(KEY_RIGHT_CONTROL))
 
         {
-            if (engine::Input::IsInputReleased(KEY_B))
+            if (engine::InputHandler::IsInputReleased(KEY_B))
             {
                 engine.BuildProjectExecutable("..\\testProjectBuildFolder");
             }
 
-            else if (engine::Input::IsInputReleased(KEY_S))
+            else if (engine::InputHandler::IsInputReleased(KEY_S))
                 engine.SaveProject();
         }
 

@@ -12,7 +12,7 @@
 
 #include <engine/utility/MemoryCheck.h>
 #include <engine/utility/Platform.h>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include <engine/Engine.h>
 #include <filesystem>
 #include <fstream>
@@ -567,7 +567,7 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction acti
     {
         m_assetCreationTable.SetSize(ui::GetAvailSpace());
 
-        if (engine::Input::IsInputPressed(KEY_ESCAPE))
+        if (engine::InputHandler::IsInputPressed(KEY_ESCAPE))
             CloseAssetCreationMenu();            
 
         if (m_assetCreationTable.StartTable())
