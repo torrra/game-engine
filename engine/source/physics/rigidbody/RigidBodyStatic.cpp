@@ -259,14 +259,18 @@ void engine::RigidBodyStatic::UpdateRigidBody(void)
 
 void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
 {
-    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+    // Delete the pointer to the implementation structure
+    delete m_materialImpl;
+    m_materialImpl = nullptr;
+
+    if (m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
     {
-        // Delete the pointer to the implementation structure
-        delete m_materialImpl;
-        m_materialImpl = nullptr;
         // Release the rigid body
         PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
+    }
 
+    if (m_rigidBodyStaticImpl != nullptr)
+    {
         delete m_rigidBodyStaticImpl;
         m_rigidBodyStaticImpl = nullptr;
     }
