@@ -51,9 +51,9 @@ namespace editor
         void            LockAxisUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
 
         /// Private members
-        std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule" };
-        std::string m_geometryName;
-        bool m_isClosed = false;
+        static  std::vector<const char*>    m_shapeTypes/* = { "Box", "Sphere", "Capsule" }*/;
+                std::string                 m_geometryName;
+                bool                        m_isClosed      = false;
 
     }; // !Class RigidBodyDynamicComponent
 } // !Namespace editor
