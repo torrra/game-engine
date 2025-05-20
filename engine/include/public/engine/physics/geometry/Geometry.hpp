@@ -9,7 +9,8 @@ namespace engine
 		BOX = 0,
 		SPHERE = 1,
 		CAPSULE = 2,
-		PLANE = 3
+		PLANE = 3,
+        TRIANGLE_MESH = 4
 
 	}; // !Enum EGeometryType
 

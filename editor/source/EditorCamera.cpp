@@ -2,7 +2,7 @@
 
 #include <math/Arithmetic.hpp>
 
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 
 editor::EditorCamera::EditorCamera(void)
 {
@@ -11,7 +11,7 @@ editor::EditorCamera::EditorCamera(void)
 
 void editor::EditorCamera::Update(f32 deltaTime)
 {
-    if (!engine::Input::IsInputDown(MOUSE_BUTTON_RIGHT))
+    if (!engine::InputHandler::IsInputDown(MOUSE_BUTTON_RIGHT))
         return;
 
     UpdateSpeed();
@@ -25,12 +25,13 @@ void editor::EditorCamera::UpdateAspectRatio(const math::Vector2f& size)
 
     /*
         When resizing the viewport it can sometimes cause the X or Y to become zero
-        therefore added these checks to avoid dividing by a negator number or zero
+        therefore added these checks to avoid dividing by a negative number or zero
     */
     newSize.X() = (size.GetX() > 0.0f) ? size.GetX() : 1.0f;
     newSize.Y() = (size.GetY() > 0.0f) ? size.GetY() : 1.0f;
 
     m_aspectRatio = newSize.GetX() / newSize.GetY();
+    CalculateProjectionMatrix();
 }
 
 math::Matrix4f editor::EditorCamera::ViewProjection(void)
@@ -52,26 +53,27 @@ void editor::EditorCamera::UpdatePosition(f32 deltaTime)
 
     math::Vector3f movement{ 0.f };
 
-    movement.X() += (engine::Input::IsInputDown(KEY_D)) ? movementScale : 0.f;
-    movement.X() -= (engine::Input::IsInputDown(KEY_A)) ? movementScale : 0.f;
+    movement.X() += (engine::InputHandler::IsInputDown(KEY_D)) ? movementScale : 0.f;
+    movement.X() -= (engine::InputHandler::IsInputDown(KEY_A)) ? movementScale : 0.f;
 
-    movement.Z() -= (engine::Input::IsInputDown(KEY_W)) ? movementScale : 0.f;
-    movement.Z() += (engine::Input::IsInputDown(KEY_S)) ? movementScale : 0.f;
+    movement.Z() -= (engine::InputHandler::IsInputDown(KEY_W)) ? movementScale : 0.f;
+    movement.Z() += (engine::InputHandler::IsInputDown(KEY_S)) ? movementScale : 0.f;
 
     m_position += m_rotationQuat.Rotate(movement);
 
-    if (engine::Input::IsInputDown(KEY_Q))
+    if (engine::InputHandler::IsInputDown(KEY_Q))
         m_position.Y() += movementScale;
 
-    if (engine::Input::IsInputDown(KEY_E))
+    if (engine::InputHandler::IsInputDown(KEY_E))
         m_position.Y() -= movementScale;
 }
 
 void editor::EditorCamera::UpdateRotation(void)
 {
-    const math::Vector2f deltaPos = engine::Input::GetCursorDeltaPos<f32>();
-    m_rotationEuler.X() -= deltaPos.GetY() * 0.1;
-    m_rotationEuler.Y() -= deltaPos.GetX() * 0.1;
+    const math::Vector2f deltaPos = engine::InputHandler::GetCursorDeltaPos<f32>();
+
+    m_rotationEuler.X() -= deltaPos.GetY() * 0.1f;
+    m_rotationEuler.Y() -= deltaPos.GetX() * 0.1f;
 
     m_rotationQuat =
     math::Quatf(
@@ -83,7 +85,7 @@ void editor::EditorCamera::UpdateRotation(void)
 
 void editor::EditorCamera::UpdateSpeed(void)
 {
-    m_speed += engine::Input::GetScrollDelta<f32>().GetY();
+    m_speed += engine::InputHandler::GetScrollDelta<f32>().GetY();
     m_speed = math::Clamp(m_speed, 1.f, 100.f);
 }
 

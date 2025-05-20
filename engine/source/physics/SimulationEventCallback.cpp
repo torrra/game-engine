@@ -3,6 +3,7 @@
 #include "engine/Engine.h"
 #include "engine/core/SceneGraph.h"
 #include "engine/physics/geometry/Geometry.hpp"
+#include "core/systems/ScriptSystem.h"
 
 void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader& inPairHeader, 
                                                 const physx::PxContactPair* inPairs, 
@@ -66,6 +67,9 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
         {
             listenerA->OnCollisionEnter(ownerB);
             listenerB->OnCollisionEnter(ownerA);
+
+            ScriptSystem::NotifyCollisionEnter(ownerA, ownerB);
+
         }
 
         if (contactPair.events & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
@@ -78,6 +82,8 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
         {
             listenerA->OnCollisionExit(ownerB);
             listenerB->OnCollisionExit(ownerA);
+
+            ScriptSystem::NotifyCollisionExit(ownerA, ownerB);
         }
     }
 }
@@ -149,10 +155,14 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs,
         if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND)
         {
             listenerA->OnTriggerEnter(ownerB);
+
+            ScriptSystem::NotifyTriggerEnter(ownerA, ownerB);
         }
         if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
         {
             listenerA->OnTriggerExit(ownerB);
+
+            ScriptSystem::NotifyTriggerExit(ownerA, ownerB);
         }
         //if (pair.status & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
         //{

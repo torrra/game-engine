@@ -4,7 +4,7 @@
 
 #include "ConsoleLog.hpp"
 #include "core/systems/ScriptSystem.h"
-#include "input/Input.h"
+#include "input/InputHandler.h"
 #include "resource/ResourceManager.h"
 #include "serialization/TextSerializer.h"
 #include "ui/UIWindow.h"
@@ -47,10 +47,10 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     if (InitScriptSystem(projectDir) != SUCCESS)
         return ERROR;
 
-    if (Input::StartUp() != SUCCESS)
+    if (InputHandler::StartUp() != SUCCESS)
         return ERROR;
 
-    Input::SetCursorMode(ECursorMode::MODE_NORMAL);
+    InputHandler::SetCursorMode(ECursorMode::MODE_NORMAL);
 
     // Load default resources
     if (LoadEngineResources() != SUCCESS)
@@ -73,10 +73,10 @@ int16 engine::Engine::Startup(uint32 threadCount)
     ScriptSystem::Startup();
     PhysicsEngine::Get().Init();
 
-    if (Input::StartUp() != SUCCESS)
+    if (InputHandler::StartUp() != SUCCESS)
         return ERROR;
 
-    Input::SetCursorMode(ECursorMode::MODE_NORMAL);
+    InputHandler::SetCursorMode(ECursorMode::MODE_NORMAL);
 
     // Load default resources
     if (LoadEngineResources() != SUCCESS)
@@ -95,7 +95,7 @@ void engine::Engine::ShutDown(void)
     ScriptSystem::Shutdown();
     ResourceManager::ShutDown();
     m_application->Shutdown();
-    Input::ShutDown();
+    InputHandler::ShutDown();
     m_uiManager.ShutDown();
     PhysicsEngine::Get().CleanUp();
 
@@ -139,7 +139,7 @@ void engine::Engine::UpdateApplicationWindow(void)
 
     m_uiManager.EndFrame();
     m_application->EndFrame();
-    Input::ResetKeys();
+    InputHandler::UpdateKeyState();
 }
 
 bool engine::Engine::HasEditor(void)
