@@ -34,3 +34,15 @@ void engine::NavigationPoint::SetPosition(const math::Vector3f& inPosition)
 {
     m_position = inPosition;
 }
+
+const char* engine::NavigationPoint::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeVector(text, m_position);
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
+}
