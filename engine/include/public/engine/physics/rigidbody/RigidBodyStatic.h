@@ -48,6 +48,10 @@ namespace engine
         /// Operator
         ENGINE_API
             RigidBodyStatic&    operator=(RigidBodyStatic&&) noexcept = default;
+
+
+        ENGINE_API
+            void                Invalidate(void) override;
         
         /// Getter
         /*

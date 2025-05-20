@@ -48,6 +48,12 @@ engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inSce
 	m_currentScene			= inScene;
 }
 
+void engine::RigidBodyStatic::Invalidate(void)
+{
+    Component::Invalidate();
+    RigidBodyStaticCleanUp();
+}
+
 math::Vector3f engine::RigidBodyStatic::GetBoxHalfExtents(void)
 {
     // Retrieve the box half extents by getting the shape of the rigid body to access
