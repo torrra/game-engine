@@ -107,3 +107,13 @@
      vec3f32 | box half extents={1,0.1,1}
      bool | trigger=1
      uint64 | flags=0
+[Entity]
+   string | name="NavPoint"
+   int64 | handle=4
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=256
+[NavigationPoint]
+     int64 | owner=4
+     vec3f32 | position={1.2,4.1,4.65}
+     uint64 | flags=0
