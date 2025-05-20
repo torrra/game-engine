@@ -38,6 +38,8 @@
 engine::RigidBodyStatic::RigidBodyStatic(EntityHandle inOwner, SceneGraph* inScene)
 {
 	m_rigidBodyStaticImpl	= new RigidBodyStaticImpl();
+    m_data.m_index			= 0;
+    m_data.m_type			= EShapeType::STATIC;
 	m_owner					= inOwner;
 	m_currentScene			= inScene;
 }

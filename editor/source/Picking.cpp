@@ -5,7 +5,6 @@
 #include <engine/resource/ResourceManager.h>
 #include <engine/core/Entity.h>
 #include <engine/resource/model/Model.h>
-#include <engine/input/Input.h>
 
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
 #define SHADER_NAME "Picking Shader"

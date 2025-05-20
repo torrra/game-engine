@@ -64,6 +64,7 @@ namespace engine
     {
         physx::PxTriangleMesh*          m_triangleMesh      = nullptr;
         physx::PxTriangleMeshDesc       m_triangleMeshDesc;
+        physx::PxRigidStatic*           m_actor      = nullptr;
     };
 
     /// PhysX using

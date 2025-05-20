@@ -7,7 +7,7 @@
 #include <engine/ui/UITree.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIStyle.h>
-#include <engine/input/Input.h>
+#include <engine/input/InputHandler.h>
 #include <engine/utility/MemoryCheck.h>
 
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
@@ -49,10 +49,6 @@ editor::SceneGraphUI::SceneGraphUI(const char* title, engine::SceneGraph* graph)
     }
     else
         m_root = nullptr;
-
-    // TODO: register keys somewhere else
-    engine::Input::RegisterInput(MOUSE_BUTTON_LEFT);
-    engine::Input::RegisterInput(MOUSE_BUTTON_RIGHT);
 }
 
 editor::SceneGraphUI::~SceneGraphUI(void)
@@ -255,7 +251,7 @@ void editor::SceneGraphUI::CheckRenameNode(TreeNode* node, std::string const& or
     ::ui::SameLine();
     ::ui::SetKeyboardFocus();
     if (::ui::InputBox("##rename", originalName.c_str(), resultStr) ||
-        engine::Input::IsInputDown(MOUSE_BUTTON_LEFT) || engine::Input::IsInputDown(MOUSE_BUTTON_RIGHT))
+        engine::InputHandler::IsInputDown(MOUSE_BUTTON_LEFT) || engine::InputHandler::IsInputDown(MOUSE_BUTTON_RIGHT))
     {
         if (resultStr[0] != '\0' && !m_graph->GetEntity(resultStr))
             m_graph->GetEntity(m_renamingHandle)->SetName(resultStr);
