@@ -23,6 +23,46 @@
 #define MAX_LABEL_LINE_LENGTH 16
 #define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag", ".mmat", ".mscn", ".ogg", ".mp3"}
 
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+bool DirUpdated(std::string const& path)
+{
+    HANDLE handles[1] = { nullptr };
+
+    handles[0] = FindFirstChangeNotificationA(path.c_str(), false, FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME);
+    if (handles[0] == INVALID_HANDLE_VALUE || handles[0] == nullptr)
+    {
+        printf("[ERROR]: FindFirstChangeNotificationA failed, error code: %lu.\n", GetLastError());
+        return false;
+    }
+
+    DWORD result = WaitForMultipleObjects(1, handles, false, 500);
+    bool newChanges = false;
+
+    switch (result)
+    {
+    case WAIT_OBJECT_0:
+        // Refresh directory
+        printf("Refresh required\n");
+        newChanges = true;
+
+        if (!FindNextChangeNotification(handles[0]))
+            printf("[ERROR]: FindNextChangeNotification failed, error code %lu.\n", GetLastError());
+
+        break;
+    case WAIT_TIMEOUT:
+        break;
+    default:
+        printf("[ERROR]: An unhandled case occurred while checking for project directory changes\n");
+        break;
+    }
+
+    return newChanges;
+}
+
+
 // Node implementation
 editor::DirTreeNode::DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent)
     : m_path(path), m_parentNode(parent)
@@ -94,6 +134,16 @@ void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
 void editor::AssetsWnd::RenderContents(void)
 {
     bool shouldRefresh = false;
+
+    if (m_isDirUpdated.valid() && m_isDirUpdated.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+    {
+        if (m_isDirUpdated.get())
+            shouldRefresh = true;
+
+        else if (m_selectedDirectory)
+            m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_selectedDirectory->m_path.string());
+    }
+
     math::Vector2f windowSize = ::ui::GetAvailSpace();
 
     if (windowSize.GetX() <= 0.f || windowSize.GetY() <= 0.f)
@@ -315,6 +365,12 @@ void editor::AssetsWnd::OnSelectDir(void)
             m_assets.emplace_back(Asset(relativeFilePath, payloadType));
         }
     }
+
+    if (m_isDirUpdated.valid())
+        m_isDirUpdated.get();
+
+    m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_selectedDirectory->m_path.string());
+
 }
 
 bool editor::AssetsWnd::IsSupportedExtension(std::string const& extension, std::string& payloadType)

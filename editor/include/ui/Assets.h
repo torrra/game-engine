@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <vector>
 #include <string>
+#include <future>
 
 /*
     -------- Supported extensions --------
@@ -122,7 +123,7 @@ namespace editor
         ui::Table   m_assetCreationTable = ui::Table("createAssetLayout", 3, {0.f, 0.f});
         std::string m_newAssetName;
 
-
+        std::future<bool> m_isDirUpdated;
         std::filesystem::path m_path;
         std::vector<Asset> m_assets;
         DirTreeNode* m_rootNode;
