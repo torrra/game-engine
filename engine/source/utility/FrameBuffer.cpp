@@ -42,23 +42,23 @@ void engine::FrameBuffer::Init(int32 width, int32 height)
 
 void engine::FrameBuffer::RescaleFBO(int32 width, int32 height)
 {
-    if (width == m_size.GetX() || height == m_size.GetY())
+    // Abort rescale if no changes in width and height
+    if (width == m_size.GetX() && height == m_size.GetY())
         return;
 
     m_size = {width, height};
 
     /*
-        Destroy & init new frame buffer
-        We do this because of DSA making use of the 'glTextureStorage2D'
-        this function is immutable and therefore removes the possibility to
-        modify the framebuffer's texture. Hence why a new framebuffer must
-        be created
+        Rescaling Framebuffer via DSA
+        As the engine uses OpenGL 4.5 and hence DSA we have to use the function
+        'glTextureStorage2D', contrary to previous versions of OpenGL this function
+        is immutable and therefore removes the possibility to modify the framebuffer's
+        texture. Consequently, in order to resize the framebuffer the current framebuffer most
+        be deleted and replaced by a new framebuffer with the correct size.
     */
 
     DeleteFrameBuffer();
     Init(width, height);
-
-
 }
 
 void engine::FrameBuffer::Bind(void) const
