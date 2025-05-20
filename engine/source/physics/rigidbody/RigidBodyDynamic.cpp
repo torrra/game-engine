@@ -215,14 +215,14 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
     delete m_materialImpl;
     m_materialImpl = nullptr;
 
-    if (m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
-    {
-        // Release the rigid body
-        PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
-    }
-
     if (m_rigidBodyImpl != nullptr)
     {
+        if (m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+        {
+            // Release the rigid body
+            PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
+        }
+    
         // Delete the pointer to the implementation structure
         delete m_rigidBodyImpl;
         m_rigidBodyImpl = nullptr;

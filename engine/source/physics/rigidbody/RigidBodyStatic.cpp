@@ -248,14 +248,14 @@ void engine::RigidBodyStatic::RigidBodyStaticCleanUp(void)
     delete m_materialImpl;
     m_materialImpl = nullptr;
 
-    if (m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
-    {
-        // Release the rigid body
-        PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
-    }
-
     if (m_rigidBodyStaticImpl != nullptr)
     {
+        if (m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr)
+        {
+            // Release the rigid body
+            PX_RELEASE(m_rigidBodyStaticImpl->m_rigidBodyStatic);
+        }
+            
         delete m_rigidBodyStaticImpl;
         m_rigidBodyStaticImpl = nullptr;
     }
