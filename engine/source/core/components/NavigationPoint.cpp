@@ -30,3 +30,7 @@ math::Vector3f engine::NavigationPoint::GetPosition(void) const
     return m_position;
 }
 
+void engine::NavigationPoint::SetPosition(const math::Vector3f& inPosition)
+{
+    m_position = inPosition;
+}
