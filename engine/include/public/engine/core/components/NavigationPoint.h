@@ -3,6 +3,7 @@
 #pragma region Engine
 
 #include "engine/EngineExport.h"
+#include "engine/CoreTypes.h"
 
 #pragma endregion
 
@@ -15,6 +16,7 @@
 #pragma region Math
 
 #include "math/Vector3.hpp"
+#include <math/Matrix4.hpp>
 
 #pragma endregion
 
@@ -80,6 +82,9 @@ namespace engine
         ENGINE_API 
             void		        Register(void) override {}
 
+        ENGINE_API
+            void                RenderNavPoint(const math::Matrix4f& inProjView);
+
 
     private :
 
@@ -91,7 +96,7 @@ namespace engine
 
         /// Operator
         // Copy assignement
-        NavigationPoint&        operator=(const NavigationPoint& inOther) = delete;
+            NavigationPoint&    operator=(const NavigationPoint& inOther) = delete;
 
         /// Private members
         math::Vector3f m_position = math::Vector3f::Zero();

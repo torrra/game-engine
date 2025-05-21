@@ -6,16 +6,11 @@
 
 #pragma endregion
 
-#pragma region Internal
-
-#include "InternalOpenGLError.hpp"
-
-#pragma endregion
-
 #pragma region Resource
 
 #include "engine/resource/shader/Shader.h"
 #include "engine/resource/ResourceManager.h"
+#include "engine/resource/model/Model.h"
 
 #pragma endregion
 
@@ -23,6 +18,11 @@ engine::NavigationPoint::NavigationPoint(EntityHandle inOwner, SceneGraph* inSce
 {
     inOwner = m_owner;
     inScene = m_currentScene;
+
+    ResourceManager::Load<Model>("..\\workspace\\assets\\sphereLP.obj", true);
+
+    ResourceManager::LoadShader("NavPointProgram", "..\\workspace\\shaders\\NavPointShader.vert",
+                                "..\\workspace\\shaders\\NavPointShader.frag", true, true);
 }
 
 math::Vector3f engine::NavigationPoint::GetPosition(void) const
@@ -67,3 +67,17 @@ const char* engine::NavigationPoint::DeserializeText(const char* text, const cha
     return text::DeserializeInteger(text, m_flags);
 }
 
+void engine::NavigationPoint::RenderNavPoint(const math::Matrix4f& inProjView)
+{
+    ResourceManager::GetResource<ShaderProgram>("NavPointProgram")->Use();
+
+    math::Matrix4f scale = math::Matrix4f::ScaleMatrix(math::Vector3f(0.2f));
+    math::Matrix4f translate = math::Matrix4f::PositionMatrix(GetPosition());
+    math::Matrix4f model = translate * scale;
+    math::Matrix4f mvp = inProjView * model;
+
+    ResourceManager::GetResource<ShaderProgram>("NavPointProgram")->Set("mvp", &mvp);
+    ResourceManager::GetResource<ShaderProgram>("NavPointProgram")->Set("aColor", math::Vector4f(1.f, 0.f, 0.f, 1.f));
+
+    ResourceManager::GetResource<Model>("..\\workspace\\assets\\sphereLP.obj")->Draw();
+}
