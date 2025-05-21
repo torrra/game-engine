@@ -14,6 +14,7 @@
 
 #pragma endregion
 
+//std::vector<const char*> editor::RigidBodyDynamicComponent::m_shapeTypes = { "Box", "Sphere", "Capsule" };
 
 editor::RigidBodyDynamicComponent::RigidBodyDynamicComponent(void)
 {
@@ -32,6 +33,11 @@ void editor::RigidBodyDynamicComponent::SetData(engine::SceneGraph* graph, engin
     BaseComponent::SetData(graph, owner);
     UpdateShapeGeometry(0, engine::EGeometryType::SPHERE, GetData<engine::RigidBodyDynamic>());
 }
+
+//void editor::RigidBodyDynamicComponent::ReleaseStaticData(void)
+//{
+//    m_shapeTypes.clear();
+//}
 
 void editor::RigidBodyDynamicComponent::SectionContent(void)
 {

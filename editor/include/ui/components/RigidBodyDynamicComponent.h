@@ -34,6 +34,8 @@ namespace editor
         /// Destructor
                         ~RigidBodyDynamicComponent(void);
 
+        //static void     ReleaseStaticData(void);
+
         void            SetData(engine::SceneGraph* graph, engine::EntityHandle owner) override;
 
     protected:
@@ -53,9 +55,9 @@ namespace editor
         void            LockAxisUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
 
         /// Private members
-        std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule" };
-        std::string m_geometryName;
-        bool m_isClosed = false;
+        /*static*/  std::vector<const char*>    m_shapeTypes = { "Box", "Sphere", "Capsule" };
+                std::string                 m_geometryName;
+                bool                        m_isClosed      = false;
 
     }; // !Class RigidBodyDynamicComponent
 } // !Namespace editor
