@@ -56,6 +56,9 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
 
    engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
 
+   for (auto& navPoint : m_graph->GetComponentArray<engine::NavigationPoint>())
+       navPoint.RenderNavPoint(viewProjection);
+
     m_fbo.Unbind();
 }
 
