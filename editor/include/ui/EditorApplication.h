@@ -38,5 +38,6 @@ namespace editor
         MenuBar                     m_menuBar;
 
         friend class MenuBar;
+        friend class Viewport;
     };
 }
