@@ -30,13 +30,15 @@ namespace ui
 
         ENGINE_API uint32 AddButton(const char* displayLabel);
         ENGINE_API bool GetButtonState(uint32 index);
+        ENGINE_API void Render(void);
+        ENGINE_API void SetSelected(int32 index);
 
         
         
-        ENGINE_API void Render(void);
     private:
         std::string m_name;
         std::vector<ToolbarButton> m_buttons;
         EToolbarOrientation m_orientation;
+        int32 m_selected;
     };
 }

@@ -39,22 +39,30 @@ void editor::GizmosUI::Render(void)
     {
         printf("Pressed translation button\n");
         
-        m_currentGizmos = (m_currentGizmos == TRANSLATION_GIZMOS) ? NO_GIZMOS : TRANSLATION_GIZMOS;
+        bool isGizmosSelected = (m_currentGizmos == TRANSLATION_GIZMOS);
+
+        m_toolbar->SetSelected((isGizmosSelected) ? -1 : m_translateButton);
+        m_currentGizmos = (isGizmosSelected) ? NO_GIZMOS : TRANSLATION_GIZMOS;
         m_translationGizmos->HideGizmos(m_currentGizmos == NO_GIZMOS);
     }
 
     if (m_toolbar->GetButtonState(m_rotateButton))
     {
         printf("Pressed rotation button\n");
-
-        m_currentGizmos = (m_currentGizmos == ROTATION_GIZMOS) ? NO_GIZMOS : ROTATION_GIZMOS;
+        bool isGizmosSelected = (m_currentGizmos == ROTATION_GIZMOS);
+        
+        m_toolbar->SetSelected((isGizmosSelected) ? -1 : m_rotateButton);
+        m_currentGizmos = (isGizmosSelected) ? NO_GIZMOS : ROTATION_GIZMOS;
         m_rotationGizmos->HideGizmos(m_currentGizmos == NO_GIZMOS);
     }
 
     if (m_toolbar->GetButtonState(m_scaleButton))
     {
         printf("Pressed scale button\n");
-        m_currentGizmos = (m_currentGizmos == SCALE_GIZMOS) ? NO_GIZMOS : SCALE_GIZMOS;
+        bool isGizmosSelected = (m_currentGizmos == SCALE_GIZMOS);
+        
+        m_toolbar->SetSelected((isGizmosSelected) ? -1 : m_scaleButton);
+        m_currentGizmos = (isGizmosSelected) ? NO_GIZMOS : SCALE_GIZMOS;
         m_scaleGizmos->HideGizmos(m_currentGizmos == NO_GIZMOS);
     }
     m_toolbar->Render();

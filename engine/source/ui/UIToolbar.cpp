@@ -71,12 +71,20 @@ void ui::Toolbar::Render(void)
     // Render toolbar content
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, math::Vector2f(5.0f, 5.0f));
-    for (auto& button : m_buttons)
+    for (uint64 buttonIndex = 0; buttonIndex < m_buttons.size(); ++buttonIndex)
     {
         if (m_buttons.size() > 0 && m_orientation == TOOLBAR_HORIZONTAL)
             ImGui::SameLine();
 
-        button.m_value = ImGui::Button(button.m_displayLabel.c_str(), icon_size);
+
+        if ((int64) buttonIndex == m_selected)
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetColorU32(ImGuiCol_ButtonActive));
+        else
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetColorU32(ImGuiCol_Button));
+
+        m_buttons[buttonIndex].m_value = ImGui::Button(m_buttons[buttonIndex].m_displayLabel.c_str(), icon_size);
+        ImGui::PopStyleColor();
+        
     }
     ImGui::PopStyleVar(2);
 
@@ -96,4 +104,9 @@ void ui::Toolbar::Render(void)
     }
 
     ImGui::End();
+}
+
+void ui::Toolbar::SetSelected(int32 index)
+{
+    m_selected = index;
 }
