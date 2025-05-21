@@ -34,10 +34,6 @@ namespace editor
         /// Destructor
                         ~RigidBodyDynamicComponent(void);
 
-        //static void     ReleaseStaticData(void);
-
-        void            SetData(engine::SceneGraph* graph, engine::EntityHandle owner) override;
-
     protected:
 
         virtual void    SectionContent(void) override;

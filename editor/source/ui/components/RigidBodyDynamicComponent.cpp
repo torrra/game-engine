@@ -28,17 +28,6 @@ editor::RigidBodyDynamicComponent::~RigidBodyDynamicComponent(void)
 {
 }
 
-void editor::RigidBodyDynamicComponent::SetData(engine::SceneGraph* graph, engine::EntityHandle owner)
-{
-    BaseComponent::SetData(graph, owner);
-    UpdateShapeGeometry(0, engine::EGeometryType::SPHERE, GetData<engine::RigidBodyDynamic>());
-}
-
-//void editor::RigidBodyDynamicComponent::ReleaseStaticData(void)
-//{
-//    m_shapeTypes.clear();
-//}
-
 void editor::RigidBodyDynamicComponent::SectionContent(void)
 {
     if (engine::RigidBodyDynamic* rigidBodyDynamic = GetData<engine::RigidBodyDynamic>())
@@ -52,6 +41,7 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         math::Vector2f textSize = ui::GetTextSize(text); // gets text size (in pixels)
         ui::Text(text); // render text
         ui::SameLine(textSize.GetX() + 5.0f); // make next component on same line starting at the position of the width + 5 ( padding)
+
         
         if (ui::DropDown("##Shape Type", currentIndex, m_shapeTypes))
         {
