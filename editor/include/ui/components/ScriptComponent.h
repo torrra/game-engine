@@ -12,6 +12,8 @@ namespace editor
     public:
         ScriptComponent(void) = delete;
         ScriptComponent(std::string const& scriptName);
+        ScriptComponent(const ScriptComponent&) = delete;
+        ScriptComponent(ScriptComponent&&) noexcept = default;
         ~ScriptComponent(void) = default;
 
         void SetScript(uint32 script);
