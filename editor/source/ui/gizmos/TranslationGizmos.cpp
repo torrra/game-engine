@@ -21,7 +21,7 @@ editor::TranslateGizmos::TranslateGizmos(void)
 
     if (!isInit)
     {
-        engine::ResourceManager::Load<engine::Model>(TRANSLATION_GIZMOS_MODEL);
+        engine::ResourceManager::Load<engine::Model>(TRANSLATION_GIZMOS_MODEL, true);
         isInit = true;
     }
 }

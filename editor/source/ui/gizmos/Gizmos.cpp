@@ -23,7 +23,7 @@ editor::Gizmos::Gizmos(void)
     static bool isInit = false;
     if (!isInit)
     {
-        engine::ResourceManager::LoadShader("GizmosShader", ".\\shaders\\Model.vs", ".\\shaders\\Model.frag");
+        engine::ResourceManager::LoadShader("GizmosShader", ".\\shaders\\Model.vs", ".\\shaders\\Model.frag", true, true);
         isInit = true;
     }
 }

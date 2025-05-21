@@ -18,7 +18,7 @@ editor::ScaleGizmos::ScaleGizmos(void)
     if (!isInit)
     {
         // Init resource
-        engine::ResourceManager::Load<engine::Model>(SCALE_GIZMOS_MODEL);
+        engine::ResourceManager::Load<engine::Model>(SCALE_GIZMOS_MODEL, true);
         isInit = true;
     }
 }

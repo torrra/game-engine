@@ -18,7 +18,7 @@ editor::RotationGizmos::RotationGizmos(void)
     if (!isInit)
     {
         // Init resources
-        engine::ResourceManager::Load<engine::Model>(ROTATION_GIZMOS_MODEL);
+        engine::ResourceManager::Load<engine::Model>(ROTATION_GIZMOS_MODEL, true);
         isInit = true;
     }
 }
