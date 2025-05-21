@@ -14,6 +14,7 @@
 
 #pragma endregion
 
+//std::vector<const char*> editor::RigidBodyDynamicComponent::m_shapeTypes = { "Box", "Sphere", "Capsule" };
 
 editor::RigidBodyDynamicComponent::RigidBodyDynamicComponent(void)
 {
@@ -29,6 +30,11 @@ editor::RigidBodyDynamicComponent::~RigidBodyDynamicComponent(void)
     m_shapeTypes.clear();
     SetData<engine::RigidBodyDynamic>(nullptr);
 }
+
+//void editor::RigidBodyDynamicComponent::ReleaseStaticData(void)
+//{
+//    m_shapeTypes.clear();
+//}
 
 void editor::RigidBodyDynamicComponent::SectionContent(void)
 {

@@ -211,14 +211,18 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
 {
-    if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
-    {
-        // Delete the pointer
-        delete m_materialImpl;
-        m_materialImpl = nullptr;
-        // Release the rigid body
-        PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
+    // Delete the pointer
+    delete m_materialImpl;
+    m_materialImpl = nullptr;
 
+    if (m_rigidBodyImpl != nullptr)
+    {
+        if (m_rigidBodyImpl->m_rigidBodyDynamic != nullptr)
+        {
+            // Release the rigid body
+            PX_RELEASE(m_rigidBodyImpl->m_rigidBodyDynamic);
+        }
+    
         // Delete the pointer to the implementation structure
         delete m_rigidBodyImpl;
         m_rigidBodyImpl = nullptr;
@@ -429,7 +433,7 @@ math::Vector3f engine::RigidBodyDynamic::GetLinearVelocity(void) const
     {
         return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getLinearVelocity());
     }
-    return{};
+    return math::Vector3f::Zero();
 }
 
 math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
@@ -438,7 +442,7 @@ math::Vector3f engine::RigidBodyDynamic::GetAngularVelocity(void) const
     {
         return ToVector3f(m_rigidBodyImpl->m_rigidBodyDynamic->getAngularVelocity());
     }
-    return {};
+    return math::Vector3f::Zero();
 }
 
 bool engine::RigidBodyDynamic::GetIsTrigger(void) const

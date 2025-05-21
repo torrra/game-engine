@@ -5,6 +5,8 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/input/InputHandler.h>
 
+#include "ui/components/RigidBodyDynamicComponent.h"
+
 #define SIMULATION_VIEW_WINDOW "Simulation view"
 #define EDITOR_VIEW_WINDOW "Editor view"
 
@@ -90,6 +92,7 @@ namespace editor
 
     void EditorApplication::Shutdown(void)
     {
+        //RigidBodyDynamicComponent::ReleaseStaticData();
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         Application::Shutdown();
