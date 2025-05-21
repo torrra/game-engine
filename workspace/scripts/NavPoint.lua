@@ -11,7 +11,8 @@ function NavigationPoint:_RegisterNavigationPointComponent(handle)
 end
 
 function _NewNavigationPointComponent(handle)
-
+	
+	print("Registering NavigationPoint with handle", handle)
 	NavigationPoint:_RegisterNavigationPointComponent(handle)
 end
 

@@ -112,8 +112,14 @@
    int64 | handle=4
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=256
+   uint64 | components=258
+[Script]
+   uint64 | index=2
+   int64 | owner=4
+   uint64 | count=1
+   string | scriptObject="NavigationPointScript"
+   uint64 | flags=0
 [NavigationPoint]
      int64 | owner=4
-     vec3f32 | position={1.2,4.1,4.65}
+     vec3f32 | position={1.2,4.4,4.65}
      uint64 | flags=0
