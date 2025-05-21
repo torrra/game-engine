@@ -44,9 +44,29 @@ int script_GetNavPointPosition(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(pos.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(pos.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(pos.GetZ()));
+
     }
 
     return 3;
+}
+
+int script_SetNavPointPosition(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 4)
+        luaL_error(luaState, "Expected 4 arguments (self, x, y, z)");
+
+    else if (engine::NavigationPoint* navPoint = (engine::NavigationPoint*)lua_touserdata(luaState, 1))
+    {
+        f32 xPos = static_cast<f32>(lua_tonumber(luaState, 2));
+        f32 yPos = static_cast<f32>(lua_tonumber(luaState, 3));
+        f32 zPos = static_cast<f32>(lua_tonumber(luaState, 4));
+
+        navPoint->SetPosition({ xPos, yPos, zPos });
+    }
+
+    return 0;
 }
 
 void engine::RegisterNavPointFunctions(lua_State* luaState)
@@ -57,6 +77,7 @@ void engine::RegisterNavPointFunctions(lua_State* luaState)
 
         {"GetNavPointPosition", script_GetNavPointPosition},
 
+        {"SetNavPointPosition", script_SetNavPointPosition},
         {NULL, NULL}
     };
 

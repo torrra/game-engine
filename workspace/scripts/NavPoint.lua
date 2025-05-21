@@ -28,15 +28,15 @@ end
 
 function NavigationPoint:RefreshRef()
 	
-	self.ref = NavigationPointRef.GetNavigationPointRef(self.entity)
+	self.ref = NavPointRef.GetNavPointRef(self.entity)
 end
 
 function NavigationPoint:GetPosition()
 	
-	return NavigationPointRef.GetPosition(self.ref)
+	return NavPointRef.GetNavPointPosition(self.ref)
 end
 
 function NavigationPoint:SetPosition(x, y, z)
 
-	NavigationPointRef.SetPosition(self.ref, x, y, z)
+	NavPointRef.SetNavPointPosition(self.ref, x, y, z)
 end
