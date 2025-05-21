@@ -21,6 +21,9 @@ namespace editor
 
         void SetCurrentScene(class ::engine::GameScene* scene) override;
         void Render(class ::engine::SceneGraph* scene) override;
+        void ResetScene(class ::engine::GameScene& activeScene) override;
+        void LoadNewScene(class ::engine::GameScene& activeScene,
+                          const std::filesystem::path& filePath);
 
         void Shutdown(void) override;
 

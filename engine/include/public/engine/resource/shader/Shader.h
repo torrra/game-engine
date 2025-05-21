@@ -60,7 +60,7 @@ namespace engine
         ENGINE_API const std::string& GetFragmentShaderName(void) const;
 
 	private:
-		void CreateProgram(void);
+		void CreateProgram(bool isVertAbsolute, bool isFragAbsolute);
 
 		std::string m_vertexShader;
 		std::string m_fragShader;

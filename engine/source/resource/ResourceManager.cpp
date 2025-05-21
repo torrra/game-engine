@@ -7,7 +7,7 @@ engine::ResourceManager* engine::ResourceManager::m_instance = nullptr;
 void engine::ResourceManager::LoadShader(
 		const char* shaderProgramName,
 		const char* vertShader, 
-		const char* fragShader)
+		const char* fragShader, bool isVertAbsolute, bool isFragAbsolute)
 {
 	if (HasResource(shaderProgramName))
 	{
@@ -24,7 +24,7 @@ void engine::ResourceManager::LoadShader(
 
     newShader->m_vertexShader = vertShader;
     newShader->m_fragShader = fragShader;
-    newShader->CreateProgram();
+    newShader->CreateProgram(isVertAbsolute, isFragAbsolute);
 }
 
 void engine::ResourceManager::Unload(std::string const& fileName)

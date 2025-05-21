@@ -51,7 +51,7 @@ editor::Picking::Picking(engine::SceneGraph* graph)
     engine::ResourceManager::LoadShader(
         SHADER_NAME,
         ".\\shaders\\Picking.vert",
-        ".\\shaders\\Picking.frag"
+        ".\\shaders\\Picking.frag", true, true
     );
     
     // Get shader program
