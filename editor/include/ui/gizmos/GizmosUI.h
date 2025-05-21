@@ -11,6 +11,14 @@ namespace engine
 
 namespace editor
 {
+    enum ESelectedGizmos
+    {
+        NO_GIZMOS,
+        TRANSLATION_GIZMOS,
+        ROTATION_GIZMOS,
+        SCALE_GIZMOS
+    };
+
     class GizmosUI
     {
     public:
@@ -33,6 +41,7 @@ namespace editor
         uint32 m_translateButton;
         uint32 m_rotateButton;
         uint32 m_scaleButton;
+        ESelectedGizmos m_currentGizmos;
 
         friend class EditorApplication;
     };

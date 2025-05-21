@@ -9,11 +9,12 @@
 
 editor::GizmosUI::GizmosUI(void)
 {
-    m_transform = nullptr;
     m_toolbar = new ui::Toolbar("GizmosToolbar");
     m_translationGizmos = new TranslateGizmos();
-    m_rotationGizmos = nullptr;// new RotationGizmos();
-    m_scaleGizmos = nullptr;//new ScaleGizmos();
+    m_rotationGizmos = new RotationGizmos();
+    m_scaleGizmos = new ScaleGizmos();
+    m_currentGizmos = NO_GIZMOS;
+    m_transform = nullptr;
 
     m_translateButton = m_toolbar->AddButton(ICON_LC_MOVE_3D);
     m_rotateButton = m_toolbar->AddButton(ICON_LC_ROTATE_3D);
@@ -28,6 +29,7 @@ editor::GizmosUI::~GizmosUI(void)
     delete m_toolbar;
 
     m_transform = nullptr;
+    m_currentGizmos = NO_GIZMOS;
 }
 
 void editor::GizmosUI::Render(void)
@@ -36,36 +38,66 @@ void editor::GizmosUI::Render(void)
     if (m_toolbar->GetButtonState(m_translateButton))
     {
         printf("Pressed translation button\n");
-        m_translationGizmos->HideGizmos(false);
+        
+        m_currentGizmos = (m_currentGizmos == TRANSLATION_GIZMOS) ? NO_GIZMOS : TRANSLATION_GIZMOS;
+        m_translationGizmos->HideGizmos(m_currentGizmos == NO_GIZMOS);
     }
-
 
     if (m_toolbar->GetButtonState(m_rotateButton))
     {
         printf("Pressed rotation button\n");
 
+        m_currentGizmos = (m_currentGizmos == ROTATION_GIZMOS) ? NO_GIZMOS : ROTATION_GIZMOS;
+        m_rotationGizmos->HideGizmos(m_currentGizmos == NO_GIZMOS);
     }
 
     if (m_toolbar->GetButtonState(m_scaleButton))
     {
         printf("Pressed scale button\n");
-
+        m_currentGizmos = (m_currentGizmos == SCALE_GIZMOS) ? NO_GIZMOS : SCALE_GIZMOS;
+        m_scaleGizmos->HideGizmos(m_currentGizmos == NO_GIZMOS);
     }
     m_toolbar->Render();
 }
 
 void editor::GizmosUI::RenderGizmos(math::Matrix4f const& viewProj)
 {
-    m_translationGizmos->RenderPass(viewProj);
-    //m_rotationGizmos->RenderPass(viewProj);
-    //m_scaleGizmos->RenderPass(viewProj);
+    switch (m_currentGizmos)
+    {
+    case editor::TRANSLATION_GIZMOS:
+        m_translationGizmos->RenderPass(viewProj);
+        break;
+    case editor::ROTATION_GIZMOS:
+        m_rotationGizmos->RenderPass(viewProj);
+        break;
+    case editor::SCALE_GIZMOS:
+        m_scaleGizmos->RenderPass(viewProj);
+        break;
+    case editor::NO_GIZMOS:
+    default:
+        break;
+    }
+    
 }
 
 void editor::GizmosUI::RenderGizmosPicking(math::Matrix4f const& viewProj)
 {
-    m_translationGizmos->RenderPickingPass(viewProj);
-    //m_rotationGizmos->RenderPickingPass(viewProj);
-    //m_scaleGizmos->RenderPickingPass(viewProj);
+
+    switch (m_currentGizmos)
+    {
+    case editor::TRANSLATION_GIZMOS:
+        m_translationGizmos->RenderPickingPass(viewProj);
+        break;
+    case editor::ROTATION_GIZMOS:
+        m_rotationGizmos->RenderPickingPass(viewProj);
+        break;
+    case editor::SCALE_GIZMOS:
+        m_scaleGizmos->RenderPickingPass(viewProj);
+        break;
+    case editor::NO_GIZMOS:
+    default:
+        break;
+    }
 }
 
 void editor::GizmosUI::UpdateGizmos(const char* wndName)
@@ -73,16 +105,41 @@ void editor::GizmosUI::UpdateGizmos(const char* wndName)
     if (!m_transform)
         return;
 
-    m_translationGizmos->IsAxisSelected(wndName, m_transform);
-    //if (m_translationGizmos->IsGizmosSelected())
-    //{
-    //    printf("e\n");
-    //}
+    switch (m_currentGizmos)
+    {
+    case editor::TRANSLATION_GIZMOS:
+        m_translationGizmos->IsAxisSelected(wndName, m_transform);
+        break;
+    case editor::ROTATION_GIZMOS:
+        m_rotationGizmos->IsAxisSelected(wndName, m_transform);
+        break;
+    case editor::SCALE_GIZMOS:
+        m_scaleGizmos->IsAxisSelected(wndName, m_transform);
+        break;
+    case editor::NO_GIZMOS:
+    default:
+        break;
+    }
 }
 
 void editor::GizmosUI::SetSelectedTransform(engine::Transform* transform)
 {
     m_transform = transform;
-    m_translationGizmos->SetPosition(transform->GetPosition());
+
+    switch (m_currentGizmos)
+    {
+    case editor::TRANSLATION_GIZMOS:
+        m_translationGizmos->SetPosition(transform->GetPosition());
+        break;
+    case editor::ROTATION_GIZMOS:
+        m_rotationGizmos->SetPosition(transform->GetPosition());
+        break;
+    case editor::SCALE_GIZMOS:
+        m_scaleGizmos->SetPosition(transform->GetPosition());
+        break;
+    case editor::NO_GIZMOS:
+    default:
+        break;
+    }
     
 }
