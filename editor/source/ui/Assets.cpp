@@ -472,8 +472,6 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::RenderRightClickMenu(void)
         //if (::ui::MenuItem("Delete asset"))
         //    result = EAssetAction::DELETE_ASSET;
 
-        math::Vector3<bool> coucou;
-
         if (::ui::MenuItem("Create script"))
             result = EAssetAction::CREATE_SCRIPT;
 
