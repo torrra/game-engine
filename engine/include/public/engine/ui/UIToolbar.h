@@ -2,6 +2,7 @@
 
 #include "engine/EngineExport.h"
 #include "engine/CoreTypes.h"
+#include <math/Vector2.hpp>
 #include <string>
 #include <vector>
 
@@ -32,12 +33,13 @@ namespace ui
         ENGINE_API bool GetButtonState(uint32 index);
         ENGINE_API void Render(void);
         ENGINE_API void SetSelected(int32 index);
-
+        ENGINE_API void SetToolbarPosition(math::Vector2f const& position);
         
         
     private:
         std::string m_name;
         std::vector<ToolbarButton> m_buttons;
+        math::Vector2f m_windowPosition;
         EToolbarOrientation m_orientation;
         int32 m_selected;
     };

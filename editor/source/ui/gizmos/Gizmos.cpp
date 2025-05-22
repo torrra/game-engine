@@ -67,6 +67,7 @@ bool editor::Gizmos::IsGizmosSelected(void) const
 
 void editor::Gizmos::SetPosition(math::Vector3f const& position)
 {
+    m_position = position;
     m_xAxis.SetPosition(position);
     m_yAxis.SetPosition(position);
     m_zAxis.SetPosition(position);

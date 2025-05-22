@@ -9,7 +9,7 @@ ui::ToolbarButton::ToolbarButton(const char* displayLabel)
 {}
 
 ui::Toolbar::Toolbar(const char* name)
-    : m_name(name), m_orientation(TOOLBAR_VERTICAL)
+    : m_name(name), m_orientation(TOOLBAR_VERTICAL), m_windowPosition(-1.0f)
 {
 }
 
@@ -27,42 +27,42 @@ bool ui::Toolbar::GetButtonState(uint32 index)
 
 void ui::Toolbar::Render(void)
 {
+    // Get auto resizing axis
+    math::Vector2f requestedSize = (m_orientation == TOOLBAR_HORIZONTAL) ? math::Vector2f(-1.0f, 0.0f) : math::Vector2f(0.0f, -1.0f);
+    ImGui::SetNextWindowSize(requestedSize);
 
-    // 1. We request auto-sizing on one axis
-    // Note however this will only affect the toolbar when NOT docked.
-    math::Vector2f requested_size = (m_orientation == TOOLBAR_HORIZONTAL) ? math::Vector2f(-1.0f, 0.0f) : math::Vector2f(0.0f, -1.0f);
-    ImGui::SetNextWindowSize(requested_size);
-
-    // 2. Specific docking options for toolbars.
-    // Currently they add some constraint we ideally wouldn't want, but this is simplifying our first implementation
-    ImGuiWindowClass window_class;
-    window_class.DockingAllowUnclassed = true;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoCloseButton;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_HiddenTabBar; // ImGuiDockNodeFlags_NoTabBar // FIXME: Will need a working Undock widget for _NoTabBar to work
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingSplit;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingOverMe;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingOverOther;
+    // Set window properties
+    ImGuiWindowClass windowClass;
+    windowClass.DockingAllowUnclassed = true;
+    
+    windowClass.DockNodeFlagsOverrideSet =
+        ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_HiddenTabBar | 
+        ImGuiDockNodeFlags_NoDockingSplit | ImGuiDockNodeFlags_NoDockingOverMe | 
+        ImGuiDockNodeFlags_NoDockingOverMe | ImGuiDockNodeFlags_NoDockingOverOther;
 
     if (m_orientation == TOOLBAR_HORIZONTAL)
-        window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoResizeY;
-    else
-        window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoResizeX;
-    ImGui::SetNextWindowClass(&window_class);
+        windowClass.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoResizeY;
+    else 
+        windowClass.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoResizeX;
+    ImGui::SetNextWindowClass(&windowClass);
 
-    const float font_size = ImGui::GetFontSize();
-    const math::Vector2f icon_size(math::Floor(font_size * 1.7f), math::Floor(font_size * 1.7f));
+    const f32 iconSizeVal = math::Floor(ImGui::GetFontSize() * 1.7f);
+    const math::Vector2f iconSize(iconSizeVal, iconSizeVal);
+    //ImGui::SetNextWindowPos(m_windowPosition, ImGuiCond_Once);
     ImGui::Begin(m_name.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-
+    
+    
+    ImGui::SetWindowPos(m_windowPosition, ImGuiCond_Once);
     // Overwrite node size
     ImGuiDockNode* node = ImGui::GetWindowDockNode();
     if (node)
     {
         // Overwrite size of the node
         ImGuiStyle& style = ImGui::GetStyle();
-        const EToolbarOrientation toolbar_axis_perp = (EToolbarOrientation) (m_orientation ^ 1);
-        const float TOOLBAR_SIZE_WHEN_DOCKED = style.WindowPadding[toolbar_axis_perp] * 2.0f + icon_size[toolbar_axis_perp];
+        const EToolbarOrientation toolbarAxis = (EToolbarOrientation) (m_orientation ^ 1);
+        const f32 dockedToolbarSize = style.WindowPadding[toolbarAxis] * 2.0f + iconSize[toolbarAxis];
         node->WantLockSizeOnce = true;
-        node->Size[toolbar_axis_perp] = node->SizeRef[toolbar_axis_perp] = TOOLBAR_SIZE_WHEN_DOCKED;
+        node->Size[toolbarAxis] = node->SizeRef[toolbarAxis] = dockedToolbarSize;
 
         if (node->ParentNode && node->ParentNode->SplitAxis != ImGuiAxis_None)
             m_orientation = (EToolbarOrientation) (node->ParentNode->SplitAxis ^ 1);
@@ -76,13 +76,13 @@ void ui::Toolbar::Render(void)
         if (m_buttons.size() > 0 && m_orientation == TOOLBAR_HORIZONTAL)
             ImGui::SameLine();
 
-
+        // Set button background color
         if ((int64) buttonIndex == m_selected)
             ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetColorU32(ImGuiCol_ButtonActive));
         else
             ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetColorU32(ImGuiCol_Button));
 
-        m_buttons[buttonIndex].m_value = ImGui::Button(m_buttons[buttonIndex].m_displayLabel.c_str(), icon_size);
+        m_buttons[buttonIndex].m_value = ImGui::Button(m_buttons[buttonIndex].m_displayLabel.c_str(), iconSize);
         ImGui::PopStyleColor();
         
     }
@@ -109,4 +109,9 @@ void ui::Toolbar::Render(void)
 void ui::Toolbar::SetSelected(int32 index)
 {
     m_selected = index;
+}
+
+void ui::Toolbar::SetToolbarPosition(math::Vector2f const& position)
+{
+    m_windowPosition = position;
 }

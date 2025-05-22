@@ -30,7 +30,7 @@ void editor::TranslateGizmos::IsAxisSelected(std::string const& wndName, engine:
 {
     if (m_hideGizmos)
         return;
-
+    
     engine::SendCmdsToGPU();
     engine::SetPixelStorageMode();
 
@@ -64,8 +64,8 @@ void editor::TranslateGizmos::IsAxisSelected(std::string const& wndName, engine:
         m_selectedAxis = (m_yAxis.OnSelectedPosition(m_position, {0.0f, 1.0f, 0.0f}, -deltaCursorPos.GetY())) ? Y_AXIS : NO_AXIS;
     else if (m_selectedAxis == Z_AXIS)
         m_selectedAxis = (m_zAxis.OnSelectedPosition(m_position, {0.0f, 0.0f, 1.0f}, -deltaCursorPos.GetX())) ? Z_AXIS : NO_AXIS;
-    
     m_prevCursorPos = cursorPos;
-    transform->SetPosition(m_position);
+    
     SetPosition(m_position);
+    transform->SetPosition(m_position);
 }

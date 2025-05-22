@@ -31,7 +31,7 @@ namespace editor
     {
         if (!m_currentScene)
             return;
-        
+
         // Render editor windows
         m_assetWnd.Render();
         m_menuBar.Render(*m_currentScene);
@@ -56,7 +56,14 @@ namespace editor
         // Editor viewport
         m_sceneEditorView->RenderPickingPass(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
+        
+        auto result = ui::GetWindowPos(EDITOR_VIEW_WINDOW); result;
+        ;
         m_gizmosUI->Render();
+        
+        
+        if (result.GetX())
+            m_gizmosUI->m_toolbar->SetToolbarPosition({(f32)result.GetX(), (f32)result.GetY() + ui::GetWindowContentSize(EDITOR_VIEW_WINDOW).GetY() - 80.0f});
         m_sceneEditorView->Render();
 
 
