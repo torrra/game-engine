@@ -53,7 +53,7 @@ namespace engine
                                                 const math::Vector3f& inVelocity =
                                                             math::Vector3f::Zero());
 
-        ENGINE_API void SetSound(const Sound* inSound);
+        ENGINE_API void     SetSound(const Sound* inSound);
 
         ENGINE_API
             AudioPlayer&    operator=(AudioPlayer&&) noexcept = default;
