@@ -51,7 +51,7 @@ namespace engine
 
         // Permanently set object up for destruction
         ENGINE_API
-        void Invalidate(void);
+        virtual void Invalidate(void);
 
         ENGINE_API
         EntityHandle GetOwner(void) const;

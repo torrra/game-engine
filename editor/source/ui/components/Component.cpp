@@ -30,8 +30,6 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
         case editor::RIGIDBODY_DYNAMIC:
             graph->DestroyComponent<engine::RigidBodyDynamic>(handle);
             break;
-        case editor::SCRIPT:
-            graph->DestroyComponent<engine::Script>(handle);
             break;
         case editor::TRANSFORM:
             graph->DestroyComponent<engine::Transform>(handle);
@@ -49,6 +47,12 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
 bool editor::BaseComponent::IsRemoved(void) const noexcept
 {
     return m_isClosed;
+}
+
+void editor::BaseComponent::SetData(engine::SceneGraph* graph, engine::EntityHandle owner)
+{
+    m_graph = graph;
+    m_owner = owner;
 }
 
 editor::EComponentType editor::BaseComponent::GetType(void) const noexcept

@@ -11,7 +11,6 @@ editor::TransformComponent::TransformComponent(void)
 
 editor::TransformComponent::~TransformComponent(void)
 {
-    SetData<engine::Transform>(nullptr);
 }
 
 void editor::TransformComponent::SectionContent(void)

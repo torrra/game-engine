@@ -33,8 +33,6 @@ namespace editor
         /// Destructor
                         ~RigidBodyDynamicComponent(void);
 
-        //static void     ReleaseStaticData(void);
-
     protected:
 
         virtual void    SectionContent(void) override;

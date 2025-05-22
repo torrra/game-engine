@@ -50,6 +50,9 @@ namespace engine
         void AddScriptObject(const std::string& type);
 
         ENGINE_API
+        void RemoveScriptObject(uint32 index);
+
+        ENGINE_API
         void SerializeText(std::ostream& output,
                            EntityHandle owner,
                            uint64 index) const override;
@@ -58,7 +61,7 @@ namespace engine
         const char* DeserializeText(const char* text, const char* end) override;
 
         ENGINE_API
-        Script& operator=(const Script&) = default;
+        Script& operator=(const Script&) = delete;
 
         ENGINE_API
         Script& operator=(Script&&) noexcept = default;

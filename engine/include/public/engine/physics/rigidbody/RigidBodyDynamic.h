@@ -52,6 +52,10 @@ namespace engine
         // Delete the rigid body and the pointer to struct RigidBodyDynamicImpl
         ENGINE_API			    ~RigidBodyDynamic(void) override {}
 
+
+        ENGINE_API
+            void                Invalidate(void) override;
+
         /// Operator
         // Default move assignement
         ENGINE_API 

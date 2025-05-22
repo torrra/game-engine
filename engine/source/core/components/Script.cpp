@@ -32,7 +32,17 @@ namespace engine
 
     void Script::AddScriptObject(const std::string& type)
     {
-        m_scriptObjects.emplace_back(m_owner, type);
+        uint32 index = static_cast<uint32>(m_scriptObjects.size());
+        m_scriptObjects.emplace_back(m_owner, type, index);
+    }
+
+    void Script::RemoveScriptObject(uint32 index)
+    {
+        if (index < m_scriptObjects.size())
+        {
+            ScriptObject& script = m_scriptObjects[index];
+            script.Unregister();
+        }
     }
 
     void Script::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
@@ -48,11 +58,22 @@ namespace engine
         text::Serialize(output, "owner", owner);
         output << "\n   ";
 
-        text::Serialize(output, "count", m_scriptObjects.size());
+        uint64 scriptObjectCount = m_scriptObjects.size();
+
+        for (const ScriptObject& object : m_scriptObjects)
+        {
+            if (!object.IsValid())
+                --scriptObjectCount;
+        }
+
+        text::Serialize(output, "count", scriptObjectCount);
         output << "\n   ";
 
         for (const ScriptObject& object : m_scriptObjects)
         {
+            if (!object.IsValid())
+                continue;
+
             text::Serialize(output, "scriptObject", object.GetType());
             output << "\n   ";
         }
@@ -76,7 +97,8 @@ namespace engine
         {
             std::string objName;
             text = text::DeserializeString(text, end, objName);
-            m_scriptObjects.emplace_back(m_owner, objName);
+
+            AddScriptObject(objName);
         }
 
         MOVE_TEXT_CURSOR(text, end);

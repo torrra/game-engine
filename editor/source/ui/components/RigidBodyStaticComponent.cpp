@@ -18,7 +18,6 @@ editor::RigidBodyStaticComponent::RigidBodyStaticComponent(void)
 
 editor::RigidBodyStaticComponent::~RigidBodyStaticComponent(void)
 {
-    SetData<engine::RigidBodyStatic>(nullptr);
 }
 
 void editor::RigidBodyStaticComponent::SectionContent(void)

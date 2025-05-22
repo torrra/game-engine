@@ -42,6 +42,12 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
     m_currentScene	= inScene;
 }
 
+void engine::RigidBodyDynamic::Invalidate(void)
+{
+    Component::Invalidate();
+    RigidBodyDynamicCleanUp();
+}
+
 engine::Transform& engine::RigidBodyDynamic::CheckEntityTransform(void)
 {
     // Check if the entity has a transform

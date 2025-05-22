@@ -26,15 +26,7 @@ editor::RigidBodyDynamicComponent::RigidBodyDynamicComponent(void)
 
 editor::RigidBodyDynamicComponent::~RigidBodyDynamicComponent(void)
 {
-    m_geometryName.clear();
-    m_shapeTypes.clear();
-    SetData<engine::RigidBodyDynamic>(nullptr);
 }
-
-//void editor::RigidBodyDynamicComponent::ReleaseStaticData(void)
-//{
-//    m_shapeTypes.clear();
-//}
 
 void editor::RigidBodyDynamicComponent::SectionContent(void)
 {
