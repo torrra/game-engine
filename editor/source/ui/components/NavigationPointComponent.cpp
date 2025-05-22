@@ -16,7 +16,7 @@ editor::NavigationPointComponent::NavigationPointComponent(void)
 
 editor::NavigationPointComponent::~NavigationPointComponent(void)
 {
-    SetData<engine::NavigationPoint>(nullptr);
+    //SetData<engine::NavigationPoint>(nullptr);
 }
 
 void editor::NavigationPointComponent::SectionContent(void)
