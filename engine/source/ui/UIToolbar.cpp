@@ -48,11 +48,7 @@ void ui::Toolbar::Render(void)
 
     const f32 iconSizeVal = math::Floor(ImGui::GetFontSize() * 1.7f);
     const math::Vector2f iconSize(iconSizeVal, iconSizeVal);
-    //ImGui::SetNextWindowPos(m_windowPosition, ImGuiCond_Once);
     ImGui::Begin(m_name.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-    
-    
-    ImGui::SetWindowPos(m_windowPosition, ImGuiCond_Once);
     // Overwrite node size
     ImGuiDockNode* node = ImGui::GetWindowDockNode();
     if (node)
