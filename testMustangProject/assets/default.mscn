@@ -3,9 +3,9 @@
    int64 | handle=0
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=7
+   uint64 | components=15
 [Transform]
-    uint64 | index=3
+    uint64 | index=2
     int64 | owner=0
     quat32 | rotation={1,-4.94458e-11,0.000392575,1.78958e-11}
     vec3f32 | position={-0.00529975,4.6,-5.00181}
@@ -15,7 +15,7 @@
     int64 | owner=0
     string | model="padoru.obj"
     string | shader="ModelTextured"
-        string | vertexShader="ModelTextured.vert"
+        string | vertexShader="shaders/ModelTextured.vert"
         string | fragmentShader="ModelTextured.frag"
     uint64 | materialCount=1
     string | material="padoru.mmat"
@@ -30,7 +30,13 @@
      int64 | owner=0
      uint32 | type=0
      uint64 | shape=0
-     uint32 | collision group=1
+     uint32 | collision group=3
+     vec3f32 | box half extents={0.5,0.5,0.5}
+     uint32 | gravity=0
+     uint32 | trigger=0
+     uint32 | lock X axis=0
+     uint32 | lock Y axis=0
+     uint32 | lock Z axis=0
      uint64 | flags=0
 [Entity]
    string | name="Camera"
@@ -64,7 +70,7 @@
    int64 | handle=2
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=1
+   uint64 | components=17
 [Transform]
     uint64 | index=1
     int64 | owner=2
@@ -74,23 +80,33 @@
     uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=2
-     uint32 | type=0
+     uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=3
+     vec3f32 | box half extents={0.5,0.5,0.5}
+     bool | trigger=0
      uint64 | flags=0
 [Entity]
    string | name="Test"
    int64 | handle=3
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=1
+   uint64 | components=17
 [Transform]
-    uint64 | index=2
+    uint64 | index=3
     int64 | owner=3
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,4,-5}
+    vec3f32 | position={0,3.25,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=3
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={0.5,0.2,0.5}
+     bool | trigger=1
+     uint64 | flags=0
 [Entity]
    string | name="New Entity 1"
    int64 | handle=4
@@ -109,3 +125,24 @@
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=0
+[Entity]
+   string | name="Trigger"
+   int64 | handle=7
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=17
+[Transform]
+    uint64 | index=4
+    int64 | owner=7
+    quat32 | rotation={1,-7.7685e-08,-1.22174e-07,0}
+    vec3f32 | position={0,1,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=7
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={0.5,0.5,0.5}
+     bool | trigger=1
+     uint64 | flags=0

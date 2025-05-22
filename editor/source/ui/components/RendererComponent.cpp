@@ -21,7 +21,6 @@ editor::RendererComponent::RendererComponent(void)
 
 editor::RendererComponent::~RendererComponent(void)
 {
-    SetData<engine::Renderer>(nullptr);
 }
 
 void editor::RendererComponent::SectionContent(void)
@@ -91,7 +90,10 @@ void editor::RendererComponent::ShaderInput(engine::Renderer* renderer)
                 m_fragName = payloadData->m_fileName.substr(startOffset);
                 std::string programName = "program" + m_fragName.substr(0, endOffset);
 
-                engine::ResourceManager::LoadShader(programName.c_str(), defaultVertexShader, payloadData->m_path.string().c_str());
+                engine::ResourceManager::LoadShader(programName.c_str(),
+                                                    defaultVertexShader,
+                                                    payloadData->m_path.string().c_str(), true);
+
                 renderer->SetShader(programName.c_str());
             }
         }

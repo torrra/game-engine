@@ -2,6 +2,7 @@
 
 #include <engine/CoreTypes.h>
 #include <engine/core/Component.h>
+#include <engine/core/SceneGraph.h>
 
 #include <concepts>
 #include <string>
@@ -22,7 +23,8 @@ namespace editor
         AUDIO,
         CAMERA,
         RENDERER,
-        RIGIDBODY,
+        RIGIDBODY_STATIC,
+        RIGIDBODY_DYNAMIC,
         SCRIPT,
         TRANSFORM
     };
@@ -30,11 +32,13 @@ namespace editor
     class BaseComponent
     {
     public:
-        void RenderSection(engine::SceneGraph* graph, engine::EntityHandle const& handle);
+        virtual void RenderSection(engine::SceneGraph* graph, engine::EntityHandle const& handle);
         bool IsRemoved(void) const noexcept;
     
-        template<CComponentType CType>
-        void SetData(CType* component);
+        //template<CComponentType CType>
+
+
+        void SetData(engine::SceneGraph* graph, engine::EntityHandle owner);
 
         EComponentType GetType(void) const noexcept;
 
@@ -50,23 +54,24 @@ namespace editor
 
 
     private:
-        void* m_component = nullptr;
+        engine::SceneGraph* m_graph = nullptr;
         std::string m_componentName;
+        engine::EntityHandle m_owner = engine::Entity::INVALID_HANDLE;
         EComponentType m_componentType = INVALID_COMPONENT_TYPE;
     
     protected:
         bool m_isClosed = false;
     };
 
-    template<CComponentType CType>
+   /* template<CComponentType CType>
     inline void BaseComponent::SetData(CType* component)
     {
         m_component = component;
-    }
+    }*/
 
     template<CComponentType CType>
     inline CType* BaseComponent::GetData(void)
     {
-        return reinterpret_cast<CType*>(m_component);
+        return m_graph->GetComponent<CType>(m_owner);
     }
 }

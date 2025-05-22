@@ -8,8 +8,10 @@
 #include <engine/ui/UIStyle.h>
 #include <engine/ui/UIDragDrop.h>
 #include <engine/ConsoleLog.hpp>
+#include <engine/core/systems/ScriptSystem.h>
 
 #include <engine/utility/MemoryCheck.h>
+#include <engine/utility/Platform.h>
 #include <engine/input/InputHandler.h>
 #include <engine/Engine.h>
 #include <filesystem>
@@ -20,6 +22,46 @@
 #define ASSET_PADDING 15.0f
 #define MAX_LABEL_LINE_LENGTH 16
 #define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag", ".mmat", ".mscn", ".ogg", ".mp3"}
+
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+bool DirUpdated(std::string const& path)
+{
+    HANDLE handles[1] = { nullptr };
+
+    handles[0] = FindFirstChangeNotificationA(path.c_str(), false, FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME);
+    if (handles[0] == INVALID_HANDLE_VALUE || handles[0] == nullptr)
+    {
+        printf("[ERROR]: FindFirstChangeNotificationA failed, error code: %lu.\n", GetLastError());
+        return false;
+    }
+
+    DWORD result = WaitForMultipleObjects(1, handles, false, 500);
+    bool newChanges = false;
+
+    switch (result)
+    {
+    case WAIT_OBJECT_0:
+        // Refresh directory
+        printf("Refresh required\n");
+        newChanges = true;
+
+        if (!FindNextChangeNotification(handles[0]))
+            printf("[ERROR]: FindNextChangeNotification failed, error code %lu.\n", GetLastError());
+
+        break;
+    case WAIT_TIMEOUT:
+        break;
+    default:
+        printf("[ERROR]: An unhandled case occurred while checking for project directory changes\n");
+        break;
+    }
+
+    return newChanges;
+}
+
 
 // Node implementation
 editor::DirTreeNode::DirTreeNode(std::filesystem::path const& path, DirTreeNode* parent)
@@ -92,7 +134,21 @@ void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
 void editor::AssetsWnd::RenderContents(void)
 {
     bool shouldRefresh = false;
+
+    if (m_isDirUpdated.valid() && m_isDirUpdated.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+    {
+        if (m_isDirUpdated.get())
+            shouldRefresh = true;
+
+        else if (m_selectedDirectory)
+            m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_selectedDirectory->m_path.string());
+    }
+
     math::Vector2f windowSize = ::ui::GetAvailSpace();
+
+    if (windowSize.GetX() <= 0.f || windowSize.GetY() <= 0.f)
+        return;
+
     m_layout->SetSize(windowSize);
 
     if (m_layout->StartTable())
@@ -108,16 +164,22 @@ void editor::AssetsWnd::RenderContents(void)
             if (m_currentAction == EAssetAction::NONE)
                 m_currentAction = rightClickMenu;
 
-            if (m_currentAction == EAssetAction::CREATE_SCENE ||
-                m_currentAction == EAssetAction::CREATE_MATERIAL)
+            switch (m_currentAction)
             {
-                
+            
+            case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
+            case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
+            case editor::AssetsWnd::EAssetAction::CREATE_SCRIPT:
+
                 ui::OpenModal("New asset");
 
                 if (CreateAsset(m_currentAction) == EAssetAction::REFRESH_WINDOW)
                     shouldRefresh = true;
-            }
+                break;
 
+            default:
+                break;
+            }
         }
     
         m_layout->EndTable();
@@ -303,6 +365,12 @@ void editor::AssetsWnd::OnSelectDir(void)
             m_assets.emplace_back(Asset(relativeFilePath, payloadType));
         }
     }
+
+    if (m_isDirUpdated.valid())
+        m_isDirUpdated.get();
+
+    m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_selectedDirectory->m_path.string());
+
 }
 
 bool editor::AssetsWnd::IsSupportedExtension(std::string const& extension, std::string& payloadType)
@@ -357,6 +425,7 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
 void editor::AssetsWnd::SelectResource(void)
 {
     constexpr uint64 sceneStrLen = sizeof(SCENE_PAYLOAD) - 1;
+    constexpr uint64 scriptStrLen = sizeof(SCRIPT_PAYLOAD) - 1;
 
     Asset& selectedAsset = m_assets[m_selectedIndex];
 
@@ -368,6 +437,16 @@ void editor::AssetsWnd::SelectResource(void)
         scenePath += selectedAsset.m_path;
         m_ownerApplication->LoadNewScene(engine::Engine::GetEngine()->GetCurrentScene(),
             scenePath);
+    }
+
+    else if (selectedAsset.m_payloadType.size() == scriptStrLen &&
+        memcmp(selectedAsset.m_payloadType.c_str(), SCRIPT_PAYLOAD, scriptStrLen) == 0)
+    {
+        std::filesystem::path scriptPath = engine::Engine::GetEngine()->GetProjectDir();
+
+        scriptPath += selectedAsset.m_path;
+
+        engine::OpenFile(scriptPath.c_str());
     }
 }
 
@@ -392,6 +471,9 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::RenderRightClickMenu(void)
         //// Delete
         //if (::ui::MenuItem("Delete asset"))
         //    result = EAssetAction::DELETE_ASSET;
+
+        if (::ui::MenuItem("Create script"))
+            result = EAssetAction::CREATE_SCRIPT;
 
         ::ui::EndPopUp();
         m_isRightClickMenuOpen = true;
@@ -447,6 +529,34 @@ void editor::AssetsWnd::CloseAssetCreationMenu(void)
     m_currentAction = EAssetAction::NONE;
 }
 
+editor::AssetsWnd::EAssetAction editor::AssetsWnd::SelectNewAssetType(EAssetAction action)
+{
+    EAssetAction result = EAssetAction::NONE;
+
+    switch (action)
+    {
+    case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
+        CreateScene();
+        result = EAssetAction::REFRESH_WINDOW;
+        break;
+    case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
+        break;
+
+    case editor::AssetsWnd::EAssetAction::CREATE_SCRIPT:
+
+        engine::ScriptSystem::CreateUserScript(
+            nullptr,
+            m_newAssetName.c_str()
+        );
+        result = EAssetAction::REFRESH_WINDOW;
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}
+
 editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction action)
 {
     EAssetAction result = EAssetAction::NONE;
@@ -466,18 +576,7 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::CreateAsset(EAssetAction acti
 
             if (ui::Button("Create asset") && IsAssetNameValid())
             {
-                switch (action)
-                {
-                case editor::AssetsWnd::EAssetAction::CREATE_SCENE:
-                    CreateScene();
-                    result = EAssetAction::REFRESH_WINDOW;
-                    break;
-                case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
-                    break;
-                default:
-                    break;
-                }
-
+                result = SelectNewAssetType(action);
                 CloseAssetCreationMenu();            
             }
             m_assetCreationTable.EndTable();

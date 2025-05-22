@@ -39,6 +39,9 @@ namespace editor
         // Menu bar
         void RenderMenuBar(void);
 
+        // Allow to drag and drop scripts into window
+        void ScriptInput(void);
+        void AddScript(engine::Script* script, const std::string& name);
 
         std::vector<BaseComponent*> m_components;
         engine::SceneGraph* m_graph;
@@ -49,7 +52,7 @@ namespace editor
     inline void editor::PropertyWnd::InitComponent(void)
     {
         CUIType* component = new CUIType;
-        dynamic_cast<BaseComponent*>(component)->SetData(m_graph->GetComponent<CType>(m_handle));
+        dynamic_cast<BaseComponent*>(component)->SetData(m_graph, m_handle);
         m_components.emplace_back(component);
     }
 

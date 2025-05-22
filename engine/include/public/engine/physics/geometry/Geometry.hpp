@@ -36,8 +36,8 @@ namespace engine
 
     struct RigidBodyData
     {
-        uint32 m_index;
-        uint32 m_type;
+        uint32 m_index  = 0;
+        uint32 m_type   = 0;
 
     }; // !Struct RigidBodyDynamicData
 

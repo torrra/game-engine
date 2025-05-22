@@ -1,5 +1,7 @@
 #include "Engine.h"
 
+#include "engine/utility/MemoryCheck.h"
+
 #include "ConsoleLog.hpp"
 #include "core/systems/ScriptSystem.h"
 #include "input/InputHandler.h"

@@ -1,12 +1,21 @@
 #include "ui/Properties.h"
+#include "ui/Assets.h"
 #include "ui/components/CameraComponent.h"
 #include "ui/components/RendererComponent.h"
 #include "ui/components/ScriptComponent.h"
 #include "ui/components/TransformComponent.h"
+#include "ui/components/RigidBodyStaticComponent.h"
+#include "ui/components/RigidBodyDynamicComponent.h"
 
 #include <engine/ui/UIComponent.h>
+#include <engine/ui/UIDragDrop.h>
+#include <engine/ui/UIDraw.h>
+#include <engine/ui/UIStyle.h>
+#include <engine/ui/InternalUIWindow.h>
+
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/ConsoleLog.hpp>
 
 #define WINDOW_NAME "Properties"
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
@@ -60,6 +69,7 @@ void editor::PropertyWnd::RenderContents(void)
 
     }
 
+    ScriptInput();
 }
 
 void editor::PropertyWnd::InitComponents(void)
@@ -82,14 +92,30 @@ void editor::PropertyWnd::InitComponents(void)
     // Camera
     if (entity->HasComponent<engine::Camera>())
         InitComponent<CameraComponent, engine::Camera>();
+
+    // RigidBodyStatic
+    if (entity->HasComponent<engine::RigidBodyStatic>())
+        InitComponent<RigidBodyStaticComponent, engine::RigidBodyStatic>();
+
+    // RigidBodyDynamic
+    if (entity->HasComponent<engine::RigidBodyDynamic>())
+        InitComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
     
     // Script
     if (entity->HasComponent<engine::Script>())
     {
         engine::Script* scriptComponent = m_graph->GetComponent<engine::Script>(m_handle);
 
-        for (engine::ScriptObject script : scriptComponent->GetScripts())
-            m_components.emplace_back(new ScriptComponent(script.GetType()));
+        for (const engine::ScriptObject& script : scriptComponent->GetScripts())
+        {
+            if (!script.IsValid())
+                continue;
+
+            ScriptComponent* newScript = new ScriptComponent(script.GetType());
+            newScript->SetScript(script.GetIndex());
+            
+            m_components.emplace_back(newScript);
+        }
     }
 }
 
@@ -103,8 +129,11 @@ void editor::PropertyWnd::RenderMenuBar(void)
                  if (ui::MenuItem("Renderer"))
                 AddComponent<RendererComponent, engine::Renderer>();
 
-            else if (ui::MenuItem("Rigidbody"))
-                printf("Adding rigidbody...\n"); // TODO: implement rigidbody
+            else if (ui::MenuItem("RigidbodyStatic"))
+                AddComponent<RigidBodyStaticComponent, engine::RigidBodyStatic>();
+
+            else if (ui::MenuItem("RigidbodyDynamic"))
+                AddComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
             
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
@@ -123,6 +152,56 @@ void editor::PropertyWnd::RenderMenuBar(void)
     ui::EndDisabledSection();
 }
 
+void editor::PropertyWnd::ScriptInput(void)
+{
+    if (::ui::StartDragDropTargetCustom(GetWindowRect(), m_title.c_str()))
+    {
+        // Check asset type
+        if (const ui::Payload payload = ui::AcceptPayload(SCRIPT_PAYLOAD, 0))
+        {
+            if (payload.IsPreview())
+            {
+                ::ui::DrawList drawList = ::ui::GetForegroundDrawList();
+                auto transform = this->GetWindowRect();
+                uint32 color = ::ui::GetColor(::ui::DRAG_DROP_TARGET_COLOR, 0.05f);
+                drawList.AddRectFilled(transform.m_min, transform.m_max, color);
+            }
+
+            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+
+            if (payload.IsDelivery())
+            {
+                std::filesystem::path filename = payloadData->m_path.filename().replace_extension();
+
+                if (engine::Script* script = m_graph->GetComponent<engine::Script>(m_handle))
+                    AddScript(script, filename.string());
+
+                else if (engine::Script* newScript = m_graph->CreateComponent<engine::Script>(m_handle))
+                    AddScript(newScript, filename.string());
+
+                else
+                    engine::PrintLog(engine::ErrorPreset(), "Unable to add script to entity");
+
+                InitComponents();
+            }
+        }
+        ui::EndDragDropTarget();
+    }
+    // Formatting
+    ui::VerticalSpacing();
+}
+
+void editor::PropertyWnd::AddScript(engine::Script* script, const std::string& name)
+{
+    for (const engine::ScriptObject& object : script->GetScripts())
+    {
+        if (object.IsValid() && name == object.GetName())
+            return;
+    }
+
+    script->AddScriptObject(name);
+}
+
 void editor::PropertyWnd::ClearComponentArray(void)
 {
     for (BaseComponent* component : m_components)
@@ -138,7 +217,11 @@ void editor::PropertyWnd::ClearComponentArray(void)
         case editor::RENDERER:
             delete dynamic_cast<RendererComponent*>(component);
             break;
-        case editor::RIGIDBODY:
+        case editor::RIGIDBODY_STATIC:
+            delete dynamic_cast<RigidBodyStaticComponent*>(component);
+            break;
+        case editor::RIGIDBODY_DYNAMIC:
+            delete dynamic_cast<RigidBodyDynamicComponent*>(component);
             break;
         case editor::SCRIPT:
             delete dynamic_cast<ScriptComponent*>(component);

@@ -236,8 +236,8 @@ bool engine::Raycast::HasHit(HitData* outData)
             }
             else
             {
-                RigidBodyDynamic& rigidbody =
-                    *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyDynamic>().begin() + actorData->m_index);
+                RigidBodyStatic& rigidbody =
+                    *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + actorData->m_index);
 
                 outData->m_hitEntity = rigidbody.GetOwner();
             }

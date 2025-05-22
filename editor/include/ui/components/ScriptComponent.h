@@ -7,19 +7,23 @@
 
 namespace editor
 {
-    class ScriptComponent : public BaseComponent
+    class ScriptComponent final : public BaseComponent
     {
     public:
         ScriptComponent(void) = delete;
         ScriptComponent(std::string const& scriptName);
-        ~ScriptComponent(void);
+        ScriptComponent(const ScriptComponent&) = delete;
+        ScriptComponent(ScriptComponent&&) noexcept = default;
+        ~ScriptComponent(void) = default;
 
-        void SetScript(engine::ScriptObject* script);
+        void SetScript(uint32 script);
     
     protected:
-        virtual void SectionContent(void) override;
+        void SectionContent(void) override;
+        void RenderSection(engine::SceneGraph* graph,
+                           engine::EntityHandle const& handle) override;
 
     private:
-        engine::ScriptObject* m_script;
+        uint32 m_script = ULONG_MAX;
     };
 }

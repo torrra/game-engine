@@ -80,4 +80,11 @@ namespace engine
                 bool                        m_isDrawn           = false;
 
     }; // !Class TriangleMesh
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<TriangleMesh>()
+    {
+        return TRIANGLE_MESH;
+    }
+
 } // !Namespace engine
