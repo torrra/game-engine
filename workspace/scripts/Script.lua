@@ -128,10 +128,19 @@ function _NewScriptComponent(handle)
 	Script:_RegisterScriptComponent(handle)
 end
 
--- Add a new script o
+-- Add a new script object
 function _NewScriptObject(typename, handle)
 	local ownerComponent = ExistingScriptComponents[handle]
 	ScriptObject._Register(typename, handle, ownerComponent)	
+end
+
+-- Remove an existing script object
+function _RemoveScriptObject(typename, handle)
+	local ownerComponent = ExistingScriptComponents[handle]
+
+	if ownerComponent ~= nil then
+		ownerComponent[typename] = nil
+	end
 end
 
 -- Update script objects inside a script
@@ -153,19 +162,28 @@ end
 function _OnCollisionEnterScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
-	component:_OnCollisionEnter(handleOther)
+
+	if component ~= nil then
+		component:_OnCollisionEnter(handleOther)
+	end
 end
 
 function _OnCollisionExitScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
-	component:_OnCollisionExit(handleOther)
+
+	if component ~= nil then
+		component:_OnCollisionExit(handleOther)
+	end
 end
 
 function _OnTriggerEnterScript(handleOwner, handleOther)
 
 	local component = ExistingScriptComponents[handleOwner]
-	component:_OnTriggerEnter(handleOther)
+
+	if component ~= nil then
+		component:_OnTriggerEnter(handleOther)
+	end
 end
 
 function _OnTriggerExitScript(handleOwner, handleOther)

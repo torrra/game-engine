@@ -73,6 +73,9 @@ namespace engine
         ENGINE_API
         static void RegisterNewScriptObject(const std::string& type, EntityHandle owner);
 
+        ENGINE_API
+        static void UnregisterScriptObject(const std::string& type, EntityHandle owner);
+
         // Call all Start() functions in a given entity's script component
         ENGINE_API
         static void StartScript(EntityHandle entity);

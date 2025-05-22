@@ -30,8 +30,6 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
         case editor::RIGIDBODY_DYNAMIC:
             graph->DestroyComponent<engine::RigidBodyDynamic>(handle);
             break;
-        case editor::SCRIPT:
-            graph->DestroyComponent<engine::Script>(handle);
             break;
         case editor::TRANSFORM:
             graph->DestroyComponent<engine::Transform>(handle);
