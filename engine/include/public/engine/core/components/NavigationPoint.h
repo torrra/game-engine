@@ -79,8 +79,10 @@ namespace engine
         ENGINE_API
             const char*         DeserializeText(const char* text, const char* end) override;
 
-        ENGINE_API 
-            void		        Register(void) override {}
+        ENGINE_API
+            void		        Register(void) override;
+        ENGINE_API
+            void                Unregister(void) override;
 
         ENGINE_API
             void                RenderNavPoint(const math::Matrix4f& inProjView);

@@ -14,6 +14,12 @@
 
 #pragma endregion
 
+#pragma region System
+
+#include "engine/core/systems/ScriptSystem.h"
+
+#pragma endregion
+
 engine::NavigationPoint::NavigationPoint(EntityHandle inOwner, SceneGraph* inScene)
 {
     inOwner = m_owner;
@@ -65,6 +71,16 @@ const char* engine::NavigationPoint::DeserializeText(const char* text, const cha
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
+}
+
+void engine::NavigationPoint::Register(void)
+{
+    engine::ScriptSystem::RegisterNewComponent("_NewNavigationPointComponent", m_owner);
+}
+
+void engine::NavigationPoint::Unregister(void)
+{
+    engine::ScriptSystem::UnregisterComponent("_RemoveNavigationPointComponent", m_owner);
 }
 
 void engine::NavigationPoint::RenderNavPoint(const math::Matrix4f& inProjView)
