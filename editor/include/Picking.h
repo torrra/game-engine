@@ -3,7 +3,6 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/resource/shader/Shader.h>
-#include <engine/utility/GizmosTest.h>
 #include <math/Vector3.hpp>
 #include <math/Matrix4.hpp>
 #include <unordered_map>
