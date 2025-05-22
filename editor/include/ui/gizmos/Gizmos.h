@@ -37,7 +37,7 @@ namespace editor
         void SetPosition(math::Vector3f const& position);
         void SetScale(math::Vector3f const& size);
         void SetColor(math::Vector3f const& color);
-
+        
     private:
         math::Matrix4f m_modelMatrix;
         std::string m_modelPath;
@@ -52,7 +52,7 @@ namespace editor
         Gizmos(void);
         ~Gizmos(void) = default;
 
-        void RenderPass(const math::Matrix4f& projViewMatrix);
+        void RenderPass(const math::Matrix4f& projViewMatrix, math::Vector3f const& cameraPos);
         void RenderPickingPass(const math::Matrix4f& projViewMatrix);
         virtual void IsAxisSelected(std::string const& wndName, engine::Transform* transform) = 0;
         void HideGizmos(bool value);
@@ -65,6 +65,7 @@ namespace editor
         class GizmosAxis m_yAxis;
         class GizmosAxis m_zAxis;
         math::Vector3f m_position;
+        math::Vector3f m_inputDir;
         math::Vector2f m_prevCursorPos;
         uint8 m_selectedAxis;
         bool m_hideGizmos;

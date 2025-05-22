@@ -68,7 +68,7 @@ void editor::GizmosUI::Render(void)
     }
 }
 
-void editor::GizmosUI::RenderGizmos(math::Matrix4f const& viewProj)
+void editor::GizmosUI::RenderGizmos(math::Matrix4f const& viewProj, math::Vector3f const& cameraPos)
 {
     if (!m_transform)
         return;
@@ -76,13 +76,13 @@ void editor::GizmosUI::RenderGizmos(math::Matrix4f const& viewProj)
     switch (m_currentGizmos)
     {
     case editor::TRANSLATION_GIZMOS:
-        m_translationGizmos->RenderPass(viewProj);
+        m_translationGizmos->RenderPass(viewProj, cameraPos);
         break;
     case editor::ROTATION_GIZMOS:
-        m_rotationGizmos->RenderPass(viewProj);
+        m_rotationGizmos->RenderPass(viewProj, cameraPos);
         break;
     case editor::SCALE_GIZMOS:
-        m_scaleGizmos->RenderPass(viewProj);
+        m_scaleGizmos->RenderPass(viewProj, cameraPos);
         break;
     case editor::NO_GIZMOS:
     default:

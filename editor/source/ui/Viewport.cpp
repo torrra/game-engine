@@ -51,13 +51,13 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     m_fbo.Bind();
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::ExecuteRenderThreadTasks();
-
+    
     if (m_graph)
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
    engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
 
-    m_editorApp->m_gizmosUI->RenderGizmos(viewProjection);
+    m_editorApp->m_gizmosUI->RenderGizmos(viewProjection, m_editorApp->m_editorViewCamera.GetPosition());
     m_fbo.Unbind();
 }
 

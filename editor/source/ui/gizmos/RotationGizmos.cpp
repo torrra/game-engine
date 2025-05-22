@@ -56,10 +56,12 @@ void editor::RotationGizmos::IsAxisSelected(std::string const& wndName, engine::
     math::Vector2f deltaCursorPos = cursorPos - m_prevCursorPos;
 
     math::Vector3f deltaRotation(0.0f);
+    f32 yAxis = (m_inputDir.GetX() == 1 && m_inputDir.GetZ() == 1) ? -1 : 1.0f;
+
     if (m_selectedAxis == X_AXIS)
         m_selectedAxis = (m_xAxis.OnSelectedRotation(deltaRotation, {1.0f, 0.0f, 0.0f}, deltaCursorPos.GetY())) ? X_AXIS : NO_AXIS;
     else if (m_selectedAxis == Y_AXIS)
-        m_selectedAxis = (m_yAxis.OnSelectedRotation(deltaRotation, {0.0f, 1.0f, 0.0f}, -deltaCursorPos.GetX())) ? Y_AXIS : NO_AXIS;
+        m_selectedAxis = (m_yAxis.OnSelectedRotation(deltaRotation, {0.0f, yAxis, 0.0f}, -deltaCursorPos.GetX())) ? Y_AXIS : NO_AXIS;
     else if (m_selectedAxis == Z_AXIS)
         m_selectedAxis = (m_zAxis.OnSelectedRotation(deltaRotation, {0.0f, 0.0f, 1.0f}, -deltaCursorPos.GetY())) ? Z_AXIS : NO_AXIS;
 

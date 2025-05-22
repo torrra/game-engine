@@ -56,11 +56,11 @@ void editor::ScaleGizmos::IsAxisSelected(std::string const& wndName, engine::Tra
     math::Vector2f deltaCursorPos = cursorPos - m_prevCursorPos;
 
     if (m_selectedAxis == X_AXIS)
-        m_selectedAxis = (m_xAxis.OnSelectedScale(transform->SetScale(), {1.0f, 0.0f, 0.0f}, deltaCursorPos.GetX())) ? X_AXIS : NO_AXIS;
+        m_selectedAxis = (m_xAxis.OnSelectedScale(transform->SetScale(), {m_inputDir.GetZ(), 0.0f, 0.0f}, deltaCursorPos.GetX())) ? X_AXIS : NO_AXIS;
     else if (m_selectedAxis == Y_AXIS)
         m_selectedAxis = (m_yAxis.OnSelectedScale(transform->SetScale(), {0.0f, 1.0f, 0.0f}, -deltaCursorPos.GetY())) ? Y_AXIS : NO_AXIS;
     else if (m_selectedAxis == Z_AXIS)
-        m_selectedAxis = (m_zAxis.OnSelectedScale(transform->SetScale(), {0.0f, 0.0f, 1.0f}, -deltaCursorPos.GetX())) ? Z_AXIS : NO_AXIS;
+        m_selectedAxis = (m_zAxis.OnSelectedScale(transform->SetScale(), {0.0f, 0.0f, m_inputDir.GetX()}, -deltaCursorPos.GetX())) ? Z_AXIS : NO_AXIS;
 
     m_prevCursorPos = cursorPos;
 }

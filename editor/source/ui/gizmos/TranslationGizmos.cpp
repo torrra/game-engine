@@ -59,11 +59,11 @@ void editor::TranslateGizmos::IsAxisSelected(std::string const& wndName, engine:
     math::Vector2f deltaCursorPos = cursorPos - m_prevCursorPos;
     
     if (m_selectedAxis == X_AXIS)
-        m_selectedAxis = (m_xAxis.OnSelectedPosition(m_position, {1.0f, 0.0f, 0.0f}, deltaCursorPos.GetX())) ? X_AXIS : NO_AXIS;
+        m_selectedAxis = (m_xAxis.OnSelectedPosition(m_position, {m_inputDir.GetZ(), 0.0f, 0.0f}, deltaCursorPos.GetX())) ? X_AXIS : NO_AXIS;
     else if (m_selectedAxis == Y_AXIS)
         m_selectedAxis = (m_yAxis.OnSelectedPosition(m_position, {0.0f, 1.0f, 0.0f}, -deltaCursorPos.GetY())) ? Y_AXIS : NO_AXIS;
     else if (m_selectedAxis == Z_AXIS)
-        m_selectedAxis = (m_zAxis.OnSelectedPosition(m_position, {0.0f, 0.0f, 1.0f}, -deltaCursorPos.GetX())) ? Z_AXIS : NO_AXIS;
+        m_selectedAxis = (m_zAxis.OnSelectedPosition(m_position, {0.0f, 0.0f, m_inputDir.GetX()}, -deltaCursorPos.GetX())) ? Z_AXIS : NO_AXIS;
     m_prevCursorPos = cursorPos;
     
     SetPosition(m_position);

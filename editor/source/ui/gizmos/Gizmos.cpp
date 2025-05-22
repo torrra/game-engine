@@ -28,7 +28,7 @@ editor::Gizmos::Gizmos(void)
     }
 }
 
-void editor::Gizmos::RenderPass(const math::Matrix4f& projViewMatrix)
+void editor::Gizmos::RenderPass(const math::Matrix4f& projViewMatrix, math::Vector3f const& cameraPos)
 {
     if (m_hideGizmos)
         return;
@@ -38,9 +38,17 @@ void editor::Gizmos::RenderPass(const math::Matrix4f& projViewMatrix)
     m_zAxis.RenderPass(projViewMatrix);
     m_yAxis.RenderPass(projViewMatrix);
     engine::EnableDepthTest();
+
+    // Calculate input axis direction for gizmos movement relative to camera
+    math::Vector3f position = (cameraPos - m_position);
+    m_inputDir = math::Vector3f(
+        (position.GetX() < 0.0f) ? -1.0f : 1.0f,
+        (position.GetY() < 0.0f) ? -1.0f : 1.0f,
+        (position.GetZ() < 0.0f) ? -1.0f : 1.0f
+    );
 }
 
-void editor::Gizmos::RenderPickingPass(const math::Matrix4f & projViewMatrix)
+void editor::Gizmos::RenderPickingPass(const math::Matrix4f& projViewMatrix)
 {
     if (m_hideGizmos)
         return;
