@@ -32,6 +32,11 @@ bool ui::DropDown(const char* id, int32& selectedValue, std::vector<const char*>
     return ImGui::Combo(id, &selectedValue, options.data(), arraySize);
 }
 
+bool ui::DropDown(const char* id, int32& selectedValue,const char** options, int32 size)
+{
+    return ImGui::Combo(id, &selectedValue, options, size);
+}
+
 bool ui::InputBox(const char* id, const char* hint, std::string& outStr, bool enterReturnTrue)
 {
     constexpr size_t size = 128;
@@ -64,6 +69,14 @@ bool ui::Selectable(const char* text, bool* selected, math::Vector2f const& size
 bool ui::Checkbox(const char* text, bool* value)
 {
     return ImGui::Checkbox(text, value);
+}
+
+bool ui::ColorEdit(const char* id, f32* values)
+{
+    constexpr ImGuiColorEditFlags flags = ImGuiColorEditFlags_PickerHueBar |
+                                          ImGuiColorEditFlags_DisplayRGB;
+
+    return ImGui::ColorEdit3(id, values, flags);;
 }
 
 bool ui::StartMenuBar(void)
