@@ -91,6 +91,24 @@ void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) cons
     } 
 }
 
+void engine::Model::Draw(void) const
+{
+    if (m_isDynamic)
+    {
+        for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
+        {
+            m_dynamicMeshes[meshIndex].Draw(false);
+        }
+    }
+    else
+    {
+        for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
+        {
+            m_staticMeshes[meshIndex].Draw(false);
+        }
+    }
+}
+
 
 uint32 engine::Model::GetMeshCount(void) const
 {
