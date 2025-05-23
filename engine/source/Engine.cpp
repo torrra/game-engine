@@ -6,6 +6,7 @@
 #include "core/systems/ScriptSystem.h"
 #include "input/InputHandler.h"
 #include "resource/ResourceManager.h"
+#include "resource/model/Model.h"
 #include "serialization/TextSerializer.h"
 #include "ui/UIWindow.h"
 #include "ui/Application.h"
@@ -73,6 +74,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
     ScriptSystem::SetCurrentScene(m_activeScene.GetGraph());
     ScriptSystem::Startup();
     PhysicsEngine::Get().Init();
+    m_activeScene.InitBuffers();
 
     if (InputHandler::StartUp() != SUCCESS)
         return ERROR;
@@ -114,6 +116,9 @@ void engine::Engine::SetEditorApplication(Application* ptr)
 {
     m_application = ptr;
     ptr->SetCurrentScene(&m_activeScene);
+    ResourceManager::Load<Model>("./assets/lightBall.obj", true);
+    ResourceManager::Load<Model>("./assets/lightArrow.obj", true);
+    ResourceManager::LoadShader("lightProgram", "./shaders/Model.vs", "./shaders/Model.frag", true, true);
 }
 
 engine::Window* engine::Engine::GetWindow(void) const noexcept
