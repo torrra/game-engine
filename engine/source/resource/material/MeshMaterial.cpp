@@ -93,26 +93,69 @@ void engine::MeshMaterial::SetEmissive(const math::Vector3f& value)
 void engine::MeshMaterial::SetDiffuseMap(const Texture* texture)
 {
     m_textureMaps[DIFFUSE] = texture;
+
+    if (texture)
+        m_data.m_useMapsBits |= DIFFUSE_BIT;
+    else
+        m_data.m_useMapsBits &= (~DIFFUSE_BIT);
+
+    SetMapUsageBits();
 }
 
 void engine::MeshMaterial::SetNormalMap(const Texture* texture)
 {
     m_textureMaps[NORMAL] = texture;
+
+    if (texture)
+        m_data.m_useMapsBits |= NORMAL_BIT;
+    else
+        m_data.m_useMapsBits &= (~NORMAL_BIT);
+
+    SetMapUsageBits();
 }
 
 void engine::MeshMaterial::SetSpecularMap(const Texture* texture)
 {
     m_textureMaps[SPECULAR] = texture;
+
+    if (texture)
+        m_data.m_useMapsBits |= SPECULAR_BIT;
+    else
+        m_data.m_useMapsBits &= (~SPECULAR_BIT);
+
+    SetMapUsageBits();
 }
 
 void engine::MeshMaterial::SetDiffuseRoughnessMap(const Texture* texture)
 {
     m_textureMaps[ROUGHNESS] = texture;
+
+    if (texture)
+        m_data.m_useMapsBits |= ROUGHNESS_BIT;
+    else
+        m_data.m_useMapsBits &= (~ROUGHNESS_BIT);
+
+    SetMapUsageBits();
 }
 
 void engine::MeshMaterial::SetAmbientOcclusionMap(const Texture* texture)
 {
     m_textureMaps[AMBIENT_OCCLUSION] = texture;
+
+    if (texture)
+        m_data.m_useMapsBits |= AMBIENT_OCCLUSION_BIT;
+    else
+        m_data.m_useMapsBits &= (~AMBIENT_OCCLUSION_BIT);
+
+    SetMapUsageBits();
+}
+
+void engine::MeshMaterial::SetOpacity(f32 value)
+{
+    constexpr uint32 offset = offsetof(BufferData, BufferData::m_opacity);
+
+    m_data.m_opacity = value;
+    glNamedBufferSubData(m_materialSSBO.GetBufferID(), offset, sizeof(m_data.m_opacity), &m_data.m_opacity);
 }
 
 void engine::MeshMaterial::SetShininess(f32 value)
@@ -233,6 +276,8 @@ void engine::MeshMaterial::DeserializeText(std::ifstream& input)
     MOVE_TEXT_CURSOR_FREE(text, start, end);
     text = DeserializeTextureMaps(text, end);
 
+    //m_data.m_diffuse = math::Vector3f::One();
+
     text::UnloadFileData(start);
 }
 
@@ -260,6 +305,13 @@ engine::MeshMaterial* engine::MeshMaterial::CreateMaterial(const char* path)
 
     ResourceManager::CreateFromData<MeshMaterial>(pathStr, std::move(mat));
     return ResourceManager::GetEditableResource<MeshMaterial>(pathStr);
+}
+
+void engine::MeshMaterial::SetMapUsageBits(void)
+{
+    constexpr uint32 offset = offsetof(BufferData, BufferData::m_useMapsBits);
+
+    m_materialSSBO.SetData(&m_data.m_useMapsBits, sizeof(m_data.m_useMapsBits), offset);                          
 }
 
 void engine::MeshMaterial::SerializeTexturePaths(std::ostream& output) const
@@ -333,8 +385,16 @@ const char* engine::MeshMaterial::DeserializeTextureMaps(const char* text, const
                     continue;
 
                 ResourceManager::Load<Texture>(paths[pathIndex]);
-                m_textureMaps[pathIndex] =
+
+                const Texture* loadedTexture =
                 ResourceManager::GetResource<Texture>(paths[pathIndex]);
+
+                m_textureMaps[pathIndex] = loadedTexture;
+
+                if (loadedTexture)
+                    m_data.m_useMapsBits |= 1 << pathIndex;
+                else
+                    m_data.m_useMapsBits &= ~(1 << pathIndex);
             }
 
             delete[] paths;

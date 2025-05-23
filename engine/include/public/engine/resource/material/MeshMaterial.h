@@ -24,6 +24,15 @@ namespace engine
             AMBIENT_OCCLUSION
         };
 
+        enum EMapBits
+        {
+            DIFFUSE_BIT = 1 << DIFFUSE,
+            NORMAL_BIT = 1 << NORMAL,
+            SPECULAR_BIT = 1 << SPECULAR,
+            ROUGHNESS_BIT = 1 << ROUGHNESS,
+            AMBIENT_OCCLUSION_BIT = 1 << AMBIENT_OCCLUSION
+        };
+
         struct BufferData
         {
             math::Vector3f          m_ambient{ 0.f };
@@ -33,6 +42,9 @@ namespace engine
 
             f32                     m_shininess = 1.f;
             f32                     m_refractionIndex = 1.f;
+            f32                     m_opacity = 1.f;
+
+            int32                   m_useMapsBits = 0;
         };
 
 
@@ -60,6 +72,7 @@ namespace engine
         ENGINE_API void SetDiffuseRoughnessMap(const class Texture* texture);
         ENGINE_API void SetAmbientOcclusionMap(const class Texture* texture);
 
+        ENGINE_API void SetOpacity(f32 value);
         ENGINE_API void SetShininess(f32 value);
         ENGINE_API void SetRefractionIndex(f32 value);
 
@@ -70,6 +83,7 @@ namespace engine
 
         ENGINE_API f32 GetShininess(void) const;
         ENGINE_API f32 GetRefractionIndex(void) const;
+        ENGINE_API f32 GetOpacity(void) const;
 
         ENGINE_API const class Texture* GetDiffuseMap(void) const;
         ENGINE_API const class Texture* GetNormalMap(void) const;
@@ -87,6 +101,7 @@ namespace engine
 
     private:
 
+        void SetMapUsageBits(void);
 
         void SerializeTexturePaths(std::ostream& output) const;
         const char* DeserializeTextureMaps(const char* text, const char* end);
