@@ -1,0 +1,160 @@
+extern "C"
+{
+#include <lua/lua.h>
+#include <lua/lualib.h>
+#include <lua/lauxlib.h>
+}
+
+#include "scripting/ui/InGameUI.h"
+#include "ui/UIManager.h"
+#include "CoreTypes.h"
+#include "ui/Canvas.h"
+#include "Engine.h"
+int script_GetCanvasRef(lua_State* luaState)
+{
+    engine::Canvas* canvas = nullptr;
+
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 1)
+        luaL_error(luaState, "Expected 1 argument (canvasName)");
+    else
+    {
+        engine::Engine* engine = engine::Engine::GetEngine();
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        printf("Creating canvas with name '%s'\n", canvasName.c_str());
+        canvas = engine->GetUIManager().GetCanvas(canvasName);
+    }
+
+    lua_pushlightuserdata(luaState, canvas);
+
+    return 1;
+}
+
+int script_CreateCanvas(lua_State* luaState)
+{
+    engine::Canvas* canvas = nullptr;
+    math::Vector2f size;
+
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 3)
+        luaL_error(luaState, "Expected 3 argument (canvasName, canvasWidth, canvasHeight)");
+    else
+    {
+        engine::Engine* engine = engine::Engine::GetEngine();
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        size.X() = static_cast<f32>(lua_tonumber(luaState, 2));
+        size.Y() = static_cast<f32>(lua_tonumber(luaState, 3));
+        engine->GetUIManager().CreateCanvas(canvasName, size);
+        canvas = engine->GetUIManager().GetCanvas(canvasName);
+    }
+
+    lua_pushlightuserdata(luaState, canvas);
+
+    return 1;
+}
+
+int script_DestroyCanvas(lua_State* luaState)
+{
+    luaState;
+    return 0;
+}
+
+int script_SetCanvasColor(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 5)
+        luaL_error(luaState, "Expected 5 arguments (canvasID, red, green, blue, alpha)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        canvas->SetColor(
+            static_cast<f32>(lua_tonumber(luaState, 2)), // red
+            static_cast<f32>(lua_tonumber(luaState, 3)), // green
+            static_cast<f32>(lua_tonumber(luaState, 4)), // blue
+            static_cast<f32>(lua_tonumber(luaState, 5))  // alpha
+        );
+    }
+
+    return 0;
+}
+
+int script_AddText(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 4)
+        luaL_error(luaState, "Expected 4 arguments (CanvasID, text, xPos, yPos)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        std::string text = luaL_checkstring(luaState, 2);
+
+        math::Vector2f position(
+            static_cast<f32>(lua_tonumber(luaState, 3)),
+            static_cast<f32>(lua_tonumber(luaState, 4))
+        );
+
+        canvas->AddLabel(text.c_str(), position);
+    }
+
+    return 0;
+}
+
+int script_AddImage(lua_State* luaState)
+{
+    luaState;
+    return 0;
+}
+
+int script_AddButton(lua_State* luaState)
+{
+    luaState;
+    return 0;
+}
+
+int script_AddProgressBar(lua_State* luaState)
+{
+    luaState;
+    return 0;
+}
+
+int script_AddRect(lua_State* luaState)
+{
+    luaState;
+    return 0;
+}
+
+int script_RemoveElement(lua_State* luaState)
+{
+    luaState;
+    return 0;
+}
+
+void engine::RegisterUIFunctions(lua_State* luaState)
+{
+    constexpr luaL_Reg uiFuncs[]
+    {
+        {"GetCanvasRef", script_GetCanvasRef},
+        {"CreateCanvas", script_CreateCanvas},
+        //{"DestroyCanvas", script_DestroyCanvas},
+        {"SetCanvasColor", script_SetCanvasColor},
+        {"AddText", script_AddText},
+        //{"AddImage", script_AddImage},
+        //{"AddButton", script_AddButton},
+        //{"AddProgressBar", script_AddProgressBar},
+        //{"AddRect", script_AddRect},
+        //{"RemoveElement", script_RemoveElement},
+        {NULL, NULL}
+    };
+
+    lua_newtable(luaState);
+    luaL_setfuncs(luaState, uiFuncs, 0);
+    lua_setglobal(luaState, "CanvasRef");
+}
