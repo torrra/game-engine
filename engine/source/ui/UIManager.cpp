@@ -1,6 +1,7 @@
 #include "ui/UIManager.h"
 #include "ui/UIComponent.h"
 #include "Window.h"
+#include "ui/Canvas.h"
 #include "window/WindowLib.h"
 
 #include <imgui/imgui.h>
@@ -11,6 +12,7 @@
 
 #include "utility/MemoryCheck.h"
 #include "Engine.h"
+#include "ConsoleLog.hpp"
 
 #define ENABLE_UI_DEBUG 0
 
@@ -35,6 +37,7 @@ void engine::UIManager::NewFrame(void)
 
 void engine::UIManager::EndFrame(void)
 {
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -57,6 +60,40 @@ void engine::UIManager::ShutDown(void)
 bool engine::UIManager::IsWindowFocused(std::string const& name)
 {
     return ::ui::IsWindowSelected(name);
+}
+
+void engine::UIManager::CreateCanvas(std::string const& name, math::Vector2f size)
+{
+    if (m_canvasMap.contains(name))
+    {
+        PrintLog(WarningPreset(), "Canvas cannot be created as it already exists.");
+        return;
+    }
+    else
+    {
+        printf("Canvas Lua created from this roblox-esk hell language\n");
+        m_canvasMap[name] = new Canvas(size, {0.0f, 0.0f, 0.0f, 0.0f});
+    }
+}
+
+engine::Canvas* engine::UIManager::GetCanvas(std::string const& name)
+{
+    if (m_canvasMap.contains(name.c_str()))
+        return m_canvasMap[name];
+    else
+    {
+        PrintLog(WarningPreset(), "Canvas does not exist.");
+        return nullptr;
+    }
+
+}
+
+void engine::UIManager::RenderCanvases(void)
+{
+    for (auto canvas : m_canvasMap)
+    {
+        canvas.second->Render();
+    }
 }
 
 void engine::UIManager::InitUI(wnd::Wnd* window)

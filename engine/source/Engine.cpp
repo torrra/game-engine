@@ -159,6 +159,11 @@ std::string engine::Engine::GetProjectName(void) const
     return m_projectName;
 }
 
+engine::UIManager& engine::Engine::GetUIManager(void)
+{
+    return m_uiManager;
+}
+
 void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)
 {
     ThreadManager::AddTask([this, path, serialize]
