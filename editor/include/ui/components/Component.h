@@ -26,7 +26,8 @@ namespace editor
         RIGIDBODY_STATIC,
         RIGIDBODY_DYNAMIC,
         SCRIPT,
-        TRANSFORM
+        TRANSFORM, 
+        LIGHT_SOURCE
     };
 
     class BaseComponent

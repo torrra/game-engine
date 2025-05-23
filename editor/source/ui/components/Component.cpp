@@ -34,6 +34,11 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
         case editor::TRANSFORM:
             graph->DestroyComponent<engine::Transform>(handle);
             break;
+
+        case editor::LIGHT_SOURCE:
+            graph->DestroyComponent<engine::LightSource>(handle);
+            break;
+
         case editor::INVALID_COMPONENT_TYPE:
         default:
             break;
