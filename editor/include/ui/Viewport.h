@@ -37,6 +37,12 @@ namespace editor
         virtual void RenderContents(void) override;
     
     private:
+
+        void RenderDebugLights(const class ::engine::Model* lightBall,
+                               const class ::engine::Model* lightArrow,
+                               const class ::engine::ShaderProgram* basicShader,
+                               const math::Matrix4f& viewProjection);
+
         Picking* m_picking = nullptr;
         engine::SceneGraph* m_graph = nullptr;
         engine::FrameBuffer m_fbo;

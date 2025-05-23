@@ -6,6 +6,9 @@
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
 #include <engine/physics/PhysicsEngine.h>
+#include <engine/resource/model/Model.h>
+#include <engine/resource/ResourceManager.h>
+#include <engine/utility/Colors.h>
 
 #include <math/Vector2.hpp>
 
@@ -52,10 +55,23 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     engine::ThreadManager::ExecuteRenderThreadTasks();
 
     if (m_graph)
+    {
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
-   engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
+        const engine::Model* lightBall =
+        engine::ResourceManager::GetResource<engine::Model>("./assets/lightBall.obj");
 
+        const engine::Model* lightArrow =
+        engine::ResourceManager::GetResource<engine::Model>("./assets/lightArrow.obj");
+
+        const engine::ShaderProgram* basicShader =
+        engine::ResourceManager::GetResource<engine::ShaderProgram>("lightProgram");
+
+        if (lightBall && lightArrow && basicShader)
+            RenderDebugLights(lightBall, lightArrow, basicShader, viewProjection);
+    }
+
+    engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
     m_fbo.Unbind();
 }
 
@@ -118,4 +134,49 @@ void editor::Viewport::RenderContents(void)
     ui::Image(m_fbo.GetFrameTexture(), m_size);
 
     m_prevSize = m_size;
+}
+
+void editor::Viewport::RenderDebugLights(const engine::Model* lightBall,
+                                         const engine::Model* lightArrow,
+                                         const engine::ShaderProgram* basicShader,
+                                         const math::Matrix4f& viewProjection)
+{
+    const engine::ComponentArray<engine::LightSource>& cachedLights = m_graph->GetCachedLights();
+
+    for (const engine::LightSource& light : cachedLights)
+    {
+        if (!light.IsValid())
+            continue;
+
+        engine::Transform* transform = m_graph->GetCachedTransform(light.GetOwner());
+
+        if (!transform)
+            return;
+
+
+       math::Matrix4f modelMat = engine::Transform::ToWorldMatrix(*transform);
+       math::Matrix4f mvp = viewProjection * modelMat;
+
+       basicShader->Use();
+       basicShader->Set("mvp", &mvp);
+       basicShader->Set("model", &modelMat);
+
+       if (light.IsActive())
+           basicShader->Set("objectColor", math::Vector3f(LIGHT_YELLOW));
+       else
+           basicShader->Set("objectColor", math::Vector3f(LIGHT_GRAY));
+
+       lightBall->Draw();
+
+       switch (light.GetType())
+       {
+       case engine::LightSource::ELightType::DIRECTIONAL:
+       case engine::LightSource::ELightType::SPOTLIGHT:
+           lightArrow->Draw();
+           break;
+
+       default:
+           break;
+       }
+    }
 }
