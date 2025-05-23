@@ -23,6 +23,7 @@ void engine::Canvas::Render(void)
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoSavedSettings |
         ImGuiWindowFlags_NoFocusOnAppearing |
+        ImGuiWindowFlags_NoInputs |
         ImGuiWindowFlags_NoDocking;
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();

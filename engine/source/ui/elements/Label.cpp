@@ -25,6 +25,11 @@ void engine::Label::Render(void)
         ImGui::PushFont(m_font);
         m_font->Scale = m_fontScale;
     }
+    else
+    {
+        ImGui::PushFont(ImGui::GetFont());
+
+    }
 
     ImGui::PushStyleColor(ImGuiCol_Text, m_textColor);
     ImGui::PushTextWrapPos(m_transform.m_position.GetX() + m_textBoxWidth);
@@ -32,10 +37,12 @@ void engine::Label::Render(void)
     ImGui::PopTextWrapPos();
     ImGui::PopStyleColor();
 
-    if (m_font)
+    if (m_font || !m_font)
     {
         ImGui::PopFont();
-        m_font->Scale = 1.0f;
+
+        if (m_font)
+            m_font->Scale = 1.0f;
     }
 }
 

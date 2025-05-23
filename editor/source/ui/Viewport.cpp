@@ -6,6 +6,7 @@
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
 #include <engine/physics/PhysicsEngine.h>
+#include <engine/Engine.h>
 
 #include <math/Vector2.hpp>
 
@@ -42,6 +43,9 @@ void editor::Viewport::RenderToViewport(void)
     m_fbo.Bind();
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::RenderScene(m_graph);
+    
+    engine::Engine::GetEngine()->GetUIManager().RenderCanvases();
+
     m_fbo.Unbind();
 }
 
