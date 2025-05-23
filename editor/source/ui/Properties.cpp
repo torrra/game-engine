@@ -4,6 +4,7 @@
 #include "ui/components/RendererComponent.h"
 #include "ui/components/ScriptComponent.h"
 #include "ui/components/TransformComponent.h"
+#include "ui/components/LightSourceComponent.h"
 #include "ui/components/RigidBodyStaticComponent.h"
 #include "ui/components/RigidBodyDynamicComponent.h"
 
@@ -14,6 +15,7 @@
 #include <engine/ui/InternalUIWindow.h>
 
 #include <engine/core/SceneGraph.h>
+#include <engine/core/components/LightSource.h>
 #include <engine/utility/MemoryCheck.h>
 #include <engine/ConsoleLog.hpp>
 
@@ -100,6 +102,9 @@ void editor::PropertyWnd::InitComponents(void)
     // RigidBodyDynamic
     if (entity->HasComponent<engine::RigidBodyDynamic>())
         InitComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
+
+    if (entity->HasComponent<engine::LightSource>())
+        InitComponent<LightSourceComponent, engine::LightSource>();
     
     // Script
     if (entity->HasComponent<engine::Script>())
@@ -126,7 +131,7 @@ void editor::PropertyWnd::RenderMenuBar(void)
     {
         if (ui::StartMenu("Add Component"))
         {
-                 if (ui::MenuItem("Renderer"))
+            if (ui::MenuItem("Renderer"))
                 AddComponent<RendererComponent, engine::Renderer>();
 
             else if (ui::MenuItem("RigidbodyStatic"))
@@ -134,15 +139,18 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("RigidbodyDynamic"))
                 AddComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
-            
+
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
-            
-             else if (ui::MenuItem("Script"))
+
+            else if (ui::MenuItem("Script"))
                 printf("Adding script...\n"); // TODO: implement for script object
-            
-             else if (ui::MenuItem("Transform"))
+
+            else if (ui::MenuItem("Transform"))
                 AddComponent<TransformComponent, engine::Transform>();
+
+            else if (ui::MenuItem("Light source"))
+                AddComponent<LightSourceComponent, engine::LightSource>();
 
             ui::EndMenu();
         }
@@ -228,6 +236,10 @@ void editor::PropertyWnd::ClearComponentArray(void)
             break;
         case editor::TRANSFORM:
             delete dynamic_cast<TransformComponent*>(component);
+            break;
+
+        case editor::LIGHT_SOURCE:
+            delete dynamic_cast<LightSourceComponent*>(component);
             break;
         case editor::INVALID_COMPONENT_TYPE:
         default:
