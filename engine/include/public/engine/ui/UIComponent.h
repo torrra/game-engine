@@ -10,6 +10,7 @@ namespace ui
     // Components
     ENGINE_API void Text(const char* text, ...);
     ENGINE_API void Image(uint64 textureID, math::Vector2f const& size);
+    ENGINE_API void Separator(const char* text = nullptr);
     ENGINE_API bool Button(const char* text, math::Vector2f const& size = {0.0F, 0.0F});
     ENGINE_API bool DropDown(const char* id, int32& selectedValue, std::vector<const char*> const& options);
     ENGINE_API bool DropDown(const char* id, int32& selectedValue, const char** options, int32 size);
