@@ -212,11 +212,6 @@ namespace engine
     
         for (int32 arrayIndex = 0; arrayIndex < static_cast<int32>(arraySize); ++arrayIndex)
            SortChildrenBones(indexArray[arrayIndex], arrayIndex, boneArray, indexArray);
-
-        for (const Bone& bone : m_skeleton)
-            std::cout << bone;
-
-
     }
 
     void DynamicMesh::SortChildrenBones(int32 oldParentIndex, int32 newIndex,
@@ -231,10 +226,6 @@ namespace engine
                 movedBone.m_parent = newIndex;
 
                 indexArray.push_back(index);
-
-                // There should be only one bone at the root, so we can exit this function
-                if (newIndex == -1)
-                    return;
             }
         }
     }
