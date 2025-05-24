@@ -117,6 +117,7 @@ namespace editor
         void SetNewAssetName(void);
         bool IsAssetNameValid(void);
         void CreateScene(void);
+        void CreateMaterial(void);
         void CloseAssetCreationMenu(void);
         EAssetAction SelectNewAssetType(EAssetAction action);
 
