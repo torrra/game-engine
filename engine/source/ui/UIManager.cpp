@@ -14,7 +14,7 @@
 #include "Engine.h"
 #include "ConsoleLog.hpp"
 
-#define ENABLE_UI_DEBUG 0
+#define ENABLE_UI_DEBUG 1
 
 engine::UIManager::UIManager(wnd::Wnd* window)
 {
@@ -88,11 +88,11 @@ engine::Canvas* engine::UIManager::GetCanvas(std::string const& name)
 
 }
 
-void engine::UIManager::RenderCanvases(void)
+void engine::UIManager::RenderCanvases(math::Vector2f const& position, math::Vector2f const& viewportSize)
 {
     for (auto canvas : m_canvasMap)
     {
-        canvas.second->Render();
+        canvas.second->Render(position, viewportSize);
     }
 }
 

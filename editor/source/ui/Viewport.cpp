@@ -2,6 +2,7 @@
 #include "Picking.h"
 
 #include <engine/ui/UIComponent.h>
+#include <engine/ui/UIWindow.h>
 #include <engine/thread/ThreadManager.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
@@ -42,9 +43,8 @@ void editor::Viewport::RenderToViewport(void)
 {
     m_fbo.Bind();
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
+   
     engine::ThreadManager::RenderScene(m_graph);
-    
-    engine::Engine::GetEngine()->GetUIManager().RenderCanvases();
 
     m_fbo.Unbind();
 }
@@ -120,6 +120,7 @@ void editor::Viewport::RenderContents(void)
     SetViewportTransform({0, 0}, sizePx);
     m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
     ui::Image(m_fbo.GetFrameTexture(), m_size);
+
 
     m_prevSize = m_size;
 }

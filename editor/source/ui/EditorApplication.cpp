@@ -4,6 +4,7 @@
 #include <engine/thread/ThreadManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/input/InputHandler.h>
+#include <engine/Engine.h>
 
 #include "ui/components/RigidBodyDynamicComponent.h"
 
@@ -46,6 +47,19 @@ namespace editor
 
         m_gameSimulationView->RenderToViewport();
         m_gameSimulationView->Render();
+        //===========================
+        if (engine::Engine::GetEngine()->GetCurrentScene().IsRunning())
+        {
+            math::Vector2i wndPositionInt = ui::GetInnerRectMinPos(SIMULATION_VIEW_WINDOW);
+            math::Vector2f wndPosition(
+                static_cast<f32>(wndPositionInt.GetX()),
+                static_cast<f32>(wndPositionInt.GetY())
+            );
+
+            engine::Engine::GetEngine()->GetUIManager().RenderCanvases(wndPosition, m_gameSimulationView->GetViewportSize());
+
+        }
+        //===============================
 
         // Editor camera
         if (m_sceneEditorView->HasWindowResized())
@@ -62,6 +76,7 @@ namespace editor
         if (engine::InputHandler::IsInputPressed(MOUSE_BUTTON_LEFT) &&
             ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             PickEntity();
+
     }
 
     void EditorApplication::ResetScene(::engine::GameScene& activeScene)

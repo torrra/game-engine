@@ -1,5 +1,6 @@
 #include "ui/Canvas.h"
 #include "ui/elements/Label.h"
+#include "engine/Engine.h"
 
 #undef new
 #include <imgui/imgui.h>
@@ -14,7 +15,7 @@ engine::Canvas::Canvas(math::Vector2f const& windowSize, math::Vector4f const& c
     SetColor(color[0], color[1], color[2], color[3]);
 }
 
-void engine::Canvas::Render(void)
+void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const& size)
 {
     // Make canvas uninteractable & allow inputs to pass through
     ImGuiWindowFlags flags =
@@ -26,25 +27,66 @@ void engine::Canvas::Render(void)
         ImGuiWindowFlags_NoInputs |
         ImGuiWindowFlags_NoDocking;
 
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-    ImGui::SetNextWindowViewport(viewport->ID);
-    ImGui::SetNextWindowPos(viewport->Pos);
-    ImGui::SetNextWindowSize(viewport->Size);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, m_bgColor);
-    ImGui::Begin("Canvas", nullptr, flags);
-
-    // Scale all UI elements to be consistent with screen size
-    RescaleCanvas();
-
-    // Update all UI elements on this canvas
-    for (UIElement* element : m_elements)
+    position;
+    flags;
+    if (engine::Engine::GetEngine()->HasEditor())
     {
-        element->Render();
+        
+        ImGui::Begin("Simulation view", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::SetCursorPos(ImGui::GetWindowContentRegionMin());
+        ImGui::PushStyleColor(ImGuiCol_ChildBg,m_bgColor);
+        
+        ImGui::BeginChild("Canvas", size, 0, flags);
+        
+        ImGui::SetWindowSize(size);
+
+        // Scale all UI elements to be consistent with screen size
+        RescaleCanvas();
+
+        // Update all UI elements on this canvas
+        for (UIElement* element : m_elements)
+        {
+            element->Render();
+        }
+
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::End();
+    }
+    else
+    {
+        printf("No Editor\n");
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, {1.0f, 0.0f, 0.0f, 1.0f});
+        
+        ImGui::Begin("Canvas", nullptr, flags);
+        
+        // Scale all UI elements to be consistent with screen size
+        RescaleCanvas();
+        
+        // Update all UI elements on this canvas
+        for (UIElement* element : m_elements)
+        {
+            element->Render();
+        }
+        
+        ImGui::End();
+        ImGui::PopStyleColor();
+        
     }
 
-    ImGui::End();
-    ImGui::PopStyleColor();
+    //if (!engine::Engine::GetEngine()->HasEditor())
+    //{
+    //}
+    //else
+    //{
+    //    ImGui::SetNextWindowPos(ImGui::GetWindowContentRegionMin());
+    //    ImGui::SetNextWindowSize(ImGui::GetWindowSize());
+    //}
+    //
 }
 
 void engine::Canvas::RemoveElement(UIElement* element)

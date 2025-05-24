@@ -137,6 +137,11 @@ void engine::Engine::UpdateApplicationWindow(void)
     m_uiManager.NewFrame();
 
     m_application->Render(m_activeScene.GetGraph());
+    
+    if (!HasEditor())
+    {
+        m_uiManager.RenderCanvases({0.0f, 0.0f}, m_application->GetWindow()->GetSize<f32>());
+    }
 
     m_uiManager.EndFrame();
     m_application->EndFrame();

@@ -34,7 +34,7 @@ namespace engine
         ENGINE_API				~Canvas(void) = default;
 
         // Render function used to display UI to screen. It should be placed at the end of the update loop.
-        ENGINE_API void			Render(void);
+        ENGINE_API void			Render(math::Vector2f const& position, math::Vector2f const& size);
 
         ENGINE_API void			RemoveElement(UIElement* element);
 
