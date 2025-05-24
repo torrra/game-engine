@@ -3,18 +3,24 @@
 #include <random>
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <unordered_map>
 
 #include "engine/EngineExport.h"
 #include "TypesECS.h"
 #include "Component.h"
 #include "Entity.h"
-#include "ComponentArray.h"
+#include "ComponentArray.hpp"
 
 #include "components/Script.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Renderer.h"
+
+#include "engine/physics/rigidbody/RigidBodyDynamic.h"
+#include "engine/physics/rigidbody/RigidBodyStatic.h"
+#include "engine/physics/TriangleMesh.h"
+
+#include "engine/sounds/AudioPlayer.h"
 
 namespace engine
 {
@@ -45,15 +51,19 @@ namespace engine
         // game logic tick
         struct ComponentCache
         {
-            ComponentArray<Transform>			m_transformRenderCache;
-            ComponentArray<Camera>				m_cameraRenderCache;
+            CopyableComponentArray<Transform>			m_transformRenderCache;
+            CopyableComponentArray<Camera>				m_cameraRenderCache;
         };
+
+
+        using EntityNameMap = std::unordered_map<uint64, EntityHandle>;
         
 
     public:
 
         ENGINE_API SceneGraph(void) = default;
-        ENGINE_API SceneGraph(const SceneGraph&) = default;
+        SceneGraph(const SceneGraph&) = delete;
+        ENGINE_API SceneGraph(SceneGraph&&) noexcept = default;
         ENGINE_API ~SceneGraph(void) = default;
 
         // Create a new entity in the current scene.
@@ -80,6 +90,10 @@ namespace engine
         // ensure the reference is up-to-date
         template <CValidComponent TComponentType>
         TComponentType* GetComponent(EntityHandle ownerEntity);
+
+        // Permamently flag an entity's component for destruction / overwrite
+        template <CValidComponent TComponentType>
+        void DestroyComponent(EntityHandle ownerEntity);
 
         // Get a raw pointer to the entity from its handle.
         // Returns nullptr if:
@@ -134,9 +148,16 @@ namespace engine
         template <CValidComponent TComponentType, typename... TVariadicArgs>
         void UpdateComponents(TVariadicArgs&&... args);
 
+        void StartAllScripts(void);
+        void SyncTransformsPostPhysics(void);
+        void SyncRigidbodiesPrePhysics(void);
+
         // Re-register all existing components after a lua state reset
         ENGINE_API
         void RegisterAllComponents(void);
+
+        ENGINE_API
+        void RegisterAllEntities(void);
 
         // Render all active renderers with all active cameras.
         // This function will use the arrays populated with CacheComponents(),
@@ -144,27 +165,46 @@ namespace engine
         ENGINE_API
         void RenderFromCache(void);
 
+
+        ENGINE_API
+        void RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection);
+
         // Copy all data from transform component array to a separate cache
         // This function is used after the game logic update, allowing to start the next
         // gameplay tick before rendering on the main thread
         ENGINE_API
         void CacheComponents(void);
 
+        // Clear transforms and cameras in render cache
+        ENGINE_API
+        void ClearCache(void);
+
+        ENGINE_API void CleanRigidBodies(void);
+
+        // Serialize all valid entities and recalculate their handles
+        // The handles are recalculated as invalid entities are filtered out,
+        // potentially leaving empty spots to be filled by valid entities.
+        // These new handles are only applied upon next deserialization to avoid breaking
+        // existing references
         ENGINE_API
         void SerializeText(std::ofstream& file);
 
+        // Read from a scene file
         ENGINE_API
         void DeserializeText(std::ifstream& file);
 
         ENGINE_API
         SceneGraph& operator=(const SceneGraph&) = default;
 
+        ENGINE_API
+        SceneGraph& operator=(SceneGraph&&) noexcept = default;
+
         // Output a int64 between LONG_MIN and LONG_MAX
         ENGINE_API
         static int64 RandomNumber(void);
 
-    private:
-
+        template<CValidComponent TComponentType>
+        uint64 GetThisIndex(TComponentType* component) const;
         // Get the component array corresponding to a type
         template <CValidComponent TComponentType>
         ComponentArray<TComponentType>& GetComponentArray(void);
@@ -173,10 +213,13 @@ namespace engine
         template <CValidComponent TComponentType>
         const ComponentArray<TComponentType>& GetComponentArray(void) const;
 
+    private:
+
+
         // Group the index and uid bits together in a 64-bit handle
-        EntityHandle MakeHandle(EntityHandle index, EntityHandle uid);
-        EntityHandle GetHandleUID(EntityHandle handle);
-        EntityHandle GetHandleIndex(EntityHandle handle);
+        EntityHandle MakeHandle(int32 index, int32 uid);
+        int32 GetHandleVersion(EntityHandle handle);
+        int32 GetHandleIndex(EntityHandle handle);
 
         // Internal ReparentEntity overload. Directly uses an entity's pointer
         void	ReparentEntity(Entity* toReparent, EntityHandle newParent);
@@ -189,16 +232,6 @@ namespace engine
         template <CValidComponent TComponentType>
         void RegisterComponents(void);
 
-        // Serialize all valid entities and recalculate their handles
-        // The handles are recalculated as invalid entities are filtered out,
-        // potentially leaving empty spots to be filled by valid entities.
-        // These new handles are only applied upon next deserialization to avoid breaking
-        // existing references
-        HandleMap SerializeValidEntitiesText(std::ostream& text);
-
-        // Serialize a single entity
-        void SerializeEntityText(std::ostream& file, const Entity& entity);
-
         // Serialize all components of a type
         template <CValidComponent TComponentType>
         void SerializeComponents(std::ostream& file, HandleMap& handles);
@@ -208,8 +241,6 @@ namespace engine
                                       const Entity& entity,
                                       HandleMap& handles) const;
 
-        void DeserializeTextV1(std::ifstream& file);
-
         const char* DeserializeEntityText(const char* text, const char* end);
 
         template <typename... TVariadicArgs>
@@ -218,26 +249,37 @@ namespace engine
         template <CValidComponent TComponentType>
         void ReorderTextArray(Component::DeserializedArray<TComponentType>& array);
 
-
         // All transform components in the scene
-        ComponentArray<Transform>			m_sceneTransforms;
+        CopyableComponentArray<Transform>			m_sceneTransforms;
 
         // All script components in the scene
         ComponentArray<Script>				m_sceneScripts;
 
         // All cameras components in the scene
-        ComponentArray<Camera>				m_sceneCameras;
+        CopyableComponentArray<Camera>				m_sceneCameras;
 
         // All renderer components in the scene
         ComponentArray<Renderer>			m_sceneRenderers;
 
-        // All entities in tge scene
+        ComponentArray<RigidBodyDynamic>    m_sceneDynamicRigidBodies;
+
+        ComponentArray<RigidBodyStatic>     m_sceneStaticRigidBodies;
+
+        ComponentArray<TriangleMesh>        m_sceneTriangleMeshes;
+
+        // All sound components in the scene
+        ComponentArray<AudioPlayer>			m_sceneAudioPlayer;
+
+
+         
+
+        // All entities in the scene
         std::vector<Entity>					m_sceneEntities;
 
         ComponentCache						m_renderCache;
 
         // Random uint64 generator. We only need a unique instance
-        static Random						m_randomNumGen;
+        static thread_local Random			m_randomNumGen;
     };
 
 
@@ -256,6 +298,12 @@ namespace engine
             if (component.IsValid() && component.IsActive())
                 component.Update(std::forward<TVariadicArgs>(args)...);
         }
+    }
+
+    template<CValidComponent TComponentType>
+    inline uint64 SceneGraph::GetThisIndex(TComponentType* component) const
+    {
+        return GetComponentArray<TComponentType>().GetThisIndex(component);
     }
 
     template<>
@@ -277,6 +325,35 @@ namespace engine
         return m_sceneRenderers;
     }
 
+    template<>
+    inline ComponentArray<RigidBodyDynamic>& SceneGraph::GetComponentArray<RigidBodyDynamic>(void)
+    {
+        return m_sceneDynamicRigidBodies;
+    }
+
+    template<>
+    inline ComponentArray<RigidBodyStatic>& SceneGraph::GetComponentArray<RigidBodyStatic>(void)
+    {
+        return m_sceneStaticRigidBodies;
+    }
+    
+    template<>
+    inline ComponentArray<TriangleMesh>& SceneGraph::GetComponentArray<TriangleMesh>(void)
+    {
+        return m_sceneTriangleMeshes;
+    }
+    
+    template<>
+    inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
+    {
+        return m_sceneAudioPlayer;
+    }
+
+    template<> inline
+    const ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void) const
+    {
+        return m_sceneAudioPlayer;
+    }
 
     template<> inline
     const ComponentArray<Transform>& SceneGraph::GetComponentArray<Transform>(void) const
@@ -297,6 +374,23 @@ namespace engine
         return m_sceneRenderers;
     }
 
+    template<> inline
+    const ComponentArray<RigidBodyDynamic>& SceneGraph::GetComponentArray<RigidBodyDynamic>(void) const
+    {
+        return m_sceneDynamicRigidBodies;
+    }
+    
+    template<> inline
+    const ComponentArray<RigidBodyStatic>& SceneGraph::GetComponentArray<RigidBodyStatic>(void) const
+    {
+        return m_sceneStaticRigidBodies;
+    }
+    
+    template<> inline
+    const ComponentArray<TriangleMesh>& SceneGraph::GetComponentArray<TriangleMesh>(void) const
+    {
+        return m_sceneTriangleMeshes;
+    }
 
     template<CValidComponent TComponentType>
     inline void SceneGraph::RegisterComponents(void)
@@ -331,6 +425,16 @@ namespace engine
         ComponentArray<TComponentType>& array = GetComponentArray<TComponentType>();
 
         return array.GetComponent(ownerEntity);
+    }
+
+    template<CValidComponent TComponentType>
+    inline void SceneGraph::DestroyComponent(EntityHandle ownerEntity)
+    {
+        GetComponentArray<TComponentType>().InvalidateComponent(ownerEntity);
+
+        // Remove component flag
+        if (Entity* ownerPtr = GetEntity(ownerEntity))
+            ownerPtr->m_components &= ~Entity::GetComponentFlag<TComponentType>();
     }
 
 
@@ -380,8 +484,11 @@ namespace engine
 
         ComponentArray<TComponentType>& compArray = GetComponentArray<TComponentType>();
 
-        for (const CompIndex& component : array)
-            compArray.AddDeserializedComponent(component.second);
+        for (CompIndex& component : array)
+        {
+            component.second.m_currentScene = this;
+            compArray.AddDeserializedComponent(std::move(component.second));
+        }
     }
 
     template<CValidComponent TComponentType>
@@ -408,6 +515,3 @@ namespace engine
     }
 
 }
-
-// short, convenient namespace alias
-namespace mustang_2024_moteur_gpm_2027_gpm_2027_projet_moteur = engine;

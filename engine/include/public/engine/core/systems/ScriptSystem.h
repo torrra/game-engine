@@ -32,7 +32,7 @@ namespace engine
         // Close lua state. Do not call any script-related
         // functions after this
         ENGINE_API
-        static void Shutdown(void);
+        static void Shutdown(bool deleteInstance = true);
 
         // Set the scripting system's active scene. This function needs to be
         // called every time a scene is loaded, so that the scripting system
@@ -55,18 +55,26 @@ namespace engine
         ENGINE_API
         static void RegisterNewComponent(const char* function, EntityHandle owner);
 
+        // Remove an existing component
+        // function: lua global function that handles the component's deletion
+        // owner: owning entity 
+        ENGINE_API
+        static void UnregisterComponent(const char* function, EntityHandle owner);
 
         // Add an entity to the scripting system's lua entity table
         ENGINE_API
         static void RegisterNewEntity(EntityHandle newEntity, const std::string& name);
 
-        // Add an entity's script component to the scripting system's lua script component table
+        // Remove an entity from the system's entity table
         ENGINE_API
-        static void RegisterNewScriptComponent(EntityHandle owner);
+        static void UnregisterEntity(EntityHandle toRemove);
 
         // Add a script object to an existing script component in script
         ENGINE_API
         static void RegisterNewScriptObject(const std::string& type, EntityHandle owner);
+
+        ENGINE_API
+        static void UnregisterScriptObject(const std::string& type, EntityHandle owner);
 
         // Call all Start() functions in a given entity's script component
         ENGINE_API
@@ -100,6 +108,19 @@ namespace engine
         // TODO: add kill condition once we have the input system ready
         ENGINE_API
         static void RunInterpreter(void);
+
+
+        ENGINE_API
+        static void NotifyCollisionEnter(EntityHandle entityA, EntityHandle entityB);
+
+        ENGINE_API
+        static void NotifyCollisionExit(EntityHandle entityA, EntityHandle entityB);
+
+        ENGINE_API
+        static void NotifyTriggerEnter(EntityHandle entityA, EntityHandle entityB);
+
+        ENGINE_API
+        static void NotifyTriggerExit(EntityHandle entityA, EntityHandle entityB);
 
     private:
 

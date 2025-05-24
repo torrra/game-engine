@@ -10,13 +10,13 @@ engine::Shader::Shader(void)
 {
 }
 
-void engine::Shader::LoadResource(const char* fileName)
+bool engine::Shader::LoadResource(const char* fileName)
 {
 	// Check shader type (vert, frag, etc...)
 	m_shaderType = ShaderType(fileName);
 
 	if (m_shaderType == EShaderType::INVALID_SHADER)
-		return;
+		return false;
 
 	// Load shader file to memory
 	FileData fileData = fileData.ReadFile(fileName);
@@ -25,7 +25,7 @@ void engine::Shader::LoadResource(const char* fileName)
 	{
 		std::printf("Failed to process shader '%s'. Shader file contains no content.\n", fileName);
 		m_shaderType = EShaderType::INVALID_SHADER;
-		return;
+		return false;
 	}
 
 	// Create shader
@@ -46,10 +46,11 @@ void engine::Shader::LoadResource(const char* fileName)
 		std::printf("Failed to compile shader. Error: %s", infoLog);
 		m_shaderType = EShaderType::INVALID_SHADER;
 
-		return;
+		return false;
 	}
 
 	fileData.Clear();
+    return true;
 }
 
 uint32 engine::Shader::GetShader(void) const noexcept

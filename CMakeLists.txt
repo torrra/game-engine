@@ -22,6 +22,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(dependencies)
 add_subdirectory(engine)
 add_subdirectory(editor)
+add_subdirectory(defaultExecutable)
 
 if (MSVC)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT editor)

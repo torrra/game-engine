@@ -47,15 +47,50 @@ math::Matrix4f engine::Transform::ToWorldMatrix(Transform& inTransform)
     inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
 
     // Iterate backwards to get parent closest to root first
-    for (auto parentIt = parents.rbegin(); parentIt != parents.rend(); ++parentIt)
+    for (auto parentIt = parents.begin(); parentIt != parents.end(); ++parentIt)
     {
         if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
-            world *= ToMatrixWithScale(*transform);
+            world = ToMatrixWithScale(*transform) * world;
     }
 
     return world * ToMatrixWithScale(inTransform);
 }
 
+math::Vector3f engine::Transform::ToWorldPosition(Transform& inTransform)
+{
+    math::Vector3f worldPosition = inTransform.m_position;
+
+    std::vector<EntityHandle> parents =
+        inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
+
+    for (auto parentIt = parents.begin(); parentIt != parents.end(); ++parentIt)
+    {
+        if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
+        {
+            worldPosition = worldPosition * transform->m_scale;
+            worldPosition = transform->m_rotation * worldPosition;
+            worldPosition += transform->m_position;
+        }
+    }
+
+    return worldPosition;
+}
+
+math::Quatf engine::Transform::ToWorldRotation(Transform& inTransform)
+{
+    math::Quatf worldRotation = inTransform.m_rotation;
+
+    std::vector<EntityHandle> parents =
+        inTransform.m_currentScene->GetAllParents(inTransform.m_owner);
+
+    for (auto parentIt = parents.begin(); parentIt != parents.end(); ++parentIt)
+    {
+        if (Transform* transform = inTransform.m_currentScene->GetComponent<Transform>(*parentIt))
+            worldRotation = transform->m_rotation * inTransform.m_rotation;
+    }
+
+    return worldRotation;
+}
 
 void engine::Transform::CopyPosition(const Transform& inTransform)
 {
@@ -88,6 +123,11 @@ void engine::Transform::Register(void)
     engine::ScriptSystem::RegisterNewComponent("_NewTransformComponent", m_owner);
 }
 
+void engine::Transform::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveTransformComponent", m_owner);
+}
+
 math::Vector3f engine::Transform::GetPosition(void) const
 {
     return m_position;
@@ -108,40 +148,69 @@ engine::Transform engine::Transform::GetTransform(void) const
     return *this;
 }
 
-void engine::Transform::SetPosition(const math::Vector3f& inPosition)
+engine::Transform& engine::Transform::SetPosition(const math::Vector3f& inPosition)
 {
     m_position = inPosition;
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetRotation(const math::Quatf& inRotation)
+math::Vector3f& engine::Transform::SetPosition(void)
 {
-    m_rotation = inRotation;
     m_dirty = true;
+
+    return m_position;
 }
 
-void engine::Transform::SetScale(const math::Vector3f& inScale)
+math::Vector3f engine::Transform::GetEulerRotation(void) const noexcept
+{
+    return m_rotation.EulerAngles() * RAD2DEG;
+}
+
+math::Vector3f& engine::Transform::SetScale(void)
+{
+    m_dirty = true;
+
+    return m_scale;
+}
+
+engine::Transform& engine::Transform::SetRotation(const math::Quatf& inRotation)
+{
+    m_rotation = inRotation.Normalized();
+    m_dirty = true;
+
+    return *this;
+}
+
+engine::Transform& engine::Transform::SetScale(const math::Vector3f& inScale)
 {
     m_scale = inScale;
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetTransform(const Transform& inTransform)
+engine::Transform& engine::Transform::SetTransform(const Transform& inTransform)
 {
     m_position = inTransform.m_position;
     m_rotation = inTransform.m_rotation;
     m_scale = inTransform.m_scale;
     m_dirty = true;
+
+    return *this;
 }
 
-void engine::Transform::SetTransform(const math::Vector3f& inPosition,
-                                     const math::Quatf& inRotation,
-                                     const math::Vector3f& inScale)
+engine::Transform& engine::Transform::SetTransform(const math::Vector3f& inPosition,
+                                                   const math::Quatf& inRotation,
+                                                   const math::Vector3f& inScale)
 {
     m_position = inPosition;
     m_rotation = inRotation;
     m_scale = inScale;
     m_dirty = true;
+
+    return *this;
 }
 
 

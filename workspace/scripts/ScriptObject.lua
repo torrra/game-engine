@@ -14,8 +14,6 @@ function ScriptObject._Register(typename, handle, owner)
 	typeTable.__index = typeTable
 	setmetatable(newObj, typeTable)
 	owner[typename] = newObj
-	print("\n[ScriptObject script] successfully registered script object of type "..typename.." owned by "..handle.."\n")
-
 end
 
 -- Create a new instance of ScriptObject prototype table
@@ -34,7 +32,6 @@ function ScriptObject:_PreExecute()
 	for _, object in pairs(self) do
 		if type(object) == "table" and
 		object.RefreshRef ~= nil then
-			-- print("[Script object]: refreshing ref "..tostring(object))
 			object:RefreshRef()
 		end
 	end
@@ -48,6 +45,26 @@ end
 
 function ScriptObject:Update(deltaTime)
 
+end
+
+function ScriptObject:OnCollisionEnter(otherEntity)
+
+	print("LUA [collision] enter")
+end
+
+function ScriptObject:OnCollisionExit(otherEntity)
+
+	print("LUA [collision] exit")
+end
+
+function ScriptObject:OnTriggerEnter(otherEntity)
+
+	print("LUA [trigger] enter")
+end
+
+function ScriptObject:OnTriggerExit(otherEntity)
+
+	print("LUA [trigger] exit")
 end
 
 -- Internal Start() caller

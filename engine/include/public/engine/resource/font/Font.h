@@ -15,7 +15,7 @@ namespace engine
 		ENGINE_API			Font(void);
 		ENGINE_API virtual	~Font(void) override;
 
-		virtual void		LoadResource(const char* fileName) override;
+		virtual bool		LoadResource(const char* fileName) override;
 
 		ENGINE_API ImFont*	GetFont(void) const noexcept;
 		ENGINE_API f32		GetFontSize(void) const noexcept;

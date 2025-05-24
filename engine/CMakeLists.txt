@@ -6,6 +6,7 @@ get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 message(STATUS "[${TARGET_NAME}] Starting source file fetching..")
 
 set(ENGINE_SHADER_DIR ${CMAKE_SOURCE_DIR}/workspace/shaders)
+set(ENGINE_SCRIPT_DIR ${CMAKE_SOURCE_DIR}/workspace/scripts)
 
 # -- Header files -- #
 file(GLOB_RECURSE TARGET_HEADER_FILES
@@ -37,7 +38,7 @@ file(GLOB TARGET_EXTRA_FILES
 )
 
 file(GLOB_RECURSE TARGET_SCRIPT_FILES
-	${CMAKE_BINARY_DIR}/scripts/*.lua
+	${ENGINE_SCRIPT_DIR}/*.lua
 )
 
 set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
@@ -45,7 +46,7 @@ set(TARGET_FILES ${TARGET_HEADER_FILES} ${TARGET_SOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
 source_group("shaders" FILES ${TARGET_ENGINE_SHADER_FILES})
 source_group("Extra files" FILES ${TARGET_EXTRA_FILES})
-source_group("Engine scripts" FILES ${TARGET_SCRIPT_FILES})
+source_group(TREE ${ENGINE_SCRIPT_DIR}/../ FILES ${TARGET_SCRIPT_FILES})
 
 add_library(${TARGET_NAME} SHARED)
 

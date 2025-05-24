@@ -1,7 +1,7 @@
 #pragma once
 
-#include <type_traits>
-#include <unordered_map>
+#include<utility>
+#include <vector>
 
 #include "TypesECS.h"
 #include "Entity.h"
@@ -24,9 +24,14 @@ namespace engine
 
         ENGINE_API Component(void) = default;
         ENGINE_API Component(EntityHandle owner, class SceneGraph* scene);
+        ENGINE_API Component(const Component&) = default;
+        ENGINE_API Component(Component&&) noexcept = default;
         ENGINE_API virtual ~Component(void) = default;
 
         virtual void Register(void) = 0;
+
+        // TODO: make pure virtual
+        virtual void Unregister(void) {};
 
         // Is this component a valid object?
         // true: this object is a valid component instance
@@ -46,7 +51,7 @@ namespace engine
 
         // Permanently set object up for destruction
         ENGINE_API
-        void Invalidate(void);
+        virtual void Invalidate(void);
 
         ENGINE_API
         EntityHandle GetOwner(void) const;
@@ -63,6 +68,9 @@ namespace engine
         template <CValidComponent TComponentType>
         static const char* DeserializeComponentText(DeserializedArray<TComponentType>& array,
                                                     const char* text, const char* end);
+
+        Component& operator=(const Component&) = default;
+        Component& operator=(Component&&) noexcept = default;
 
     protected:
 

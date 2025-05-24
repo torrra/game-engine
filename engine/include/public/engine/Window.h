@@ -35,6 +35,7 @@ namespace engine
         ENGINE_API void ClearWindow(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
         ENGINE_API void Update(void);
         ENGINE_API bool ShouldWindowClose(void) const noexcept;
+        ENGINE_API void SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size);
 
         template<math::CScalarType TValueType = uint32>
         TValueType GetWidth(void) const noexcept;
@@ -63,13 +64,13 @@ namespace engine
     template<math::CScalarType TValueType>
     inline TValueType engine::Window::GetWidth(void) const noexcept
     {
-        return m_size.GetX();
+        return static_cast<TValueType>(m_size.GetX());
     }
 
     template<math::CScalarType TValueType>
     inline TValueType engine::Window::GetHeight(void) const noexcept
     {
-        return m_size.GetY();
+        return static_cast<TValueType>(m_size.GetY());
     }
 
     template<math::CScalarType TValueType>

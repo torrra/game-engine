@@ -1,4 +1,12 @@
 InputCode = {
+
+MOUSE_BUTTON_NONE = -1,
+MOUSE_BUTTON_LEFT = 0,
+MOUSE_BUTTON_RIGHT = 1,
+MOUSE_BUTTON_MIDDLE = 2,
+MOUSE_BUTTON_3 = 3,
+MOUSE_BUTTON_4 = 4,
+
 KEY_SPACE = 32,
 KEY_APOSTROPHE = 39,
 KEY_COMMA = 44,
@@ -142,4 +150,18 @@ end
 function IsInputReleased(key)
 
     return Input.IsInputReleased(key)
+end
+
+function GetCursorPosition()
+
+    return Input.GetCursorPosition()
+end
+
+function GetCursorDeltaPos()
+
+    return Input.GetCursorDeltaPos()
+end
+
+function GetScrollDelta()
+    return Input.GetScrollDelta()
 end

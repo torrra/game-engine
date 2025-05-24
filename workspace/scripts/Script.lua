@@ -9,12 +9,16 @@ function Script:_RegisterScriptComponent(handle)
 	self.__index = self
 	setmetatable(newComponent, self)
 	ExistingScriptComponents[handle] = newComponent	
-	print("\n[Script component] successfully registered component owned by "..handle.."\n")
 end
 
 -- Add a new script object instance to this comopnent
 function Script:_RegisterScriptObject(type)
 	ScriptObject._Register(type, self.entity, self)
+end
+
+function _RemoveScriptComponent(handle)
+
+	ExistingScriptComponents[handle] = nil
 end
 
 
@@ -39,8 +43,6 @@ end
 -- Start all script objects in this component
 function Script:_StartComponent()
 
-	print("[Script component]: component starting...")
-
 	for _, object in pairs(self) do
 
 		if type(object) == "table" and 
@@ -51,6 +53,69 @@ function Script:_StartComponent()
 	end
 end
 
+
+function Script:_OnCollisionEnter(otherHandle)
+
+	for _, object in pairs(self) do
+		
+		if type(object) == "table" and
+			object.OnCollisionEnter ~= nil and
+			object._PreExecute ~= nil then
+
+			object:_PreExecute()
+			object:OnCollisionEnter(otherHandle)
+
+		end
+
+	end
+end
+
+function Script:_OnCollisionExit(otherHandle)
+
+	for _, object in pairs(self) do
+		
+		if type(object) == "table" and
+			object.OnCollisionExit ~= nil and
+			object._PreExecute ~= nil then
+
+			object:_PreExecute()
+			object:OnCollisionExit(otherHandle)
+
+		end
+
+	end
+end
+
+function Script:_OnTriggerEnter(otherHandle)
+
+	for _, object in pairs(self) do
+		
+		if type(object) == "table" and
+			object.OnTriggerEnter ~= nil and
+			object._PreExecute ~= nil then
+
+			object:_PreExecute()
+			object:OnTriggerEnter(otherHandle)
+
+		end
+
+	end
+end
+
+function Script:_OnTriggerExit(otherHandle)
+
+	for _, object in pairs(self) do
+		
+		if type(object) == "table" and
+			object.OnTriggerExit ~= nil and
+			object._PreExecute ~= nil then
+
+			object:_PreExecute()
+			object:OnTriggerExit(otherHandle)
+
+		end
+	end
+end
 
 -- Get an existing script component
 function GetScriptComponent(ownerHandle)
@@ -63,10 +128,19 @@ function _NewScriptComponent(handle)
 	Script:_RegisterScriptComponent(handle)
 end
 
--- Add a new script o
+-- Add a new script object
 function _NewScriptObject(typename, handle)
 	local ownerComponent = ExistingScriptComponents[handle]
 	ScriptObject._Register(typename, handle, ownerComponent)	
+end
+
+-- Remove an existing script object
+function _RemoveScriptObject(typename, handle)
+	local ownerComponent = ExistingScriptComponents[handle]
+
+	if ownerComponent ~= nil then
+		ownerComponent[typename] = nil
+	end
 end
 
 -- Update script objects inside a script
@@ -80,11 +154,42 @@ end
 -- Call Start() on all script objects
 function _StartScript(handle)
 
-	print("\n[Script component] starting script component owned by "..handle.."\n")
 	local component = ExistingScriptComponents[handle]
 	component:_StartComponent()
 end
 
 
+function _OnCollisionEnterScript(handleOwner, handleOther)
+
+	local component = ExistingScriptComponents[handleOwner]
+
+	if component ~= nil then
+		component:_OnCollisionEnter(handleOther)
+	end
+end
+
+function _OnCollisionExitScript(handleOwner, handleOther)
+
+	local component = ExistingScriptComponents[handleOwner]
+
+	if component ~= nil then
+		component:_OnCollisionExit(handleOther)
+	end
+end
+
+function _OnTriggerEnterScript(handleOwner, handleOther)
+
+	local component = ExistingScriptComponents[handleOwner]
+
+	if component ~= nil then
+		component:_OnTriggerEnter(handleOther)
+	end
+end
+
+function _OnTriggerExitScript(handleOwner, handleOther)
+
+	local component = ExistingScriptComponents[handleOwner]
+	component:_OnTriggerExit(handleOther)
+end
 
 return Script

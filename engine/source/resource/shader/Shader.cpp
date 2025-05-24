@@ -2,18 +2,20 @@
 #include "resource/shader/ShaderResource.h"
 #include "resource/ResourceManager.h"
 #include "utility/MemoryCheck.h"
+#include "ConsoleLog.hpp"
 
 #include <glad/glad.h>
 
 engine::ShaderProgram::ShaderProgram(const char* vertexShader, const char* fragShader)
 	: m_vertexShader(vertexShader), m_fragShader(fragShader), m_programID(0)
 {
-	CreateProgram();
+	CreateProgram(false, false);
 }
 
-void engine::ShaderProgram::LoadResource(const char* filePath)
+bool engine::ShaderProgram::LoadResource(const char* filePath)
 {
 	(void) filePath;
+    return true;
 }
 
 void engine::ShaderProgram::Use(void) const
@@ -96,57 +98,77 @@ void engine::ShaderProgram::Set(const char* uniformName, math::Vector4d const& v
 }
 
 // Matrix float
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2f* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix2f* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix2fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
+	glUniformMatrix2fv(location, 1, GL_FALSE, reinterpret_cast<const f32*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3f* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix3f* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix3fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
+	glUniformMatrix3fv(location, 1, GL_FALSE, reinterpret_cast<const f32*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4f* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix4f* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<f32*>(matrix));
+	glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const f32*>(matrix));
 }
 
 // Matrix double
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix2d* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix2d* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix2dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
+	glUniformMatrix2dv(location, 1, GL_FALSE, reinterpret_cast<const f64*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix3d* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix3d* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix3dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
+	glUniformMatrix3dv(location, 1, GL_FALSE, reinterpret_cast<const f64*>(matrix));
 }
 
-void engine::ShaderProgram::Set(const char* uniformName, math::Matrix4d* matrix) const
+void engine::ShaderProgram::Set(const char* uniformName, const math::Matrix4d* matrix) const
 {
 	int32 location = glGetUniformLocation(m_programID, uniformName);
 
-	glUniformMatrix4dv(location, 1, GL_FALSE, reinterpret_cast<f64*>(matrix));
+	glUniformMatrix4dv(location, 1, GL_FALSE, reinterpret_cast<const f64*>(matrix));
 }
 
-void engine::ShaderProgram::CreateProgram(void)
+const std::string& engine::ShaderProgram::GetVertexShaderName(void) const
 {
+    return m_vertexShader;
+}
+
+const std::string& engine::ShaderProgram::GetFragmentShaderName(void) const
+{
+    return m_fragShader;
+}
+
+void engine::ShaderProgram::CreateProgram(bool isVertAbsolute, bool isFragAbsolute)
+{
+    // Don't create OpenGL program twice
+    if (m_programID)
+        return;
+     
 	// Resource manager will only load if resource does not exist
-	ResourceManager::Load<Shader>(m_vertexShader);
-	ResourceManager::Load<Shader>(m_fragShader);
+	ResourceManager::Load<Shader>(m_vertexShader, isVertAbsolute);
+	ResourceManager::Load<Shader>(m_fragShader, isFragAbsolute);
 	
 	const Shader* vShader = ResourceManager::GetResource<Shader>(m_vertexShader);
 	const Shader* fShader = ResourceManager::GetResource<Shader>(m_fragShader);
+
+    if (!vShader || !fShader)
+    {
+        PrintLog(ErrorPreset(), "Failed to compute shader");
+        return;
+    }
 
 	if (!vShader->GetShaderType() ||
 		!fShader->GetShaderType())

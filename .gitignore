@@ -12,3 +12,22 @@
 # vim files
 *.swp
 
+# ImGui meta data
+/workspace/imgui.ini
+
+# Build tests
+/testProjectBuildFolder/*
+!/testProjectBuildFolder/DoNotRemove.txt
+
+# Test assets
+/workspace/assets/banana-dancing-fortnite
+/workspace/assets/hilda
+/workspace/assets/freddy
+/workspace/assets/manny
+/workspace/assets/alien
+/workspace/assets/dancer
+/workspace/assets/garf/source
+/workspace/assets/garf/textures
+/workspace/assets/grug
+/workspace/assets/pete
+/workspace/assets/remy

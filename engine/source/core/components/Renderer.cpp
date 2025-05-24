@@ -12,7 +12,9 @@
 
 #include "serialization/TextSerializer.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
+
+#include "InternalOpenGLError.hpp"
 
 namespace engine
 {
@@ -26,12 +28,8 @@ namespace engine
         if (!m_model || !m_shader)
             return;
 
-        if (m_texture)
-        {
-            m_texture->UseTexture();
-        }
-        else
-            Texture::RemoveTexture();
+        if (!m_model->CanRender())
+            return;
 
         m_shader->Use();
 
@@ -45,17 +43,23 @@ namespace engine
 
             m_shader->Set("model", &transformMat);
             m_shader->Set("mvp", &mvp);
-            m_shader->Set("normalMat", &normalMat3x3);		
+            m_shader->Set("normalMat", &normalMat3x3);
         }
         else
         {
-            math::Matrix3f identityMat{ 1.f };
+            math::Matrix4f identity4x4{ 1.f };
+            math::Matrix3f identity3x3{ 1.f };
 
+            m_shader->Set("model", &identity4x4);
             m_shader->Set("mvp", &viewProjection);
-            m_shader->Set("normalMat", &identityMat);
+            m_shader->Set("normalMat", &identity3x3);
         }
 
-        DrawModel();
+        if (m_materials.empty())
+            m_materials.resize(m_model->GetMeshCount());
+
+        m_model->Draw(m_materials);
+        OpenGLError();
     }
 
     const Model* Renderer::GetModel(void) const
@@ -68,9 +72,27 @@ namespace engine
         return m_shader;
     }
 
-    const Texture* Renderer::GetTexture(void) const
+    const MeshMaterial* Renderer::GetMaterial(uint32 index) const
     {
-        return m_texture;
+        if (index < m_materials.size())
+            return m_materials.at(index);
+
+        else
+            return nullptr;
+    }
+
+    void Renderer::SetMaterial(uint32 index, const MeshMaterial* material)
+    {
+        if (index >= m_materials.size())
+            m_materials.resize(static_cast<uint64>(index + 1));
+
+        m_materials[index] = material;
+    }
+
+    void Renderer::SetMaterial(uint32 index, const char* key)
+    {
+        if (const MeshMaterial* mat = ResourceManager::GetResource<MeshMaterial>(key))
+            SetMaterial(index, mat);
     }
 
     void Renderer::SetModel(const Model* model)
@@ -81,7 +103,7 @@ namespace engine
     void Renderer::SetModel(const char* key)
     {
         if (const Model* model = ResourceManager::GetResource<Model>(key))
-            m_model = model;
+            SetModel(model);
     }
 
     void Renderer::SetShader(const ShaderProgram* shader)
@@ -95,23 +117,11 @@ namespace engine
             m_shader = shader;
     }
 
-    void Renderer::SetTexture(const Texture* texture)
-    {
-        m_texture = texture;
-    }
-
-    void Renderer::SetTexture(const char* key)
-    {
-        if (const Texture* texture = ResourceManager::GetResource<Texture>(key))
-            m_texture = texture;
-    }
-
     void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
                                  uint64 index) const
     {
 
         const std::string* model = ResourceManager::FindKeyByVal(m_model);
-        const std::string* texture = ResourceManager::FindKeyByVal(m_texture);
         const std::string* shader = ResourceManager::FindKeyByVal(m_shader);
 
         if ((!model) || (!shader))
@@ -128,19 +138,32 @@ namespace engine
         text::Serialize(output, "owner", owner);
 
         output << "\n    ";
-        text::Serialize(output, "hasTexture", (bool)texture);
-        output << "\n    ";
         text::Serialize(output, "model", *model);
         output << "\n    ";
         text::Serialize(output, "shader", *shader);
+        output << "\n        ";
+        text::Serialize(output, "vertexShader", m_shader->GetVertexShaderName());
+        output << "\n        ";
+        text::Serialize(output, "fragmentShader", m_shader->GetFragmentShaderName());
         output << "\n    ";
 
-        if (texture)
+        std::vector<const std::string*> validMeshMaterials;
+        validMeshMaterials.reserve(m_materials.size());
+
+        for (const MeshMaterial* mat : m_materials)
         {
-            text::Serialize(output, "texture", *texture);
-            output << "\n    ";
+            if (mat)
+                validMeshMaterials.push_back(ResourceManager::FindKeyByVal(mat));
         }
 
+        text::Serialize(output, "materialCount", validMeshMaterials.size());
+        output << "\n    ";
+
+        for (const std::string* matKey : validMeshMaterials)
+        {
+            text::Serialize(output, "material", *matKey);
+            output << "\n    ";
+        }
         text::Serialize(output, "flags", m_flags);
         output << '\n';
     }
@@ -150,41 +173,42 @@ namespace engine
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeInteger(text, m_owner);
 
-        uint8 hasTexture;
-
-        MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeInteger(text, hasTexture);
-
         std::string key;
         text = text::DeserializeString(text, end, key);
 
+        ResourceManager::Load<Model>(key);
         m_model = ResourceManager::GetResource<Model>(key);
 
         key.clear();
         text = text::DeserializeString(text, end, key);
+
+        std::string vertShader, fragShader;
+
+        text = text::DeserializeString(text, end, vertShader);
+        text = text::DeserializeString(text, end, fragShader);
+
+        ResourceManager::LoadShader(key.c_str(), vertShader.c_str(), fragShader.c_str(), true);
         m_shader = ResourceManager::GetResource<ShaderProgram>(key);
 
-        if (hasTexture)
+
+        uint64 matCount = 0;
+        std::string material;
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeInteger(text, matCount);
+
+        m_materials.resize(matCount);
+
+        for (uint64 matNum = 0; matNum < matCount; ++matNum)
         {
-            key.clear();
-            text = text::DeserializeString(text, end, key);
-            m_texture = ResourceManager::GetResource<Texture>(key);
+            material.clear();
+            text = text::DeserializeString(text, end, material);
+            ResourceManager::Load<MeshMaterial>(material);
+            m_materials[matNum] = ResourceManager::GetResource<MeshMaterial>(material);
         }
 
         MOVE_TEXT_CURSOR(text, end);
         return text::DeserializeInteger(text, m_flags);
     }
-
-    void Renderer::DrawModel(void) const
-    {
-        for (const Mesh& mesh : m_model->GetMeshes())
-        {
-            glBindVertexArray(mesh.m_vao);
-            glDrawElements(GL_TRIANGLES, mesh.m_indexCount, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-        }
-    }
-
-
 
 }

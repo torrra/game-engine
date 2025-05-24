@@ -7,27 +7,27 @@
 #include "engine/CoreTypes.h"
 #include "engine/EngineExport.h"
 #include "engine/core/Component.h"
+#include "engine/core/components/Transform.h"
 
 namespace engine
 {
     struct Frustum
     {
-        f32 m_near;
-        f32 m_far;
-        f32 m_fovRad;
-        f32 m_ratio;
+        f32 m_near = 0.005f;
+        f32 m_far = 250.0f;
+        f32 m_fovRad = 1.0471976f;
+        f32 m_ratio = 1.77777777778f;
 
-        ENGINE_API Frustum(f32 near = 0.005f, f32 far = 250.0f, f32 fovDeg = 60.0f, f32 ratio = 1.77777777778f)
-            : m_near(near), m_far(far), m_fovRad(fovDeg* DEG2RAD), m_ratio(ratio)
-        {
-        }
     };
 
     class Camera : public Component
     {
     public:
-        
+       
+
         ENGINE_API Camera(EntityHandle, class SceneGraph*);
+        ENGINE_API Camera(Camera&&) noexcept = default;
+        ENGINE_API Camera(const Camera&) = default;
 
         ENGINE_API ~Camera(void) = default;
 
@@ -35,10 +35,12 @@ namespace engine
         ENGINE_API void Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed);
         ENGINE_API math::Matrix4f ViewProjection(void);
 
-        ENGINE_API void Register(void);
+        ENGINE_API void Register(void) override;
+        ENGINE_API void Unregister(void) override;
 
         ENGINE_API math::Vector3f GetPosition(void) const noexcept;
         ENGINE_API math::Vector3f GetRotation(void) const noexcept;
+        ENGINE_API math::Quatf GetRotationQuat(void) const noexcept;
 
         ENGINE_API f32 GetFOV(void) const noexcept;
         ENGINE_API f32 GetNearPlane(void) const noexcept;
@@ -57,6 +59,11 @@ namespace engine
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
 
+        ENGINE_API
+        Camera& operator=(const Camera&) = default;
+
+        ENGINE_API
+        Camera& operator=(Camera&&) noexcept = default;
 
     private:
         math::Matrix4f GetViewMatrix(void);
@@ -64,10 +71,17 @@ namespace engine
 
         f32 RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed);
 
-        Frustum		   m_frustum;
+        Transform*     m_transform;
+        Frustum        m_frustum;
         math::Quatf    m_rotQuat = math::Quatf(1.f, 0.f, 0.f, 0.f);
         math::Matrix4f m_projectionMatrix{1.f};
-        math::Vector3f m_position{ 0.f };
         math::Vector3f m_rotation{ 0.f };
     };
+
+    template<>
+    inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<Camera>()
+    {
+        return CAMERA;
+    }
+
 }

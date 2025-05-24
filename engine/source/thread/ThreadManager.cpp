@@ -1,7 +1,8 @@
 #include "engine/thread/ThreadManager.h"
 #include "engine/core/SceneGraph.h"
+#include "InternalOpenGLError.hpp"
 
-engine::ThreadManager*  engine::ThreadManager::m_instance = nullptr;
+engine::ThreadManager* engine::ThreadManager::m_instance = nullptr;
 std::once_flag			engine::ThreadManager::m_instanceCreatedFlag;
 
 void engine::ThreadManager::Startup(uint32 numThreads)
@@ -18,6 +19,7 @@ void engine::ThreadManager::Startup(uint32 numThreads)
 void engine::ThreadManager::Shutdown(void)
 {
     SynchronizeGameThread(nullptr);
+    ExecuteRenderThreadTasks();
 
     // lock mutex here, we want
     // the bool to be assigned BEFORE
@@ -50,10 +52,10 @@ void engine::ThreadManager::UpdateGameLogic(SceneGraph* scene, f32 deltaTime)
 }
 
 void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
-{
+{ 
     // Wait until the logic update is finished (unless no update was sent to a thread)
     if (GetInstance()->m_gameUpdateFinished.valid())
-        GetInstance()->m_gameUpdateFinished.wait();
+        GetInstance()->m_gameUpdateFinished.get();
 
     // Copy updated transforms into separate array for rendering
     if (scene)
@@ -62,8 +64,29 @@ void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
 
 void engine::ThreadManager::RenderScene(SceneGraph* scene)
 {
+    ExecuteRenderThreadTasks();
+
     if (scene)
         scene->RenderFromCache();
+}
+
+void engine::ThreadManager::ExecuteRenderThreadTasks(void)
+{
+    ThreadManager* instance = GetInstance();
+    TaskQueue& tasks = instance->GetQueue<ETaskType::GRAPHICS>();
+
+    instance->m_poolMutex.lock();
+
+    while (!tasks.empty())
+    {
+        std::function<void()>& function = tasks.front();
+
+        function();
+        tasks.pop();
+        OpenGLError();
+    }
+
+    instance->m_poolMutex.unlock();
 }
 
 void engine::ThreadManager::ThreadLoop(void)

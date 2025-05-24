@@ -9,8 +9,7 @@ namespace engine
 {
     class Entity
     {
-    private:
-
+    public:
         // Special handle values
         enum EHandleUtils : EntityHandle
         {
@@ -23,7 +22,7 @@ namespace engine
             UID_MASK = 0xFFFFFFFF00000000
         };
 
-
+    private:
         // Makes it easier to know which components an entity has
         enum EComponentFlags : uint64
         {
@@ -31,13 +30,18 @@ namespace engine
             TRANSFORM = 1,
             SCRIPT = (uint64) (1 << 1),
             RENDERER = (uint64) (1 << 2),
-            RIGIDBODYDYNAMIC = (uint64) (1 << 3)
+            RIGIDBODY_DYNAMIC = (uint64) (1 << 3),
+            RIGIDBODY_STATIC = (uint64) (1 << 4),
+            CAMERA = (uint64) (1 << 5),
+            AUDIO_PLAYER = (uint64) (1 << 6),
+            TRIANGLE_MESH = (uint64) (1 << 7)
         };
 
         friend class SceneGraph;
 
     public:
 
+        Entity(void) = default;
         ENGINE_API Entity(const std::string& name, EntityHandle handle, EntityHandle parent);
         ENGINE_API Entity(const Entity&) = default;
 
@@ -74,22 +78,25 @@ namespace engine
         EntityHandle GetParent(void) const;
 
         ENGINE_API
-        std::string  GetName(void) const;
+        const std::string&  GetName(void) const;
 
         ENGINE_API
         void         SetName(const std::string& name);
 
         ENGINE_API
-        Entity& operator=(const Entity& rhs);
+        void        SerializeText(std::ofstream& file) const;
+
+        ENGINE_API
+        const char* DeserializeText(const char* text, const char* end);
 
         // Permanently set object up for destruction
         ENGINE_API
         void Invalidate(void);
 
+        ENGINE_API
+        Entity& operator=(const Entity& rhs);
+
     private:
-
-        Entity(void) = default;
-
 
         // Get EComponentFlag corresponding to the component type
         // NO_COMPONENT by default, must be manually instantiated for
@@ -104,7 +111,7 @@ namespace engine
         // status modifiers that affect behavior (inactive, invalid)
         uint64              m_statusFlags = ecs::NONE;
 
-        // what component this entity hass
+        // what component this entity has
         uint64              m_components = NO_COMPONENTS;
 
     };

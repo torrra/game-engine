@@ -6,25 +6,14 @@ extern "C"
 }
 
 #include <iostream>
-#include <fstream>
-#include <iostream>
 
 #include "core/components/Script.h"
 #include "core/systems/ScriptSystem.h"
 #include "core/SceneGraph.h"
 
-#include "scripting/EntityScriptFunctions.h"
-#include "scripting/ComponentFunctions.h"
-#include "scripting/ScriptFunctions.h"
-#include "scripting/CameraFunctions.h"
-#include "scripting/TransformFunctions.h"
-#include "scripting/InputFunctions.h"
+#include "scripting/EngineScriptFunctions.h"
+#include "utility/Platform.h"
 
-//#include "utility/StringConversion.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <shellapi.h>
 
 
 namespace engine
@@ -51,26 +40,36 @@ namespace engine
         RegisterCameraFunctions(GetInstance()->m_luaState);
         RegisterTransformFunctions(GetInstance()->m_luaState);
         RegisterInputFunctions(GetInstance()->m_luaState);
+        RegisterVector2Functions(GetInstance()->m_luaState);
+        RegisterVector3Functions(GetInstance()->m_luaState);
+        RegisterRaycastFunctions(GetInstance()->m_luaState);
 
+        RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
         RunConfigScript("Entity.lua");
-
         RunConfigScript("ScriptObject.lua");
         RunConfigScript("Script.lua");
-
         RunConfigScript("Camera.lua");
         RunConfigScript("Transform.lua");
-
         RunConfigScript("Input.lua");
+
+        RunConfigScript("vector/Vector2.lua");
+        RunConfigScript("vector/Vector3.lua");
+
+        RunConfigScript("physics/Raycast.lua");
 
         RunAllUserScripts();
     }
 
-    void ScriptSystem::Shutdown(void)
+    void ScriptSystem::Shutdown(bool deleteInstance)
     {
         lua_close(GetInstance()->m_luaState);
-        delete m_instance;
-        m_instance = nullptr;
+        
+        if (deleteInstance)
+        {
+            delete m_instance;
+            m_instance = nullptr;
+        }
     }
 
     void ScriptSystem::SetCurrentScene(SceneGraph* graph)
@@ -97,6 +96,15 @@ namespace engine
             LogLuaError();
     }
 
+    void ScriptSystem::UnregisterComponent(const char* function, EntityHandle owner)
+    {
+        lua_getglobal(GetInstance()->m_luaState, function);
+        lua_pushinteger(GetInstance()->m_luaState, owner);
+
+        if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
+            LogLuaError();
+    }
+
     void ScriptSystem::RegisterNewEntity(EntityHandle newEntity, const std::string& name)
     {
         if (name.empty())
@@ -110,11 +118,13 @@ namespace engine
             LogLuaError();
     }
 
-    void ScriptSystem::RegisterNewScriptComponent(EntityHandle owner)
+    void ScriptSystem::UnregisterEntity(EntityHandle toRemove)
     {
-        lua_getglobal(GetInstance()->m_luaState, "_NewScriptComponent");
-        lua_pushinteger(GetInstance()->m_luaState, owner);
-          
+        std::string fullName = GetInstance()->m_currentScene->GetFullEntityName(toRemove);
+
+        lua_getglobal(GetInstance()->m_luaState, "_UnregisterEntity");
+        lua_pushstring(GetInstance()->m_luaState, fullName.c_str());
+
         if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
             LogLuaError();
     }
@@ -122,6 +132,16 @@ namespace engine
     void ScriptSystem::RegisterNewScriptObject(const std::string& type, EntityHandle owner)
     {
         lua_getglobal(GetInstance()->m_luaState, "_NewScriptObject");
+        lua_pushstring(GetInstance()->m_luaState, type.c_str());
+        lua_pushinteger(GetInstance()->m_luaState, owner);
+
+        if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+            LogLuaError();
+    }
+
+    void ScriptSystem::UnregisterScriptObject(const std::string& type, EntityHandle owner)
+    {
+        lua_getglobal(GetInstance()->m_luaState, "_RemoveScriptObject");
         lua_pushstring(GetInstance()->m_luaState, type.c_str());
         lua_pushinteger(GetInstance()->m_luaState, owner);
 
@@ -166,17 +186,15 @@ namespace engine
 
     void ScriptSystem::ResetState(SceneGraph* newScene)
     {
-        SceneGraph* oldScenePtr = GetInstance()->m_currentScene;
-
-        Shutdown();
+        Shutdown(false);
         Startup();
 
         if (newScene)
+        {
             GetInstance()->m_currentScene = newScene;
-        else
-            GetInstance()->m_currentScene = oldScenePtr;
-
-        GetInstance()->m_currentScene->RegisterAllComponents();
+            GetInstance()->m_currentScene->RegisterAllEntities();
+            GetInstance()->m_currentScene->RegisterAllComponents();
+        }
     }
 
     void ScriptSystem::SetUserScriptLocation(const char* path)
@@ -186,33 +204,44 @@ namespace engine
 
     void ScriptSystem::CreateUserScript(const char* dirRelativePath, const char* className)
     {
-        std::string fullPath = GetInstance()->m_userScriptsLocation +
-                              ((dirRelativePath) ? dirRelativePath : "") +
-                              ((className) ? className : "UserScript") + ".lua";
+        std::string luaName;
+        
+        if (className && (*className != '\0'))
+            luaName = className;
+        else
+            luaName = "NewUserScript";
+
+
+        std::string fullPath = GetInstance()->m_userScriptsLocation;
+
+        fullPath.push_back('/');
+
+        if (dirRelativePath)
+            fullPath.append(dirRelativePath);
+
+        fullPath.append(luaName);
+        fullPath.append(".lua");
 
         if (std::filesystem::exists(fullPath))
             return;
 
-        std::string formattedName = FormatLuaClassName(className);
-
-        if (formattedName.empty())
+        if (luaName.empty() || luaName.size() >= 64)
             return;
 
-        std::ofstream newFile(fullPath,
-                             std::ios::out);
+        std::ofstream newFile(fullPath, std::ios::out);
 
         if (!newFile)
             return;
 
-        const char fileData[] = "%s = ScriptObject:_new()\n\n-- Define member variables \
-here\n\n-- Is executed once when the object becomes active\nfunction %s:Start()\n\nend\n\n\n\
+        const char fileData[] = "%s = ScriptObject:_new()\n\n-- Is executed once when the object becomes \
+active\nfunction %s:Start()\n\nend\n\n\n\
 -- Is executed every tick\nfunction %s:Update(deltaTime)\n\nend\n\n\n-- Engine definitions\n\
 ScriptObjectTypes.%s = %s\nreturn %s";
 
         char textBuffer[1024];
 
-        sprintf_s(textBuffer, fileData, className, className, className,
-                  formattedName.c_str(), className, className);
+        sprintf_s(textBuffer, fileData, luaName.c_str(), luaName.c_str(), luaName.c_str(),
+                  luaName.c_str(), luaName.c_str(), luaName.c_str());
 
         newFile << textBuffer;
         newFile.close();
@@ -220,8 +249,8 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         FilePath pathObject(fullPath);
         
         // Open new file in text editor
-        ShellExecuteA(NULL, NULL, std::filesystem::absolute(fullPath).string().c_str(), NULL, NULL, SW_SHOW);
-
+        OpenFile(std::filesystem::absolute(fullPath).c_str());
+        
         // Run lua file to register existing type
         RunUserScript(fullPath);
     }
@@ -234,6 +263,96 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         {		
             if (luaL_dostring(GetInstance()->m_luaState, buff) != LUA_OK)
                 LogLuaError();
+        }
+    }
+
+    void ScriptSystem::NotifyCollisionEnter(EntityHandle entityA, EntityHandle entityB)
+    {
+        if (Entity* entityPtrA = GetInstance()->m_currentScene->GetEntity(entityA))
+        {
+            if (entityPtrA->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnCollisionEnterScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
+
+        if (Entity* entityPtrB = GetInstance()->m_currentScene->GetEntity(entityB))
+        {
+            if (entityPtrB->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnCollisionEnterScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
+    }
+
+    void ScriptSystem::NotifyCollisionExit(EntityHandle entityA, EntityHandle entityB)
+    {
+        if (Entity* entityPtrA = GetInstance()->m_currentScene->GetEntity(entityA))
+        {
+            if (entityPtrA->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnCollisionExitScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
+
+        if (Entity* entityPtrB = GetInstance()->m_currentScene->GetEntity(entityB))
+        {
+            if (entityPtrB->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnCollisionExitScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
+    }
+
+    void ScriptSystem::NotifyTriggerEnter(EntityHandle entityA, EntityHandle entityB)
+    {
+        if (Entity* entityPtrA = GetInstance()->m_currentScene->GetEntity(entityA))
+        {
+            if (entityPtrA->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnTriggerEnterScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
+        }
+    }
+
+    void ScriptSystem::NotifyTriggerExit(EntityHandle entityA, EntityHandle entityB)
+    {
+        if (Entity* entityPtrA = GetInstance()->m_currentScene->GetEntity(entityA))
+        {
+            if (entityPtrA->HasComponent<Script>())
+            {
+                lua_getglobal(GetInstance()->m_luaState, "_OnTriggerExitScript");
+                lua_pushinteger(GetInstance()->m_luaState, entityA);
+                lua_pushinteger(GetInstance()->m_luaState, entityB);
+
+                if (lua_pcall(GetInstance()->m_luaState, 2, 0, 0) != LUA_OK)
+                    LogLuaError();
+            }
         }
     }
 
@@ -265,8 +384,8 @@ ScriptObjectTypes.%s = %s\nreturn %s";
             if ((!isalnum(character)) && (character != '_'))
                 return std::string();
 
-            if (character >= 'A' && character <= 'Z')
-                character += 32;
+           /* if (character >= 'A' && character <= 'Z')
+                character += 32;*/
         }
 
         return formattedName;
@@ -276,11 +395,7 @@ ScriptObjectTypes.%s = %s\nreturn %s";
     {
         if (!m_instance)
         {
-            std::unique_lock lock(m_mutex);
-
-            if (!m_instance)
-                m_instance = new ScriptSystem();
-
+            m_instance = new ScriptSystem();
         }
 
         return m_instance;

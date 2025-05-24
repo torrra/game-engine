@@ -13,8 +13,11 @@
 #include <math/Vector4.hpp>
 #include <math/Quaternion.hpp>
 
-#define MOVE_TEXT_CURSOR(text, end) text = text::GetValuePointer(text, end);\
-if (text == end) return text
+#define MOVE_TEXT_CURSOR(cursor, end) text = text::GetValuePointer(cursor, end);\
+if (cursor == end) return cursor
+
+#define MOVE_TEXT_CURSOR_FREE(cursor, start, end) cursor = text::GetValuePointer(cursor, end);\
+if (cursor == end){ text::UnloadFileData(start); return;}
 
 namespace engine::text
 {
@@ -146,7 +149,7 @@ namespace engine::text
         using TNameType = std::remove_reference_t<std::remove_const_t<TValueType>>;
 
         const char* valName((name) ? name : "unnamed val");
-        file << "@" <<  types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
+        file << types::GetTypeName<TNameType>() << " | " << valName << '=' << val;
     }
 
     template<math::CIntegralType TValueType>

@@ -8,13 +8,17 @@ function Transform:_RegisterTransformComponent(handle)
 	self.__index = self
 	setmetatable(newComponent, self)
 	ExistingTransformComponents[handle] = newComponent
-	print("\n[Transform component] successfully registered component owned by "..handle.."\n")
 end
 
 function _NewTransformComponent(handle)
+
 	Transform:_RegisterTransformComponent(handle)
 end
 
+function _RemoveTransformComponent(handle)
+
+	ExistingTransformComponents[handle] = nil
+end
 
 function GetTransformComponent(handle)
 
@@ -28,8 +32,8 @@ function Transform:RefreshRef()
 end
 
 function Transform:GetPosition()
-	
-	return TransformRef.GetTransformPosition(self.ref)
+    
+    return TransformRef.GetPosition(self.ref)
 end
 
 

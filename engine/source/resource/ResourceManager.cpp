@@ -1,23 +1,30 @@
 #include "resource/ResourceManager.h"
 #include "resource/shader/Shader.h"
 
-std::mutex engine::ResourceManager::m_mutex;
+std::mutex               engine::ResourceManager::m_mutex;
 engine::ResourceManager* engine::ResourceManager::m_instance = nullptr;
 
 void engine::ResourceManager::LoadShader(
 		const char* shaderProgramName,
 		const char* vertShader, 
-		const char* fragShader)
+		const char* fragShader, bool isVertAbsolute, bool isFragAbsolute)
 {
 	if (HasResource(shaderProgramName))
 	{
-		std::printf("Shader UID already exists. Failed to create new shader program '%s'\n", 
+		std::printf("Shader name already exists. Failed to create new shader program '%s'\n", 
 			shaderProgramName);
 		
 		return;
 	}
 
-	GetInstance()->m_resources[shaderProgramName] = new ShaderProgram(vertShader, fragShader);
+	ShaderProgram* newShader = new ShaderProgram();
+    m_mutex.lock();
+    GetInstance()->m_resources[shaderProgramName] = newShader;
+    m_mutex.unlock();
+
+    newShader->m_vertexShader = vertShader;
+    newShader->m_fragShader = fragShader;
+    newShader->CreateProgram(isVertAbsolute, isFragAbsolute);
 }
 
 void engine::ResourceManager::Unload(std::string const& fileName)
@@ -27,14 +34,17 @@ void engine::ResourceManager::Unload(std::string const& fileName)
 		return;
 
 	delete GetInstance()->m_resources[fileName];
+    GetInstance()->m_resources.erase(fileName);
 }
 
 void engine::ResourceManager::UnloadAll(void)
 {
+    m_mutex.lock();
 	for (auto& resource : GetInstance()->m_resources)
 	{
 		delete resource.second;
 	}
+    m_mutex.unlock();
 }
 
 void engine::ResourceManager::ShutDown(void)
@@ -43,6 +53,7 @@ void engine::ResourceManager::ShutDown(void)
 		GetInstance()->UnloadAll();
 
 	delete m_instance;
+    m_instance = nullptr;
 }
 
 const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resource)
@@ -59,12 +70,7 @@ const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resour
 engine::ResourceManager* engine::ResourceManager::GetInstance(void)
 {
 	if (!m_instance)
-	{
-		std::unique_lock<std::mutex> lock(m_mutex);
-
-		if (!m_instance)
-			m_instance = new ResourceManager();
-	}
+		m_instance = new ResourceManager();
 
 	return m_instance;
 }

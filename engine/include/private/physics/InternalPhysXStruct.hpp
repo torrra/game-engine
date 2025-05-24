@@ -6,17 +6,23 @@
 
 #pragma endregion
 
+#pragma region Standard
+
+#include <vector>
+
+#pragma endregion
+
 namespace engine
 {
 	// Create a structure of physX elements to store them
 	struct PhysicsEngineImpl
 	{
-		physx::PxFoundation*			m_foundation		= nullptr;
-		physx::PxPhysics*				m_physics			= nullptr;
-		physx::PxScene*					m_scene				= nullptr;
-		physx::PxDefaultCpuDispatcher*	m_dispatcher		= nullptr;
-		physx::PxMaterial*				m_material			= nullptr;
-		physx::PxPvd*					m_pvd				= nullptr;
+		physx::PxFoundation*			    m_foundation		= nullptr;
+		physx::PxPhysics*				    m_physics			= nullptr;
+		physx::PxScene*					    m_scene				= nullptr;
+		physx::PxDefaultCpuDispatcher*	    m_dispatcher		= nullptr;
+		physx::PxMaterial*				    m_material			= nullptr;
+		physx::PxPvd*					    m_pvd				= nullptr;
 
 	}; // !Struct PhysicsEngineImpl
 
@@ -38,9 +44,32 @@ namespace engine
 
 	}; // !Struct MaterialImpl
 
-	struct GeometryImpl
-	{
-		physx::PxGeometry*				m_geometry			= nullptr;
+    struct DebugDrawImpl
+    {
+        const physx::PxRenderBuffer*    m_renderBuffer      = nullptr;
+        std::vector<physx::PxDebugLine> m_customLines       = {};
 
-	}; // !Struct GeometryImpl
+    }; // !Struct DebugDrawImpl
+
+    struct RaycastImpl
+    {
+        physx::PxRaycastBuffer*         m_hit               = nullptr;
+        physx::PxQueryFilterData        m_queryFilterData;
+        physx::PxDebugLine*             m_successLine       = nullptr;
+        physx::PxDebugLine*             m_failureLine       = nullptr;
+
+    }; // !Struct RaycastImpl
+
+    struct TriangleMeshImpl
+    {
+        physx::PxTriangleMesh*          m_triangleMesh      = nullptr;
+        physx::PxTriangleMeshDesc       m_triangleMeshDesc;
+        physx::PxRigidStatic*           m_actor      = nullptr;
+    };
+
+    /// PhysX using
+    using PxVisualParam = physx::PxVisualizationParameter;
+    using PxInstruFlag  = physx::PxPvdInstrumentationFlag;
+    using PxTolerances  = physx::PxTolerancesScale;
+
 } // !Namespace engine

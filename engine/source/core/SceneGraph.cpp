@@ -1,23 +1,99 @@
 #include "core/SceneGraph.h"
+#include "core/SceneGraph.h"
 #include "core/Entity.h"
 #include "core/systems/ScriptSystem.h"
 
-#include "thread/ThreadManager.h"
-
 #include "serialization/TextSerializer.h"
+#include "thread/ThreadManager.h"
+#include "InternalOpenGLError.hpp"
 
-#include <iostream>
-#include <sstream>
+#include "physics/Raycast.h"
 
 namespace engine
 {
-    SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
+    thread_local SceneGraph::Random	SceneGraph::m_randomNumGen = Random(std::random_device());
+
+    void SceneGraph::StartAllScripts(void)
+    {
+        for (Script& script : m_sceneScripts)
+        {
+            if (script.IsValid())
+                script.Start();
+        }
+    }
+
+    void SceneGraph::SyncTransformsPostPhysics(void)
+    {
+        for (RigidBodyDynamic& rigidbody : m_sceneDynamicRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateEntity();
+        }
+
+        for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateEntity();
+        }
+
+        for (TriangleMesh& mesh : m_sceneTriangleMeshes)
+        {
+            Entity* entity = GetEntity(mesh.GetOwner());
+
+            if (entity && entity->IsActive())
+                mesh.UpdateEntity();
+        }
+    }
+
+    void SceneGraph::SyncRigidbodiesPrePhysics(void)
+    {
+        for (RigidBodyDynamic& rigidbody : m_sceneDynamicRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateRigidBody();
+        }
+
+        for (RigidBodyStatic& rigidbody : m_sceneStaticRigidBodies)
+        {
+            Entity* entity = GetEntity(rigidbody.GetOwner());
+
+            if (entity && entity->IsActive())
+                rigidbody.UpdateRigidBody();
+        }
+
+        for (TriangleMesh& mesh : m_sceneTriangleMeshes)
+        {
+            Entity* entity = GetEntity(mesh.GetOwner());
+
+            if (entity && entity->IsActive())
+                mesh.UpdateTriangleMesh();
+        }
+    }
 
     void SceneGraph::RegisterAllComponents(void)
     {
         RegisterComponents<Transform>();
         RegisterComponents<Script>();
         RegisterComponents<Camera>();
+        RegisterComponents<RigidBodyDynamic>();
+        RegisterComponents<RigidBodyStatic>();
+        RegisterComponents<TriangleMesh>();
+        RegisterComponents<AudioPlayer>();
+    }
+
+    void SceneGraph::RegisterAllEntities(void)
+    {
+        for (Entity& entity : m_sceneEntities)
+        {
+            if (entity.IsValid())
+                ScriptSystem::RegisterNewEntity(entity.m_handle, GetFullEntityName(entity.m_handle));
+        }
     }
 
     int64 SceneGraph::RandomNumber(void)
@@ -27,10 +103,9 @@ namespace engine
 
     EntityHandle SceneGraph::CreateEntity(const std::string& name, EntityHandle parent)
     {
-        EntityHandle newIndex = 0;
-        EntityHandle newUID = RandomNumber();
+        int32 newIndex = 0;
 
-        EntityHandle entityCount = static_cast<EntityHandle>(m_sceneEntities.size());
+        int32 entityCount = static_cast<int32>(m_sceneEntities.size());
 
         for (; newIndex < entityCount; ++newIndex)
         {
@@ -38,8 +113,7 @@ namespace engine
 
             if (!currentEntity.IsValid())
             {
-                //printf("[Scene graph]: filling invalid slot\n");
-                EntityHandle newHandle = MakeHandle(newIndex, newUID);
+                EntityHandle newHandle = MakeHandle(newIndex, GetHandleVersion(currentEntity.m_handle) + 1);
 
                 // write over dead entity to avoid reallocation
                 currentEntity = Entity(name, newHandle, parent);
@@ -48,10 +122,8 @@ namespace engine
             }
         }
 
-        //printf("[Scene graph]: creating new slot\n");
-
         // create entity in new slot in array
-        EntityHandle newHandle = MakeHandle(newIndex, newUID);
+        EntityHandle newHandle = MakeHandle(newIndex, 0);
 
         if (newHandle != Entity::INVALID_HANDLE)
         {
@@ -72,24 +144,22 @@ namespace engine
         if (handle == Entity::INVALID_HANDLE)
             return nullptr;
 
-        EntityHandle index = (handle & Entity::INDEX_MASK);
+        int32 index = GetHandleIndex(handle);
 
         // out of bounds
-        if (index >= static_cast<EntityHandle>(m_sceneEntities.size()))
+        if (index >= static_cast<int32>(m_sceneEntities.size()))
             return nullptr;
 
         Entity& entity = m_sceneEntities[index];
-        EntityHandle uid = (handle & Entity::UID_MASK);
 
         // requested object was written over and no longer exists
-        if (uid != (entity.m_handle & Entity::UID_MASK))
+        if (handle != entity.m_handle)
             return nullptr;
 
         // object is dead and will be written over
         if (!entity.IsValid())
             return nullptr;
 
-        //printf("[Scene graph]: found entity with matching handle\n");
         return &entity;
     }
 
@@ -154,7 +224,15 @@ namespace engine
         if (Entity* entityPtr = GetEntity(entity))
         {
             m_sceneTransforms.InvalidateComponent(entity);
+            m_sceneCameras.InvalidateComponent(entity);
+            m_sceneRenderers.InvalidateComponent(entity);
+            m_sceneScripts.InvalidateComponent(entity);
+            m_sceneDynamicRigidBodies.InvalidateComponent(entity);
+            m_sceneStaticRigidBodies.InvalidateComponent(entity);
+            m_sceneTriangleMeshes.InvalidateComponent(entity);
+            m_sceneAudioPlayer.InvalidateComponent(entity);
 
+            ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
 
             std::vector<EntityHandle> children = GetChildren(entity);
@@ -199,7 +277,7 @@ namespace engine
         uint64 index = 0;
 
         // gather all children's children and their children, etc...
-        // we have to look through the entire array each time becauuse child entities
+        // we have to look through the entire array each time because child entities
         // are not guaranteed to be after parent in memory
         while(index < children.size())
         {
@@ -225,13 +303,19 @@ namespace engine
 
             math::Matrix4f viewProjection = camera.ViewProjection();
 
-            for (Renderer& renderer : m_sceneRenderers)
-            {
-                if (!renderer.IsValid() || !renderer.IsActive())
-                    continue;
+            RenderFromCacheSingleCamera(viewProjection);
+        }
+    }
 
-                renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
-            }
+    void SceneGraph::RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection)
+    {
+        for (Renderer& renderer : m_sceneRenderers)
+        {
+            if (!renderer.IsValid() || !renderer.IsActive())
+                continue;
+
+            renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
+            OpenGLError();
         }
     }
 
@@ -241,7 +325,13 @@ namespace engine
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
     }
 
-    EntityHandle SceneGraph::MakeHandle(EntityHandle index, EntityHandle uid)
+    void SceneGraph::ClearCache(void)
+    {
+        m_renderCache.m_cameraRenderCache = CopyableComponentArray<Camera>();
+        m_renderCache.m_transformRenderCache = CopyableComponentArray<Transform>();
+    }
+
+    EntityHandle SceneGraph::MakeHandle(int32 index, int32 uid)
     {
         // if either half is over 32 bits, the handle is invalid
         if (index >= LONG_MAX || uid >= LONG_MAX)
@@ -250,18 +340,17 @@ namespace engine
         if (index <= LONG_MIN || uid <= LONG_MIN)
             return Entity::INVALID_HANDLE;
 
-        index |= (uid << 32);
-        return index;
+        return static_cast<EntityHandle>(index) | (static_cast<EntityHandle>(uid) << 32);
     }
 
-    EntityHandle SceneGraph::GetHandleUID(EntityHandle handle)
+    int32 SceneGraph::GetHandleVersion(EntityHandle handle)
     {
-        return (handle & Entity::UID_MASK) >> 32;
+        return static_cast<int32>((handle & Entity::UID_MASK) >> 32);
     }
 
-    EntityHandle SceneGraph::GetHandleIndex(EntityHandle handle)
+    int32 SceneGraph::GetHandleIndex(EntityHandle handle)
     {
-        return handle & Entity::INDEX_MASK;
+        return static_cast<int32>(handle & Entity::INDEX_MASK);
     }
 
     void SceneGraph::ReparentEntity(Entity* toReparent, EntityHandle newParent)
@@ -275,35 +364,36 @@ namespace engine
         if (newParent == Entity::INVALID_HANDLE)
             return;
 
-        EntityHandle parentIndex = (newParent & Entity::INDEX_MASK);
-        EntityHandle toReparentIndex = (toReparent->m_handle & Entity::INDEX_MASK);
+        int32 parentIndex = GetHandleIndex(newParent);
+        int32 toReparentIndex = GetHandleIndex(toReparent->m_handle);
 
         if (toReparentIndex < parentIndex)
-        {
-            //printf("[Scene graph]: moving child to back of array\n");
             MoveReparentedComponents(toReparent->m_handle, newParent);			
-        }
-
-        //else
-            //printf("[Scene graph]: reparent complete with no layout changes\n");
-
     }
 
     void SceneGraph::MoveReparentedComponents(EntityHandle reparented, EntityHandle newParent)
     {
-        // no need to move the reparented component's children if it hasn't moved itself
-        bool transformMoved = m_sceneTransforms.MoveReparentedComponent(reparented, newParent);
-        bool scriptMoved = m_sceneScripts.MoveReparentedComponent(reparented, newParent);
+        m_sceneTransforms.MoveReparentedComponent(reparented, newParent);
+        m_sceneScripts.MoveReparentedComponent(reparented, newParent);
+        m_sceneCameras.MoveReparentedComponent(reparented, newParent);
+        m_sceneScripts.MoveReparentedComponent(reparented, newParent);
+        m_sceneDynamicRigidBodies.MoveReparentedComponent(reparented, newParent);
+        m_sceneStaticRigidBodies.MoveReparentedComponent(reparented, newParent);
+        m_sceneTriangleMeshes.MoveReparentedComponent(reparented, newParent);
+        m_sceneAudioPlayer.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
 
         for (EntityHandle child : allChildren)
         {
-            if (transformMoved)
-                m_sceneTransforms.MoveReparentedComponent(child);
-
-            if (scriptMoved)
-                m_sceneScripts.MoveReparentedComponent(child);
+           m_sceneTransforms.MoveReparentedComponent(child);
+           m_sceneScripts.MoveReparentedComponent(child);
+           m_sceneCameras.MoveReparentedComponent(child);
+           m_sceneRenderers.MoveReparentedComponent(child);
+           m_sceneDynamicRigidBodies.MoveReparentedComponent(child);
+           m_sceneStaticRigidBodies.MoveReparentedComponent(child);
+           m_sceneTriangleMeshes.MoveReparentedComponent(child);
+           m_sceneAudioPlayer.MoveReparentedComponent(child);
         }
     }
 
@@ -317,20 +407,45 @@ namespace engine
     {
         return m_distribution(m_generator);
     }
+    
+    const char* SceneGraph::DeserializeEntityText(const char* text, const char* end)
+    {    
+        return m_sceneEntities.emplace_back().DeserializeText(text, end);
+    }
+
+    void SceneGraph::CleanRigidBodies(void)
+    {
+        Raycast::CleanupRays();
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
+        {
+            rbDynamic.RigidBodyDynamicCleanUp();
+        }
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.RigidBodyStaticCleanUp();
+        }
+        for (TriangleMesh& triangleMesh : m_sceneTriangleMeshes)
+        {
+            triangleMesh.CleanUpTriangleMesh();
+        }
+        m_sceneDynamicRigidBodies = ComponentArray<RigidBodyDynamic>();
+        m_sceneStaticRigidBodies = ComponentArray<RigidBodyStatic>();
+        m_sceneTriangleMeshes = ComponentArray<TriangleMesh>();
+    }
 
 
-    SceneGraph::HandleMap SceneGraph::SerializeValidEntitiesText(std::ostream& file)
+    void SceneGraph::SerializeText(std::ofstream& file)
     {
         std::vector<Entity> validEntities;
         HandleMap			handles;
 
-        uint64 index = 0;
+        int32 index = 0;
         for (const Entity& entity : m_sceneEntities)
         {
             if (!entity.IsValid())
                 continue;
 
-            EntityHandle newHandle = MakeHandle(index, GetHandleUID(entity.m_handle));
+            EntityHandle newHandle = MakeHandle(index, GetHandleVersion(entity.m_handle));
 
             handles[entity.m_handle] = newHandle;
             validEntities.push_back(entity);
@@ -340,39 +455,36 @@ namespace engine
         for (Entity& entity : validEntities)
         {
             entity.m_handle = handles[entity.m_handle];
-            entity.m_parent = handles[entity.m_parent];
 
-            SerializeEntityText(file, entity);
+            auto parentHandle = handles.find(entity.m_parent);
+
+            if (parentHandle != handles.end())
+                entity.m_parent = parentHandle->second;
+            else
+                entity.m_parent = -1;
+
+            entity.SerializeText(file);
             SerializeSingleComponent<Transform>(file, entity, handles);
             SerializeSingleComponent<Camera>(file, entity, handles);
             SerializeSingleComponent<Renderer>(file, entity, handles);
             SerializeSingleComponent<Script>(file, entity, handles);
+            SerializeSingleComponent<RigidBodyDynamic>(file, entity, handles);
+            SerializeSingleComponent<RigidBodyStatic>(file, entity, handles);
+            SerializeSingleComponent<TriangleMesh>(file, entity, handles);
+            SerializeSingleComponent<AudioPlayer>(file, entity, handles);
         }
-
-        return handles;
     }
 
-    void SceneGraph::SerializeEntityText(std::ostream& file, const Entity& entity)
-    {
-        file << "[Entity]\n   ";
-        text::Serialize(file, "name", entity.m_name);
-        file << "\n   ";
-        text::Serialize(file, "handle", entity.m_handle);
-        file << "\n   ";
-        text::Serialize(file, "parent", entity.m_parent);
-        file << "\n   ";
-        text::Serialize(file, "flags", entity.m_statusFlags);
-        file << "\n   ";
-        text::Serialize(file, "components", entity.m_components);
-        file << '\n';
-    }
-
-    void SceneGraph::DeserializeTextV1(std::ifstream& file)
+    void SceneGraph::DeserializeText(std::ifstream& file)
     {
         Component::DeserializedArray<Transform> transforms;
         Component::DeserializedArray<Camera>	cameras;
         Component::DeserializedArray<Renderer>	renderers;
         Component::DeserializedArray<Script>	scripts;
+        Component::DeserializedArray<RigidBodyDynamic>	dynamicRigidBodies;
+        Component::DeserializedArray<RigidBodyStatic>	staticRigidBodies;
+        Component::DeserializedArray<TriangleMesh>	triangleMeshes;
+        Component::DeserializedArray<AudioPlayer>	audioPlayers;
 
         const char* start;
         const char* end;
@@ -394,63 +506,32 @@ namespace engine
 
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
+            
+            else if (memcmp(start, "[RigidBodyDynamic]", 17) == 0)
+                start = Component::DeserializeComponentText(dynamicRigidBodies, start, end);
+            
+            else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
+                start = Component::DeserializeComponentText(staticRigidBodies, start, end);
+
+            else if (memcmp(start, "[TriangleMesh]", 14) == 0)
+                start = Component::DeserializeComponentText(triangleMeshes, start, end);
+
+            else if (memcmp(start, "[AudioPlayer]", 13) == 0)
+                start = Component::DeserializeComponentText(audioPlayers, start, end);
 
             start = text::GetNewLine(start, end);
         }
 
-        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts);
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, staticRigidBodies, triangleMeshes, audioPlayers);
         text::UnloadFileData(data);
-    }
-    
-    const char* SceneGraph::DeserializeEntityText(const char* text, const char* end)
-    {
-        Entity newEntity;
-
-        text = text::DeserializeString(text, end, newEntity.m_name);
-
-        MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeInteger(text, newEntity.m_handle);
-
-        MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeInteger(text, newEntity.m_parent);
-
-        MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeInteger(text, newEntity.m_statusFlags);
-
-        MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeInteger(text, newEntity.m_components);
-
-        m_sceneEntities.push_back(newEntity);
-        return text;
-    }
-
-
-    void SceneGraph::SerializeText(std::ofstream& file)
-    {
-        text::Serialize(file, "formatVersion", 1);
-        file << '\n';
-        SerializeValidEntitiesText(file);
-    }
-
-    void SceneGraph::DeserializeText(std::ifstream& file)
-    {
-        uint64		cursor = 0;
-        std::string firstLine;
-
-        std::getline(file, firstLine);
-        text::MoveCursorToVal(cursor, firstLine);
-
-        int32 formatVersion = strtol(firstLine.c_str() + cursor, nullptr, 0);
-
-        switch (formatVersion)
+        for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {
-        case 1:
-            DeserializeTextV1(file);
-            break;
-
-        default: break;
+            rbDynamic.SwitchShape(static_cast<EGeometryType>(rbDynamic.m_rigidBodyShape));
         }
-
+        for (RigidBodyStatic& rbStatic : m_sceneStaticRigidBodies)
+        {
+            rbStatic.SwitchShape(static_cast<EGeometryType>(rbStatic.m_rigidBodyShape));
+        }
     }
 
 }

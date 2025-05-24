@@ -15,14 +15,14 @@
 
 namespace engine
 {
-	class ShaderProgram : public IResource
+	class ShaderProgram final : public IResource
 	{
 	public:
-		ENGINE_API ShaderProgram(void) = delete;
+		ENGINE_API ShaderProgram(void) = default;
 		ENGINE_API ShaderProgram(const char* vertexShader, const char* fragShader);
 		ENGINE_API virtual ~ShaderProgram(void) override = default;
 
-		virtual void LoadResource(const char* filePath) override;
+		bool LoadResource(const char* filePath) override;
 
 		ENGINE_API void Use(void) const;
 
@@ -47,20 +47,26 @@ namespace engine
 		ENGINE_API void Set(const char* uniformName, math::Vector4d const& vec) const;
 
 		// Matrices
-		ENGINE_API void Set(const char* uniformName, math::Matrix2f* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix3f* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix4f* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix2f* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix3f* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix4f* matrix) const;
 
-		ENGINE_API void Set(const char* uniformName, math::Matrix2d* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix3d* matrix) const;
-		ENGINE_API void Set(const char* uniformName, math::Matrix4d* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix2d* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix3d* matrix) const;
+		ENGINE_API void Set(const char* uniformName, const math::Matrix4d* matrix) const;
+
+
+        ENGINE_API const std::string& GetVertexShaderName(void) const;
+        ENGINE_API const std::string& GetFragmentShaderName(void) const;
 
 	private:
-		void CreateProgram(void);
+		void CreateProgram(bool isVertAbsolute, bool isFragAbsolute);
 
 		std::string m_vertexShader;
 		std::string m_fragShader;
 		
-		uint32 m_programID;
+		uint32 m_programID = 0;
+
+        friend class ResourceManager;
 	};
 }

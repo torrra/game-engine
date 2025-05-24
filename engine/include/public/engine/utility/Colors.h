@@ -31,7 +31,7 @@
 /* Dark colors */
 
 #define DARK_RED        0.502f, 0.02f, 0.f               // Dark red
-#define DARK_GREEN      0.f, 0.431f, 0.2f                // Dark green
+#define DARK_GREEN      0.0f, 0.2f, 0.2f                 // Dark green
 #define DARK_BLUE       0.012f, 0.145f, 0.494f           // Dark blue
 
 #define DARK_PURPLE     0.294f, 0.212f, 0.373f           // Dark purple
