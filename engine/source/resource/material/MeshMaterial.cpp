@@ -182,7 +182,7 @@ const math::Vector3f& engine::MeshMaterial::GetDiffuse(void) const
     return m_data.m_diffuse;
 }
 
-const math::Vector3f& engine::MeshMaterial::GeSpecular(void) const
+const math::Vector3f& engine::MeshMaterial::GetSpecular(void) const
 {
     return m_data.m_specular;
 }
@@ -200,6 +200,11 @@ f32 engine::MeshMaterial::GetShininess(void) const
 f32 engine::MeshMaterial::GetRefractionIndex(void) const
 {
     return m_data.m_refractionIndex;
+}
+
+f32 engine::MeshMaterial::GetOpacity(void) const
+{
+    return m_data.m_opacity;
 }
 
 const engine::Texture* engine::MeshMaterial::GetDiffuseMap(void) const
@@ -227,6 +232,38 @@ const engine::Texture* engine::MeshMaterial::GetAmbientOcclusionMap(void) const
     return m_textureMaps[AMBIENT_OCCLUSION];
 }
 
+const engine::Texture** engine::MeshMaterial::GetTextures(void)
+{
+    return m_textureMaps;
+}
+
+void engine::MeshMaterial::SetTexture(const Texture* texture, uint64 index)
+{
+    EMapIndex mapIndex = static_cast<EMapIndex>(index);
+
+    switch (mapIndex)
+    {
+    case engine::MeshMaterial::DIFFUSE:
+        SetDiffuseMap(texture);
+        break;
+    case engine::MeshMaterial::NORMAL:
+        SetNormalMap(texture);
+        break;
+    case engine::MeshMaterial::SPECULAR:
+        SetSpecularMap(texture);
+        break;
+    case engine::MeshMaterial::ROUGHNESS:
+        SetDiffuseRoughnessMap(texture);
+        break;
+    case engine::MeshMaterial::AMBIENT_OCCLUSION:
+        SetAmbientOcclusionMap(texture);
+        break;
+    default:
+        break;
+    }
+}
+
+
 void engine::MeshMaterial::SerializeText(void) const
 {
     std::ofstream output(m_filePath, std::ios::out | std::ios::trunc);
@@ -243,6 +280,8 @@ void engine::MeshMaterial::SerializeText(void) const
     text::Serialize(output, "shininess", m_data.m_shininess);
     output << "\n    ";
     text::Serialize(output, "refractionIndex", m_data.m_refractionIndex);
+    output << "\n    ";
+    text::Serialize(output, "opacity", m_data.m_opacity);
     output << "\n    ";
 
     SerializeTexturePaths(output);
@@ -274,9 +313,10 @@ void engine::MeshMaterial::DeserializeText(std::ifstream& input)
     text = text::DeserializeReal(text, m_data.m_refractionIndex);
 
     MOVE_TEXT_CURSOR_FREE(text, start, end);
-    text = DeserializeTextureMaps(text, end);
+    text = text::DeserializeReal(text, m_data.m_opacity);
 
-    //m_data.m_diffuse = math::Vector3f::One();
+    MOVE_TEXT_CURSOR_FREE(text, start, end);
+    text = DeserializeTextureMaps(text, end);
 
     text::UnloadFileData(start);
 }

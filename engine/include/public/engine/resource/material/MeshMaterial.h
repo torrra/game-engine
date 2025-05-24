@@ -13,7 +13,7 @@ namespace engine
 {
     class MeshMaterial : public IResource
     {
-    private:
+    public:
 
         enum EMapIndex
         {
@@ -23,6 +23,8 @@ namespace engine
             ROUGHNESS,
             AMBIENT_OCCLUSION
         };
+
+    private:
 
         enum EMapBits
         {
@@ -78,18 +80,21 @@ namespace engine
 
         ENGINE_API const math::Vector3f& GetAmbient(void) const;
         ENGINE_API const math::Vector3f& GetDiffuse(void) const;
-        ENGINE_API const math::Vector3f& GeSpecular(void) const;
+        ENGINE_API const math::Vector3f& GetSpecular(void) const;
         ENGINE_API const math::Vector3f& GetEmissive(void) const;
 
         ENGINE_API f32 GetShininess(void) const;
         ENGINE_API f32 GetRefractionIndex(void) const;
         ENGINE_API f32 GetOpacity(void) const;
-
+        
         ENGINE_API const class Texture* GetDiffuseMap(void) const;
         ENGINE_API const class Texture* GetNormalMap(void) const;
         ENGINE_API const class Texture* GetSpecularMap(void) const;
         ENGINE_API const class Texture* GetDiffuseRoughnessMap(void) const;
         ENGINE_API const class Texture* GetAmbientOcclusionMap(void) const;
+
+        ENGINE_API const class Texture** GetTextures(void);
+        ENGINE_API void SetTexture(const class Texture* texture, uint64 index);
 
         ENGINE_API void SerializeText(void) const;
         ENGINE_API void DeserializeText(std::ifstream& input);
