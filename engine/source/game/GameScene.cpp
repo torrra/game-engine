@@ -6,6 +6,8 @@
 #include "physics/PhysicsEngine.h"
 #include "physics/Raycast.h"
 
+#include "sounds/SoundEngine.h"
+
 #include <fstream>
 
 namespace engine
@@ -90,6 +92,7 @@ namespace engine
         m_graph.DeserializeText(input);
         PhysicsEngine::Get().StepSimulation(0.0001f);
         m_graph.SyncTransformsPostPhysics();
+        SoundEngine::Get().UpdateSoundEngine();
         ThreadManager::SynchronizeGameThread(&m_graph);
         return true;
     }
@@ -100,6 +103,7 @@ namespace engine
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
             PhysicsUpdate();
+            SoundEngine::Get().UpdateSoundEngine();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
         }
 
