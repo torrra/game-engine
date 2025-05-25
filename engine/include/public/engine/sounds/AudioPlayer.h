@@ -80,6 +80,9 @@ namespace engine
 
         ENGINE_API [[nodiscard]]
             bool            GetIsPlayed(void) const;
+
+        ENGINE_API [[nodiscard]]
+            math::Vector3f GetListenerPosition(void) const;
         /// Setters
         /*
             Set the volume of a sound
@@ -113,7 +116,14 @@ namespace engine
                                                 const math::Vector3f& inVelocity =
                                                             math::Vector3f::Zero());
 
-        ENGINE_API void     SetSound(const Sound* inSound);
+        ENGINE_API
+            void            SetListenerPosition(const math::Vector3f& inPosition);
+        ENGINE_API
+            void            SetListenerForward(const math::Vector3f& inForward);
+        ENGINE_API
+            void            SetListenerUp(const math::Vector3f& inUp);
+        ENGINE_API
+            void            SetListenerVelocity(const math::Vector3f& inVelocity);
 
         ENGINE_API
             void            SetIs3DSound(bool inIs3DSound);
