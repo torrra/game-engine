@@ -106,3 +106,28 @@ void editor::AudioComponent::DragAndDrop(engine::AudioPlayer* inAudioPlayer)
     }
     ui::EndDragDropTarget();
     }
+
+void editor::AudioComponent::Sound3DUI(engine::AudioPlayer* inAudioPlayer)
+{
+    f32 volume = inAudioPlayer->GetSoundVolume();
+    ui::Text("SoundVolume: ");
+    InputField("##Volume", &volume, 0.05f);
+    inAudioPlayer->SetVolumeSound(volume);
+    ui::VerticalSpacing();
+
+    math::Vector3f position = inAudioPlayer->GetSoundPosition();
+    ui::Text("SoundPosition: ");
+    InputField("##XPos", &position[0], 0.05f);
+    InputField("##YPos", &position[1], 0.05f);
+    InputField("##ZPos", &position[2], 0.05f);
+    inAudioPlayer->SetSoundPosition(position);
+    ui::VerticalSpacing();
+
+    math::Vector3f velocity = inAudioPlayer->GetSoundVelocity();
+    ui::Text("SoundVelocity: ");
+    InputField("##XVel", &velocity[0], 0.05f);
+    InputField("##YVel", &velocity[1], 0.05f);
+    InputField("##ZVel", &velocity[2], 0.05f);
+    inAudioPlayer->SetSoundVelocity(velocity);
+    ui::VerticalSpacing();
+}
