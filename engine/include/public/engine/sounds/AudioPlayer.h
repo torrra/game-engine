@@ -55,6 +55,12 @@ namespace engine
         */
         ENGINE_API [[nodiscard]]
             math::Vector3f  GetSoundPosition(void);
+        /*
+            Get the velocity of the sound
+            <return> [out] Vector3f : Velocity of the sound
+        */
+        ENGINE_API [[nodiscard]]
+            math::Vector3f  GetSoundVelocity(void);
         /// Setters
         /*
             Set the volume of a sound
@@ -69,6 +75,11 @@ namespace engine
         ENGINE_API
             void            SetSoundPosition(const math::Vector3f& inPosition);
         /*
+            Set the velocity of the sound
+            <param> [in] inVelocity : Vector3f : The velocity of the sound
+        */
+        ENGINE_API
+            void            SetSoundVelocity(const math::Vector3f& inVelocity);
         /*
             Set the 3D position of a sound
             <param> [in] inPosition : Position of the sound
@@ -115,6 +126,7 @@ namespace engine
         const Sound*    m_sound     = nullptr;
         Listener*       m_listener  = nullptr;
         math::Vector3f  m_position  = math::Vector3f::Zero();
+        math::Vector3f  m_velocity  = math::Vector3f::Zero();
 
     }; // !Class AudioPlayer
 

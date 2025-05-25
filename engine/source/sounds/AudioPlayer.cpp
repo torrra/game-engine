@@ -61,7 +61,26 @@ math::Vector3f engine::AudioPlayer::GetSoundPosition(void)
     return math::Vector3f::Zero();
 }
 
+math::Vector3f engine::AudioPlayer::GetSoundVelocity(void)
+{
+    auto& channels = SoundEngine::Get().GetSoundImpl().m_channels;
+    auto it = channels.find(m_owner);
 
+    if (it != channels.end() && it->second)
+    {
+        FMOD_VECTOR position;
+        FMOD_VECTOR velocity;
+
+        FMOD_RESULT result = it->second->get3DAttributes(&position, &velocity);
+        if (result == FMOD_OK)
+        {
+            m_velocity = ToMathVector(velocity);
+
+            return ToMathVector(velocity);
+        }
+        else
+            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
+    }
 
     return math::Vector3f::Zero();
 }
@@ -115,7 +134,34 @@ void engine::AudioPlayer::SetSoundPosition(const math::Vector3f& inPosition)
     }
 }
 
-void engine::AudioPlayer::SetListenerPosition(const math::Vector3f& inPosition, 
+void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
+{
+    auto& channels = SoundEngine::Get().GetSoundImpl().m_channels;
+    auto it = channels.find(m_owner);
+
+    if (it != channels.end() && it->second)
+    {
+        FMOD_VECTOR position;
+        FMOD_VECTOR velocity;
+
+        FMOD_RESULT res = it->second->get3DAttributes(&position, &velocity);
+
+        if (res == FMOD_OK)
+        {
+            velocity = ToFmodVector(inVelocity);
+
+            FMOD_RESULT result = it->second->set3DAttributes(&position, &velocity);
+            if (result == FMOD_OK)
+            {
+                PrintLog(SuccessPreset(), "Position successfully setted");
+                m_velocity = inVelocity;
+            }
+            else
+                PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
+        }
+        else
+            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(res)));
+    }
 }
                                               const math::Vector3f& inForward, 
                                               const math::Vector3f& inUp, 
