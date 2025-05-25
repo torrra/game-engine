@@ -52,6 +52,11 @@ void engine::UIManager::EndFrame(void)
 
 void engine::UIManager::ShutDown(void)
 {
+    for (auto& canvas : m_canvasMap)
+    {
+        delete canvas.second;
+    }
+
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
@@ -93,6 +98,14 @@ void engine::UIManager::RenderCanvases(math::Vector2f const& position, math::Vec
     for (auto canvas : m_canvasMap)
     {
         canvas.second->Render(position, viewportSize);
+    }
+}
+
+void engine::UIManager::ClearAllCanvases(void)
+{
+    for (auto& canvas : m_canvasMap)
+    {
+        canvas.second->RemoveAllEntities();
     }
 }
 

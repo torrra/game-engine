@@ -37,6 +37,7 @@ namespace engine
         ENGINE_API void			Render(math::Vector2f const& position, math::Vector2f const& size);
 
         ENGINE_API void			RemoveElement(UIElement* element);
+        void RemoveAllEntities(void);
 
         // Clear function used to destroy a canvas & clear all associated UI elements.
         ENGINE_API void			Clear(void);

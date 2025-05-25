@@ -111,6 +111,16 @@ void engine::Canvas::RemoveElement(UIElement* element)
     std::printf("Warning: failed to delete UI element\n");
 }
 
+void engine::Canvas::RemoveAllEntities(void)
+{
+    for (UIElement* element : m_elements)
+    {
+        delete element;
+    }
+
+    m_elements.clear();
+}
+
 void engine::Canvas::Clear(void)
 {
     // Remove all elements

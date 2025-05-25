@@ -81,6 +81,7 @@ namespace editor
 
     void EditorApplication::ResetScene(::engine::GameScene& activeScene)
     {
+        engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         engine::ThreadManager::SynchronizeGameThread(nullptr);
         activeScene.Stop();
 
