@@ -7,6 +7,12 @@
 
 #pragma endregion
 
+#pragma region Engine
+
+#include "engine/Engine.h"
+
+#pragma endregion
+
 #include "engine/ConsoleLog.hpp"
 
 engine::SoundEngine* engine::SoundEngine::m_instance = nullptr;
@@ -54,6 +60,24 @@ void engine::SoundEngine::UpdateSoundEngine(void)
         return;
 
     m_soundImpl->m_system->update();
+
+    for (auto& it : Engine::GetEngine()->GetCurrentScene().GetGraph()->GetComponentArray<AudioPlayer>())
+    {
+        if (Engine::GetEngine()->GetCurrentScene().GetGraph() != nullptr)
+        {
+            if (Engine::GetEngine()->GetCurrentScene().GetGraph()->GetEntity(it.GetOwner()) != nullptr)
+            {
+                if (Engine::GetEngine()->GetCurrentScene().GetGraph()->GetEntity(it.GetOwner())->HasComponent<Transform>())
+                {
+                    if (it.GetSound() != nullptr)
+                    {
+                        it.SetSoundPosition(Engine::GetEngine()->GetCurrentScene().GetGraph()->GetComponent<Transform>(
+                            it.GetOwner())->GetPosition());
+                    }
+                }
+            }
+        }
+    }
 }
 
 void engine::SoundEngine::CloseSoundEngine(void)

@@ -6,6 +6,12 @@
 
 #pragma endregion
 
+#pragma region Sound
+
+#include "engine/sounds/AudioPlayer.h"
+
+#pragma endregion
+
 namespace engine
 {
     struct SoundImpl;
@@ -45,6 +51,7 @@ namespace engine
         /// Private members
         static  SoundEngine*    m_instance;
                 SoundImpl*      m_soundImpl = nullptr;
+                AudioPlayer* m_audioPlayer  = nullptr;
 
     }; // !Class SoundsEngine
 } // !Namespace engine
