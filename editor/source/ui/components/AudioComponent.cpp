@@ -94,4 +94,15 @@ void editor::AudioComponent::SectionContent(void)
 }
 }
 
+void editor::AudioComponent::DragAndDrop(engine::AudioPlayer* inAudioPlayer)
+{
+    if (const ui::Payload payload = ui::AcceptPayload(AUDIO_PAYLOAD, 0))
+    {
+        Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+
+        engine::ResourceManager::Load<engine::Sound>(payloadData->m_path.string());
+        m_soundName = payloadData->m_path.string().c_str();
+        inAudioPlayer->SetSound(payloadData->m_path.string().c_str());        
+    }
+    ui::EndDragDropTarget();
     }
