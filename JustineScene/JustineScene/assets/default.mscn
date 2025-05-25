@@ -86,3 +86,67 @@
      vec3f32 | box half extents={2.5,0.1,2.5}
      bool | trigger=1
      uint64 | flags=0
+[Entity]
+   string | name="SoundStatic"
+   int64 | handle=4
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=128
+[AudioPlayer]
+     int64 | owner=4
+     string | sound="\Falling_In_Reverse-Im_Not_A_Vampire.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=0
+     uint32 | play=0
+     vec3f32 | position={0,0,0}
+     vec3f32 | velocity={0,0,0}
+     uint64 | flags=0
+[Entity]
+   string | name="SoundDynamic"
+   int64 | handle=5
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=133
+[Transform]
+    uint64 | index=4
+    int64 | owner=5
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={-4.6,0.6,-0.3}
+    vec3f32 | scale={0.25,0.25,0.25}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=5
+    string | model="\bunny.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=0
+    uint64 | flags=0
+[AudioPlayer]
+     int64 | owner=5
+     string | sound="\CrazyFrogAxelF.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=1
+     uint32 | play=0
+     vec3f32 | position={-4.8,0.5,-0.3}
+     vec3f32 | velocity={0,0,0}
+     uint64 | flags=0
+[Entity]
+   string | name="SoundDynamicWithoutBody"
+   int64 | handle=6
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=128
+[AudioPlayer]
+     int64 | owner=6
+     string | sound="\CrazyFrogAxelF.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=1
+     uint32 | play=0
+     vec3f32 | position={0,0,0}
+     vec3f32 | velocity={0,0,0}
+     vec3f32 | listener position={0,0,0}
+     vec3f32 | listener forward={0,0,0}
+     vec3f32 | listener up={0,0,0}
+     vec3f32 | listener velocity={0,0,0}
+     uint64 | flags=0
