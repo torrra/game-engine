@@ -33,8 +33,8 @@ namespace engine
             RIGIDBODY_DYNAMIC = (uint64) (1 << 3),
             RIGIDBODY_STATIC = (uint64) (1 << 4),
             CAMERA = (uint64) (1 << 5),
-            AUDIO_PLAYER = (uint64) (1 << 6),
-            TRIANGLE_MESH = (uint64) (1 << 7)
+            TRIANGLE_MESH = (uint64) (1 << 6),
+            AUDIO_PLAYER = (uint64) (1 << 7)
         };
 
         friend class SceneGraph;
