@@ -117,7 +117,8 @@ namespace engine
             <param> [in] inUp       : Up vector of the sound
             <param> [in] inVelocity : Take the velocity of the listener (optional)
         */
-        ENGINE_API void     SetListenerPosition(const math::Vector3f& inPosition,
+        ENGINE_API 
+            void            SetListener(const math::Vector3f& inPosition,
                                                 const math::Vector3f& inForward,
                                                 const math::Vector3f& inUp,
                                                 const math::Vector3f& inVelocity =

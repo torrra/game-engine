@@ -241,6 +241,8 @@ void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
             PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(res)));
     }
 }
+
+void engine::AudioPlayer::SetListener(const math::Vector3f& inPosition, 
                                               const math::Vector3f& inForward, 
                                               const math::Vector3f& inUp, 
                                               const math::Vector3f& inVelocity)
@@ -250,6 +252,14 @@ void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
     const   FMOD_VECTOR up          = ToFmodVector(inUp);
             FMOD_VECTOR velocity    = ToFmodVector(inVelocity);
     
+    if (m_listener != nullptr)
+    {
+        m_listener->m_position = inPosition;
+        m_listener->m_forward = inForward;
+        m_listener->m_up = inUp;
+        m_listener->m_velocity = inVelocity;
+    }
+
     SoundEngine::Get().GetSoundImpl().m_system->set3DListenerAttributes(0, &position, &velocity,
                                                                         &forward, &up);
 }
