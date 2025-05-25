@@ -44,6 +44,10 @@ namespace engine
         ENGINE_API
                             ~AudioPlayer(void) override = default;
 
+        /// Operator
+        ENGINE_API
+            AudioPlayer&    operator=(AudioPlayer&& inOther) noexcept = default;
+
         /// Getters
         /*
             Get the position of the sound
