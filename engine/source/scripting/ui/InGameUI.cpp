@@ -7,9 +7,13 @@ extern "C"
 
 #include "scripting/ui/InGameUI.h"
 #include "ui/UIManager.h"
-#include "CoreTypes.h"
+#include "ui/UIStyle.h"
 #include "ui/Canvas.h"
+#include "CoreTypes.h"
 #include "Engine.h"
+#include "resource/ResourceManager.h"
+#include "resource/texture/Texture.h"
+
 int script_GetCanvasRef(lua_State* luaState)
 {
     engine::Canvas* canvas = nullptr;
@@ -88,7 +92,7 @@ int script_AddText(lua_State* luaState)
     int argumentCount = lua_gettop(luaState);
 
     if (argumentCount != 4)
-        luaL_error(luaState, "Expected 4 arguments (CanvasID, text, xPos, yPos)");
+        luaL_error(luaState, "Expected 4 arguments (canvasID, text, xPos, yPos)");
     else
     {
         std::string canvasName = luaL_checkstring(luaState, 1);
@@ -112,20 +116,88 @@ int script_AddText(lua_State* luaState)
 
 int script_AddImage(lua_State* luaState)
 {
-    luaState;
-    return 0;
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 4)
+        luaL_error(luaState, "Expected 4 arguments (canvasID, path, xPos, yPos)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        std::string path = luaL_checkstring(luaState, 2);
+        engine::ResourceManager::Load<engine::Texture>(path, true);
+
+        math::Vector2f position(
+            static_cast<f32>(lua_tonumber(luaState, 3)),
+            static_cast<f32>(lua_tonumber(luaState, 4))
+        );
+
+        engine::Image* image = canvas->AddImage(path.c_str(), position);
+
+        lua_pushlightuserdata(luaState, image);
+    }
+
+    return 1;
 }
 
 int script_AddButton(lua_State* luaState)
 {
-    luaState;
-    return 0;
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 4)
+        luaL_error(luaState, "Expected 4 arguments (canvasID, text, xPos, yPos)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        std::string text = luaL_checkstring(luaState, 2);
+        math::Vector2f position(
+            static_cast<f32>(lua_tonumber(luaState, 3)),
+            static_cast<f32>(lua_tonumber(luaState, 4))
+        );
+
+        engine::Button* button = canvas->AddButton(text.c_str(), position, ui::GetTextSize(text.c_str()));
+
+        lua_pushlightuserdata(luaState, button);
+    }
+
+    return 1;
 }
 
 int script_AddProgressBar(lua_State* luaState)
 {
-    luaState;
-    return 0;
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 7)
+        luaL_error(luaState, "Expected 7 arguments (canvasID, xPos, yPos, xSize, ySize, minRange, maxRange)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        math::Vector2f position(
+            static_cast<f32>(lua_tonumber(luaState, 2)),
+            static_cast<f32>(lua_tonumber(luaState, 3))
+        );
+
+        math::Vector2f size(
+            static_cast<f32>(lua_tonumber(luaState, 4)),
+            static_cast<f32>(lua_tonumber(luaState, 5))
+        );
+
+        math::Vector2f range(
+            static_cast<f32>(lua_tonumber(luaState, 6)),
+            static_cast<f32>(lua_tonumber(luaState, 7))
+        );
+
+        engine::ProgressBar* progressBar = canvas->AddProgressBar(position, size, range);
+
+        lua_pushlightuserdata(luaState, progressBar);
+    }
+
+    return 1;
 }
 
 int script_AddRect(lua_State* luaState)
@@ -149,9 +221,9 @@ void engine::RegisterUIFunctions(lua_State* luaState)
         //{"DestroyCanvas", script_DestroyCanvas},
         {"SetCanvasColor", script_SetCanvasColor},
         {"AddText", script_AddText},
-        //{"AddImage", script_AddImage},
-        //{"AddButton", script_AddButton},
-        //{"AddProgressBar", script_AddProgressBar},
+        {"AddImage", script_AddImage},
+        {"AddButton", script_AddButton},
+        {"AddProgressBar", script_AddProgressBar},
         //{"AddRect", script_AddRect},
         //{"RemoveElement", script_RemoveElement},
         {NULL, NULL}

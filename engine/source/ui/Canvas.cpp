@@ -36,7 +36,7 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
         ImGui::SetCursorPos(ImGui::GetWindowContentRegionMin());
         ImGui::PushStyleColor(ImGuiCol_ChildBg,m_bgColor);
         
-        ImGui::BeginChild("Canvas", size, 0, flags);
+        ImGui::BeginChild("Canvas", size, ImGuiChildFlags_NavFlattened, flags);
         
         ImGui::SetWindowSize(size);
 

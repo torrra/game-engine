@@ -30,35 +30,12 @@ function Canvas:AddImage(path, xPos, yPos)
 	return Image:_new(newImageRef)
 end
 
+function Canvas:AddButton(text, xPos, yPos)
+	newButtonRef = CanvasRef.AddButton(self._name, text, xPos, yPos)
+	return Button:_new(newButtonRef)
+end
 
-
-
-
-
-
-
-
-
-
---Canvas = Canvas:_new()
---Canvas = {name = "", width = nil, height = nil}
---
---function Canvas:RefreshRef(canvasName)
---	self.ref = CanvasRef.GetCanvasRef(canvasName)
---end
---
---function Canvas:CreateCanvas(canvasName, _width, _height)
---	local newCanvas = {name = canvasName, width = _width, height = _height}
---	
---
---
---	CanvasRef.CreateCanvas(canvasName, _width, _height)
---
---	return self
---end
---
---function Canvas:SetCanvasColor(red, green, blue, alpha)
---	return CanvasRef.SetCanvasColor(self.name, red, green, blue, alpha)
---end
-
-
+function Canvas:AddProgressBar(xPos, yPos, width, height, minRange, maxRange)
+	newProgressBarRef = CanvasRef.AddProgressBar(self._name, xPos, yPos, width, height, minRange, maxRange)
+	return ProgressBar:_new(newProgressBarRef)
+end
