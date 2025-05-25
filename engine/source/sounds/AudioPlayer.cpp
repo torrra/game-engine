@@ -85,6 +85,27 @@ math::Vector3f engine::AudioPlayer::GetSoundVelocity(void)
     return math::Vector3f::Zero();
 }
 
+f32 engine::AudioPlayer::GetSoundVolume(void)
+{
+    auto& channels = SoundEngine::Get().GetSoundImpl().m_channels;
+    auto it = channels.find(m_owner);
+
+    if (it != channels.end() && it->second)
+    {
+        f32 volume;
+
+        FMOD_RESULT result = it->second->getVolume(&volume);
+
+        if (result == FMOD_OK)
+        {
+            m_volume = volume;
+            return volume;
+        }
+        else
+            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
+    }
+    return -1.f;
+}
 void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
@@ -104,6 +125,11 @@ void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
     
         if (result != FMOD_OK)
             return;
+
+        m_volume = inVolume;
+    }
+}
+
 void engine::AudioPlayer::SetSoundPosition(const math::Vector3f& inPosition)
 {
     auto& channels = SoundEngine::Get().GetSoundImpl().m_channels;
