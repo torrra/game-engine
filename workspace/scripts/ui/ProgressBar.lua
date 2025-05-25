@@ -10,3 +10,11 @@ end
 function ProgressBar:SetValue(value)
     ProgressBarRef.SetValue(self.progressBarRef, value)
 end
+
+function ProgressBar:SetBgColor(red, green, blue, alpha)
+    ProgressBarRef.SetBgColor(self.progressBarRef, red, green, blue, alpha)
+end
+
+function ProgressBar:SetFillColor(red, green, blue, alpha)
+    ProgressBarRef.SetFillColor(self.progressBarRef, red, green, blue, alpha)
+end
