@@ -24,6 +24,7 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoSavedSettings |
         ImGuiWindowFlags_NoFocusOnAppearing |
+        ImGuiWindowFlags_NoNavInputs |
         ImGuiWindowFlags_NoDocking;
 
     position;
