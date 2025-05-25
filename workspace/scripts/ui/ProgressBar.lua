@@ -6,3 +6,7 @@ function ProgressBar:_new(newProgressBarRef)
     setmetatable(newProgressBarObj, self)
     return newProgressBarObj
 end
+
+function ProgressBar:SetValue(value)
+    ProgressBarRef.SetValue(self.progressBarRef, value)
+end
