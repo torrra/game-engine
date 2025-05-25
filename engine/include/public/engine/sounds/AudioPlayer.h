@@ -119,9 +119,9 @@ namespace engine
         */
         ENGINE_API 
             void            SetListener(const math::Vector3f& inPosition,
-                                                const math::Vector3f& inForward,
-                                                const math::Vector3f& inUp,
-                                                const math::Vector3f& inVelocity =
+                                        const math::Vector3f& inForward,
+                                        const math::Vector3f& inUp,
+                                        const math::Vector3f& inVelocity =
                                                             math::Vector3f::Zero());
 
         ENGINE_API
@@ -135,7 +135,7 @@ namespace engine
 
         ENGINE_API
             void            SetIs3DSound(bool inIs3DSound);
-        ENGINE_API 
+        ENGINE_API
             void            SetIsPlayed(bool inIsPlayed);
 
         ENGINE_API 
@@ -160,14 +160,22 @@ namespace engine
         */
         ENGINE_API 
             void            PauseSound(bool inIsPaused);
-        ENGINE_API
-        ENGINE_API
+        ENGINE_API 
+            void            Register(void) override {}
+        ENGINE_API 
+            void            Unregister(void) override {}
         ENGINE_API
             void            Invalidate(void) override;
+        ENGINE_API
+            void            SerializeText(std::ostream& output, EntityHandle owner, 
+                                          uint64 index) const override;
+        ENGINE_API
+            const char*     DeserializeText(const char* text, const char* end) override;
 
     private :
 
-        AudioPlayer(void) = delete;
+        /// Constructor
+                            AudioPlayer(void) = delete;
                             AudioPlayer(const AudioPlayer& inOther) = delete;
         /// Operator
             AudioPlayer&    operator=(const AudioPlayer& inOther) = delete;
@@ -178,6 +186,8 @@ namespace engine
         // Play a sound with 3D parameters
             void            PlaySound3D(void);
 
+            void            Serialize3DSound(std::ostream& output) const;
+            const char*     Deserialize3DSound(const char* text, const char* end);
 
         const Sound*    m_sound     = nullptr;
         Listener*       m_listener  = nullptr;

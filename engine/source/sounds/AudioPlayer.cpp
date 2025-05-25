@@ -127,7 +127,7 @@ math::Vector3f engine::AudioPlayer::GetListenerPosition(void) const
     if (m_listener != nullptr)
     {
         return m_listener->m_position;
-}
+    }
     return {};
 }
 
@@ -136,7 +136,7 @@ math::Vector3f engine::AudioPlayer::GetListenerForward(void) const
     if (m_listener != nullptr)
     {
         return m_listener->m_forward;
-}
+    }
     return {};
 }
 
@@ -145,7 +145,7 @@ math::Vector3f engine::AudioPlayer::GetListenerUp(void) const
     if (m_listener != nullptr)
     {
         return m_listener->m_up;
-}
+    }
     return {};
 }
 
@@ -243,9 +243,9 @@ void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
 }
 
 void engine::AudioPlayer::SetListener(const math::Vector3f& inPosition, 
-                                              const math::Vector3f& inForward, 
-                                              const math::Vector3f& inUp, 
-                                              const math::Vector3f& inVelocity)
+                                      const math::Vector3f& inForward, 
+                                      const math::Vector3f& inUp, 
+                                      const math::Vector3f& inVelocity)
 {
     const   FMOD_VECTOR position    = ToFmodVector(inPosition);
     const   FMOD_VECTOR forward     = ToFmodVector(inForward);
@@ -274,7 +274,7 @@ void engine::AudioPlayer::SetListenerPosition(const math::Vector3f& inPosition)
     if (m_listener != nullptr)
     {
         m_listener->m_position = inPosition;
-}
+    }
 
     SoundEngine::Get().GetSoundImpl().m_system->get3DListenerAttributes(
         0, &position, &velocity, &forward, &up);
@@ -295,7 +295,7 @@ void engine::AudioPlayer::SetListenerForward(const math::Vector3f& inForward)
     if (m_listener != nullptr)
     {
         m_listener->m_forward = inForward;
-}
+    }
 
     SoundEngine::Get().GetSoundImpl().m_system->get3DListenerAttributes(
         0, &position, &velocity, &forward, &up);
@@ -316,7 +316,7 @@ void engine::AudioPlayer::SetListenerUp(const math::Vector3f& inUp)
     if (m_listener != nullptr)
     {
         m_listener->m_up = inUp;
-}
+    }
 
     SoundEngine::Get().GetSoundImpl().m_system->get3DListenerAttributes(
         0, &position, &velocity, &forward, &up);
@@ -471,5 +471,134 @@ void engine::AudioPlayer::Invalidate(void)
     SoundEngine::Get().GetSoundImpl().m_channels.erase(m_owner);
 }
 
+void engine::AudioPlayer::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
+{
+    const std::string* sound = ResourceManager::FindKeyByVal(m_sound);
+    if (!sound)
+        return;
+
+    output << "[AudioPlayer]\n     ";
+
+    if constexpr (UpdateAfterParent<AudioPlayer>::m_value)
+    {
+        text::Serialize(output, "index", index);
+        output << "\n     ";
+    }
+
+    text::Serialize(output, "owner", owner);
+    output << "\n     ";
+
+    text::Serialize(output, "sound", *sound);
+    output << "\n    ";    
+
+    text::Serialize(output, "volume", m_volume);
+    output << "\n     ";
+
+    text::Serialize(output, "3D sound", static_cast<uint32>(m_is3DSound));
+    output << "\n     ";
+    
+    text::Serialize(output, "play", static_cast<uint32>(m_isPlayed));
+    output << "\n     ";
+
+ /*   if (m_is3DSound)
+    {*/
+        text::Serialize(output, "position", m_position);
+        output << "\n     ";
+
+        text::Serialize(output, "velocity", m_velocity);
+        output << "\n     ";
+
+
+        if (m_listener != nullptr)
+        {
+            text::Serialize(output, "listener position", m_listener->m_position);
+            output << "\n     ";
+
+            text::Serialize(output, "listener forward", m_listener->m_forward);
+            output << "\n     ";
+
+            text::Serialize(output, "listener up", m_listener->m_up);
+            output << "\n     ";
+
+            text::Serialize(output, "listener velocity", m_listener->m_velocity);
+            output << "\n     ";
+        }
+    //}
+    
+    //if (m_is3DSound)
+    //{
+    //    Serialize3DSound(output);
+    //}    
+
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
 }
+
+void engine::AudioPlayer::Serialize3DSound([[maybe_unused]]std::ostream& output) 
+const
+{
+    
+}
+
+const char* engine::AudioPlayer::DeserializeText(const char* text, const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeInteger(text, m_owner);
+
+    std::string key;
+    text = text::DeserializeString(text, end, key);
+    ResourceManager::Load<Sound>(key);
+    m_sound = ResourceManager::GetResource<Sound>(key);
+
+    key.clear();    
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeReal(text, m_volume);
+
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 is3DSound = 0;
+    text = text::DeserializeInteger(text, is3DSound);
+    m_is3DSound = is3DSound;
+    
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isPlayed = 0;
+    text = text::DeserializeInteger(text, isPlayed);
+    m_isPlayed = isPlayed;
+
+    if (m_is3DSound)
+    {
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_position);
+
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_velocity);
+
+        if (m_listener != nullptr)
+        {
+            MOVE_TEXT_CURSOR(text, end);
+            text = text::DeserializeVector(text, m_listener->m_position);
+
+            MOVE_TEXT_CURSOR(text, end);
+            text = text::DeserializeVector(text, m_listener->m_forward);
+
+            MOVE_TEXT_CURSOR(text, end);
+            text = text::DeserializeVector(text, m_listener->m_up);
+
+            MOVE_TEXT_CURSOR(text, end);
+            text = text::DeserializeVector(text, m_listener->m_velocity);
+        }
+    }
+
+    //if (is3DSound)
+    //{
+    //    text = Deserialize3DSound(text, end);
+    //}
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
+}
+
+const char* engine::AudioPlayer::Deserialize3DSound([[maybe_unused]] const char* text, [[maybe_unused]] const char* end)
+{
+    return {};
 }
