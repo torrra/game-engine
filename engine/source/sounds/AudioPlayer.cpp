@@ -130,6 +130,15 @@ math::Vector3f engine::AudioPlayer::GetListenerPosition(void) const
 }
     return {};
 }
+
+math::Vector3f engine::AudioPlayer::GetListenerForward(void) const
+{
+    if (m_listener != nullptr)
+    {
+        return m_listener->m_forward;
+}
+    return {};
+}
 void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
@@ -245,6 +254,30 @@ void engine::AudioPlayer::SetListenerPosition(const math::Vector3f& inPosition)
 
     SoundEngine::Get().GetSoundImpl().m_system->set3DListenerAttributes(0, &position, &velocity,
         &forward, &up);
+}
+
+void engine::AudioPlayer::SetListenerForward(const math::Vector3f& inForward)
+{
+    FMOD_VECTOR position    = FMOD_VECTOR(0.f);
+    FMOD_VECTOR forward     = FMOD_VECTOR(0.f);
+    FMOD_VECTOR up          = FMOD_VECTOR(0.f);
+    FMOD_VECTOR velocity    = FMOD_VECTOR(0.f);
+
+    if (m_listener != nullptr)
+    {
+        m_listener->m_forward = inForward;
+}
+
+    SoundEngine::Get().GetSoundImpl().m_system->get3DListenerAttributes(
+        0, &position, &velocity, &forward, &up);
+
+    forward = ToFmodVector(inForward);
+
+    SoundEngine::Get().GetSoundImpl().m_system->set3DListenerAttributes(0, &position, &velocity,
+        &forward, &up);
+}
+}
+}
 }
 void engine::AudioPlayer::SetIs3DSound(bool inIs3DSound)
 {
