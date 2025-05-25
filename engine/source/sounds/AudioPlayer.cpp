@@ -465,3 +465,11 @@ void engine::AudioPlayer::PauseSound(bool inIsPaused)
             return;
     }
 }
+
+void engine::AudioPlayer::Invalidate(void)
+{
+    SoundEngine::Get().GetSoundImpl().m_channels.erase(m_owner);
+}
+
+}
+}

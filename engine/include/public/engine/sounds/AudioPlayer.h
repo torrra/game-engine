@@ -160,6 +160,10 @@ namespace engine
         */
         ENGINE_API 
             void            PauseSound(bool inIsPaused);
+        ENGINE_API
+        ENGINE_API
+        ENGINE_API
+            void            Invalidate(void) override;
 
     private :
 
