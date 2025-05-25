@@ -97,10 +97,7 @@
      string | sound="\Falling_In_Reverse-Im_Not_A_Vampire.mp3"
     f32 | volume=1
      uint32 | 3D sound=0
-     uint32 | play=0
-     vec3f32 | position={0,0,0}
-     vec3f32 | velocity={0,0,0}
-     uint64 | flags=0
+     uint64 | flags=1
 [Entity]
    string | name="SoundDynamic"
    int64 | handle=5
@@ -125,11 +122,10 @@
 [AudioPlayer]
      int64 | owner=5
      string | sound="\CrazyFrogAxelF.mp3"
-    f32 | volume=1
+    f32 | volume=0.8
      uint32 | 3D sound=1
-     uint32 | play=0
-     vec3f32 | position={-4.8,0.5,-0.3}
-     vec3f32 | velocity={0,0,0}
+     vec3f32 | position={-4.6,0.6,-0.3}
+     vec3f32 | velocity={-4.6,0.6,-0.3}
      uint64 | flags=0
 [Entity]
    string | name="SoundDynamicWithoutBody"
@@ -140,13 +136,8 @@
 [AudioPlayer]
      int64 | owner=6
      string | sound="\CrazyFrogAxelF.mp3"
-    f32 | volume=1
+    f32 | volume=0.45
      uint32 | 3D sound=1
-     uint32 | play=0
-     vec3f32 | position={0,0,0}
-     vec3f32 | velocity={0,0,0}
-     vec3f32 | listener position={0,0,0}
-     vec3f32 | listener forward={0,0,0}
-     vec3f32 | listener up={0,0,0}
-     vec3f32 | listener velocity={0,0,0}
+     vec3f32 | position={4.75,0,3.7}
+     vec3f32 | velocity={0,1.75,1.7}
      uint64 | flags=0

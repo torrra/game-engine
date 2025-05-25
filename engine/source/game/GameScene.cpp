@@ -31,8 +31,8 @@ namespace engine
 
     void GameScene::Stop(void)
     {
-        m_state = EGameState::STOPPED;
         SoundEngine::Get().StopSounds();
+        m_state = EGameState::STOPPED;
     }
 
     void GameScene::Reset(bool reload)

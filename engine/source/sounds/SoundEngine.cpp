@@ -102,6 +102,6 @@ void engine::SoundEngine::CloseSoundEngine(void)
 
 void engine::SoundEngine::StopSounds(void)
 {
-    for (auto sound : m_soundImpl->m_channels)
-        sound.second->stop();
+    for (auto& sound : Engine::GetEngine()->GetGraph()->GetComponentArray<AudioPlayer>())
+        sound.StopSound();
 }
