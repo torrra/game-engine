@@ -67,6 +67,13 @@ namespace engine
         */
         ENGINE_API [[nodiscard]]
             f32             GetSoundVolume(void);
+
+        /*
+            Get the sound
+            <return> [out] Sound : The sound
+        */
+        ENGINE_API [[nodiscard]]
+        const Sound*        GetSound(void) const;
         /// Setters
         /*
             Set the volume of a sound
@@ -103,7 +110,11 @@ namespace engine
         ENGINE_API void     SetSound(const Sound* inSound);
 
         ENGINE_API
-            AudioPlayer&    operator=(AudioPlayer&&) noexcept = default;
+        ENGINE_API 
+        ENGINE_API 
+            void            SetSound(const char* inSoundName);
+        ENGINE_API 
+            void            SetSound(const Sound* inSound);
 
         /// Functions
         /*

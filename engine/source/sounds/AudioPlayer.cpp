@@ -106,6 +106,11 @@ f32 engine::AudioPlayer::GetSoundVolume(void)
     }
     return -1.f;
 }
+
+const engine::Sound* engine::AudioPlayer::GetSound(void) const
+{
+    return m_sound;
+}
 void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
@@ -200,6 +205,12 @@ void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
     
     SoundEngine::Get().GetSoundImpl().m_system->set3DListenerAttributes(0, &position, &velocity,
                                                                         &forward, &up);
+}
+
+void engine::AudioPlayer::SetSound(const char* inSoundName)
+{
+    if (const Sound* sound = ResourceManager::GetResource<Sound>(inSoundName))
+        SetSound(sound);
 }
 
 void engine::AudioPlayer::SetSound(const Sound* inSound)
