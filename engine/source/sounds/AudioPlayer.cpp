@@ -111,6 +111,16 @@ const engine::Sound* engine::AudioPlayer::GetSound(void) const
 {
     return m_sound;
 }
+
+bool engine::AudioPlayer::GetIs3DSound(void) const
+{
+    return m_is3DSound;
+}
+
+bool engine::AudioPlayer::GetIsPlayed(void) const
+{
+    return m_isPlayed;
+}
 void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
 {
     auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
@@ -205,6 +215,19 @@ void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
     
     SoundEngine::Get().GetSoundImpl().m_system->set3DListenerAttributes(0, &position, &velocity,
                                                                         &forward, &up);
+}
+
+void engine::AudioPlayer::SetIs3DSound(bool inIs3DSound)
+{
+    m_is3DSound = inIs3DSound;
+
+    if (inIs3DSound)
+        m_listener = new Listener();
+}
+
+void engine::AudioPlayer::SetIsPlayed(bool inIsPlayed)
+{
+    m_isPlayed = inIsPlayed;
 }
 
 void engine::AudioPlayer::SetSound(const char* inSoundName)
