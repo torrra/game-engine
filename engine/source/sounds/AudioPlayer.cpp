@@ -455,7 +455,7 @@ void engine::AudioPlayer::StopSound(void)
 
 void engine::AudioPlayer::PauseSound(bool inIsPaused)
 {
-    auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_sound->GetID());
+    auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
     
     if (it != SoundEngine::Get().GetSoundImpl().m_channels.end() && it->second)
     {

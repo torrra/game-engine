@@ -158,8 +158,8 @@ namespace engine
             <param> [in] inID       : ID of the sound
             <param> [in] inIsPaused : Pause flag
         */
-        ENGINE_API void     PauseSound(bool inIsPaused);
-        ENGINE_API void     Register(void) override {}
+        ENGINE_API 
+            void            PauseSound(bool inIsPaused);
 
     private :
 
