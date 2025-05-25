@@ -34,11 +34,14 @@ namespace engine
 
         /// Constructor
         // Component constructor
-        ENGINE_API          AudioPlayer(EntityHandle inOwner, class SceneGraph* inScene);
+        ENGINE_API          
+                            AudioPlayer(EntityHandle inOwner, class SceneGraph* inScene);
         // Move constructor
-        ENGINE_API          AudioPlayer(AudioPlayer&& inOther) noexcept = default;
+        ENGINE_API          
+                            AudioPlayer(AudioPlayer&& inOther) noexcept = default;
 
         /// Destructor
+        ENGINE_API
                             ~AudioPlayer(void) override = default;
 
         /// Setters
@@ -69,30 +72,7 @@ namespace engine
         /// Functions
         /*
             Load a sound
-            <param> [in] inID   : ID of the sound
-            <param> [in] inPath : Path of the sound
-            <param> [in] inLoop : Loop flag : set by default to false (optional)
-        */
-        //ENGINE_API bool     LoadSound(const std::string& inID, const std::string& inPath,
-        //                              bool inLoop = false);
-        /*
-            Play a sound
-            <param> [in] inID       : ID of the sound
-            <param> [in] inVolume   : Volume of the sound   : 0.0f to 1.0f (optional)
-            <param> [in] inPaused   : Pause flag (optional)
-        */
-        ENGINE_API void     PlaySound(f32 inVolume = 1.f,
-                                      bool inPaused = false);
-        /*
-            Play a 3D sound
-            <param> [in] inID       : ID of the sound
-            <param> [in] inPosition : Position of the sound
-            <param> [in] inVelocity : Velocity of the sound (Calculate the doppler effect) (optional)
-            <param> [in] inVolume   : Volume of the sound   : 0.0f to 1.0f (optional)
-        */
-        ENGINE_API void     PlaySound3D(const math::Vector3f& inPosition,
-                                        const math::Vector3f& inVelocity = math::Vector3f::Zero(),
-                                        f32 inVolume = 1.f);
+        
         /*
             Stop a sound
             <param> [in] inID : ID of the sound
@@ -109,8 +89,12 @@ namespace engine
     private :
 
         AudioPlayer(void) = delete;
+                            AudioPlayer(const AudioPlayer& inOther) = delete;
+        /// Operator
+            AudioPlayer&    operator=(const AudioPlayer& inOther) = delete;
 
         const Sound*              m_sound = nullptr;
+        const Sound*    m_sound     = nullptr;
         Listener*       m_listener  = nullptr;
 
     }; // !Class AudioPlayer
