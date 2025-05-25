@@ -372,7 +372,7 @@ void engine::AudioPlayer::SetSound(const Sound* inSound)
     m_sound = inSound;
 }
 
-void engine::AudioPlayer::PlaySound(f32 inVolume, bool inPaused)
+void engine::AudioPlayer::PlaySoundWithout3D(void)
 {
     FMOD::Channel* channel = nullptr;
     FMOD_RESULT result = SoundEngine::Get().GetSoundImpl().m_system->playSound(static_cast<FMOD::Sound*>(m_sound->GetSound()), nullptr,
@@ -383,22 +383,22 @@ void engine::AudioPlayer::PlaySound(f32 inVolume, bool inPaused)
     
     if (channel)
     {
-        FMOD_RESULT result1 = channel->setVolume(inVolume);
+        FMOD_RESULT result1 = channel->setVolume(m_volume);
     
         if (result1 != FMOD_OK)
             return;
     
-        FMOD_RESULT result2 = channel->setPaused(inPaused);
+        FMOD_RESULT result2 = channel->setPaused(false);
     
         if (result2 != FMOD_OK)
             return;
     
-        SoundEngine::Get().GetSoundImpl().m_channels[m_sound->GetID()] = channel;
+        SoundEngine::Get().GetSoundImpl().m_channels[m_owner] = channel;
     }
+    m_is3DSound = false;
 }
 
-void engine::AudioPlayer::PlaySound3D(const math::Vector3f& inPosition, 
-                                      const math::Vector3f& inVelocity, f32 inVolume)
+void engine::AudioPlayer::PlaySound3D(void)
 {    
     FMOD::Channel* channel = nullptr;
     FMOD_RESULT result = SoundEngine::Get().GetSoundImpl().m_system->playSound(static_cast<FMOD::Sound*>(m_sound->GetSound()),
@@ -409,13 +409,35 @@ void engine::AudioPlayer::PlaySound3D(const math::Vector3f& inPosition,
         return;
     
     channel->setMode(FMOD_3D);
-    const FMOD_VECTOR velocity = ToFmodVector(inVelocity);
-    const FMOD_VECTOR position = ToFmodVector(inPosition);
+    const FMOD_VECTOR velocity = ToFmodVector(m_velocity);
+    const FMOD_VECTOR position = ToFmodVector(m_position);
     channel->set3DAttributes(&position, &velocity);
-    channel->setVolume(inVolume);
+    channel->setVolume(m_volume);
     channel->setPaused(false);
     
-    SoundEngine::Get().GetSoundImpl().m_channels[m_sound->GetID()] = channel;
+    SoundEngine::Get().GetSoundImpl().m_channels[m_owner] = channel;
+
+    m_is3DSound = true;
+}
+
+void engine::AudioPlayer::PlaySound(bool is3DSound)
+{
+    if (is3DSound)
+    {
+        if (m_currentScene->GetEntity(m_owner)->HasComponent<Transform>())
+        {
+            m_position = m_currentScene->GetComponent<Transform>(m_owner)->GetPosition();
+            PlaySound3D();
+        }
+        else
+        {
+            PlaySound3D();
+        }
+    }
+    else
+    {
+        PlaySoundWithout3D();
+    }
 }
 
 void engine::AudioPlayer::StopSound(void)

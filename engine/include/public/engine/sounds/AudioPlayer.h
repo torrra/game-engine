@@ -144,8 +144,8 @@ namespace engine
             void            SetSound(const Sound* inSound);
 
         /// Functions
-        /*
-            Load a sound
+        ENGINE_API
+            void            PlaySound(bool is3DSound = false);
         
         /*
             Stop a sound
@@ -167,7 +167,13 @@ namespace engine
         /// Operator
             AudioPlayer&    operator=(const AudioPlayer& inOther) = delete;
 
-        const Sound*              m_sound = nullptr;
+        /// Functions
+        // Play sound without 3D 
+            void            PlaySoundWithout3D(void);
+        // Play a sound with 3D parameters
+            void            PlaySound3D(void);
+
+
         const Sound*    m_sound     = nullptr;
         Listener*       m_listener  = nullptr;
         math::Vector3f  m_position  = math::Vector3f::Zero();
