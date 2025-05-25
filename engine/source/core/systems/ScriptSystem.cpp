@@ -42,6 +42,7 @@ namespace engine
         RegisterInputFunctions(GetInstance()->m_luaState);
         RegisterUIFunctions(GetInstance()->m_luaState);
         RegisterUITextFunctions(GetInstance()->m_luaState);
+        RegisterUIButtonFunctions(GetInstance()->m_luaState);
         RegisterUIElementFunctions(GetInstance()->m_luaState);
         RegisterVector2Functions(GetInstance()->m_luaState);
         RegisterVector3Functions(GetInstance()->m_luaState);

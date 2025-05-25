@@ -10,3 +10,6 @@
 #include "scripting/ui/InGameUI.h"
 #include "scripting/ui/Element.h"
 #include "scripting/ui/Text.h"
+#include "scripting/ui/Image.h"
+#include "scripting/ui/Button.h"
+#include "scripting/ui/ProgressBar.h"

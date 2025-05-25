@@ -6,3 +6,7 @@ function Button:_new(newButtonRef)
     setmetatable(newButtonObj, self)
     return newButtonObj
 end
+
+function Button:IsButtonPressed()
+    return ButtonRef.IsButtonPressed(self.buttonRef)
+end
