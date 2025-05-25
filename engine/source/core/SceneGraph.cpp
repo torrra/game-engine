@@ -507,10 +507,10 @@ namespace engine
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
             
-            else if (memcmp(start, "[RigidBodyDynamic]", 17) == 0)
+            else if (memcmp(start, "[RigidBodyDynamic]", 18) == 0)
                 start = Component::DeserializeComponentText(dynamicRigidBodies, start, end);
             
-            else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
+            else if (memcmp(start, "[RigidBodyStatic]", 17) == 0)
                 start = Component::DeserializeComponentText(staticRigidBodies, start, end);
 
             else if (memcmp(start, "[TriangleMesh]", 14) == 0)
