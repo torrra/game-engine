@@ -8,6 +8,5 @@ function Text:_new(newTextRef)
 end
 
 function Text:SetTextColor(red, green, blue, alpha)
-    print("Set color called", self.ref, red, green, blue, alpha)
     TextRef.SetTextColor(self.ref, red, green, blue, alpha)
 end
