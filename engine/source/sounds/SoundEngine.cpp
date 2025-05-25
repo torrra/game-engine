@@ -99,3 +99,9 @@ void engine::SoundEngine::CloseSoundEngine(void)
 
     PrintLog(SuccessPreset(), "Sound engine closed.");
 }
+
+void engine::SoundEngine::StopSounds(void)
+{
+    for (auto sound : m_soundImpl->m_channels)
+        sound.second->stop();
+}

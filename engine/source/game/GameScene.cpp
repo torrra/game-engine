@@ -32,6 +32,7 @@ namespace engine
     void GameScene::Stop(void)
     {
         m_state = EGameState::STOPPED;
+        SoundEngine::Get().StopSounds();
     }
 
     void GameScene::Reset(bool reload)
@@ -92,7 +93,6 @@ namespace engine
         m_graph.DeserializeText(input);
         PhysicsEngine::Get().StepSimulation(0.0001f);
         m_graph.SyncTransformsPostPhysics();
-        SoundEngine::Get().UpdateSoundEngine();
         ThreadManager::SynchronizeGameThread(&m_graph);
         return true;
     }

@@ -37,6 +37,9 @@ namespace engine
         ENGINE_API void     UpdateSoundEngine(void);
         // Close the sounds engine system, channels and sounds
         ENGINE_API void     CloseSoundEngine(void);
+        // Stop all sounds
+        ENGINE_API
+            void            StopSounds(void);
 
     private :
 
@@ -51,7 +54,7 @@ namespace engine
         /// Private members
         static  SoundEngine*    m_instance;
                 SoundImpl*      m_soundImpl = nullptr;
-                AudioPlayer* m_audioPlayer  = nullptr;
+                AudioPlayer*    m_audioPlayer  = nullptr;
 
     }; // !Class SoundsEngine
 } // !Namespace engine
