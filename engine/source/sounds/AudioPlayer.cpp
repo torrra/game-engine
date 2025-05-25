@@ -10,6 +10,7 @@
 
 #include "sounds/InternalSoundsStruct.hpp"
 #include "sounds/InternalFmodConversion.hpp"
+#include "engine/ConsoleLog.hpp"
 
 #pragma endregion
 
@@ -19,15 +20,55 @@
 
 #pragma endregion
 
+#pragma region FMOD
+
+#include <fmod/fmod_errors.h>
+
+#pragma endregion
+
+#pragma region Serialization
+
+#include "serialization/TextSerializer.h"
+
+#pragma endregion
+
 engine::AudioPlayer::AudioPlayer(EntityHandle inOwner, SceneGraph* inScene)
 {
     m_owner         = inOwner;
     m_currentScene  = inScene;
 }
 
+math::Vector3f engine::AudioPlayer::GetSoundPosition(void)
+{
+    auto& channels = SoundEngine::Get().GetSoundImpl().m_channels;
+    auto it = channels.find(m_owner);
+    
+    if (it != channels.end() && it->second)
+    {
+        FMOD_VECTOR position;
+        FMOD_VECTOR velocity;
+
+        FMOD_RESULT result = it->second->get3DAttributes(&position, &velocity);
+        if (result == FMOD_OK)
+        {
+            m_position = ToMathVector(position);
+            return ToMathVector(position);
+        }
+        else
+            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
+    }
+
+    return math::Vector3f::Zero();
+}
+
+
+
+    return math::Vector3f::Zero();
+}
+
 void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
 {
-    auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_sound->GetID());
+    auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
     
     if (inVolume < 0.f)
     {
@@ -44,10 +85,38 @@ void engine::AudioPlayer::SetVolumeSound(f32 inVolume)
     
         if (result != FMOD_OK)
             return;
+void engine::AudioPlayer::SetSoundPosition(const math::Vector3f& inPosition)
+{
+    auto& channels = SoundEngine::Get().GetSoundImpl().m_channels;
+    auto it = channels.find(m_owner);
+
+    if (it != channels.end() && it->second)
+    {
+        FMOD_VECTOR position;
+        FMOD_VECTOR velocity;
+
+        FMOD_RESULT res = it->second->get3DAttributes(&position, &velocity);
+
+        if (res == FMOD_OK)
+        {
+            position = ToFmodVector(inPosition);
+
+            FMOD_RESULT result = it->second->set3DAttributes(&position, &velocity);
+            if (result == FMOD_OK)
+            {
+                PrintLog(SuccessPreset(), "Position successfully setted");
+                m_position = inPosition;
+            }
+            else
+                PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
+        }
+        else
+            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(res)));
     }
 }
 
 void engine::AudioPlayer::SetListenerPosition(const math::Vector3f& inPosition, 
+}
                                               const math::Vector3f& inForward, 
                                               const math::Vector3f& inUp, 
                                               const math::Vector3f& inVelocity)

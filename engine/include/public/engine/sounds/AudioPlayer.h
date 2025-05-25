@@ -44,6 +44,13 @@ namespace engine
         ENGINE_API
                             ~AudioPlayer(void) override = default;
 
+        /// Getters
+        /*
+            Get the position of the sound
+            <return> [out] Vector3f : Position of the sound
+        */
+        ENGINE_API [[nodiscard]]
+            math::Vector3f  GetSoundPosition(void);
         /// Setters
         /*
             Set the volume of a sound
@@ -51,6 +58,13 @@ namespace engine
             <param> [in] inVolume   : Volume of the sound : 0.0f to 1.0f
         */
         ENGINE_API void     SetVolumeSound(f32 inVolume = 1.f);
+        /*
+            Set the position of the sound
+            <param> [in] inPosition : Vector3f : The position of the sound
+        */
+        ENGINE_API
+            void            SetSoundPosition(const math::Vector3f& inPosition);
+        /*
         /*
             Set the 3D position of a sound
             <param> [in] inPosition : Position of the sound
@@ -96,6 +110,7 @@ namespace engine
         const Sound*              m_sound = nullptr;
         const Sound*    m_sound     = nullptr;
         Listener*       m_listener  = nullptr;
+        math::Vector3f  m_position  = math::Vector3f::Zero();
 
     }; // !Class AudioPlayer
 
