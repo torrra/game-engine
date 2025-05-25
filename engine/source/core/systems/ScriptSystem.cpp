@@ -59,6 +59,9 @@ namespace engine
         RunConfigScript("ui/Canvas.lua");
         RunConfigScript("ui/Element.lua");
         RunConfigScript("ui/Text.lua");
+        RunConfigScript("ui/Image.lua");
+        RunConfigScript("ui/Button.lua");
+        RunConfigScript("ui/ProgressBar.lua");
 
         RunConfigScript("vector/Vector2.lua");
         RunConfigScript("vector/Vector3.lua");

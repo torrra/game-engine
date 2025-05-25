@@ -25,6 +25,10 @@ function Canvas:AddText(text, xPos, yPos)
 	return Text:_new(newTextRef)
 end
 
+function Canvas:AddImage(path, xPos, yPos)
+	newImageRef = CanvasRef.AddImage(self._name, path, xPos, yPos)
+	return Image:_new(newImageRef)
+end
 
 
 
