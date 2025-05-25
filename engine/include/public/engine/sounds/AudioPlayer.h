@@ -151,7 +151,8 @@ namespace engine
             Stop a sound
             <param> [in] inID : ID of the sound
         */
-        ENGINE_API void     StopSound(void);
+        ENGINE_API 
+            void            StopSound(void);
         /*
             Put a sound in pause or resume
             <param> [in] inID       : ID of the sound

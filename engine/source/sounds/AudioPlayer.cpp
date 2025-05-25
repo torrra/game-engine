@@ -442,7 +442,7 @@ void engine::AudioPlayer::PlaySound(bool is3DSound)
 
 void engine::AudioPlayer::StopSound(void)
 {
-    auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_sound->GetID());
+    auto it = SoundEngine::Get().GetSoundImpl().m_channels.find(m_owner);
 
     if (it != SoundEngine::Get().GetSoundImpl().m_channels.end() && it->second)
     {
