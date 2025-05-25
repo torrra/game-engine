@@ -20,6 +20,14 @@
 
 namespace engine
 {
+    struct Listener
+    {
+        math::Vector3f m_position   = math::Vector3f::Zero();
+        math::Vector3f m_forward    = math::Vector3f::Zero();
+        math::Vector3f m_up         = math::Vector3f::Zero();
+        math::Vector3f m_velocity   = math::Vector3f::Zero();
+    };
+
     class AudioPlayer : public Component
     {
     public :
@@ -103,6 +111,7 @@ namespace engine
         AudioPlayer(void) = delete;
 
         const Sound*              m_sound = nullptr;
+        Listener*       m_listener  = nullptr;
 
     }; // !Class AudioPlayer
 
