@@ -38,5 +38,60 @@ editor::AudioComponent::AudioComponent(void)
     m_soundName = NO_SOUND_NAME;
 }
 
+editor::AudioComponent::~AudioComponent(void)
+{
+        }
+
+void editor::AudioComponent::SectionContent(void)
+{
+    if (engine::AudioPlayer* audioPlayer = GetData<engine::AudioPlayer>())
+    {
+        m_soundName = (audioPlayer->GetSound()) ? audioPlayer->GetSound()->GetID() : NO_SOUND_NAME;
+
+        ui::Text("Sound: ");
+        ui::SameLine(150.f);
+        ui::Button(m_soundName.c_str());
+
+        if (ui::StartDragDropTarget())
+        {
+            DragAndDrop(audioPlayer);
+}
+        ui::VerticalSpacing();
+
+        if (audioPlayer->GetSound())
+        {
+            bool is3DSound = audioPlayer->GetIs3DSound();
+            if (ui::Checkbox("##3DSound", &is3DSound))
+            {
+                audioPlayer->SetIs3DSound(is3DSound);
+            }
+            if (is3DSound)
+            {
+                Sound3DUI(audioPlayer);
+                ListenerUI(audioPlayer);
+            }            
+
+            bool isPlayed = audioPlayer->GetIsPlayed();
+            if (ui::Checkbox("##IsPlayed", &isPlayed))
+            {
+                f32 volume = audioPlayer->GetSoundVolume();
+                ui::Text("SoundVolume: ");
+                InputField("##Volume", &volume, 0.05f);
+                audioPlayer->SetVolumeSound(volume);
+                ui::VerticalSpacing();
+
+                audioPlayer->SetIsPlayed(isPlayed);
+                if (isPlayed)
+                {
+                    audioPlayer->PlaySound(is3DSound);
+                }
+                else
+                {
+                    audioPlayer->StopSound();
+                }
+            }
+        }
+}
 }
 
+    }
