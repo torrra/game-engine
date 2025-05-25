@@ -1,5 +1,4 @@
 Text = {ref = nil}
---Text.__index = Text
 
 function Text:_new(newTextRef)
     local newTextObj = {ref = newTextRef}
