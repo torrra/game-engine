@@ -85,6 +85,8 @@ namespace engine
             math::Vector3f GetListenerPosition(void) const;
         ENGINE_API [[nodiscard]]
             math::Vector3f GetListenerForward(void) const;
+        ENGINE_API [[nodiscard]]
+            math::Vector3f GetListenerUp(void) const;
         /// Setters
         /*
             Set the volume of a sound
