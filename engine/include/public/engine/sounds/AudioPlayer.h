@@ -74,6 +74,9 @@ namespace engine
         */
         ENGINE_API [[nodiscard]]
         const Sound*        GetSound(void) const;
+
+        ENGINE_API [[nodiscard]]
+            bool            GetIs3DSound(void) const;
         /// Setters
         /*
             Set the volume of a sound
@@ -110,6 +113,7 @@ namespace engine
         ENGINE_API void     SetSound(const Sound* inSound);
 
         ENGINE_API
+            void            SetIs3DSound(bool inIs3DSound);
         ENGINE_API 
         ENGINE_API 
             void            SetSound(const char* inSoundName);
@@ -146,6 +150,7 @@ namespace engine
         math::Vector3f  m_position  = math::Vector3f::Zero();
         math::Vector3f  m_velocity  = math::Vector3f::Zero();
         f32             m_volume    = 1.f;
+        bool            m_is3DSound = false;
 
     }; // !Class AudioPlayer
 
