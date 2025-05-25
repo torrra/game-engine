@@ -8,3 +8,5 @@
 #include "scripting/vector/Vector3Functions.h"
 #include "scripting/physics/RaycastFunctions.h"
 #include "scripting/ui/InGameUI.h"
+#include "scripting/ui/Element.h"
+#include "scripting/ui/Text.h"

@@ -101,10 +101,13 @@ int script_AddText(lua_State* luaState)
             static_cast<f32>(lua_tonumber(luaState, 4))
         );
 
-        canvas->AddLabel(text.c_str(), position);
+        engine::Label* label = canvas->AddLabel(text.c_str(), position);
+        
+        lua_pushlightuserdata(luaState, label);
+       
     }
 
-    return 0;
+    return 1;
 }
 
 int script_AddImage(lua_State* luaState)

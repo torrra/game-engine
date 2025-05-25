@@ -21,7 +21,8 @@ function Canvas:SetCanvasColor(red, green, blue, alpha)
 end
 
 function Canvas:AddText(text, xPos, yPos)
-	CanvasRef.AddText(self._name, text, xPos, yPos)
+	newTextRef = CanvasRef.AddText(self._name, text, xPos, yPos)
+	return Text:_new(newTextRef)
 end
 
 
