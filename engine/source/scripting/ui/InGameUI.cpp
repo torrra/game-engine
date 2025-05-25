@@ -9,6 +9,7 @@ extern "C"
 #include "ui/UIManager.h"
 #include "ui/UIStyle.h"
 #include "ui/Canvas.h"
+#include "ui/UIElement.h"
 #include "CoreTypes.h"
 #include "Engine.h"
 #include "resource/ResourceManager.h"
@@ -208,7 +209,21 @@ int script_AddRect(lua_State* luaState)
 
 int script_RemoveElement(lua_State* luaState)
 {
-    luaState;
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 2)
+        luaL_error(luaState, "Expected 2 arguments (canvasID, element)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        if (engine::UIElement* element = (engine::UIElement*) lua_touserdata(luaState, 2))
+            canvas->RemoveElement(element);
+        else
+            luaL_error(luaState, "Expected an element as second argument");
+    }
+
     return 0;
 }
 
@@ -225,7 +240,7 @@ void engine::RegisterUIFunctions(lua_State* luaState)
         {"AddButton", script_AddButton},
         {"AddProgressBar", script_AddProgressBar},
         //{"AddRect", script_AddRect},
-        //{"RemoveElement", script_RemoveElement},
+        {"RemoveElement", script_RemoveElement},
         {NULL, NULL}
     };
 

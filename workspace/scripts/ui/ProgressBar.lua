@@ -7,6 +7,10 @@ function ProgressBar:_new(newProgressBarRef)
     return newProgressBarObj
 end
 
+function ProgressBar:GetRef()
+    return self.progressBarRef
+end
+
 function ProgressBar:SetValue(value)
     ProgressBarRef.SetValue(self.progressBarRef, value)
 end

@@ -7,6 +7,10 @@ function Button:_new(newButtonRef)
     return newButtonObj
 end
 
+function Button:GetRef()
+    return self.buttonRef
+end
+
 function Button:IsButtonPressed()
     return ButtonRef.IsButtonPressed(self.buttonRef)
 end

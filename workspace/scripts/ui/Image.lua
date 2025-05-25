@@ -7,6 +7,6 @@ function Image:_new(newImageRef)
     return newImageObj
 end
 
-function Image:SetImageSize(xSize, ySize)
-    print(xSize, ySize)
+function Image:GetRef()
+    return self.imgRef
 end

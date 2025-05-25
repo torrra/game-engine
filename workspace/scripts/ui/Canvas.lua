@@ -16,6 +16,10 @@ function Canvas:CreateCanvas(canvasName, canvasWidth, canvasHeight)
 	return canvas
 end
 
+function Canvas:RemoveElement(element)
+	CanvasRef.RemoveElement(self._name, element:GetRef())
+end
+
 function Canvas:SetCanvasColor(red, green, blue, alpha)
 	CanvasRef.SetCanvasColor(self._name, red, green, blue, alpha)
 end
