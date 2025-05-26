@@ -12,14 +12,10 @@
 
 #pragma endregion
 
-#pragma region Sounds
-
-#include "engine/sounds/Sound.h"
-
-#pragma endregion
-
 namespace engine
 {
+    class Sound;
+
     struct Listener
     {
         math::Vector3f m_position   = math::Vector3f::Zero();
@@ -28,9 +24,11 @@ namespace engine
         math::Vector3f m_velocity   = math::Vector3f::Zero();
     };
 
-    class AudioPlayer : public Component
+    class AudioPlayer final : public Component
     {
     public :
+
+        using Component::Component;
 
         /// Constructor
         // Component constructor
@@ -140,8 +138,6 @@ namespace engine
 
         ENGINE_API 
             void            SetSound(const char* inSoundName);
-        ENGINE_API 
-            void            SetSound(const Sound* inSound);
 
         /// Functions
         ENGINE_API
@@ -180,6 +176,8 @@ namespace engine
         /// Operator
             AudioPlayer&    operator=(const AudioPlayer& inOther) = delete;
 
+        /// Setter
+            void            SetSound(const Sound* inSound);
         /// Functions
         // Play sound without 3D 
             void            PlaySoundWithout3D(void);

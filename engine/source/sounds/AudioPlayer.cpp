@@ -3,6 +3,7 @@
 #pragma region Sounds
 
 #include "engine/sounds/SoundEngine.h"
+#include "engine/sounds/Sound.h"
 
 #pragma endregion
 
@@ -20,15 +21,15 @@
 
 #pragma endregion
 
-#pragma region FMOD
-
-#include <fmod/fmod_errors.h>
-
-#pragma endregion
-
 #pragma region Serialization
 
 #include "serialization/TextSerializer.h"
+
+#pragma endregion
+
+#pragma region System
+
+#include "engine/core/systems/ScriptSystem.h"
 
 #pragma endregion
 
@@ -54,8 +55,6 @@ math::Vector3f engine::AudioPlayer::GetSoundPosition(void)
             m_position = ToMathVector(position);
             return ToMathVector(position);
         }
-        else
-            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
     }
 
     return math::Vector3f::Zero();
@@ -78,8 +77,6 @@ math::Vector3f engine::AudioPlayer::GetSoundVelocity(void)
 
             return ToMathVector(velocity);
         }
-        else
-            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
     }
 
     return math::Vector3f::Zero();
@@ -101,8 +98,6 @@ f32 engine::AudioPlayer::GetSoundVolume(void)
             m_volume = volume;
             return volume;
         }
-        else
-            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
     }
     return -1.f;
 }
@@ -201,14 +196,9 @@ void engine::AudioPlayer::SetSoundPosition(const math::Vector3f& inPosition)
             FMOD_RESULT result = it->second->set3DAttributes(&position, &velocity);
             if (result == FMOD_OK)
             {
-                PrintLog(SuccessPreset(), "Position successfully setted");
                 m_position = inPosition;
             }
-            else
-                PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
         }
-        else
-            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(res)));
     }
 }
 
@@ -231,14 +221,9 @@ void engine::AudioPlayer::SetSoundVelocity(const math::Vector3f& inVelocity)
             FMOD_RESULT result = it->second->set3DAttributes(&position, &velocity);
             if (result == FMOD_OK)
             {
-                PrintLog(SuccessPreset(), "Position successfully setted");
                 m_velocity = inVelocity;
             }
-            else
-                PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(result)));
         }
-        else
-            PrintLog(ErrorPreset(), std::string(FMOD_ErrorString(res)));
     }
 }
 
@@ -525,21 +510,6 @@ void engine::AudioPlayer::SerializeText(std::ostream& output, EntityHandle owner
         }
     }
     
-    //if (m_is3DSound)
-    //{
-    //    Serialize3DSound(output);
-    //}    
-
-    text::Serialize(output, "flags", m_flags);
-    output << '\n';
-}
-
-void engine::AudioPlayer::Serialize3DSound([[maybe_unused]]std::ostream& output) 
-const
-{
-    
-}
-
 const char* engine::AudioPlayer::DeserializeText(const char* text, const char* end)
 {
     MOVE_TEXT_CURSOR(text, end);
@@ -587,18 +557,5 @@ const char* engine::AudioPlayer::DeserializeText(const char* text, const char* e
             MOVE_TEXT_CURSOR(text, end);
             text = text::DeserializeVector(text, m_listener->m_velocity);
         }
-    }
-
-    //if (is3DSound)
-    //{
-    //    text = Deserialize3DSound(text, end);
-    //}
-
-    MOVE_TEXT_CURSOR(text, end);
-    return text::DeserializeInteger(text, m_flags);
-}
-
-const char* engine::AudioPlayer::Deserialize3DSound([[maybe_unused]] const char* text, [[maybe_unused]] const char* end)
-{
-    return {};
+    return text;
 }
