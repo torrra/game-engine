@@ -13,6 +13,12 @@
 
 #pragma endregion
 
+#pragma region Sound
+
+#include "engine/sounds/AudioPlayer.h"
+
+#pragma endregion
+
 #include "engine/ConsoleLog.hpp"
 
 engine::SoundEngine* engine::SoundEngine::m_instance = nullptr;
