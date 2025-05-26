@@ -159,9 +159,9 @@ namespace engine
         ENGINE_API 
             void            PauseSound(bool inIsPaused);
         ENGINE_API 
-            void            Register(void) override {}
+            void            Register(void) override;
         ENGINE_API 
-            void            Unregister(void) override {}
+            void            Unregister(void) override;
         ENGINE_API
             void            Invalidate(void) override;
         ENGINE_API

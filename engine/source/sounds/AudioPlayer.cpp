@@ -459,6 +459,16 @@ void engine::AudioPlayer::PauseSound(bool inIsPaused)
     }
 }
 
+void engine::AudioPlayer::Register(void)
+{
+    engine::ScriptSystem::RegisterNewComponent("_NewAudioPlayerComponent", m_owner);
+}
+
+void engine::AudioPlayer::Unregister(void)
+{
+    engine::ScriptSystem::UnregisterComponent("_RemoveAudioPlayerComponent", m_owner);
+}
+
 void engine::AudioPlayer::Invalidate(void)
 {
     SoundEngine::Get().GetSoundImpl().m_channels.erase(m_owner);
