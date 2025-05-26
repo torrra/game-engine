@@ -63,13 +63,13 @@ bool engine::Model::IsDynamic(void) const
     return m_isDynamic;
 }
 
-void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) const
+void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials) const
 {
     if (m_isDynamic)
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
         {
-            const MeshMaterial* currentMaterial = materials[meshIndex];
+            const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
 
             if (currentMaterial)
                 currentMaterial->Use(0);
@@ -81,7 +81,7 @@ void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) cons
     {
         for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
         {
-            const MeshMaterial* currentMaterial = materials[meshIndex];
+            const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
 
             if (currentMaterial)
                 currentMaterial->Use(0);

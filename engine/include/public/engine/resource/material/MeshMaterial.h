@@ -4,6 +4,7 @@
 #include "engine/EngineExport.h"
 #include "engine/resource/model/Buffer.h"
 #include "engine/resource/Resource.h"
+#include "engine/utility/ResourceRefDecl.h"
 
 #include <math/Vector3.hpp>
 
@@ -54,11 +55,11 @@ namespace engine
         ENGINE_API void SetSpecular(const math::Vector3f& value);
         ENGINE_API void SetEmissive(const math::Vector3f& value);
 
-        ENGINE_API void SetDiffuseMap(const class Texture* texture);
-        ENGINE_API void SetNormalMap(const class Texture* texture);
-        ENGINE_API void SetSpecularMap(const class Texture* texture);
-        ENGINE_API void SetDiffuseRoughnessMap(const class Texture* texture);
-        ENGINE_API void SetAmbientOcclusionMap(const class Texture* texture);
+        ENGINE_API void SetDiffuseMap(ResourceRef<class Texture>&& texture);
+        ENGINE_API void SetNormalMap(ResourceRef<class Texture>&& texture);
+        ENGINE_API void SetSpecularMap(ResourceRef<class Texture>&& texture);
+        ENGINE_API void SetDiffuseRoughnessMap(ResourceRef<class Texture>&& texture);
+        ENGINE_API void SetAmbientOcclusionMap(ResourceRef<class Texture>&& texture);
 
         ENGINE_API void SetShininess(f32 value);
         ENGINE_API void SetRefractionIndex(f32 value);
@@ -71,11 +72,11 @@ namespace engine
         ENGINE_API f32 GetShininess(void) const;
         ENGINE_API f32 GetRefractionIndex(void) const;
 
-        ENGINE_API const class Texture* GetDiffuseMap(void) const;
-        ENGINE_API const class Texture* GetNormalMap(void) const;
-        ENGINE_API const class Texture* GetSpecularMap(void) const;
-        ENGINE_API const class Texture* GetDiffuseRoughnessMap(void) const;
-        ENGINE_API const class Texture* GetAmbientOcclusionMap(void) const;
+        ENGINE_API const ResourceRef<class Texture>& GetDiffuseMap(void) const;
+        ENGINE_API const ResourceRef<class Texture>& GetNormalMap(void) const;
+        ENGINE_API const ResourceRef<class Texture>& GetSpecularMap(void) const;
+        ENGINE_API const ResourceRef<class Texture>& GetDiffuseRoughnessMap(void) const;
+        ENGINE_API const ResourceRef<class Texture>& GetAmbientOcclusionMap(void) const;
 
         ENGINE_API void SerializeText(void) const;
         ENGINE_API void DeserializeText(std::ifstream& input);
@@ -83,7 +84,7 @@ namespace engine
         ENGINE_API void MoveFile(const std::filesystem::path& newPath);
         ENGINE_API const std::filesystem::path& GetFilePath(void) const;
 
-        ENGINE_API static MeshMaterial* CreateMaterial(const char* path);
+        ENGINE_API static EditableRef<MeshMaterial> CreateMaterial(const char* path);
 
     private:
 
@@ -92,10 +93,10 @@ namespace engine
         const char* DeserializeTextureMaps(const char* text, const char* end);
         const char* DeserializePath(const char* text, const char* end, std::string& path);
 
-        const class Texture*    m_textureMaps[5]{ nullptr };         
-        std::filesystem::path   m_filePath;
-        BufferData              m_data;
-        Buffer                  m_materialSSBO = 0;
+        ResourceRef<class Texture>    m_textureMaps[5]{};         
+        std::filesystem::path         m_filePath;
+        BufferData                    m_data;
+        Buffer                        m_materialSSBO = 0;
 
         friend class Mesh;
     };

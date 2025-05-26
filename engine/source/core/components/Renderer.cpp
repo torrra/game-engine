@@ -7,6 +7,7 @@
 #include "resource/shader/Shader.h"
 #include "resource/texture/Texture.h"
 #include "resource/ResourceManager.h"
+#include "utility/ResourceRef.h"
 
 #include "core/SceneGraph.h"
 
@@ -62,59 +63,58 @@ namespace engine
         OpenGLError();
     }
 
-    const Model* Renderer::GetModel(void) const
+    const ResourceRef<Model>& Renderer::GetModel(void) const
     {
         return m_model;
     }
 
-    const ShaderProgram* Renderer::GetShader(void) const
+    const ResourceRef<ShaderProgram>& Renderer::GetShader(void) const
     {
         return m_shader;
     }
 
-    const MeshMaterial* Renderer::GetMaterial(uint32 index) const
+    const ResourceRef<MeshMaterial>& Renderer::GetMaterial(uint32 index) const
     {
-        if (index < m_materials.size())
-            return m_materials.at(index);
-
-        else
-            return nullptr;
+        return m_materials.at(index);
     }
 
-    void Renderer::SetMaterial(uint32 index, const MeshMaterial* material)
+    void Renderer::SetMaterial(uint32 index, ResourceRef<MeshMaterial>&& material)
     {
         if (index >= m_materials.size())
             m_materials.resize(static_cast<uint64>(index + 1));
 
-        m_materials[index] = material;
+        m_materials[index] = std::forward<ResourceRef<MeshMaterial>>(material);
     }
 
     void Renderer::SetMaterial(uint32 index, const char* key)
     {
-        if (const MeshMaterial* mat = ResourceManager::GetResource<MeshMaterial>(key))
-            SetMaterial(index, mat);
+        if (ResourceRef<MeshMaterial> mat =
+            ResourceManager::GetResource<MeshMaterial>(key))
+        {
+            SetMaterial(index, std::move(mat));
+        }
     }
 
-    void Renderer::SetModel(const Model* model)
+    void Renderer::SetModel(ResourceRef<Model>&& model)
     {
-        m_model = model;
+        m_model = std::forward<ResourceRef<Model>>(model);
     }
 
     void Renderer::SetModel(const char* key)
     {
-        if (const Model* model = ResourceManager::GetResource<Model>(key))
-            SetModel(model);
+        if (ResourceRef<Model> model = ResourceManager::GetResource<Model>(key))
+            SetModel(std::move(model));
     }
 
-    void Renderer::SetShader(const ShaderProgram* shader)
+    void Renderer::SetShader(ResourceRef<ShaderProgram>&& shader)
     {
-        m_shader = shader;
+        m_shader = std::forward<ResourceRef<ShaderProgram>>(shader);
     }
 
     void Renderer::SetShader(const char* key)
     {
-        if (const ShaderProgram* shader = ResourceManager::GetResource<ShaderProgram>(key))
-            m_shader = shader;
+        if (ResourceRef<ShaderProgram> shader = ResourceManager::GetResource<ShaderProgram>(key))
+            SetShader(std::move(shader));
     }
 
     void Renderer::SerializeText(std::ostream& output, EntityHandle owner,
@@ -150,7 +150,7 @@ namespace engine
         std::vector<const std::string*> validMeshMaterials;
         validMeshMaterials.reserve(m_materials.size());
 
-        for (const MeshMaterial* mat : m_materials)
+        for (const ResourceRef<MeshMaterial>& mat : m_materials)
         {
             if (mat)
                 validMeshMaterials.push_back(ResourceManager::FindKeyByVal(mat));

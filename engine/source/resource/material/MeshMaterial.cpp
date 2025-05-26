@@ -3,6 +3,7 @@
 #include "resource/ResourceManager.h"
 #include "serialization/TextSerializer.h"
 #include "thread/ThreadManager.h"
+#include "utility/ResourceRef.h"
 
 #include <fstream>
 
@@ -90,29 +91,29 @@ void engine::MeshMaterial::SetEmissive(const math::Vector3f& value)
 }
 
 
-void engine::MeshMaterial::SetDiffuseMap(const Texture* texture)
+void engine::MeshMaterial::SetDiffuseMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[DIFFUSE] = texture;
+    m_textureMaps[DIFFUSE] = std::forward<ResourceRef<Texture>>(texture);
 }
 
-void engine::MeshMaterial::SetNormalMap(const Texture* texture)
+void engine::MeshMaterial::SetNormalMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[NORMAL] = texture;
+    m_textureMaps[NORMAL] = std::forward<ResourceRef<Texture>>(texture);
 }
 
-void engine::MeshMaterial::SetSpecularMap(const Texture* texture)
+void engine::MeshMaterial::SetSpecularMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[SPECULAR] = texture;
+    m_textureMaps[SPECULAR] = std::forward<ResourceRef<Texture>>(texture);
 }
 
-void engine::MeshMaterial::SetDiffuseRoughnessMap(const Texture* texture)
+void engine::MeshMaterial::SetDiffuseRoughnessMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[ROUGHNESS] = texture;
+    m_textureMaps[ROUGHNESS] = std::forward<ResourceRef<Texture>>(texture);
 }
 
-void engine::MeshMaterial::SetAmbientOcclusionMap(const Texture* texture)
+void engine::MeshMaterial::SetAmbientOcclusionMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[AMBIENT_OCCLUSION] = texture;
+    m_textureMaps[AMBIENT_OCCLUSION] = std::forward<ResourceRef<Texture>>(texture);
 }
 
 void engine::MeshMaterial::SetShininess(f32 value)
@@ -159,27 +160,27 @@ f32 engine::MeshMaterial::GetRefractionIndex(void) const
     return m_data.m_refractionIndex;
 }
 
-const engine::Texture* engine::MeshMaterial::GetDiffuseMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetDiffuseMap(void) const
 {
     return m_textureMaps[DIFFUSE];
 }
 
-const engine::Texture* engine::MeshMaterial::GetNormalMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetNormalMap(void) const
 {
     return m_textureMaps[DIFFUSE];
 }
 
-const engine::Texture* engine::MeshMaterial::GetSpecularMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetSpecularMap(void) const
 {
     return m_textureMaps[SPECULAR];
 }
 
-const engine::Texture* engine::MeshMaterial::GetDiffuseRoughnessMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetDiffuseRoughnessMap(void) const
 {
     return m_textureMaps[ROUGHNESS];
 }
 
-const engine::Texture* engine::MeshMaterial::GetAmbientOcclusionMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetAmbientOcclusionMap(void) const
 {
     return m_textureMaps[AMBIENT_OCCLUSION];
 }
@@ -248,7 +249,7 @@ const std::filesystem::path& engine::MeshMaterial::GetFilePath(void) const
     return m_filePath;
 }
 
-engine::MeshMaterial* engine::MeshMaterial::CreateMaterial(const char* path)
+engine::EditableRef<engine::MeshMaterial> engine::MeshMaterial::CreateMaterial(const char* path)
 {
     std::string pathStr = path;
 

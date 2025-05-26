@@ -4,6 +4,7 @@
 #include "engine/core/Component.h"
 #include "engine/core/ComponentArray.hpp"
 #include "engine/core/components/Transform.h"
+#include "engine/utility/ResourceRefDecl.h"
 #include <math/Matrix4.hpp>
 #include <fstream>
 
@@ -13,7 +14,7 @@ namespace engine
     {
     private:
 
-        using MaterialArray = std::vector<const class MeshMaterial*>;
+        using MaterialArray = std::vector<ResourceRef<class MeshMaterial>>;
 
     public:
 
@@ -36,28 +37,28 @@ namespace engine
                     ComponentArray<Transform>& transforms);
 
         ENGINE_API
-        const class Model* GetModel(void) const;
+        const ResourceRef<class Model>& GetModel(void) const;
 
         ENGINE_API
-        const class ShaderProgram* GetShader(void) const;
+        const ResourceRef<class ShaderProgram>& GetShader(void) const;
 
         ENGINE_API
-        const class MeshMaterial* GetMaterial(uint32 index) const;
+        const ResourceRef<class MeshMaterial>& GetMaterial(uint32 index) const;
 
         ENGINE_API
-        void SetMaterial(uint32 index, const class MeshMaterial* material);
+        void SetMaterial(uint32 index, ResourceRef<class MeshMaterial>&& material);
 
         ENGINE_API
         void SetMaterial(uint32 index, const char* key);
         
         ENGINE_API
-        void SetModel(const class Model* model);
+        void SetModel(ResourceRef<class Model>&& model);
 
         ENGINE_API
         void SetModel(const char* key);
 
         ENGINE_API
-        void SetShader(const class ShaderProgram* shader);
+        void SetShader(ResourceRef<class ShaderProgram>&& shader);
 
         ENGINE_API
         void SetShader(const char* key);
@@ -77,9 +78,9 @@ namespace engine
         Renderer& operator=(Renderer&&) noexcept = default;
 
     private:
-        MaterialArray                m_materials;
-        const class Model*           m_model = nullptr;
-        const class ShaderProgram*   m_shader = nullptr;
+        MaterialArray                       m_materials;
+        ResourceRef<class Model>            m_model;
+        ResourceRef<class ShaderProgram>    m_shader;
     };
 
 
