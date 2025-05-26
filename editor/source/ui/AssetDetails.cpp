@@ -7,7 +7,7 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
 
-// leava data union uninitialized as it will be initialized and
+// leave data union uninitialized as it will be initialized and
 // destroyed in SelectAsset depending on asset type
 // Initializing it from the start could
 // cause STL container proxies to never be deallocated until after
