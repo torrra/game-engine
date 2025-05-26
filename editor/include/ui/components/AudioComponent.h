@@ -39,7 +39,6 @@ namespace editor
         /// Function
         void            DragAndDrop(engine::AudioPlayer* inAudioPlayer);
         void            Sound3DUI(engine::AudioPlayer* inAudioPlayer);
-        void            ListenerUI(engine::AudioPlayer* inAudioPlayer);
 
         /// Private members
         std::string m_soundName = "";

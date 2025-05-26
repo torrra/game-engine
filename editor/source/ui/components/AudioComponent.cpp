@@ -69,7 +69,6 @@ void editor::AudioComponent::SectionContent(void)
             if (is3DSound)
             {
                 Sound3DUI(audioPlayer);
-                ListenerUI(audioPlayer);
             }            
 
             bool isPlayed = audioPlayer->GetIsPlayed();
@@ -130,40 +129,5 @@ void editor::AudioComponent::Sound3DUI(engine::AudioPlayer* inAudioPlayer)
     InputField("##YVel", &velocity[1], 0.05f);
     InputField("##ZVel", &velocity[2], 0.05f);
     inAudioPlayer->SetSoundVelocity(velocity);
-    ui::VerticalSpacing();
-}
-
-void editor::AudioComponent::ListenerUI(engine::AudioPlayer* inAudioPlayer)
-{   
-    math::Vector3f position = inAudioPlayer->GetListenerPosition();
-    ui::Text("ListenerPosition: ");
-    InputField("##XListenerPos", &position[0], 0.05f);
-    InputField("##YListenerPos", &position[1], 0.05f);
-    InputField("##ZListenerPos", &position[2], 0.05f);
-    inAudioPlayer->SetListenerPosition(position);
-    ui::VerticalSpacing();
-    
-    math::Vector3f forward = inAudioPlayer->GetListenerForward();
-    ui::Text("ListenerForward: ");
-    InputField("##XListenerForward", &forward[0], 0.05f);
-    InputField("##YListenerForward", &forward[1], 0.05f);
-    InputField("##ZListenerForward", &forward[2], 0.05f);
-    inAudioPlayer->SetListenerForward(forward);
-    ui::VerticalSpacing();
-    
-    math::Vector3f up = inAudioPlayer->GetListenerUp();
-    ui::Text("ListenerUp: ");
-    InputField("##XListenerUp", &up[0], 0.05f);
-    InputField("##YListenerUp", &up[1], 0.05f);
-    InputField("##ZListenerUp", &up[2], 0.05f);
-    inAudioPlayer->SetListenerUp(up);
-    ui::VerticalSpacing();
-
-    math::Vector3f velocity = inAudioPlayer->GetListenerVelocity();
-    ui::Text("ListenerVelocity: ");
-    InputField("##XListenerVel", &velocity[0], 0.05f);
-    InputField("##YListenerVel", &velocity[1], 0.05f);
-    InputField("##ZListenerVel", &velocity[2], 0.05f);
-    inAudioPlayer->SetListenerVelocity(velocity);
     ui::VerticalSpacing();
 }

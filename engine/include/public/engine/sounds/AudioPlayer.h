@@ -186,9 +186,6 @@ namespace engine
         // Play a sound with 3D parameters
             void            PlaySound3D(void);
 
-            void            Serialize3DSound(std::ostream& output) const;
-            const char*     Deserialize3DSound(const char* text, const char* end);
-
         const Sound*    m_sound     = nullptr;
         Listener*       m_listener  = nullptr;
         math::Vector3f  m_position  = math::Vector3f::Zero();
