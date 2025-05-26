@@ -26,7 +26,8 @@ namespace editor
         RIGIDBODY_STATIC,
         RIGIDBODY_DYNAMIC,
         SCRIPT,
-        TRANSFORM
+        TRANSFORM,
+        NAVIGATION_POINT
     };
 
     class BaseComponent

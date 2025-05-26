@@ -6,6 +6,7 @@
 #include "ui/components/TransformComponent.h"
 #include "ui/components/RigidBodyStaticComponent.h"
 #include "ui/components/RigidBodyDynamicComponent.h"
+#include "ui/components/NavigationPointComponent.h"
 #include "ui/components/AudioComponent.h"
 
 #include <engine/ui/UIComponent.h>
@@ -122,6 +123,10 @@ void editor::PropertyWnd::InitComponents(void)
             m_components.emplace_back(newScript);
         }
     }
+
+    // Navigation point
+    if (entity->HasComponent<engine::NavigationPoint>())
+        InitComponent<NavigationPointComponent, engine::NavigationPoint>();
 }
 
 void editor::PropertyWnd::RenderMenuBar(void)
@@ -148,6 +153,9 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("Transform"))
                 AddComponent<TransformComponent, engine::Transform>();
+
+            else if (ui::MenuItem("NavigationPoint"))
+                AddComponent<NavigationPointComponent, engine::NavigationPoint>();
 
             else if (ui::MenuItem("AudioPlayer"))
                 AddComponent<AudioComponent, engine::AudioPlayer>();
@@ -234,6 +242,9 @@ void editor::PropertyWnd::ClearComponentArray(void)
             break;
         case editor::TRANSFORM:
             delete dynamic_cast<TransformComponent*>(component);
+            break;
+        case editor::NAVIGATION_POINT:
+            delete dynamic_cast<NavigationPointComponent*>(component);
             break;
         case editor::AUDIO:
             delete dynamic_cast<AudioComponent*>(component);
