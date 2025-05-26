@@ -61,22 +61,30 @@ void engine::SoundEngine::UpdateSoundEngine(void)
 
     m_soundImpl->m_system->update();
 
-    for (auto& it : Engine::GetEngine()->GetCurrentScene().GetGraph()->GetComponentArray<AudioPlayer>())
+    // We can store the graph in a local variable for
+    // readability
+    SceneGraph* graph = Engine::GetEngine()->GetGraph();
+
+    // The type used in a ranged for-loop is actually AudioPlayer,
+    // not an iterator
+    for (AudioPlayer& it : graph->GetComponentArray<AudioPlayer>())
     {
-        if (Engine::GetEngine()->GetCurrentScene().GetGraph() != nullptr)
-        {
-            if (Engine::GetEngine()->GetCurrentScene().GetGraph()->GetEntity(it.GetOwner()) != nullptr)
-            {
-                if (Engine::GetEngine()->GetCurrentScene().GetGraph()->GetEntity(it.GetOwner())->HasComponent<Transform>())
-                {
-                    if (it.GetSound() != nullptr)
-                    {
-                        it.SetSoundPosition(Engine::GetEngine()->GetCurrentScene().GetGraph()->GetComponent<Transform>(
-                            it.GetOwner())->GetPosition());
-                    }
-                }
-            }
-        }
+        // This check removes the need to check if the entity
+        // pointer is valid, and makes sure a deactivated
+        // component is not updated
+        if (!it.IsValid() || !it.IsActive())
+            continue;
+
+        // We can move on to the next component
+        // if this one doesn't have a sound
+        if (it.GetSound() == nullptr)
+            continue;
+
+        // Instead of checking if the entity has a transform, and then get the
+        // transform, we can check if the transform is non-null to achieve
+        // the same result
+        if (Transform* transform = graph->GetComponent<Transform>(it.GetOwner()))
+            it.SetSoundPosition(transform->GetPosition());
     }
 }
 
