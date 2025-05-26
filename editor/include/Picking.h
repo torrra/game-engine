@@ -34,7 +34,7 @@ namespace editor
     {
     public:
         Picking(engine::SceneGraph* graph);
-        ~Picking(void);
+        ~Picking(void) = default;
 
         engine::EntityHandle FindSelectedEntity(std::string const& wndName) const;
         void InitEntities(engine::SceneGraph* graph);

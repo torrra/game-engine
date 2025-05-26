@@ -61,13 +61,9 @@ editor::Picking::Picking(engine::SceneGraph* graph)
     InitEntities(graph);
 }
 
-editor::Picking::~Picking(void)
-{
-}
-
 void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection)
 {
-    for (auto pickableEntity : m_pickableEntity)
+    for (const auto& pickableEntity : m_pickableEntity)
     {
         engine::EntityHandle handle = pickableEntity.second.GetEntityHandle();
         engine::Renderer* renderer = graph->GetComponent<engine::Renderer>(handle);
