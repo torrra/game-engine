@@ -1,3 +1,4 @@
+#include "ui/gizmos/Gizmos.h"
 #include "ui/gizmos/RotationGizmos.h"
 #include <engine/resource/ResourceManager.h>
 #include <engine/resource/model/Model.h>

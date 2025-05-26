@@ -24,6 +24,8 @@ namespace editor
     {
     public:
         GizmosAxis(void);
+        GizmosAxis(GizmosAxis const&) = delete;
+        GizmosAxis(GizmosAxis&&) noexcept = default;
         GizmosAxis(math::Quatf const& direction, std::string const& modelPath, math::Vector3f const& color, uint32 pickingID);
         ~GizmosAxis(void) = default;
 
@@ -37,6 +39,8 @@ namespace editor
         void SetPosition(math::Vector3f const& position);
         void SetScale(math::Vector3f const& size);
         void SetColor(math::Vector3f const& color);
+
+        GizmosAxis& operator=(GizmosAxis&&) noexcept = default;
         
     private:
         math::Matrix4f m_modelMatrix;
@@ -50,6 +54,8 @@ namespace editor
     {
     public:
         Gizmos(void);
+        Gizmos(Gizmos const&) = default;
+        Gizmos(Gizmos&&) = default;
         ~Gizmos(void) = default;
 
         void RenderPass(const math::Matrix4f& projViewMatrix, math::Vector3f const& cameraPos);
