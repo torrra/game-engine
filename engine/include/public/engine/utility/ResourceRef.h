@@ -1,5 +1,6 @@
+#pragma once
 #include "ResourceRefDecl.h"
-#include "resource/ResourceManager.h"
+#include "engine/resource/ResourceManager.h"
 
 namespace engine
 {
