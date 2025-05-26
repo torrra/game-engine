@@ -43,12 +43,13 @@ namespace engine
         template<typename TResourceType>
         static EditableRef<TResourceType> GetEditableResource(std::string const& fileName);
 
+        template <typename TResourceType>
+		static const std::string* FindKeyByVal(const ResourceRef<TResourceType>& resource);
+
 		ENGINE_API static void		Unload(std::string const& fileName);
 		ENGINE_API static void		UnloadAll(void);
 		ENGINE_API static void		ShutDown(void);
 
-        template <typename TResourceType>
-		static const std::string* FindKeyByVal(const ResourceRef<TResourceType>& resource);
 
 	private:
 									ResourceManager(void) = default;
