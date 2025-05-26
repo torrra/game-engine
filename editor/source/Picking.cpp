@@ -68,7 +68,7 @@ editor::Picking::~Picking(void)
 
 void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection)
 {
-    for (auto pickableEntity : m_pickableEntity)
+    for (auto const& pickableEntity : m_pickableEntity)
     {
         engine::EntityHandle handle = pickableEntity.second.GetEntityHandle();
         engine::Renderer* renderer = graph->GetComponent<engine::Renderer>(handle);
@@ -132,5 +132,5 @@ void editor::Picking::InitEntities(engine::SceneGraph* graph)
 void editor::Picking::AddEntity(engine::EntityHandle const& handle)
 {
     PickableEntity entity(handle);
-    m_pickableEntity[entity.GetPickingID()] = entity;
+    m_pickableEntity[entity.GetPickingID()] = std::move(entity);
 }
