@@ -80,13 +80,15 @@ namespace engine
             bool            GetIsPlayed(void) const;
 
         ENGINE_API [[nodiscard]]
-            math::Vector3f GetListenerPosition(void) const;
+            Listener*       GetListener(void) const;
         ENGINE_API [[nodiscard]]
-            math::Vector3f GetListenerForward(void) const;
+            math::Vector3f  GetListenerPosition(void) const;
         ENGINE_API [[nodiscard]]
-            math::Vector3f GetListenerUp(void) const;
+            math::Vector3f  GetListenerForward(void) const;
         ENGINE_API [[nodiscard]]
-            math::Vector3f GetListenerVelocity(void) const;
+            math::Vector3f  GetListenerUp(void) const;
+        ENGINE_API [[nodiscard]]
+            math::Vector3f  GetListenerVelocity(void) const;
 
         /// Setters
         /*

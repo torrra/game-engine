@@ -117,6 +117,14 @@ bool engine::AudioPlayer::GetIsPlayed(void) const
     return m_isPlayed;
 }
 
+engine::Listener* engine::AudioPlayer::GetListener(void) const
+{
+    if (m_listener == nullptr)
+        return nullptr;
+
+    return m_listener;
+}
+
 math::Vector3f engine::AudioPlayer::GetListenerPosition(void) const
 {
     if (m_listener != nullptr)
