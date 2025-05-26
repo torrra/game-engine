@@ -25,10 +25,10 @@ engine::NavigationPoint::NavigationPoint(EntityHandle inOwner, SceneGraph* inSce
     inOwner = m_owner;
     inScene = m_currentScene;
 
-    ResourceManager::Load<Model>("..\\workspace\\assets\\sphereLP.obj", true);
+    ResourceManager::Load<Model>(".\\assets\\sphereLP.obj", true);
 
-    ResourceManager::LoadShader("NavPointProgram", "..\\workspace\\shaders\\NavPointShader.vert",
-                                "..\\workspace\\shaders\\NavPointShader.frag", true, true);
+    ResourceManager::LoadShader("NavPointProgram", ".\\shaders\\NavPointShader.vert",
+                                ".\\shaders\\NavPointShader.frag", true, true);
 }
 
 math::Vector3f engine::NavigationPoint::GetPosition(void) const
@@ -95,5 +95,5 @@ void engine::NavigationPoint::RenderNavPoint(const math::Matrix4f& inProjView)
     ResourceManager::GetResource<ShaderProgram>("NavPointProgram")->Set("mvp", &mvp);
     ResourceManager::GetResource<ShaderProgram>("NavPointProgram")->Set("aColor", math::Vector4f(1.f, 0.f, 0.f, 1.f));
 
-    ResourceManager::GetResource<Model>("..\\workspace\\assets\\sphereLP.obj")->Draw();
+    ResourceManager::GetResource<Model>(".\\assets\\sphereLP.obj")->Draw();
 }
