@@ -500,10 +500,17 @@ void engine::AudioPlayer::SerializeText(std::ostream& output, EntityHandle owner
     text::Serialize(output, "3D sound", static_cast<uint32>(m_is3DSound));
     output << "\n     ";
     
-    //text::Serialize(output, "play", static_cast<uint32>(m_isPlayed));
-    //output << "\n     ";
-
     if (m_is3DSound)
+    {
+        Serialize3DSound(output);
+    }    
+
+    text::Serialize(output, "flags", m_flags);
+    output << '\n';
+}
+
+void engine::AudioPlayer::Serialize3DSound([[maybe_unused]]std::ostream& output) 
+const
     {
         text::Serialize(output, "position", m_position);
         output << "\n     ";
@@ -548,12 +555,16 @@ const char* engine::AudioPlayer::DeserializeText(const char* text, const char* e
     text = text::DeserializeInteger(text, is3DSound);
     m_is3DSound = is3DSound;
     
-    //MOVE_TEXT_CURSOR(text, end);
-    //uint32 isPlayed = 0;
-    //text = text::DeserializeInteger(text, isPlayed);
-    //m_isPlayed = isPlayed;
-
     if (m_is3DSound)
+    {
+        text = Deserialize3DSound(text, end);
+    }
+
+    MOVE_TEXT_CURSOR(text, end);
+    return text::DeserializeInteger(text, m_flags);
+}
+
+const char* engine::AudioPlayer::Deserialize3DSound([[maybe_unused]] const char* text, [[maybe_unused]] const char* end)
     {
         MOVE_TEXT_CURSOR(text, end);
         text = text::DeserializeVector(text, m_position);
