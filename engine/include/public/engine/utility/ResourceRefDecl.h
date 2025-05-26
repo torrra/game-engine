@@ -1,3 +1,4 @@
+#pragma once
 #include "ResourceContainer.h"
 
 namespace engine
@@ -7,17 +8,17 @@ namespace engine
     {
     public:
 
-        ResourceRef(void) = delete;
-        ResourceRef(ResourceContainer* controlBlock, const TResourceType* rawVal);
+        ResourceRef(void) = default;
+        ResourceRef(ResourceContainer* controlBlock, TResourceType* rawVal);
         ResourceRef(const ResourceRef& other);
-        ResourceRef(ResourceRef&&) = default;
+        ResourceRef(ResourceRef&&) noexcept = default;
         ~ResourceRef(void);
 
-        ResourceRef& operator=(const ResourceRef&) = delete;
-        ResourceRef& operator==(const ResourceRef&&) = delete;
+        ResourceRef& operator=(const ResourceRef& rhs);
+        ResourceRef& operator=(ResourceRef&& rhs) noexcept;
 
-        const TResourceType& operator*(void);
-        const TResourceType* operator->(void);
+        const TResourceType& operator*(void) const;
+        const TResourceType* operator->(void) const;
 
         bool operator==(const ResourceRef& rhs) const;
         bool operator!=(const ResourceRef& rhs) const;
@@ -27,17 +28,43 @@ namespace engine
 
         operator bool(void) const;
 
-    private:
+    protected:
 
         void DecrementRefCount(void);
 
-        const TResourceType* m_raw;
-        ResourceContainer* m_controlBlock;
+        TResourceType* m_raw = nullptr;
+        ResourceContainer* m_controlBlock = nullptr;
+       
     }; 
+
+    template <typename TResourceType>
+    class EditableRef : public ResourceRef<TResourceType>
+    {
+    public:
+
+        using ResourceRef<TResourceType>::ResourceRef;
+
+        TResourceType& operator*(void);
+        TResourceType* operator->(void);
+
+    };
+
+    template<typename TResourceType>
+    inline TResourceType& EditableRef<TResourceType>::operator*(void)
+    {
+        return *ResourceRef<TResourceType>::m_raw;
+    }
+
+    template<typename TResourceType>
+    inline TResourceType* EditableRef<TResourceType>::operator->(void)
+    {
+        return ResourceRef<TResourceType>::m_raw;
+    }
+
 
     template<typename TResourceType> inline
     ResourceRef<TResourceType>::ResourceRef(ResourceContainer* controlBlock,
-                                            const TResourceType* rawVal)
+                                            TResourceType* rawVal)
         : m_controlBlock(controlBlock), m_raw(rawVal)
     {
         if (m_controlBlock)
@@ -59,14 +86,42 @@ namespace engine
             m_controlBlock->RemoveRef();
     }
 
+    template<typename TResourceType> inline
+    ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
+                                                    const ResourceRef<TResourceType>& rhs)
+    {
+        m_controlBlock = rhs.m_controlBlock;
+        m_raw = rhs.m_raw;
+
+        if (rhs.m_controlBlock)
+            rhs.m_controlBlock->AddRef();
+
+        return *this;
+    }
+
+
+    template<typename TResourceType> inline
+    ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
+                                                     ResourceRef<TResourceType>&& rhs) noexcept
+    {
+        m_controlBlock = rhs.m_controlBlock;
+        m_raw = rhs.m_raw;
+
+        rhs.m_controlBlock = nullptr;
+        rhs.m_raw = nullptr;
+
+        return *this;
+    }
+
+
     template<typename TResourceType>
-    inline const TResourceType& ResourceRef<TResourceType>::operator*(void)
+    inline const TResourceType& ResourceRef<TResourceType>::operator*(void) const
     {
         return *m_raw;
     }
 
     template<typename TResourceType>
-    inline const TResourceType* ResourceRef<TResourceType>::operator->(void)
+    inline const TResourceType* ResourceRef<TResourceType>::operator->(void) const
     {
         return m_raw;
     }
