@@ -46,7 +46,8 @@ void editor::AudioComponent::SectionContent(void)
 {
     if (engine::AudioPlayer* audioPlayer = GetData<engine::AudioPlayer>())
     {
-        m_soundName = (audioPlayer->GetSound()) ? audioPlayer->GetSound()->GetID() : NO_SOUND_NAME;
+        m_soundName = (audioPlayer->GetSound()) ? audioPlayer->GetSound()->GetID().c_str() : 
+                                                  NO_SOUND_NAME;
 
         ui::Text("Sound: ");
         ui::SameLine(150.f);

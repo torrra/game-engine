@@ -12,6 +12,11 @@
 
 #pragma endregion
 
+namespace engine
+{
+    class AudioPlayer;
+}
+
 namespace editor
 {
     class AudioComponent : public BaseComponent
