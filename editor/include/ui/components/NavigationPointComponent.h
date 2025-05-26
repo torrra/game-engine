@@ -22,7 +22,7 @@ namespace editor
                         NavigationPointComponent(void);
 
         /// Destructor
-                        ~NavigationPointComponent(void);
+                        ~NavigationPointComponent(void) = default;
 
     protected:
 

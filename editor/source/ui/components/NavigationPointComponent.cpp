@@ -14,11 +14,6 @@ editor::NavigationPointComponent::NavigationPointComponent(void)
     SetType(NAVIGATION_POINT);
 }
 
-editor::NavigationPointComponent::~NavigationPointComponent(void)
-{
-    //SetData<engine::NavigationPoint>(nullptr);
-}
-
 void editor::NavigationPointComponent::SectionContent(void)
 {
     if (engine::NavigationPoint* navPoint = GetData<engine::NavigationPoint>())
