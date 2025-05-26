@@ -31,7 +31,7 @@ engine::NavigationPoint::NavigationPoint(EntityHandle inOwner, SceneGraph* inSce
                                 ".\\shaders\\NavPointShader.frag", true, true);
 }
 
-math::Vector3f engine::NavigationPoint::GetPosition(void) const
+const math::Vector3f& engine::NavigationPoint::GetPosition(void) const
 {
     return m_position;
 }

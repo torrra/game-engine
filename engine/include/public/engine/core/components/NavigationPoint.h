@@ -50,7 +50,7 @@ namespace engine
         /// Getter
         // Get the navigation point position
         ENGINE_API [[nodiscard]]
-            math::Vector3f      GetPosition(void) const;
+            const math::Vector3f&     GetPosition(void) const;
 
         /// Setter
         /*
