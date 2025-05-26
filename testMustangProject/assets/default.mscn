@@ -148,17 +148,17 @@
      uint64 | flags=0
 [Entity]
    string | name="NavPoint"
-   int64 | handle=4
+   int64 | handle=8
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=258
 [Script]
    uint64 | index=2
-   int64 | owner=4
+   int64 | owner=8
    uint64 | count=1
    string | scriptObject="NavigationPointScript"
    uint64 | flags=0
 [NavigationPoint]
-     int64 | owner=4
-     vec3f32 | position={1.2,4.4,4.65}
+     int64 | owner=8
+     vec3f32 | position={0,0,0}
      uint64 | flags=0
