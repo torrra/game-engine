@@ -7,8 +7,8 @@
 [Transform]
     uint64 | index=0
     int64 | owner=0
-    quat32 | rotation={1,0,0,1.49012e-08}
-    vec3f32 | position={0,4,-5}
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={0,5,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Renderer]
@@ -32,41 +32,20 @@
      uint32 | lock Z axis=0
      uint64 | flags=0
 [Entity]
-   string | name="Camera"
-   int64 | handle=1
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=33
-[Transform]
-    uint64 | index=1
-    int64 | owner=1
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,2.5,5}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[Camera]
-    int64 | owner=1
-    f32 | near=0.005
-    f32 | far=250
-    f32 | fov=1.0472
-    f32 | aspectRatio=1.77778
-    vec3f32 | rotationEuler={0,0,0}
-    uint64 | flags=0
-[Entity]
    string | name="Floor"
-   int64 | handle=2
+   int64 | handle=1
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=17
 [Transform]
-    uint64 | index=2
-    int64 | owner=2
+    uint64 | index=1
+    int64 | owner=1
     quat32 | rotation={1,0,0,0}
     vec3f32 | position={0,0,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [RigidBodyStatic]
-     int64 | owner=2
+     int64 | owner=1
      uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=3
@@ -75,19 +54,19 @@
      uint64 | flags=0
 [Entity]
    string | name="Trigger"
-   int64 | handle=3
+   int64 | handle=2
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=17
 [Transform]
-    uint64 | index=3
-    int64 | owner=3
+    uint64 | index=2
+    int64 | owner=2
     quat32 | rotation={1,0,0,0}
     vec3f32 | position={0,2,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [RigidBodyStatic]
-     int64 | owner=3
+     int64 | owner=2
      uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=4
@@ -96,31 +75,31 @@
      uint64 | flags=0
 [Entity]
    string | name="SoundStatic"
-   int64 | handle=4
+   int64 | handle=3
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=128
+   uint64 | components=64
 [AudioPlayer]
-     int64 | owner=4
-     string | sound="\CrazyFrogAxelF.mp3"
+     int64 | owner=3
+     string | sound="\Falling_In_Reverse-Im_Not_A_Vampire.mp3"
     f32 | volume=1
      uint32 | 3D sound=0
      uint64 | flags=0
 [Entity]
    string | name="SoundDynamic"
-   int64 | handle=5
+   int64 | handle=4
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=135
+   uint64 | components=71
 [Transform]
-    uint64 | index=4
-    int64 | owner=5
+    uint64 | index=3
+    int64 | owner=4
     quat32 | rotation={1,0,0,0}
     vec3f32 | position={-4.8,0.5,-0.3}
     vec3f32 | scale={0.1,0.1,0.1}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=5
+    int64 | owner=4
     string | model="\bunny.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
@@ -129,29 +108,45 @@
     uint64 | flags=0
 [Script]
    uint64 | index=0
-   int64 | owner=5
+   int64 | owner=4
    uint64 | count=1
    string | scriptObject="SoundController"
    uint64 | flags=0
 [AudioPlayer]
-     int64 | owner=5
-     string | sound="\CrazyFrogAxelF.mp3"
-    f32 | volume=1
-     uint32 | 3D sound=1
-     vec3f32 | position={-4.8,0.5,-0.3}
-     vec3f32 | velocity={0,0,0}
-     uint64 | flags=0
-[Entity]
-   string | name="SoundDynamicWithoutBody"
-   int64 | handle=6
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=128
-[AudioPlayer]
-     int64 | owner=6
-     string | sound="\CrazyFrogAxelF.mp3"
+     int64 | owner=4
+     string | sound="\Crazy Frog - Axel F (Official Video).mp3"
     f32 | volume=1
      uint32 | 3D sound=1
      vec3f32 | position={0,0,0}
      vec3f32 | velocity={0,0,0}
+     uint64 | flags=0
+[Entity]
+   string | name="SoundDynamicWithoutBody"
+   int64 | handle=5
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=64
+[AudioPlayer]
+     int64 | owner=5
+     string | sound="\Crazy Frog - Axel F (Official Video).mp3"
+    f32 | volume=1
+     uint32 | 3D sound=1
+     vec3f32 | position={0,0,0}
+     vec3f32 | velocity={0,0,0}
+     uint64 | flags=0
+[Entity]
+   string | name="NavPoint"
+   int64 | handle=6
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=258
+[Script]
+   uint64 | index=1
+   int64 | owner=6
+   uint64 | count=1
+   string | scriptObject="NavigationPointScript"
+   uint64 | flags=0
+[NavigationPoint]
+     int64 | owner=6
+     vec3f32 | position={0,0,0}
      uint64 | flags=0
