@@ -26,9 +26,6 @@ function NavigationPointScript:Update(deltaTime)
     if IsInputDown(InputCode.KEY_RIGHT) then
         x = x + moveSpeed
     end
-
-    self.nav:SetPosition(x, y, z)
-    print("New navigation point position:", self.nav:GetPosition())
 end
 
 -- Engine definitions

@@ -89,7 +89,17 @@ void engine::NavigationPoint::RenderNavPoint(const math::Matrix4f& inProjView)
 
     math::Matrix4f scale = math::Matrix4f::ScaleMatrix(math::Vector3f(0.2f));
     math::Matrix4f translate = math::Matrix4f::PositionMatrix(GetPosition());
-    math::Matrix4f model = translate * scale;
+
+    math::Matrix4f model(1.f);
+
+    model[0][0] = scale[0][0];
+    model[1][1] = scale[1][1];
+    model[2][2] = scale[2][2];
+
+    model[3][0] = translate[3][0];
+    model[3][1] = translate[3][1];
+    model[3][2] = translate[3][2];
+
     math::Matrix4f mvp = inProjView * model;
 
     ResourceManager::GetResource<ShaderProgram>("NavPointProgram")->Set("mvp", &mvp);
