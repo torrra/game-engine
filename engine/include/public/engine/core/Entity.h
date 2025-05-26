@@ -36,8 +36,6 @@ namespace engine
             AUDIO_PLAYER = (uint64) (1 << 6),
             TRIANGLE_MESH = (uint64) (1 << 7),
             NAVIGATION_POINT = (uint64) (1 << 8)
-            TRIANGLE_MESH = (uint64) (1 << 6),
-            AUDIO_PLAYER = (uint64) (1 << 7)
         };
 
         friend class SceneGraph;
