@@ -3,6 +3,7 @@
 #include "scripting/ecs/ScriptFunctions.h"
 #include "scripting/ecs/CameraFunctions.h"
 #include "scripting/ecs/TransformFunctions.h"
+#include "scripting/ecs/NavPointFunctions.h"
 #include "scripting/InputFunctions.h"
 #include "scripting/vector/Vector2Functions.h"
 #include "scripting/vector/Vector3Functions.h"

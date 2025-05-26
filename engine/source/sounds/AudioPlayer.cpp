@@ -131,7 +131,7 @@ math::Vector3f engine::AudioPlayer::GetListenerPosition(void) const
     {
         return m_listener->m_position;
     }
-    return {};
+    return math::Vector3f::Zero();
 }
 
 math::Vector3f engine::AudioPlayer::GetListenerForward(void) const
@@ -140,7 +140,7 @@ math::Vector3f engine::AudioPlayer::GetListenerForward(void) const
     {
         return m_listener->m_forward;
     }
-    return {};
+    return math::Vector3f::Zero();
 }
 
 math::Vector3f engine::AudioPlayer::GetListenerUp(void) const
@@ -149,7 +149,7 @@ math::Vector3f engine::AudioPlayer::GetListenerUp(void) const
     {
         return m_listener->m_up;
     }
-    return {};
+    return math::Vector3f::Zero();
 }
 
 math::Vector3f engine::AudioPlayer::GetListenerVelocity(void) const
@@ -158,7 +158,7 @@ math::Vector3f engine::AudioPlayer::GetListenerVelocity(void) const
     {
         return m_listener->m_velocity;
     }
-    return {};
+    return math::Vector3f::Zero();
 }
 
 void engine::AudioPlayer::SetVolumeSound(f32 inVolume)

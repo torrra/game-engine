@@ -14,10 +14,10 @@ engine::FrameBuffer::~FrameBuffer(void)
 void engine::FrameBuffer::Init(int32 width, int32 height)
 {
     m_size = {width, height};
-
+    
     // Init FBO
     glCreateFramebuffers(1, &m_fbo);
-
+    
     // Init RBO 
     glCreateRenderbuffers(1, &m_rbo);
     glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, width, height);
@@ -47,7 +47,6 @@ void engine::FrameBuffer::RescaleFBO(int32 width, int32 height)
         return;
 
     m_size = {width, height};
-
     /*
         Rescaling Framebuffer via DSA
         As the engine uses OpenGL 4.5 and hence DSA we have to use the function
@@ -83,9 +82,9 @@ uint64 engine::FrameBuffer::GetFrameTexture(void) const noexcept
 
 void engine::FrameBuffer::DeleteFrameBuffer(void)
 {
-    glDeleteFramebuffers(1, &m_fbo);
     glDeleteTextures(1, &m_colorTex);
     glDeleteRenderbuffers(1, &m_rbo);
+    glDeleteFramebuffers(1, &m_fbo);
 
     m_fbo, m_rbo, m_colorTex = 0;
 }
