@@ -60,5 +60,6 @@ namespace engine
         math::Vector2f			m_prevSize;
         uint32					m_bgColor;
         int32					m_uidCounter;
+        bool                    m_isFirstUpdate;
     };
 }

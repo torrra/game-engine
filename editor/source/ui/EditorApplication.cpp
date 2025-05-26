@@ -39,7 +39,7 @@ namespace editor
         m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
 
-        // Get selected entity to dislay its components
+        // Get selected entity to display its components
         if (m_graphView.IsNewEntitySelected())
             m_properties.SetHandle(m_graphView.GetSelectedEntity());
 
@@ -47,20 +47,9 @@ namespace editor
 
         m_gameSimulationView->RenderToViewport();
         m_gameSimulationView->Render();
-        //===========================
-        if (engine::Engine::GetEngine()->GetCurrentScene().IsRunning())
-        {
-            math::Vector2i wndPositionInt = ui::GetInnerRectMinPos(SIMULATION_VIEW_WINDOW);
-            math::Vector2f wndPosition(
-                static_cast<f32>(wndPositionInt.GetX()),
-                static_cast<f32>(wndPositionInt.GetY())
-            );
+        m_gameSimulationView->RenderInGameUI();
 
-            engine::Engine::GetEngine()->GetUIManager().RenderCanvases(wndPosition, m_gameSimulationView->GetViewportSize());
-
-        }
-        //===============================
-
+        
         // Editor camera
         if (m_sceneEditorView->HasWindowResized())
             m_editorViewCamera.UpdateAspectRatio(m_sceneEditorView->GetViewportSize());
@@ -81,12 +70,12 @@ namespace editor
 
     void EditorApplication::ResetScene(::engine::GameScene& activeScene)
     {
-        engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         engine::ThreadManager::SynchronizeGameThread(nullptr);
         activeScene.Stop();
 
         m_graphView.ClearGraph();
         activeScene.Reset();
+        engine::Engine::GetEngine()->GetUIManager().DeleteAllCanvases();
         engine::ThreadManager::SynchronizeGameThread(activeScene.GetGraph());
         m_graphView.SetGraph(activeScene.GetGraph());
     }
@@ -108,7 +97,7 @@ namespace editor
 
     void EditorApplication::Shutdown(void)
     {
-        //RigidBodyDynamicComponent::ReleaseStaticData();
+        engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         Application::Shutdown();

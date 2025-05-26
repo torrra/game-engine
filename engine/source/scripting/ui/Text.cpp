@@ -17,7 +17,6 @@ int script_SetTextColor(lua_State* luaState)
         luaL_error(luaState, "Expected 5 argument (element, red, green, blue, alpha)");
     else if (engine::Label* label = (engine::Label*)lua_touserdata(luaState, 1))
     {
-        printf("Call success\n");
         f32 red = static_cast<f32>(lua_tonumber(luaState, 2));
         f32 green = static_cast<f32>(lua_tonumber(luaState, 3));
         f32 blue = static_cast<f32>(lua_tonumber(luaState, 4));

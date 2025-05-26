@@ -49,6 +49,11 @@ void editor::Viewport::RenderToViewport(void)
     m_fbo.Unbind();
 }
 
+void editor::Viewport::RenderInGameUI(void)
+{
+    engine::Engine::GetEngine()->GetUIManager().RenderCanvases({0.0f, 0.0f}, m_size);
+}
+
 void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)
 {
     m_fbo.Bind();
@@ -120,7 +125,6 @@ void editor::Viewport::RenderContents(void)
     SetViewportTransform({0, 0}, sizePx);
     m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
     ui::Image(m_fbo.GetFrameTexture(), m_size);
-
 
     m_prevSize = m_size;
 }

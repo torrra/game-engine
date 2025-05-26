@@ -14,7 +14,7 @@
 #include "Engine.h"
 #include "ConsoleLog.hpp"
 
-#define ENABLE_UI_DEBUG 1
+#define ENABLE_UI_DEBUG 0
 
 engine::UIManager::UIManager(wnd::Wnd* window)
 {
@@ -69,16 +69,8 @@ bool engine::UIManager::IsWindowFocused(std::string const& name)
 
 void engine::UIManager::CreateCanvas(std::string const& name, math::Vector2f size)
 {
-    if (m_canvasMap.contains(name))
-    {
-        PrintLog(WarningPreset(), "Canvas cannot be created as it already exists.");
-        return;
-    }
-    else
-    {
-        printf("Canvas Lua created from this roblox-esk hell language\n");
+    if (!m_canvasMap.contains(name))
         m_canvasMap[name] = new Canvas(size, {0.0f, 0.0f, 0.0f, 0.0f});
-    }
 }
 
 engine::Canvas* engine::UIManager::GetCanvas(std::string const& name)
@@ -107,6 +99,18 @@ void engine::UIManager::ClearAllCanvases(void)
     {
         canvas.second->RemoveAllEntities();
     }
+}
+
+void engine::UIManager::DeleteAllCanvases(void)
+{
+    ClearAllCanvases();
+    
+    for (auto& canvas : m_canvasMap)
+    {
+        delete canvas.second;
+    }
+
+    m_canvasMap.clear();
 }
 
 void engine::UIManager::InitUI(wnd::Wnd* window)

@@ -10,15 +10,18 @@
 #include <functional>
 
 engine::Canvas::Canvas(math::Vector2f const& windowSize, math::Vector4f const& color)
-    : m_size(windowSize), m_prevSize(windowSize), m_uidCounter(0)
+    : m_size(windowSize), m_prevSize(windowSize), m_uidCounter(0), m_isFirstUpdate(true)
 {
     SetColor(color[0], color[1], color[2], color[3]);
 }
 
 void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const& size)
 {
+    // Re-introduce window position
+    (void) position;
+
     // Make canvas uninteractable & allow inputs to pass through
-    ImGuiWindowFlags flags =
+    constexpr ImGuiWindowFlags flags =
         ImGuiWindowFlags_NoDecoration |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoScrollWithMouse |
@@ -27,19 +30,18 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
         ImGuiWindowFlags_NoNavInputs |
         ImGuiWindowFlags_NoDocking;
 
-    position;
-    flags;
+    // Window needs to be different if the scene is rendered is
     if (engine::Engine::GetEngine()->HasEditor())
     {
         
         ImGui::Begin("Simulation view", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::SetCursorPos(ImGui::GetWindowContentRegionMin());
-        ImGui::PushStyleColor(ImGuiCol_ChildBg,m_bgColor);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, m_bgColor);
         
         ImGui::BeginChild("Canvas", size, ImGuiChildFlags_NavFlattened, flags);
         
         ImGui::SetWindowSize(size);
-
+        
         // Scale all UI elements to be consistent with screen size
         RescaleCanvas();
 
@@ -75,18 +77,7 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
         
         ImGui::End();
         ImGui::PopStyleColor();
-        
     }
-
-    //if (!engine::Engine::GetEngine()->HasEditor())
-    //{
-    //}
-    //else
-    //{
-    //    ImGui::SetNextWindowPos(ImGui::GetWindowContentRegionMin());
-    //    ImGui::SetNextWindowSize(ImGui::GetWindowSize());
-    //}
-    //
 }
 
 void engine::Canvas::RemoveElement(UIElement* element)
@@ -212,11 +203,18 @@ void engine::Canvas::RescaleCanvas(void)
 {
     m_size = ImGui::GetContentRegionAvail();
 
+    // Prevent canvas invalid aspect ratio
+    if (m_isFirstUpdate)
+    {
+        m_prevSize = m_size;
+        m_isFirstUpdate = false;
+    }
+
     // Screen size has not changed
     if (m_size == m_prevSize)
         return;
 
-    const f32 regionRatio = m_size.GetX() / m_prevSize.GetX();
+    f32 regionRatio = m_size.GetX() / m_prevSize.GetX();
 
     // Update scale for all UI elements
     for (UIElement* element : m_elements)
