@@ -85,6 +85,7 @@ namespace engine
         RegisterComponents<RigidBodyStatic>();
         RegisterComponents<TriangleMesh>();
         RegisterComponents<AudioPlayer>();
+        RegisterComponents<NavigationPoint>();
         RegisterComponents<LightSource>();
     }
 
@@ -232,6 +233,7 @@ namespace engine
             m_sceneStaticRigidBodies.InvalidateComponent(entity);
             m_sceneTriangleMeshes.InvalidateComponent(entity);
             m_sceneAudioPlayer.InvalidateComponent(entity);
+            m_sceneNavigationPoints.InvalidateComponent(entity);
             m_sceneLights.InvalidateComponent(entity);
 
             ScriptSystem::UnregisterEntity(entity);
@@ -433,6 +435,7 @@ namespace engine
         m_sceneStaticRigidBodies.MoveReparentedComponent(reparented, newParent);
         m_sceneTriangleMeshes.MoveReparentedComponent(reparented, newParent);
         m_sceneAudioPlayer.MoveReparentedComponent(reparented, newParent);
+        m_sceneNavigationPoints.MoveReparentedComponent(reparented, newParent);
         m_sceneLights.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
@@ -447,6 +450,7 @@ namespace engine
            m_sceneStaticRigidBodies.MoveReparentedComponent(child);
            m_sceneTriangleMeshes.MoveReparentedComponent(child);
            m_sceneAudioPlayer.MoveReparentedComponent(child);
+           m_sceneNavigationPoints.MoveReparentedComponent(child);
            m_sceneLights.MoveReparentedComponent(child);
         }
     }
@@ -571,6 +575,7 @@ namespace engine
             SerializeSingleComponent<RigidBodyStatic>(file, entity, handles);
             SerializeSingleComponent<TriangleMesh>(file, entity, handles);
             SerializeSingleComponent<AudioPlayer>(file, entity, handles);
+            SerializeSingleComponent<NavigationPoint>(file, entity, handles);
             SerializeSingleComponent<LightSource>(file, entity, handles);
         }
     }
@@ -585,6 +590,7 @@ namespace engine
         Component::DeserializedArray<RigidBodyStatic>	staticRigidBodies;
         Component::DeserializedArray<TriangleMesh>	triangleMeshes;
         Component::DeserializedArray<AudioPlayer>	audioPlayers;
+        Component::DeserializedArray<NavigationPoint> navigationPoint;
         Component::DeserializedArray<LightSource>	lights;
 
         const char* start;
@@ -619,6 +625,10 @@ namespace engine
 
             else if (memcmp(start, "[AudioPlayer]", 13) == 0)
                 start = Component::DeserializeComponentText(audioPlayers, start, end);
+            
+            else if (memcmp(start, "[NavigationPoint]", 17) == 0)
+                start = Component::DeserializeComponentText(navigationPoint, start, end);
+
 
             else if (memcmp(start, "[LightSource]", 13) == 0)
                 start = Component::DeserializeComponentText(lights, start, end);
@@ -626,9 +636,9 @@ namespace engine
             start = text::GetNewLine(start, end);
         }
 
-        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts,
-                                      dynamicRigidBodies, staticRigidBodies, triangleMeshes,
-                                      audioPlayers, lights);
+        ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, 
+                                      staticRigidBodies, triangleMeshes, audioPlayers, 
+                                      navigationPoint, lights);
         text::UnloadFileData(data);
         for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {

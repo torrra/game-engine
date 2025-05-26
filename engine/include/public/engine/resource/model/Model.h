@@ -23,8 +23,8 @@ namespace engine
 
         ENGINE_API bool IsDynamic(void) const;
 
-        ENGINE_API void Draw(const std::vector<const MeshMaterial*>& materials) const;
         ENGINE_API void Draw(void) const;
+        ENGINE_API void Draw(const std::vector<const MeshMaterial*>& materials) const;
 
         ENGINE_API uint32 GetMeshCount(void) const;
 

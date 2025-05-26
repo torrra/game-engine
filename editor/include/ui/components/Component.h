@@ -27,7 +27,8 @@ namespace editor
         RIGIDBODY_DYNAMIC,
         SCRIPT,
         TRANSFORM, 
-        LIGHT_SOURCE
+        LIGHT_SOURCE,
+        NAVIGATION_POINT
     };
 
     class BaseComponent

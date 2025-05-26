@@ -43,6 +43,13 @@ editor::Viewport::~Viewport(void)
 void editor::Viewport::RenderToViewport(void)
 {
     m_fbo.Bind();
+
+    // Use the size of this viewport
+    SetViewportTransform({0, 0},
+    {
+        static_cast<int32>(m_size.GetX()),
+        static_cast<int32>(m_size.GetY())
+    });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::RenderScene(m_graph);
     m_fbo.Unbind();
@@ -50,7 +57,14 @@ void editor::Viewport::RenderToViewport(void)
 
 void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)
 {
+    
     m_fbo.Bind();
+    // Use the size of this viewport
+    SetViewportTransform({0, 0}, 
+    {
+        static_cast<int32>(m_size.GetX()),
+        static_cast<int32>(m_size.GetY())
+    });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::ExecuteRenderThreadTasks();
 
@@ -72,6 +86,10 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     }
 
     engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
+
+   for (auto& navPoint : m_graph->GetComponentArray<engine::NavigationPoint>())
+       navPoint.RenderNavPoint(viewProjection);
+
     m_fbo.Unbind();
 }
 
@@ -128,7 +146,7 @@ void editor::Viewport::RenderContents(void)
         math::Max(static_cast<int32>(m_size.GetX()), 1),
         math::Max(static_cast<int32>(m_size.GetY()), 1)
     ); 
-    
+
     SetViewportTransform({0, 0}, sizePx);
     m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
     ui::Image(m_fbo.GetFrameTexture(), m_size);

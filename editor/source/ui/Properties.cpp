@@ -7,6 +7,7 @@
 #include "ui/components/LightSourceComponent.h"
 #include "ui/components/RigidBodyStaticComponent.h"
 #include "ui/components/RigidBodyDynamicComponent.h"
+#include "ui/components/NavigationPointComponent.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
@@ -122,6 +123,10 @@ void editor::PropertyWnd::InitComponents(void)
             m_components.emplace_back(newScript);
         }
     }
+
+    // Navigation point
+    if (entity->HasComponent<engine::NavigationPoint>())
+        InitComponent<NavigationPointComponent, engine::NavigationPoint>();
 }
 
 void editor::PropertyWnd::RenderMenuBar(void)
@@ -151,6 +156,9 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("Light source"))
                 AddComponent<LightSourceComponent, engine::LightSource>();
+
+            else if (ui::MenuItem("NavigationPoint"))
+                AddComponent<NavigationPointComponent, engine::NavigationPoint>();
 
             ui::EndMenu();
         }
@@ -237,9 +245,11 @@ void editor::PropertyWnd::ClearComponentArray(void)
         case editor::TRANSFORM:
             delete dynamic_cast<TransformComponent*>(component);
             break;
-
         case editor::LIGHT_SOURCE:
             delete dynamic_cast<LightSourceComponent*>(component);
+            break;
+        case editor::NAVIGATION_POINT:
+            delete dynamic_cast<NavigationPointComponent*>(component);
             break;
         case editor::INVALID_COMPONENT_TYPE:
         default:

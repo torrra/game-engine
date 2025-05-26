@@ -16,6 +16,7 @@
 #include "components/Camera.h"
 #include "components/LightSource.h"
 #include "components/Renderer.h"
+#include "components/NavigationPoint.h"
 
 #include "engine/physics/rigidbody/RigidBodyDynamic.h"
 #include "engine/physics/rigidbody/RigidBodyStatic.h"
@@ -290,6 +291,9 @@ namespace engine
         // All sound components in the scene
         ComponentArray<AudioPlayer>			m_sceneAudioPlayer;
 
+        // All navigation point components in the scene
+        ComponentArray<NavigationPoint>     m_sceneNavigationPoints;
+
 
          
 
@@ -385,6 +389,17 @@ namespace engine
     const ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void) const
     {
         return m_sceneAudioPlayer;
+    }
+    template<>
+    inline ComponentArray<NavigationPoint>& SceneGraph::GetComponentArray<NavigationPoint>(void)
+    {
+        return m_sceneNavigationPoints;
+    }
+
+    template<> inline
+    const ComponentArray<NavigationPoint>& SceneGraph::GetComponentArray<NavigationPoint>(void) const
+    {
+        return m_sceneNavigationPoints;
     }
 
     template<> inline
