@@ -511,30 +511,30 @@ void engine::AudioPlayer::SerializeText(std::ostream& output, EntityHandle owner
 
 void engine::AudioPlayer::Serialize3DSound([[maybe_unused]]std::ostream& output) 
 const
+{
+    text::Serialize(output, "position", m_position);
+    output << "\n     ";
+
+    text::Serialize(output, "velocity", m_velocity);
+    output << "\n     ";
+
+
+    if (m_listener != nullptr)
     {
-        text::Serialize(output, "position", m_position);
+        text::Serialize(output, "listener position", m_listener->m_position);
         output << "\n     ";
 
-        text::Serialize(output, "velocity", m_velocity);
+        text::Serialize(output, "listener forward", m_listener->m_forward);
         output << "\n     ";
 
+        text::Serialize(output, "listener up", m_listener->m_up);
+        output << "\n     ";
 
-        if (m_listener != nullptr)
-        {
-            text::Serialize(output, "listener position", m_listener->m_position);
-            output << "\n     ";
-
-            text::Serialize(output, "listener forward", m_listener->m_forward);
-            output << "\n     ";
-
-            text::Serialize(output, "listener up", m_listener->m_up);
-            output << "\n     ";
-
-            text::Serialize(output, "listener velocity", m_listener->m_velocity);
-            output << "\n     ";
-        }
+        text::Serialize(output, "listener velocity", m_listener->m_velocity);
+        output << "\n     ";
     }
-    
+}
+
 const char* engine::AudioPlayer::DeserializeText(const char* text, const char* end)
 {
     MOVE_TEXT_CURSOR(text, end);
@@ -554,7 +554,7 @@ const char* engine::AudioPlayer::DeserializeText(const char* text, const char* e
     uint32 is3DSound = 0;
     text = text::DeserializeInteger(text, is3DSound);
     m_is3DSound = is3DSound;
-    
+
     if (m_is3DSound)
     {
         text = Deserialize3DSound(text, end);
@@ -565,26 +565,26 @@ const char* engine::AudioPlayer::DeserializeText(const char* text, const char* e
 }
 
 const char* engine::AudioPlayer::Deserialize3DSound([[maybe_unused]] const char* text, [[maybe_unused]] const char* end)
+{
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeVector(text, m_position);
+
+    MOVE_TEXT_CURSOR(text, end);
+    text = text::DeserializeVector(text, m_velocity);
+
+    if (m_listener != nullptr)
     {
         MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeVector(text, m_position);
+        text = text::DeserializeVector(text, m_listener->m_position);
 
         MOVE_TEXT_CURSOR(text, end);
-        text = text::DeserializeVector(text, m_velocity);
+        text = text::DeserializeVector(text, m_listener->m_forward);
 
-        if (m_listener != nullptr)
-        {
-            MOVE_TEXT_CURSOR(text, end);
-            text = text::DeserializeVector(text, m_listener->m_position);
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_listener->m_up);
 
-            MOVE_TEXT_CURSOR(text, end);
-            text = text::DeserializeVector(text, m_listener->m_forward);
-
-            MOVE_TEXT_CURSOR(text, end);
-            text = text::DeserializeVector(text, m_listener->m_up);
-
-            MOVE_TEXT_CURSOR(text, end);
-            text = text::DeserializeVector(text, m_listener->m_velocity);
-        }
+        MOVE_TEXT_CURSOR(text, end);
+        text = text::DeserializeVector(text, m_listener->m_velocity);
+    }
     return text;
 }
