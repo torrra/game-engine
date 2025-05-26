@@ -5,26 +5,11 @@ function NavigationPointScript:Start()
 
     self.nav = GetNavigationPointComponent(self.entity.handle)
 
-    if not self.nav then
-        print("NavigationPoint not ready in Start. Will retry in Update.")
-        self.waitingForNav = true
-    else
-        print("NavigationPoint ready at:", self.nav:GetPosition())
-    end
+    self.nas:RefreshRef()
 end
 
 -- Is executed every tick
 function NavigationPointScript:Update(deltaTime)
-
-    if self.waitingForNav then
-        self.nav = GetNavigationPointComponent(self.entity.handle)
-        if self.nav then
-            self.waitingForNav = false
-            print("NavigationPoint now ready at:", self.nav:GetPosition())
-        else
-            return -- Wait
-        end
-    end
     
     local moveSpeed = 1.0 * deltaTime
     local x, y, z = self.nav:GetPosition()
