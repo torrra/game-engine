@@ -28,10 +28,10 @@ namespace engine
 
     enum EForceMode : uint32
     {
-        FORCE = 0,
-        IMPULSE = 1 << 1,
-        VELOCITY_CHANGE = 1 << 2,
-        ACCELERATION = 1 << 3
+        FORCE,
+        IMPULSE,
+        VELOCITY_CHANGE,
+        ACCELERATION
     }; // !Enum EForceMode
 
     struct RigidBodyData
