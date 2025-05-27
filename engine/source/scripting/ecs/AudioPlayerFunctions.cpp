@@ -240,9 +240,9 @@ int script_GetListenerUp(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerUp.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerUp.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerUp.GetZ()));
+        return 3;
     }
-
-    return 3;
+    return 0;
 }
 
 int script_GetListenerVelocity(lua_State* luaState)
