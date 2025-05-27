@@ -87,9 +87,9 @@ int script_GetSoundVelocity(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(velocity.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(velocity.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(velocity.GetZ()));
+        return 3;
     }
-
-    return 3;
+    return 0;
 }
 
 int script_GetSoundVolume(lua_State* luaState)
