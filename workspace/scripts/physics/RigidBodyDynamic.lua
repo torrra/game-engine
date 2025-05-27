@@ -1,3 +1,7 @@
+RigidBodyDynamic = Component:_new()
+
+local ExistingRigidBodyDynamicComponents = {}
+
 ForceMode = {
 
 	FORCE			= 0,
@@ -5,10 +9,6 @@ ForceMode = {
 	VELOCITY_CHANGE = 2,
 	ACCELERATION	= 3
 }
-
-RigidBodyDynamic = Component:_new()
-
-local ExistingRigidBodyDynamicComponents = {}
 
 function RigidBodyDynamic:_RegisterRigidBodyDynamicComponent(handle)
 
@@ -140,7 +140,9 @@ end
 
 function RigidBodyDynamic:AddForce(x, y, z, forceMode, autoWake)
 
-	RigidBodyDynamicRef.AddForce(self.ref, x, y, z, forceMode, autoWake)
+	force = forceMode == nil and FORCE or forceMode
+	wake = autoWake == nil and true or autoWake
+	RigidBodyDynamicRef.AddForce(self.ref, x, y, z, force, wake)
 end
 
 function RigidBodyDynamic:AddTorque(x, y, z, forceMode, autoWake)
