@@ -85,12 +85,14 @@ namespace engine
         
         if (absolute)
             resourcePath = fileName;
+
         else if (Engine::HasEditor())
         {
             resourcePath = Engine::GetEngine()->GetProjectDir().string();
             resourcePath.push_back('\\');
             resourcePath += fileName;
         }
+
         else
             resourcePath = "assets\\" + fileName;
         

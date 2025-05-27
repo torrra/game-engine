@@ -26,7 +26,6 @@ namespace editor
         void UpdateStartButton(::engine::GameScene& scene);
         void DisplayCurrentProject(void);
         void ProjectMenu(::engine::GameScene& scene);
-        void CloseProgram(void);
 
         void OpenProject(::engine::GameScene& scene);
         bool SelectProject(std::filesystem::path& projectPath);

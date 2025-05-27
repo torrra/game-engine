@@ -47,11 +47,6 @@ math::Matrix4f editor::EditorCamera::ViewProjection(void)
     return m_projectionMatrix * view;
 }
 
-math::Vector3f editor::EditorCamera::GetPosition(void) const
-{
-    return m_position;
-}
-
 void editor::EditorCamera::UpdatePosition(f32 deltaTime)
 {
     const f32 movementScale = m_speed * deltaTime;

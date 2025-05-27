@@ -1,6 +1,6 @@
 #include "ui/Viewport.h"
 #include "Picking.h"
-#include "ui/EditorApplication.h"
+
 #include <engine/ui/UIComponent.h>
 #include <engine/thread/ThreadManager.h>
 #include <engine/core/SceneGraph.h>
@@ -10,8 +10,8 @@
 #include <math/Vector2.hpp>
 
 
-editor::Viewport::Viewport(const char* title, engine::SceneGraph* graph, EditorApplication* editorApp, math::Vector4f const& bgColor)
-    : m_bgColor(bgColor), m_editorApp(editorApp)
+editor::Viewport::Viewport(const char* title, engine::SceneGraph* graph, math::Vector4f const& bgColor)
+    : m_bgColor(bgColor)
 {
     SetName(title);
     SetFlags(
@@ -35,7 +35,6 @@ editor::Viewport::~Viewport(void)
 
     m_picking = nullptr;
     m_graph = nullptr;
-    m_editorApp = nullptr;
 }
 
 void editor::Viewport::RenderToViewport(void)
@@ -65,7 +64,7 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::ExecuteRenderThreadTasks();
-    
+
     if (m_graph)
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
@@ -74,7 +73,6 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
    for (auto& navPoint : m_graph->GetComponentArray<engine::NavigationPoint>())
        navPoint.RenderNavPoint(viewProjection);
 
-    m_editorApp->m_gizmosUI->RenderGizmos(viewProjection, m_editorApp->m_editorViewCamera.GetPosition());
     m_fbo.Unbind();
 }
 
@@ -91,7 +89,6 @@ void editor::Viewport::RenderPickingPass(const math::Matrix4f& viewProjection)
     SetViewportTransform({0, 0}, sizePx);
     SetViewportBg(0.0f, 0.0f, 0.0f, 1.0f);
     m_picking->RenderSceneColored(m_graph, viewProjection);
-    m_editorApp->m_gizmosUI->RenderGizmosPicking(viewProjection);
 }
 
 void editor::Viewport::SetBgColor(math::Vector4f const& bgColor)

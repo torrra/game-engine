@@ -15,7 +15,7 @@ namespace editor
     class Viewport : public ::ui::UIWindow
     {
     public:
-        Viewport(const char* title, engine::SceneGraph* graph, class EditorApplication* editorApp, math::Vector4f const& bgColor);
+        Viewport(const char* title, engine::SceneGraph* graph, math::Vector4f const& bgColor);
         ~Viewport(void);
 
         // The scene which the viewport should render
@@ -39,7 +39,6 @@ namespace editor
     private:
         Picking* m_picking = nullptr;
         engine::SceneGraph* m_graph = nullptr;
-        class EditorApplication* m_editorApp;
         engine::FrameBuffer m_fbo;
         math::Vector4f m_bgColor;
         math::Vector2f m_size;
