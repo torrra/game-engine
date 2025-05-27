@@ -686,6 +686,23 @@ void engine::RigidBodyDynamic::SetZAxisLock(bool inAxisLock)
     m_isZLock = inAxisLock;
 }
 
+engine::EForceMode engine::RigidBodyDynamic::SetForceMode(uint32 inForceMode)
+{
+    switch (inForceMode)
+    {
+    case 0:
+        return EForceMode::FORCE;
+    case 1:
+        return EForceMode::IMPULSE;
+    case 2:
+        return EForceMode::VELOCITY_CHANGE;
+    case 3:
+        return EForceMode::ACCELERATION;
+    default:
+        return EForceMode::FORCE;
+    }
+}
+
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
 {
     if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))

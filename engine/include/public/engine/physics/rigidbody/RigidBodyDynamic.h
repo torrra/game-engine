@@ -219,6 +219,8 @@ namespace engine
         */
         ENGINE_API  
             void                SetZAxisLock(bool inAxisLock);
+        ENGINE_API
+            EForceMode          SetForceMode(uint32 inForceMode);
 
         /// Functions
         // Update the entity transform in reference to the dynamic rigid body
