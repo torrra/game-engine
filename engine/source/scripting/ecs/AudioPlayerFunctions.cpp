@@ -221,9 +221,9 @@ int script_GetListenerForward(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerForward.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerForward.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerForward.GetZ()));
+        return 3;
     }
-
-    return 3;
+    return 0;
 }
 
 int script_GetListenerUp(lua_State* luaState)
