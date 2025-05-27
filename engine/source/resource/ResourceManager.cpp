@@ -19,7 +19,7 @@ void engine::ResourceManager::LoadShader(
 
 	ShaderProgram* newShader = new ShaderProgram();
     m_mutex.lock();
-    GetInstance()->m_resources[shaderProgramName] = newShader;
+    GetInstance()->m_resources[shaderProgramName] = ResourceContainer(newShader, shaderProgramName);
     m_mutex.unlock();
 
     newShader->m_vertexShader = vertShader;
@@ -33,17 +33,13 @@ void engine::ResourceManager::Unload(std::string const& fileName)
 	if (!HasResource(fileName))
 		return;
 
-	delete GetInstance()->m_resources[fileName];
     GetInstance()->m_resources.erase(fileName);
 }
 
 void engine::ResourceManager::UnloadAll(void)
 {
     m_mutex.lock();
-	for (auto& resource : GetInstance()->m_resources)
-	{
-		delete resource.second;
-	}
+    GetInstance()->m_resources.clear();
     m_mutex.unlock();
 }
 
@@ -54,17 +50,6 @@ void engine::ResourceManager::ShutDown(void)
 
 	delete m_instance;
     m_instance = nullptr;
-}
-
-const std::string* engine::ResourceManager::FindKeyByVal(const IResource* resource)
-{
-	for (auto const& data : GetInstance()->m_resources)
-	{
-		if (resource == data.second)
-			return &data.first;
-	}
-
-	return nullptr;
 }
 
 engine::ResourceManager* engine::ResourceManager::GetInstance(void)

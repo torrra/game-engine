@@ -3,6 +3,7 @@
 #include <engine/resource/Resource.h>
 #include <engine/ui/UIWindow.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/utility/ResourceRef.h>
 
 #include <string>
 
@@ -60,7 +61,7 @@ namespace editor
         void DestroyMaterialData(void);
         void InitMaterialData(void);
 
-        engine::IResource* m_selectedResource = nullptr;
+        engine::EditableRef<engine::IResource> m_selectedResource;
 
         union
         {

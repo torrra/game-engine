@@ -33,6 +33,19 @@ editor::PropertyWnd::PropertyWnd(engine::SceneGraph* graph)
     m_graph = graph;
 }
 
+editor::PropertyWnd::PropertyWnd(PropertyWnd&& other) noexcept
+{
+    m_flags = other.m_flags;
+    m_graph = other.m_graph;
+    m_handle = other.m_handle;
+    m_title = std::move(other.m_title);
+    m_components = std::move(other.m_components);
+
+    other.m_flags = 0;
+    other.m_graph = nullptr;
+    other.m_handle = -1;
+}
+
 editor::PropertyWnd::~PropertyWnd(void)
 {
     ClearComponentArray();
@@ -269,4 +282,18 @@ void editor::PropertyWnd::ClearComponentArray(void)
     }
 
     m_components.clear();
+}
+
+editor::PropertyWnd& editor::PropertyWnd::operator=(PropertyWnd&& rhs) noexcept
+{
+    m_flags = rhs.m_flags;
+    m_graph = rhs.m_graph;
+    m_handle = rhs.m_handle;
+    m_title = std::move(rhs.m_title);
+    m_components = std::move(rhs.m_components);
+
+    rhs.m_flags = 0;
+    rhs.m_graph = nullptr;
+    rhs.m_handle = -1;
+    return *this;
 }

@@ -102,7 +102,7 @@ f32 engine::AudioPlayer::GetSoundVolume(void)
     return -1.f;
 }
 
-const engine::Sound* engine::AudioPlayer::GetSound(void) const
+const engine::ResourceRef<engine::Sound>& engine::AudioPlayer::GetSound(void) const
 {
     return m_sound;
 }
@@ -353,13 +353,13 @@ void engine::AudioPlayer::SetIsPlayed(bool inIsPlayed)
 
 void engine::AudioPlayer::SetSound(const char* inSoundName)
 {
-    if (const Sound* sound = ResourceManager::GetResource<Sound>(inSoundName))
-        SetSound(sound);
+    if (ResourceRef<Sound> sound = ResourceManager::GetResource<Sound>(inSoundName))
+        SetSound(std::move(sound));
 }
 
-void engine::AudioPlayer::SetSound(const Sound* inSound)
+void engine::AudioPlayer::SetSound(ResourceRef<Sound>&& inSound)
 {
-    m_sound = inSound;
+    m_sound = std::forward<ResourceRef<Sound>>(inSound);
 }
 
 void engine::AudioPlayer::PlaySoundWithout3D(void)
@@ -473,7 +473,7 @@ void engine::AudioPlayer::Invalidate(void)
 
 void engine::AudioPlayer::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
 {
-    const std::string* sound = ResourceManager::FindKeyByVal(m_sound);
+    const std::string* sound = ResourceManager::FindKeyByVal<Sound>(m_sound);
     if (!sound)
         return;
 

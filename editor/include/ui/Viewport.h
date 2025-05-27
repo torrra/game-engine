@@ -5,6 +5,7 @@
 #include <engine/ui/UIWindow.h>
 #include <engine/utility/FrameBuffer.h>
 #include <engine/core/SceneGraph.h>
+#include <engine/utility/ResourceRef.h>
 
 #include <math/Vector2.hpp>
 #include <math/Vector4.hpp>
@@ -38,9 +39,9 @@ namespace editor
     
     private:
 
-        void RenderDebugLights(const class ::engine::Model* lightBall,
-                               const class ::engine::Model* lightArrow,
-                               const class ::engine::ShaderProgram* basicShader,
+        void RenderDebugLights(const engine::ResourceRef<class ::engine::Model>& lightBall,
+                               const engine::ResourceRef<class ::engine::Model>& lightArrow,
+                               const engine::ResourceRef<class ::engine::ShaderProgram>& shader,
                                const math::Matrix4f& viewProjection);
 
         Picking* m_picking = nullptr;

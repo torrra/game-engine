@@ -2,6 +2,7 @@
 
 #include <engine/CoreTypes.h>
 #include <engine/core/Entity.h>
+#include <engine/utility/ResourceRef.h>
 
 #include <math/Vector3.hpp>
 #include <math/Quaternion.hpp>
@@ -44,7 +45,9 @@ namespace editor
         
     private:
         math::Matrix4f m_modelMatrix;
-        std::string m_modelPath;
+        engine::ResourceRef<class engine::Model> m_model;
+        engine::ResourceRef<class engine::ShaderProgram> m_shader;
+        engine::ResourceRef<class engine::ShaderProgram> m_pickingShader;
         math::Quatf m_direction;
         math::Vector3f m_color;
         uint32 m_pickingID;

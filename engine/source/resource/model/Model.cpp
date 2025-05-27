@@ -96,36 +96,46 @@ void engine::Model::Draw(void) const
     }
 }
 
-void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) const
+void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials) const
 {
     if (m_isDynamic)
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
         {
-            const MeshMaterial* currentMaterial = nullptr;
-            
+            bool useDefaultMat = true;
+
             if (meshIndex < static_cast<uint32>(materials.size()))
-                currentMaterial = materials[meshIndex];
+            {
+                const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
 
-            if (currentMaterial)
-                currentMaterial->Use(0);
+                if (currentMaterial)
+                {
+                    currentMaterial->Use(0);
+                    useDefaultMat = false;
+                }
+            }
 
-            m_dynamicMeshes[meshIndex].Draw(!currentMaterial);
+            m_dynamicMeshes[meshIndex].Draw(useDefaultMat);
         }
     }
     else
     {
         for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
         {
-            const MeshMaterial* currentMaterial = nullptr;
+            bool useDefaultMat = true;
 
             if (meshIndex < static_cast<uint32>(materials.size()))
-                currentMaterial = materials[meshIndex];
+            {
+                const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
 
-            if (currentMaterial)
-                currentMaterial->Use(0);
+                if (currentMaterial)
+                {
+                    currentMaterial->Use(0);
+                    useDefaultMat = false;
+                }
+            }
 
-            m_staticMeshes[meshIndex].Draw(!currentMaterial);
+            m_staticMeshes[meshIndex].Draw(useDefaultMat);
         }
     } 
 }

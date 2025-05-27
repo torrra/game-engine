@@ -39,7 +39,7 @@ void editor::RendererComponent::SectionContent(void)
         if (ui::Button("Add material", { 100.f, 25.f }))
         {
             rendererData->SetMaterial(rendererData->GetMaterialCount(),
-                                      (const engine::MeshMaterial*)nullptr);
+                                      engine::ResourceRef<engine::MeshMaterial>());
         }
     }
 }
@@ -148,7 +148,7 @@ void editor::RendererComponent::MaterialInput(engine::Renderer* renderer, const 
 
     std::string matName;
 
-    const engine::MeshMaterial* material = renderer->GetMaterial(index);
+    const engine::ResourceRef<engine::MeshMaterial>& material = renderer->GetMaterial(index);
 
     if (material)
     {
@@ -160,7 +160,7 @@ void editor::RendererComponent::MaterialInput(engine::Renderer* renderer, const 
        matName = name;
     
     if (ui::Button(matName.c_str()))
-        renderer->SetMaterial(index, (const engine::MeshMaterial*)nullptr);
+        renderer->SetMaterial(index, engine::ResourceRef<engine::MeshMaterial>());
 
 
     // Drag / drop

@@ -73,13 +73,13 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     {
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
-        const engine::Model* lightBall =
+        engine::ResourceRef<engine::Model> lightBall =
         engine::ResourceManager::GetResource<engine::Model>("./assets/lightBall.obj");
 
-        const engine::Model* lightArrow =
+        engine::ResourceRef<engine::Model> lightArrow =
         engine::ResourceManager::GetResource<engine::Model>("./assets/lightArrow.obj");
 
-        const engine::ShaderProgram* basicShader =
+        engine::ResourceRef<engine::ShaderProgram> basicShader =
         engine::ResourceManager::GetResource<engine::ShaderProgram>("lightProgram");
 
         if (lightBall && lightArrow && basicShader)
@@ -163,9 +163,9 @@ void editor::Viewport::RenderContents(void)
     m_prevSize = m_size;
 }
 
-void editor::Viewport::RenderDebugLights(const engine::Model* lightBall,
-                                         const engine::Model* lightArrow,
-                                         const engine::ShaderProgram* basicShader,
+void editor::Viewport::RenderDebugLights(const engine::ResourceRef<engine::Model>& lightBall,
+                                         const engine::ResourceRef<engine::Model>& lightArrow,
+                                         const engine::ResourceRef<engine::ShaderProgram>& basicShader,
                                          const math::Matrix4f& viewProjection)
 {
     const engine::ComponentArray<engine::LightSource>& cachedLights = m_graph->GetCachedLights();

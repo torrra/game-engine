@@ -28,11 +28,13 @@ editor::AssetDetailsWnd::~AssetDetailsWnd(void)
 void editor::AssetDetailsWnd::SelectAsset(const std::string& path, EAssetType type)
 {
     ResetData();
+    engine::EditableRef<engine::MeshMaterial> mat;
 
     switch (type)
     {
     case EAssetType::MATERIAL:
         engine::ResourceManager::Load<engine::MeshMaterial>(path);
+
 
         m_selectedResource =
         engine::ResourceManager::GetEditableResource<engine::MeshMaterial>(path);
@@ -61,7 +63,7 @@ void editor::AssetDetailsWnd::RenderContents(void)
 
 void editor::AssetDetailsWnd::RenderMaterialWindow(void)
 {
-    engine::MeshMaterial* material = dynamic_cast<engine::MeshMaterial*>(m_selectedResource);
+    engine::MeshMaterial* material = dynamic_cast<engine::MeshMaterial*>(&*m_selectedResource);
 
     if (!material)
         return;
@@ -90,7 +92,7 @@ void editor::AssetDetailsWnd::RenderMaterialTextureInput(engine::MeshMaterial* m
         
         if (ui::Button(m_matData.m_mapNames[index].c_str()))
         {
-            material->SetTexture(nullptr, index);
+            material->SetTexture(engine::ResourceRef<engine::Texture>(), index);
             m_matData.m_mapNames[index] = "No " + GetTextureName(index);
         }
 
@@ -250,16 +252,16 @@ void editor::AssetDetailsWnd::InitMaterialData(void)
     for (uint64 index = 0; index < mapNameCount; ++index)
         new(m_matData.m_mapNames + index) std::string();
 
-    engine::MeshMaterial* material = dynamic_cast<engine::MeshMaterial*>(m_selectedResource);
+    engine::MeshMaterial* material = dynamic_cast<engine::MeshMaterial*>(&*m_selectedResource);
 
     if (!material)
         return;
 
-    const engine::Texture** textures = material->GetTextures();
+    const engine::ResourceRef<engine::Texture>* textures = material->GetTextures();
 
     for (uint64 index = 0; index < mapNameCount; ++index)
     {
-        const std::string* textureName = engine::ResourceManager::FindKeyByVal(textures[index]);
+        const std::string* textureName = engine::ResourceManager::FindKeyByVal<engine::Texture>(textures[index]);
         m_matData.m_mapNames[index] = (textureName) ? *textureName : "No " + GetTextureName(index);
     }
 
