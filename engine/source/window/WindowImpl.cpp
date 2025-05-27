@@ -106,6 +106,12 @@ void engine::wnd::Update(Wnd* window)
     glfwPollEvents();
 }
 
+void engine::wnd::CloseWindow(Wnd* window)
+{
+    if (window)
+        glfwSetWindowShouldClose(*window, true);
+}
+
 void engine::wnd::SizeCallback(GLFWwindow* window, int32 width, int32 height)
 {
     Window* wndClass = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));

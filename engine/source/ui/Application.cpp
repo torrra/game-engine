@@ -24,7 +24,7 @@ namespace engine
         m_window = new Window((projectName) ? projectName : DEFAULT_NAME);
 
         // TODO: change dimensions however keep for debugging
-        if (m_window->CreateWindow(1920, 1080))
+        if (m_window->CreateWindow(/*1920, 1080*/))
             return ERROR;
 
         m_started = true;
