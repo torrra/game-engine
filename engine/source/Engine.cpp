@@ -6,11 +6,13 @@
 #include "core/systems/ScriptSystem.h"
 #include "input/InputHandler.h"
 #include "resource/ResourceManager.h"
+#include "resource/model/Model.h"
 #include "serialization/TextSerializer.h"
 #include "ui/UIWindow.h"
 #include "ui/Application.h"
 #include "Window.h"
 #include "physics/PhysicsEngine.h"
+#include "sounds/SoundEngine.h"
 #include "ui/UIComponent.h"
 #include "engine/utility/GraphicsHelperFunctions.h"
 
@@ -59,6 +61,7 @@ int16 engine::Engine::Startup(const char* projectName, const char* projectDir, u
     
     m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
     PhysicsEngine::Get().Init();
+    SoundEngine::Get().InitSoundEngine();
     return SUCCESS;
 }
 
@@ -73,6 +76,8 @@ int16 engine::Engine::Startup(uint32 threadCount)
     ScriptSystem::SetCurrentScene(m_activeScene.GetGraph());
     ScriptSystem::Startup();
     PhysicsEngine::Get().Init();
+    SoundEngine::Get().InitSoundEngine();
+    m_activeScene.InitBuffers();
 
     if (InputHandler::StartUp() != SUCCESS)
         return ERROR;
@@ -99,6 +104,7 @@ void engine::Engine::ShutDown(void)
     InputHandler::ShutDown();
     m_uiManager.ShutDown();
     PhysicsEngine::Get().CleanUp();
+    SoundEngine::Get().CloseSoundEngine();
 
     if (m_application)
         delete m_application;
@@ -114,6 +120,9 @@ void engine::Engine::SetEditorApplication(Application* ptr)
 {
     m_application = ptr;
     ptr->SetCurrentScene(&m_activeScene);
+    ResourceManager::Load<Model>("./assets/lightBall.obj", true);
+    ResourceManager::Load<Model>("./assets/lightArrow.obj", true);
+    ResourceManager::LoadShader("lightProgram", "./shaders/Model.vs", "./shaders/Model.frag", true, true);
 }
 
 engine::Window* engine::Engine::GetWindow(void) const noexcept

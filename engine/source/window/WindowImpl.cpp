@@ -55,6 +55,8 @@ engine::wnd::Wnd& engine::wnd::Wnd::operator=(GLFWwindow* wndPtr)
     // Enable depth as the game engine is made for 3D projects
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, POLYGON_MODE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     return 0;
 }
@@ -104,6 +106,12 @@ void engine::wnd::Update(Wnd* window)
 {
     glfwSwapBuffers(*window);
     glfwPollEvents();
+}
+
+void engine::wnd::CloseWindow(Wnd* window)
+{
+    if (window)
+        glfwSetWindowShouldClose(*window, true);
 }
 
 void engine::wnd::SizeCallback(GLFWwindow* window, int32 width, int32 height)

@@ -46,6 +46,7 @@ namespace engine
         RegisterNavPointFunctions(GetInstance()->m_luaState);
         RegisterRigidBodyDynamicFunctions(GetInstance()->m_luaState);
         RegisterRigidBodyStaticFunctions(GetInstance()->m_luaState);
+        RegisterAudioPlayerFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
@@ -63,6 +64,8 @@ namespace engine
         RunConfigScript("physics/Raycast.lua");
         RunConfigScript("physics/RigidBodyDynamic.lua");
         RunConfigScript("physics/RigidBodyStatic.lua");
+
+        RunConfigScript("AudioPlayer.lua");
 
         RunAllUserScripts();
     }

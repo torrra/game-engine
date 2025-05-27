@@ -2,11 +2,16 @@
 #include "thread/ThreadManager.h"
 #include "core/systems/ScriptSystem.h"
 #include "Engine.h"
+#include "resource/ResourceManager.h"
 
 #include "physics/PhysicsEngine.h"
 #include "physics/Raycast.h"
 
+#include "sounds/SoundEngine.h"
+
 #include <fstream>
+
+#include <glad/glad.h>
 
 namespace engine
 {
@@ -15,6 +20,18 @@ namespace engine
     {      
         UpdateNameAndPath(name);
         DeserializeText();
+    }
+
+    void GameScene::InitBuffers(void)
+    {
+        m_lightBuffers.m_omnidirectionalBuffer.Init();
+        m_lightBuffers.m_directionalBuffer.Init();
+        m_lightBuffers.m_spotlightBuffer.Init();
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightBuffers.m_omnidirectionalBuffer.GetBufferID());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_lightBuffers.m_directionalBuffer.GetBufferID());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_lightBuffers.m_spotlightBuffer.GetBufferID());
+
     }
 
     void GameScene::Start(void)
@@ -29,6 +46,7 @@ namespace engine
 
     void GameScene::Stop(void)
     {
+        SoundEngine::Get().StopSounds();
         m_state = EGameState::STOPPED;
     }
 
@@ -99,7 +117,11 @@ namespace engine
         if (m_state == EGameState::RUNNING)
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
+            m_graph.UpdateSceneLights(m_lightBuffers.m_omnidirectionalBuffer,
+                                      m_lightBuffers.m_directionalBuffer,
+                                      m_lightBuffers.m_spotlightBuffer);
             PhysicsUpdate();
+            SoundEngine::Get().UpdateSoundEngine();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
         }
 
@@ -107,6 +129,9 @@ namespace engine
         {
             // Update render cache
             ThreadManager::SynchronizeGameThread(&m_graph);
+            m_graph.UpdateSceneLights(m_lightBuffers.m_omnidirectionalBuffer,
+                                      m_lightBuffers.m_directionalBuffer,
+                                      m_lightBuffers.m_spotlightBuffer);
 
             for (TriangleMesh& triangleMesh : m_graph.GetComponentArray<engine::TriangleMesh>())
             {
@@ -126,6 +151,12 @@ namespace engine
         }
 
         m_time.Update();
+    }
+
+    void GameScene::UpdateLightBuffers(void)
+    {
+        
+
     }
 
     SceneGraph* GameScene::GetGraph(void)

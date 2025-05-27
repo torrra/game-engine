@@ -6,7 +6,7 @@
 #include "serialization/TextSerializer.h"
 #include "thread/ThreadManager.h"
 #include "InternalOpenGLError.hpp"
-
+#include "resource/model/Buffer.h"
 #include "physics/Raycast.h"
 
 namespace engine
@@ -86,6 +86,7 @@ namespace engine
         RegisterComponents<TriangleMesh>();
         RegisterComponents<AudioPlayer>();
         RegisterComponents<NavigationPoint>();
+        RegisterComponents<LightSource>();
     }
 
     void SceneGraph::RegisterAllEntities(void)
@@ -233,6 +234,7 @@ namespace engine
             m_sceneTriangleMeshes.InvalidateComponent(entity);
             m_sceneAudioPlayer.InvalidateComponent(entity);
             m_sceneNavigationPoints.InvalidateComponent(entity);
+            m_sceneLights.InvalidateComponent(entity);
 
             ScriptSystem::UnregisterEntity(entity);
             entityPtr->Invalidate();
@@ -309,6 +311,55 @@ namespace engine
         }
     }
 
+    Transform* SceneGraph::GetCachedTransform(EntityHandle owner)
+    {
+        return m_renderCache.m_transformRenderCache.GetComponent(owner);
+    }
+
+    void SceneGraph::UpdateSceneLights(Buffer& omniBuffer,
+                                       Buffer& directionalBuffer, Buffer& spotBuffer)
+    {
+
+        UpdateLightCount(omniBuffer, directionalBuffer, spotBuffer);
+
+        uint32 omniBufferOffset = sizeof(GLuint);
+        uint32 directionalBufferOffset = sizeof(GLuint);
+        uint32 spotBufferOffset = sizeof(GLuint);
+
+        for (const LightSource& light : m_renderCache.m_lightRenderCache)
+        {
+            if (!light.IsValid() || !light.IsActive())
+                continue;
+            
+            switch (light.GetType())
+            {
+            case LightSource::ELightType::OMNIDIRECTIONAL:
+                light.AddOmniToBuffer(omniBuffer, omniBufferOffset);
+                omniBufferOffset += LightSource::GetOmniSize();
+                break;
+
+            case LightSource::ELightType::DIRECTIONAL:
+                light.AddDirectionalToBuffer(directionalBuffer, directionalBufferOffset);
+                directionalBufferOffset += LightSource::GetDirectionalSize();
+                break;
+
+            case LightSource::ELightType::SPOTLIGHT:
+                light.AddSpotToBuffer(spotBuffer, spotBufferOffset);
+                spotBufferOffset += LightSource::GetSpotSize();
+                break;
+
+            default:
+                break;
+            }
+            
+        }
+    }
+
+    const ComponentArray<LightSource>& SceneGraph::GetCachedLights(void) const
+    {
+        return m_renderCache.m_lightRenderCache;
+    }
+
     void SceneGraph::RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection)
     {
         for (Renderer& renderer : m_sceneRenderers)
@@ -325,6 +376,7 @@ namespace engine
     {
         m_renderCache.m_cameraRenderCache = m_sceneCameras;
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
+        m_renderCache.m_lightRenderCache = m_sceneLights;
     }
 
     void SceneGraph::ClearCache(void)
@@ -384,6 +436,7 @@ namespace engine
         m_sceneTriangleMeshes.MoveReparentedComponent(reparented, newParent);
         m_sceneAudioPlayer.MoveReparentedComponent(reparented, newParent);
         m_sceneNavigationPoints.MoveReparentedComponent(reparented, newParent);
+        m_sceneLights.MoveReparentedComponent(reparented, newParent);
 
         std::vector<EntityHandle> allChildren = GetChildrenAllLevels(reparented);
 
@@ -398,6 +451,7 @@ namespace engine
            m_sceneTriangleMeshes.MoveReparentedComponent(child);
            m_sceneAudioPlayer.MoveReparentedComponent(child);
            m_sceneNavigationPoints.MoveReparentedComponent(child);
+           m_sceneLights.MoveReparentedComponent(child);
         }
     }
 
@@ -415,6 +469,51 @@ namespace engine
     const char* SceneGraph::DeserializeEntityText(const char* text, const char* end)
     {    
         return m_sceneEntities.emplace_back().DeserializeText(text, end);
+    }
+
+    void SceneGraph::UpdateLightCount(Buffer& omniBuffer, Buffer& directionalBuffer,
+                                      Buffer& spotBuffer)
+    {
+
+        uint32 omniCount = 0;
+        uint32 directionalCount = 0;
+        uint32 spotCount = 0;
+
+        for (const LightSource& light : m_renderCache.m_lightRenderCache)
+        {
+            if (!light.IsValid() || !light.IsActive())
+                continue;
+
+            switch (light.GetType())
+            {
+            case LightSource::ELightType::OMNIDIRECTIONAL:
+                ++omniCount;
+                break;
+
+            case LightSource::ELightType::DIRECTIONAL:
+                ++directionalCount;
+                break;
+
+            case LightSource::ELightType::SPOTLIGHT:
+                ++spotCount;
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        uint32 omniBufSize = LightSource::GetOmniSize() * omniCount;
+        omniBuffer.SetData(0, omniBufSize + sizeof(uint32));
+        omniBuffer.SetData(&omniCount, sizeof(uint32), 0);
+
+        uint32 dirBufSize = LightSource::GetDirectionalSize() * directionalCount;
+        directionalBuffer.SetData(0, dirBufSize + sizeof(uint32));
+        directionalBuffer.SetData(&directionalCount, sizeof(uint32), 0);
+
+        uint32 spotBufSize = LightSource::GetSpotSize() * spotCount;
+        spotBuffer.SetData(0, sizeof(uint32) + spotBufSize);
+        spotBuffer.SetData(&spotCount, sizeof(uint32), 0);
     }
 
     void SceneGraph::CleanRigidBodies(void)
@@ -477,6 +576,7 @@ namespace engine
             SerializeSingleComponent<TriangleMesh>(file, entity, handles);
             SerializeSingleComponent<AudioPlayer>(file, entity, handles);
             SerializeSingleComponent<NavigationPoint>(file, entity, handles);
+            SerializeSingleComponent<LightSource>(file, entity, handles);
         }
     }
 
@@ -491,6 +591,7 @@ namespace engine
         Component::DeserializedArray<TriangleMesh>	triangleMeshes;
         Component::DeserializedArray<AudioPlayer>	audioPlayers;
         Component::DeserializedArray<NavigationPoint> navigationPoint;
+        Component::DeserializedArray<LightSource>	lights;
 
         const char* start;
         const char* end;
@@ -513,10 +614,10 @@ namespace engine
             else if (memcmp(start, "[Script]", 8) == 0)
                 start = Component::DeserializeComponentText(scripts, start, end);
             
-            else if (memcmp(start, "[RigidBodyDynamic]", 17) == 0)
+            else if (memcmp(start, "[RigidBodyDynamic]", 18) == 0)
                 start = Component::DeserializeComponentText(dynamicRigidBodies, start, end);
             
-            else if (memcmp(start, "[RigidBodyStatic]", 16) == 0)
+            else if (memcmp(start, "[RigidBodyStatic]", 17) == 0)
                 start = Component::DeserializeComponentText(staticRigidBodies, start, end);
 
             else if (memcmp(start, "[TriangleMesh]", 14) == 0)
@@ -528,12 +629,16 @@ namespace engine
             else if (memcmp(start, "[NavigationPoint]", 17) == 0)
                 start = Component::DeserializeComponentText(navigationPoint, start, end);
 
+
+            else if (memcmp(start, "[LightSource]", 13) == 0)
+                start = Component::DeserializeComponentText(lights, start, end);
+
             start = text::GetNewLine(start, end);
         }
 
         ReorderDeserializedTextArrays(transforms, cameras, renderers, scripts, dynamicRigidBodies, 
                                       staticRigidBodies, triangleMeshes, audioPlayers, 
-                                      navigationPoint);
+                                      navigationPoint, lights);
         text::UnloadFileData(data);
         for (RigidBodyDynamic& rbDynamic : m_sceneDynamicRigidBodies)
         {

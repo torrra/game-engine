@@ -10,6 +10,8 @@
 #include "engine/EngineExport.h"
 #include "engine/Engine.h"
 
+#include "engine/utility/ResourceContainer.h"
+//#include "engine/utility/ResourceRefDecl.h"
 /*
 *	-------- Resource Manager --------
 *	- Meta data
@@ -23,6 +25,7 @@ namespace engine
 	public:
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName, bool absolute = false);
+
 		ENGINE_API static void		LoadShader(
 										const char* shaderProgramName, 
 										const char* vertShader, 
@@ -35,16 +38,18 @@ namespace engine
         static void CreateFromData(const std::string& name, TVariadicArgs&&... args);
 
 		template<typename TResourceType>
-		static const TResourceType*	GetResource(std::string const& fileName);
+		static ResourceRef<TResourceType>	GetResource(std::string const& fileName);
 
         template<typename TResourceType>
-        static TResourceType* GetEditableResource(std::string const& fileName);
+        static EditableRef<TResourceType> GetEditableResource(std::string const& fileName);
+
+        template <typename TResourceType>
+		static const std::string* FindKeyByVal(const ResourceRef<TResourceType>& resource);
 
 		ENGINE_API static void		Unload(std::string const& fileName);
 		ENGINE_API static void		UnloadAll(void);
 		ENGINE_API static void		ShutDown(void);
 
-		ENGINE_API static const std::string* FindKeyByVal(const IResource* resource);
 
 	private:
 									ResourceManager(void) = default;
@@ -58,7 +63,7 @@ namespace engine
         static std::mutex			m_mutex;
         static ResourceManager* m_instance;
 
-		std::unordered_map<std::string, IResource*> m_resources;
+		std::unordered_map<std::string, ResourceContainer> m_resources;
 	};
 
 	// Template function definitions
@@ -78,21 +83,19 @@ namespace engine
             }
 
             newVal = new TResourceType();
-            GetInstance()->m_resources[fileName] = newVal;
+            GetInstance()->m_resources[fileName] = ResourceContainer(newVal, fileName);
         }
 
         std::string resourcePath;
         
         if (absolute)
             resourcePath = fileName;
-
         else if (Engine::HasEditor())
         {
             resourcePath = Engine::GetEngine()->GetProjectDir().string();
             resourcePath.push_back('\\');
             resourcePath += fileName;
         }
-
         else
             resourcePath = "assets\\" + fileName;
         
@@ -101,7 +104,6 @@ namespace engine
         {
             m_mutex.lock();
             GetInstance()->m_resources.erase(fileName);
-            delete newVal;
             m_mutex.unlock();
         }
 	}
@@ -119,35 +121,52 @@ namespace engine
         }
         
         TResourceType* newVal = new TResourceType(std::forward<TVariadicArgs>(args)...);
-        GetInstance()->m_resources[name] = newVal;
+        GetInstance()->m_resources[name] = ResourceContainer(newVal, name);
     }
 
     template<typename TResourceType>
-	inline const TResourceType* engine::ResourceManager::GetResource(std::string const& fileName)
+	inline ResourceRef<TResourceType> engine::ResourceManager::GetResource(std::string const& fileName)
 	{
-        return GetEditableResource<TResourceType>(fileName);
+        return static_cast<ResourceRef<TResourceType>>(GetEditableResource<TResourceType>(fileName));
 	}
 
     template<typename TResourceType>
-    inline TResourceType* ResourceManager::GetEditableResource(std::string const& fileName)
+    inline EditableRef<TResourceType> ResourceManager::GetEditableResource(std::string const& fileName)
     {
         // Check if resource exists
         if (!HasResource(fileName))
-            return nullptr;
+            return {};
 
+       ResourceContainer& container = GetInstance()->m_resources[fileName];
+       TResourceType* resource = dynamic_cast<TResourceType*>(container.GetResource());
 
         if constexpr (!IsLoadedAsync<TResourceType>::m_value)
-            return dynamic_cast<TResourceType*>(GetInstance()->m_resources[fileName]);
+            return EditableRef<TResourceType>(&container, resource);
 
         else
         {
-            TResourceType* resource = dynamic_cast<TResourceType*>(GetInstance()->m_resources[fileName]);
 
             if (!resource->HasFailedToLoad())
-                return resource;
+                return EditableRef<TResourceType>(&container, resource);
 
             Unload(fileName);
-            return nullptr;
+            return {};
         }
     }
+
+    template <typename TResourceType> inline
+    const std::string* ResourceManager::FindKeyByVal(const ResourceRef<TResourceType>& resource)
+    {
+        if (!resource)
+            return nullptr;
+
+        for (auto const& data : GetInstance()->m_resources)
+        {
+            if (resource == dynamic_cast<const TResourceType*>(data.second.GetResource()))
+                return &data.first;
+        }
+
+        return nullptr;
+    }
+
 }

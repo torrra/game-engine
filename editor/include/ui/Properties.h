@@ -18,11 +18,14 @@ namespace editor
         // Should not use this constructor, is required for STL container
         PropertyWnd(void) = default;
         PropertyWnd(engine::SceneGraph* graph);
+        PropertyWnd(PropertyWnd&& other) noexcept;
         ~PropertyWnd(void);
 
         void SetHandle(engine::EntityHandle handle);
         engine::EntityHandle GetHandle(void) const noexcept;
         void ClearComponentArray(void);
+
+        PropertyWnd& operator=(PropertyWnd&& rhs) noexcept;
 
     protected:
         virtual void RenderContents(void) override;

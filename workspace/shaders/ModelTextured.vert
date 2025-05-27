@@ -9,16 +9,19 @@ layout (location = 5) in vec4 aVertexColor;
 layout (location = 6) in uvec4 aBoneIndices;
 layout (location = 7) in vec4 aBoneWeights;
 
+uniform mat4 model;
 uniform mat4 mvp;
 uniform mat3 normalMat;
 
 out vec2 TexCoord;
 out vec3 Normal;
+out vec3 FragPos;
 
 void main()
 {
 	TexCoord = aTexCoord;
 	Normal = normalMat * aNormal;
+	FragPos = vec3(model * vec4(aPosition, 1.0));
 
 	gl_Position = mvp * vec4(aPosition, 1.0);
 }

@@ -19,6 +19,7 @@ namespace engine
         void        Init(void);
 		uint32		GetBufferID(void) const noexcept;
 		void		SetData(void* data, uint64 size);
+		void		SetData(void* data, uint64 size, uint32 offset);
 		void		DeleteData(void);
 
 	private:

@@ -1,6 +1,7 @@
 #include "ui/Assets.h"
 #include "ui/components/Component.h"
 #include "ui/EditorApplication.h"
+#include "ui/AssetDetails.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDraw.h>
@@ -9,6 +10,7 @@
 #include <engine/ui/UIDragDrop.h>
 #include <engine/ConsoleLog.hpp>
 #include <engine/core/systems/ScriptSystem.h>
+#include <engine/resource/material/MeshMaterial.h>
 
 #include <engine/utility/MemoryCheck.h>
 #include <engine/utility/Platform.h>
@@ -418,6 +420,10 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
         payloadType = MATERIAL_PAYLOAD;
     else if (extension == supportedExtensions[9])
         payloadType = SCENE_PAYLOAD;
+    else if (extension == supportedExtensions[10])
+        payloadType = AUDIO_PAYLOAD;
+    else if (extension == supportedExtensions[11])
+        payloadType = AUDIO_PAYLOAD;
 
     return payloadType;
 }
@@ -426,8 +432,10 @@ void editor::AssetsWnd::SelectResource(void)
 {
     constexpr uint64 sceneStrLen = sizeof(SCENE_PAYLOAD) - 1;
     constexpr uint64 scriptStrLen = sizeof(SCRIPT_PAYLOAD) - 1;
+    constexpr uint64 materialStrLen = sizeof(MATERIAL_PAYLOAD) - 1;
 
     Asset& selectedAsset = m_assets[m_selectedIndex];
+    AssetDetailsWnd::EAssetType type = AssetDetailsWnd::EAssetType::INVALID;
 
     if (selectedAsset.m_payloadType.size() == sceneStrLen &&
         memcmp(selectedAsset.m_payloadType.c_str(), SCENE_PAYLOAD, sceneStrLen) == 0)
@@ -448,6 +456,21 @@ void editor::AssetsWnd::SelectResource(void)
 
         engine::OpenFile(scriptPath.c_str());
     }
+
+    else if (selectedAsset.m_payloadType.size() == materialStrLen &&
+        memcmp(selectedAsset.m_payloadType.c_str(), MATERIAL_PAYLOAD, materialStrLen) == 0)
+    {
+        std::string matPath = selectedAsset.m_path.string();
+
+        m_ownerApplication->GetAssetDetailsWindow().SelectAsset(matPath,
+                 AssetDetailsWnd::EAssetType::MATERIAL);
+
+        return;
+
+    }
+
+    m_ownerApplication->GetAssetDetailsWindow().SelectAsset("",
+        AssetDetailsWnd::EAssetType::INVALID);
 }
 
 
@@ -464,9 +487,9 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::RenderRightClickMenu(void)
         if (::ui::MenuItem("Create scene"))
             result = EAssetAction::CREATE_SCENE;
 
-        //// Add material
-        //if (::ui::MenuItem("Create material"))
-        //    result = EAssetAction::CREATE_MATERIAL;
+        // Add material
+        if (::ui::MenuItem("Create material"))
+            result = EAssetAction::CREATE_MATERIAL;
 
         //// Delete
         //if (::ui::MenuItem("Delete asset"))
@@ -522,6 +545,15 @@ void editor::AssetsWnd::CreateScene(void)
 
 }
 
+void editor::AssetsWnd::CreateMaterial(void)
+{
+    std::string path = m_path.string();
+
+    path.push_back('\\');
+    path += m_newAssetName + ".mmat";
+    engine::MeshMaterial::CreateMaterial(path.c_str());
+}
+
 void editor::AssetsWnd::CloseAssetCreationMenu(void)
 {
     m_isRightClickMenuOpen = false;
@@ -540,6 +572,8 @@ editor::AssetsWnd::EAssetAction editor::AssetsWnd::SelectNewAssetType(EAssetActi
         result = EAssetAction::REFRESH_WINDOW;
         break;
     case editor::AssetsWnd::EAssetAction::CREATE_MATERIAL:
+        CreateMaterial();
+        result = EAssetAction::REFRESH_WINDOW;
         break;
 
     case editor::AssetsWnd::EAssetAction::CREATE_SCRIPT:

@@ -5,6 +5,7 @@
 #include <engine/ui/UIWindow.h>
 #include <engine/utility/FrameBuffer.h>
 #include <engine/core/SceneGraph.h>
+#include <engine/utility/ResourceRef.h>
 
 #include <math/Vector2.hpp>
 #include <math/Vector4.hpp>
@@ -15,7 +16,7 @@ namespace editor
     class Viewport : public ::ui::UIWindow
     {
     public:
-        Viewport(const char* title, engine::SceneGraph* graph, math::Vector4f const& bgColor);
+        Viewport(const char* title, engine::SceneGraph* graph, class EditorApplication* editorApp, math::Vector4f const& bgColor);
         ~Viewport(void);
 
         // The scene which the viewport should render
@@ -37,8 +38,15 @@ namespace editor
         virtual void RenderContents(void) override;
     
     private:
+
+        void RenderDebugLights(const engine::ResourceRef<class ::engine::Model>& lightBall,
+                               const engine::ResourceRef<class ::engine::Model>& lightArrow,
+                               const engine::ResourceRef<class ::engine::ShaderProgram>& shader,
+                               const math::Matrix4f& viewProjection);
+
         Picking* m_picking = nullptr;
         engine::SceneGraph* m_graph = nullptr;
+        class EditorApplication* m_editorApp;
         engine::FrameBuffer m_fbo;
         math::Vector4f m_bgColor;
         math::Vector2f m_size;

@@ -3,17 +3,20 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/resource/shader/Shader.h>
+#include <engine/utility/ResourceRef.h>
 #include <math/Vector3.hpp>
 #include <math/Matrix4.hpp>
 #include <unordered_map>
+
 
 namespace editor
 {
     class PickableEntity
     {
     public:
-        // Never use this constructor, it is only here due to the umap in the picking class
         PickableEntity(void) = default;
+        PickableEntity(PickableEntity const&) = delete;
+        PickableEntity(PickableEntity&&) = default;
         PickableEntity(int64 const& handle);
         ~PickableEntity(void) = default;
 
@@ -21,6 +24,8 @@ namespace editor
         uint32 GetPickingID(void) const;
         int64 GetEntityHandle(void) const;
         math::Vector3f GetColor(void) const;
+
+        PickableEntity& operator=(PickableEntity&&) = default;
 
     private:
         int64 m_entityHandle;
@@ -33,14 +38,17 @@ namespace editor
     {
     public:
         Picking(engine::SceneGraph* graph);
-        ~Picking(void);
+        Picking(Picking const&) = delete;
+        Picking(Picking&&) = default;
+        ~Picking(void) = default;
 
-        engine::EntityHandle FindSelectedEntity(std::string const& wndName) const;
+        engine::EntityHandle FindSelectedEntity(std::string const& wndName);
         void InitEntities(engine::SceneGraph* graph);
+        void AddEntity(engine::EntityHandle const& handle);
         void RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection);
 
     private:
         std::unordered_map<uint32, PickableEntity> m_pickableEntity;
-        const engine::ShaderProgram* m_pickingShader;
+        engine::ResourceRef<engine::ShaderProgram> m_pickingShader;
     };
 }

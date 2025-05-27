@@ -4,9 +4,11 @@
 #include "ui/components/RendererComponent.h"
 #include "ui/components/ScriptComponent.h"
 #include "ui/components/TransformComponent.h"
+#include "ui/components/LightSourceComponent.h"
 #include "ui/components/RigidBodyStaticComponent.h"
 #include "ui/components/RigidBodyDynamicComponent.h"
 #include "ui/components/NavigationPointComponent.h"
+#include "ui/components/AudioComponent.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
@@ -15,6 +17,7 @@
 #include <engine/ui/InternalUIWindow.h>
 
 #include <engine/core/SceneGraph.h>
+#include <engine/core/components/LightSource.h>
 #include <engine/utility/MemoryCheck.h>
 #include <engine/ConsoleLog.hpp>
 
@@ -28,6 +31,19 @@ editor::PropertyWnd::PropertyWnd(engine::SceneGraph* graph)
 
     m_handle = INVALID_HANDLE;
     m_graph = graph;
+}
+
+editor::PropertyWnd::PropertyWnd(PropertyWnd&& other) noexcept
+{
+    m_flags = other.m_flags;
+    m_graph = other.m_graph;
+    m_handle = other.m_handle;
+    m_title = std::move(other.m_title);
+    m_components = std::move(other.m_components);
+
+    other.m_flags = 0;
+    other.m_graph = nullptr;
+    other.m_handle = -1;
 }
 
 editor::PropertyWnd::~PropertyWnd(void)
@@ -101,6 +117,14 @@ void editor::PropertyWnd::InitComponents(void)
     // RigidBodyDynamic
     if (entity->HasComponent<engine::RigidBodyDynamic>())
         InitComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
+
+    if (entity->HasComponent<engine::LightSource>())
+        InitComponent<LightSourceComponent, engine::LightSource>();
+    
+
+    // AudioPlayer
+    if (entity->HasComponent<engine::AudioPlayer>())
+        InitComponent<AudioComponent, engine::AudioPlayer>();
     
     // Script
     if (entity->HasComponent<engine::Script>())
@@ -149,8 +173,14 @@ void editor::PropertyWnd::RenderMenuBar(void)
             else if (ui::MenuItem("Transform"))
                 AddComponent<TransformComponent, engine::Transform>();
 
+            else if (ui::MenuItem("Light source"))
+                AddComponent<LightSourceComponent, engine::LightSource>();
+
             else if (ui::MenuItem("NavigationPoint"))
                 AddComponent<NavigationPointComponent, engine::NavigationPoint>();
+
+            else if (ui::MenuItem("AudioPlayer"))
+                AddComponent<AudioComponent, engine::AudioPlayer>();
 
             ui::EndMenu();
         }
@@ -217,8 +247,6 @@ void editor::PropertyWnd::ClearComponentArray(void)
         // Call the derrived class destructor
         switch (component->GetType())
         {
-        case editor::AUDIO:
-            break;
         case editor::CAMERA:
             delete dynamic_cast<CameraComponent*>(component);
             break;
@@ -237,8 +265,14 @@ void editor::PropertyWnd::ClearComponentArray(void)
         case editor::TRANSFORM:
             delete dynamic_cast<TransformComponent*>(component);
             break;
+        case editor::LIGHT_SOURCE:
+            delete dynamic_cast<LightSourceComponent*>(component);
+            break;
         case editor::NAVIGATION_POINT:
             delete dynamic_cast<NavigationPointComponent*>(component);
+            break;
+        case editor::AUDIO:
+            delete dynamic_cast<AudioComponent*>(component);
             break;
         case editor::INVALID_COMPONENT_TYPE:
         default:
@@ -248,4 +282,18 @@ void editor::PropertyWnd::ClearComponentArray(void)
     }
 
     m_components.clear();
+}
+
+editor::PropertyWnd& editor::PropertyWnd::operator=(PropertyWnd&& rhs) noexcept
+{
+    m_flags = rhs.m_flags;
+    m_graph = rhs.m_graph;
+    m_handle = rhs.m_handle;
+    m_title = std::move(rhs.m_title);
+    m_components = std::move(rhs.m_components);
+
+    rhs.m_flags = 0;
+    rhs.m_graph = nullptr;
+    rhs.m_handle = -1;
+    return *this;
 }

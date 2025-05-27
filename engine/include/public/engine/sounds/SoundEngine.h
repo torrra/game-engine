@@ -9,6 +9,7 @@
 namespace engine
 {
     struct SoundImpl;
+    class AudioPlayer;
 
     class SoundEngine
     {
@@ -31,6 +32,9 @@ namespace engine
         ENGINE_API void     UpdateSoundEngine(void);
         // Close the sounds engine system, channels and sounds
         ENGINE_API void     CloseSoundEngine(void);
+        // Stop all sounds
+        ENGINE_API
+            void            StopSounds(void);
 
     private :
 

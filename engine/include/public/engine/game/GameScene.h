@@ -6,6 +6,7 @@
 
 #include "engine/core/SceneGraph.h"
 #include "engine/utility/Timer.h"
+#include "engine/resource/model/Buffer.h"
 
 namespace engine
 {
@@ -17,17 +18,31 @@ namespace engine
 
     class GameScene
     {
+
+    private:
+
+        struct LightBuffers
+        {
+            Buffer m_omnidirectionalBuffer = 0;
+            Buffer m_directionalBuffer = 0;
+            Buffer m_spotlightBuffer = 0;
+        };
+
     public:
 
         ENGINE_API GameScene(void) = default;
         ENGINE_API GameScene(const std::filesystem::path& path, const std::string& name);
+
         GameScene(const GameScene&) = delete;
+
         ENGINE_API GameScene(GameScene&&) = default;
         ENGINE_API ~GameScene(void) = default;
 
+        ENGINE_API void InitBuffers(void);
         ENGINE_API void Start(void);
 
         ENGINE_API void Tick(void);
+        ENGINE_API void UpdateLightBuffers(void);
 
         ENGINE_API void Stop(void);
 
@@ -58,6 +73,7 @@ namespace engine
         std::filesystem::path       m_path;
         std::string                 m_name;
         SceneGraph                  m_graph;
+        LightBuffers                m_lightBuffers;
         Time                        m_time;
         f32                         m_timeScale = 1.f;
         f32                         m_timeSincePhysicsTick = 0.f;

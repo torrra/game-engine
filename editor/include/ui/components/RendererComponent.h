@@ -19,6 +19,9 @@ namespace editor
         void ModelInput(engine::Renderer* renderer);
         void ShaderInput(engine::Renderer* renderer);
 
+        void RenderMaterialList(engine::Renderer* renderer);
+        void MaterialInput(engine::Renderer* renderer, const std::string& name, uint32 index);
+
         std::string m_modelName;
         std::string m_fragName;
     };

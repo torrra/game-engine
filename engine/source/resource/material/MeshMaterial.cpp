@@ -3,6 +3,7 @@
 #include "resource/ResourceManager.h"
 #include "serialization/TextSerializer.h"
 #include "thread/ThreadManager.h"
+#include "utility/ResourceRef.h"
 
 #include <fstream>
 
@@ -90,29 +91,67 @@ void engine::MeshMaterial::SetEmissive(const math::Vector3f& value)
 }
 
 
-void engine::MeshMaterial::SetDiffuseMap(const Texture* texture)
+void engine::MeshMaterial::SetDiffuseMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[DIFFUSE] = texture;
+    if (texture)
+        m_data.m_useMapsBits |= DIFFUSE_BIT;
+    else
+        m_data.m_useMapsBits &= (~DIFFUSE_BIT);
+
+    m_textureMaps[DIFFUSE] = std::forward<ResourceRef<Texture>>(texture);
+    SetMapUsageBits();
 }
 
-void engine::MeshMaterial::SetNormalMap(const Texture* texture)
+void engine::MeshMaterial::SetNormalMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[NORMAL] = texture;
+    if (texture)
+        m_data.m_useMapsBits |= NORMAL_BIT;
+    else
+        m_data.m_useMapsBits &= (~NORMAL_BIT);
+
+    m_textureMaps[NORMAL] = std::forward<ResourceRef<Texture>>(texture);
+    SetMapUsageBits();
 }
 
-void engine::MeshMaterial::SetSpecularMap(const Texture* texture)
+void engine::MeshMaterial::SetSpecularMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[SPECULAR] = texture;
+    if (texture)
+        m_data.m_useMapsBits |= SPECULAR_BIT;
+    else
+        m_data.m_useMapsBits &= (~SPECULAR_BIT);
+
+    m_textureMaps[SPECULAR] = std::forward<ResourceRef<Texture>>(texture);
+    SetMapUsageBits();
 }
 
-void engine::MeshMaterial::SetDiffuseRoughnessMap(const Texture* texture)
+void engine::MeshMaterial::SetDiffuseRoughnessMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[ROUGHNESS] = texture;
+    if (texture)
+        m_data.m_useMapsBits |= ROUGHNESS_BIT;
+    else
+        m_data.m_useMapsBits &= (~ROUGHNESS_BIT);
+
+    m_textureMaps[ROUGHNESS] = std::forward<ResourceRef<Texture>>(texture);
+    SetMapUsageBits();
 }
 
-void engine::MeshMaterial::SetAmbientOcclusionMap(const Texture* texture)
+void engine::MeshMaterial::SetAmbientOcclusionMap(ResourceRef<Texture>&& texture)
 {
-    m_textureMaps[AMBIENT_OCCLUSION] = texture;
+    if (texture)
+        m_data.m_useMapsBits |= AMBIENT_OCCLUSION_BIT;
+    else
+        m_data.m_useMapsBits &= (~AMBIENT_OCCLUSION_BIT);
+
+    m_textureMaps[AMBIENT_OCCLUSION] = std::forward<ResourceRef<Texture>>(texture);
+    SetMapUsageBits();
+}
+
+void engine::MeshMaterial::SetOpacity(f32 value)
+{
+    constexpr uint32 offset = offsetof(BufferData, BufferData::m_opacity);
+
+    m_data.m_opacity = value;
+    glNamedBufferSubData(m_materialSSBO.GetBufferID(), offset, sizeof(m_data.m_opacity), &m_data.m_opacity);
 }
 
 void engine::MeshMaterial::SetShininess(f32 value)
@@ -139,7 +178,7 @@ const math::Vector3f& engine::MeshMaterial::GetDiffuse(void) const
     return m_data.m_diffuse;
 }
 
-const math::Vector3f& engine::MeshMaterial::GeSpecular(void) const
+const math::Vector3f& engine::MeshMaterial::GetSpecular(void) const
 {
     return m_data.m_specular;
 }
@@ -159,30 +198,67 @@ f32 engine::MeshMaterial::GetRefractionIndex(void) const
     return m_data.m_refractionIndex;
 }
 
-const engine::Texture* engine::MeshMaterial::GetDiffuseMap(void) const
+f32 engine::MeshMaterial::GetOpacity(void) const
+{
+    return m_data.m_opacity;
+}
+
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetDiffuseMap(void) const
 {
     return m_textureMaps[DIFFUSE];
 }
 
-const engine::Texture* engine::MeshMaterial::GetNormalMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetNormalMap(void) const
 {
     return m_textureMaps[DIFFUSE];
 }
 
-const engine::Texture* engine::MeshMaterial::GetSpecularMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetSpecularMap(void) const
 {
     return m_textureMaps[SPECULAR];
 }
 
-const engine::Texture* engine::MeshMaterial::GetDiffuseRoughnessMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetDiffuseRoughnessMap(void) const
 {
     return m_textureMaps[ROUGHNESS];
 }
 
-const engine::Texture* engine::MeshMaterial::GetAmbientOcclusionMap(void) const
+const engine::ResourceRef<engine::Texture>& engine::MeshMaterial::GetAmbientOcclusionMap(void) const
 {
     return m_textureMaps[AMBIENT_OCCLUSION];
 }
+
+const engine::ResourceRef<engine::Texture>* engine::MeshMaterial::GetTextures(void)
+{
+    return m_textureMaps;
+}
+
+void engine::MeshMaterial::SetTexture(ResourceRef<Texture>&& texture, uint64 index)
+{
+    EMapIndex mapIndex = static_cast<EMapIndex>(index);
+
+    switch (mapIndex)
+    {
+    case engine::MeshMaterial::DIFFUSE:
+        SetDiffuseMap(std::forward<ResourceRef<Texture>>(texture));
+        break;
+    case engine::MeshMaterial::NORMAL:
+        SetNormalMap(std::forward<ResourceRef<Texture>>(texture));
+        break;
+    case engine::MeshMaterial::SPECULAR:
+        SetSpecularMap(std::forward<ResourceRef<Texture>>(texture));
+        break;
+    case engine::MeshMaterial::ROUGHNESS:
+        SetDiffuseRoughnessMap(std::forward<ResourceRef<Texture>>(texture));
+        break;
+    case engine::MeshMaterial::AMBIENT_OCCLUSION:
+        SetAmbientOcclusionMap(std::forward<ResourceRef<Texture>>(texture));
+        break;
+    default:
+        break;
+    }
+}
+
 
 void engine::MeshMaterial::SerializeText(void) const
 {
@@ -200,6 +276,8 @@ void engine::MeshMaterial::SerializeText(void) const
     text::Serialize(output, "shininess", m_data.m_shininess);
     output << "\n    ";
     text::Serialize(output, "refractionIndex", m_data.m_refractionIndex);
+    output << "\n    ";
+    text::Serialize(output, "opacity", m_data.m_opacity);
     output << "\n    ";
 
     SerializeTexturePaths(output);
@@ -231,6 +309,9 @@ void engine::MeshMaterial::DeserializeText(std::ifstream& input)
     text = text::DeserializeReal(text, m_data.m_refractionIndex);
 
     MOVE_TEXT_CURSOR_FREE(text, start, end);
+    text = text::DeserializeReal(text, m_data.m_opacity);
+
+    MOVE_TEXT_CURSOR_FREE(text, start, end);
     text = DeserializeTextureMaps(text, end);
 
     text::UnloadFileData(start);
@@ -248,7 +329,7 @@ const std::filesystem::path& engine::MeshMaterial::GetFilePath(void) const
     return m_filePath;
 }
 
-engine::MeshMaterial* engine::MeshMaterial::CreateMaterial(const char* path)
+engine::EditableRef<engine::MeshMaterial> engine::MeshMaterial::CreateMaterial(const char* path)
 {
     std::string pathStr = path;
 
@@ -260,6 +341,13 @@ engine::MeshMaterial* engine::MeshMaterial::CreateMaterial(const char* path)
 
     ResourceManager::CreateFromData<MeshMaterial>(pathStr, std::move(mat));
     return ResourceManager::GetEditableResource<MeshMaterial>(pathStr);
+}
+
+void engine::MeshMaterial::SetMapUsageBits(void)
+{
+    constexpr uint32 offset = offsetof(BufferData, BufferData::m_useMapsBits);
+
+    m_materialSSBO.SetData(&m_data.m_useMapsBits, sizeof(m_data.m_useMapsBits), offset);                          
 }
 
 void engine::MeshMaterial::SerializeTexturePaths(std::ostream& output) const
@@ -333,8 +421,16 @@ const char* engine::MeshMaterial::DeserializeTextureMaps(const char* text, const
                     continue;
 
                 ResourceManager::Load<Texture>(paths[pathIndex]);
-                m_textureMaps[pathIndex] =
+
+                ResourceRef<Texture> loadedTexture =
                 ResourceManager::GetResource<Texture>(paths[pathIndex]);
+
+                if (loadedTexture)
+                    m_data.m_useMapsBits |= 1 << pathIndex;
+                else
+                    m_data.m_useMapsBits &= ~(1 << pathIndex);
+
+                m_textureMaps[pathIndex] = std::move(loadedTexture);
             }
 
             delete[] paths;
