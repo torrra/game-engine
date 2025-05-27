@@ -26,9 +26,7 @@ int script_GetCanvasRef(lua_State* luaState)
     else
     {
         engine::Engine* engine = engine::Engine::GetEngine();
-        std::string canvasName = luaL_checkstring(luaState, 1);
-        printf("Creating canvas with name '%s'\n", canvasName.c_str());
-        canvas = engine->GetUIManager().GetCanvas(canvasName);
+        canvas = engine->GetUIManager().GetCanvas(luaL_checkstring(luaState, 1));
     }
 
     lua_pushlightuserdata(luaState, canvas);
@@ -39,7 +37,6 @@ int script_GetCanvasRef(lua_State* luaState)
 int script_CreateCanvas(lua_State* luaState)
 {
     engine::Canvas* canvas = nullptr;
-    math::Vector2f size;
 
     int argumentCount = lua_gettop(luaState);
 
@@ -49,8 +46,11 @@ int script_CreateCanvas(lua_State* luaState)
     {
         engine::Engine* engine = engine::Engine::GetEngine();
         std::string canvasName = luaL_checkstring(luaState, 1);
-        size.X() = static_cast<f32>(lua_tonumber(luaState, 2));
-        size.Y() = static_cast<f32>(lua_tonumber(luaState, 3));
+        math::Vector2f size(
+            static_cast<f32>(lua_tonumber(luaState, 2)),
+            static_cast<f32>(lua_tonumber(luaState, 3))
+        );
+
         engine->GetUIManager().CreateCanvas(canvasName, size);
         canvas = engine->GetUIManager().GetCanvas(canvasName);
     }
@@ -62,8 +62,18 @@ int script_CreateCanvas(lua_State* luaState)
 
 int script_DestroyCanvas(lua_State* luaState)
 {
-    luaState;
-    return 0;
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 1)
+        luaL_error(luaState, "Expected 1 arguments (canvasID)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Engine::GetEngine()->GetUIManager().DeleteCanvas(canvasName);
+        lua_pushnil(luaState);
+    }
+
+    return 1;
 }
 
 int script_SetCanvasColor(lua_State* luaState)
@@ -201,12 +211,6 @@ int script_AddProgressBar(lua_State* luaState)
     return 1;
 }
 
-int script_AddRect(lua_State* luaState)
-{
-    luaState;
-    return 0;
-}
-
 int script_RemoveElement(lua_State* luaState)
 {
     int argumentCount = lua_gettop(luaState);
@@ -220,8 +224,6 @@ int script_RemoveElement(lua_State* luaState)
 
         if (engine::UIElement* element = (engine::UIElement*) lua_touserdata(luaState, 2))
             canvas->RemoveElement(element);
-        else
-            luaL_error(luaState, "Expected an element as second argument");
     }
 
     return 0;
@@ -233,13 +235,12 @@ void engine::RegisterUIFunctions(lua_State* luaState)
     {
         {"GetCanvasRef", script_GetCanvasRef},
         {"CreateCanvas", script_CreateCanvas},
-        //{"DestroyCanvas", script_DestroyCanvas},
+        {"DestroyCanvas", script_DestroyCanvas},
         {"SetCanvasColor", script_SetCanvasColor},
         {"AddText", script_AddText},
         {"AddImage", script_AddImage},
         {"AddButton", script_AddButton},
         {"AddProgressBar", script_AddProgressBar},
-        //{"AddRect", script_AddRect},
         {"RemoveElement", script_RemoveElement},
         {NULL, NULL}
     };

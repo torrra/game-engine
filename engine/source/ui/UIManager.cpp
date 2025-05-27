@@ -67,7 +67,7 @@ bool engine::UIManager::IsWindowFocused(std::string const& name)
     return ::ui::IsWindowSelected(name);
 }
 
-void engine::UIManager::CreateCanvas(std::string const& name, math::Vector2f size)
+void engine::UIManager::CreateCanvas(std::string const& name, math::Vector2f const& size)
 {
     if (!m_canvasMap.contains(name))
         m_canvasMap[name] = new Canvas(size, {0.0f, 0.0f, 0.0f, 0.0f});
@@ -111,6 +111,17 @@ void engine::UIManager::DeleteAllCanvases(void)
     }
 
     m_canvasMap.clear();
+}
+
+void engine::UIManager::DeleteCanvas(std::string const& name)
+{
+    if (m_canvasMap.contains(name))
+    {
+        m_canvasMap[name]->Clear();
+        m_canvasMap.erase(name);
+    }
+    else
+        PrintLog(WarningPreset(), "Attempted to delete an invalid canvas");
 }
 
 void engine::UIManager::InitUI(wnd::Wnd* window)

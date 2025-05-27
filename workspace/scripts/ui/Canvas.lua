@@ -1,8 +1,6 @@
 Canvas = {}
 Canvas.__index = Canvas
 
-local ExistingCanvases = {}
-
 function Canvas:CreateCanvas(canvasName, canvasWidth, canvasHeight)
 	local canvas = setmetatable({}, self)
 	
@@ -10,10 +8,15 @@ function Canvas:CreateCanvas(canvasName, canvasWidth, canvasHeight)
 	canvas._width = canvasWidth
 	canvas._height = canvasHeight
 
-	ExistingCanvases[canvasName] = canvas
 	CanvasRef.CreateCanvas(canvasName, canvasWidth, canvasHeight)
 
 	return canvas
+end
+
+function Canvas:DeleteCanvas()
+	CanvasRef = CanvasRef.DeleteCanvas(self._name)
+
+	return nil
 end
 
 function Canvas:RemoveElement(element)

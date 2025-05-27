@@ -10,7 +10,6 @@ extern "C"
     int script_AddImage(struct lua_State* luaState);
     int script_AddButton(struct lua_State* luaState);
     int script_AddProgressBar(struct lua_State* luaState);
-    int script_AddRect(struct lua_State* luaState);
     int script_RemoveElement(struct lua_State* luaState);
 }
 

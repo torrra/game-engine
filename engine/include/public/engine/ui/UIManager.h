@@ -32,10 +32,11 @@ namespace engine
 
         ENGINE_API bool IsWindowFocused(std::string const& name);
 
-        ENGINE_API void CreateCanvas(std::string const& name, math::Vector2f size);
+        ENGINE_API void CreateCanvas(std::string const& name, math::Vector2f const& size);
         ENGINE_API class Canvas* GetCanvas(std::string const& name);
         ENGINE_API void ClearAllCanvases(void);
         ENGINE_API void DeleteAllCanvases(void);
+        ENGINE_API void DeleteCanvas(std::string const& name);
         ENGINE_API void RenderCanvases(math::Vector2f const& position, math::Vector2f const& viewportSize);
         
 	

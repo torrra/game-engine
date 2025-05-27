@@ -44,7 +44,6 @@ namespace engine
         RegisterUITextFunctions(GetInstance()->m_luaState);
         RegisterUIButtonFunctions(GetInstance()->m_luaState);
         RegisterUIProgressBarFunctions(GetInstance()->m_luaState);
-        RegisterUIElementFunctions(GetInstance()->m_luaState);
         RegisterVector2Functions(GetInstance()->m_luaState);
         RegisterVector3Functions(GetInstance()->m_luaState);
         RegisterRaycastFunctions(GetInstance()->m_luaState);
@@ -59,7 +58,6 @@ namespace engine
         RunConfigScript("Input.lua");
 
         RunConfigScript("ui/Canvas.lua");
-        RunConfigScript("ui/Element.lua");
         RunConfigScript("ui/Text.lua");
         RunConfigScript("ui/Image.lua");
         RunConfigScript("ui/Button.lua");
