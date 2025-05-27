@@ -196,7 +196,11 @@ void editor::MenuBar::CreateProject(void)
         static uint8 createProjectStatus = CREATE_PROJECT_IN_PROGRESS;
 
         if (engine::InputHandler::IsInputPressed(KEY_ESCAPE))
+        {
+            // Explicitly call destructor to prevent memory leaks
+            table.~Table();
             CloseCreateMenu(projectName, projectPath, createProjectStatus);
+        }
 
         // Use table for alignment
         if (table.StartTable())
@@ -246,6 +250,8 @@ void editor::MenuBar::CreateProject(void)
                         }
                     }
                     
+                    // Explicitly call destructor to prevent memory leaks
+                    table.~Table();
                     CloseCreateMenu(projectName, projectPath, createProjectStatus);
                 }
                 else
@@ -365,6 +371,12 @@ void editor::MenuBar::CloseCreateMenu(std::string& projectName, std::filesystem:
 {
     projectName.clear();
     projectPath.clear();
+    
+    projectName.~basic_string();
+    projectPath.~path();
+
     m_isCreateWndOpened = false;
     status = CREATE_PROJECT_IN_PROGRESS;
+
+
 }
