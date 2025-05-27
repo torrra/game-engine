@@ -17,6 +17,7 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
         switch (m_componentType)
         {
         case editor::AUDIO:
+            graph->DestroyComponent<engine::AudioPlayer>(handle);
             break;
         case editor::CAMERA:
             graph->DestroyComponent<engine::Camera>(handle);
@@ -29,7 +30,6 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
             break;
         case editor::RIGIDBODY_DYNAMIC:
             graph->DestroyComponent<engine::RigidBodyDynamic>(handle);
-            break;
             break;
         case editor::TRANSFORM:
             graph->DestroyComponent<engine::Transform>(handle);

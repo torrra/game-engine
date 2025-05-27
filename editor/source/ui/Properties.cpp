@@ -7,6 +7,7 @@
 #include "ui/components/RigidBodyStaticComponent.h"
 #include "ui/components/RigidBodyDynamicComponent.h"
 #include "ui/components/NavigationPointComponent.h"
+#include "ui/components/AudioComponent.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
@@ -101,6 +102,10 @@ void editor::PropertyWnd::InitComponents(void)
     // RigidBodyDynamic
     if (entity->HasComponent<engine::RigidBodyDynamic>())
         InitComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
+
+    // AudioPlayer
+    if (entity->HasComponent<engine::AudioPlayer>())
+        InitComponent<AudioComponent, engine::AudioPlayer>();
     
     // Script
     if (entity->HasComponent<engine::Script>())
@@ -151,6 +156,9 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("NavigationPoint"))
                 AddComponent<NavigationPointComponent, engine::NavigationPoint>();
+
+            else if (ui::MenuItem("AudioPlayer"))
+                AddComponent<AudioComponent, engine::AudioPlayer>();
 
             ui::EndMenu();
         }
@@ -217,8 +225,6 @@ void editor::PropertyWnd::ClearComponentArray(void)
         // Call the derrived class destructor
         switch (component->GetType())
         {
-        case editor::AUDIO:
-            break;
         case editor::CAMERA:
             delete dynamic_cast<CameraComponent*>(component);
             break;
@@ -239,6 +245,9 @@ void editor::PropertyWnd::ClearComponentArray(void)
             break;
         case editor::NAVIGATION_POINT:
             delete dynamic_cast<NavigationPointComponent*>(component);
+            break;
+        case editor::AUDIO:
+            delete dynamic_cast<AudioComponent*>(component);
             break;
         case editor::INVALID_COMPONENT_TYPE:
         default:
