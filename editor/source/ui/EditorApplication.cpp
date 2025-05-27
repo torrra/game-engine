@@ -1,4 +1,5 @@
 #include "ui/EditorApplication.h"
+#include "Input.h"
 
 #include <engine/game/GameScene.h>
 #include <engine/thread/ThreadManager.h>
@@ -32,6 +33,9 @@ namespace editor
     {
         if (!m_currentScene)
             return;
+
+        static bool lockMouse = false;
+        LockMousePosition(SIMULATION_VIEW_WINDOW, lockMouse);
 
         // Render editor windows
         m_assetDetails.Render();

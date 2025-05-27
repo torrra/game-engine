@@ -44,6 +44,7 @@ namespace engine
         RegisterVector3Functions(GetInstance()->m_luaState);
         RegisterRaycastFunctions(GetInstance()->m_luaState);
         RegisterNavPointFunctions(GetInstance()->m_luaState);
+        RegisterAudioPlayerFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
@@ -59,6 +60,8 @@ namespace engine
         RunConfigScript("vector/Vector3.lua");
 
         RunConfigScript("physics/Raycast.lua");
+
+        RunConfigScript("AudioPlayer.lua");
 
         RunAllUserScripts();
     }

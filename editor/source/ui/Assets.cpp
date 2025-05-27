@@ -420,6 +420,10 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
         payloadType = MATERIAL_PAYLOAD;
     else if (extension == supportedExtensions[9])
         payloadType = SCENE_PAYLOAD;
+    else if (extension == supportedExtensions[10])
+        payloadType = AUDIO_PAYLOAD;
+    else if (extension == supportedExtensions[11])
+        payloadType = AUDIO_PAYLOAD;
 
     return payloadType;
 }

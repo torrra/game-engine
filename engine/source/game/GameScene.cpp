@@ -7,6 +7,8 @@
 #include "physics/PhysicsEngine.h"
 #include "physics/Raycast.h"
 
+#include "sounds/SoundEngine.h"
+
 #include <fstream>
 
 #include <glad/glad.h>
@@ -44,6 +46,7 @@ namespace engine
 
     void GameScene::Stop(void)
     {
+        SoundEngine::Get().StopSounds();
         m_state = EGameState::STOPPED;
     }
 
@@ -118,6 +121,7 @@ namespace engine
                                       m_lightBuffers.m_directionalBuffer,
                                       m_lightBuffers.m_spotlightBuffer);
             PhysicsUpdate();
+            SoundEngine::Get().UpdateSoundEngine();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
         }
 

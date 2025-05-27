@@ -98,6 +98,12 @@ void editor::Viewport::RenderPickingPass(const math::Matrix4f& viewProjection)
     if (!m_enablePicking)
         return;
 
+    math::Vector2i sizePx(
+        math::Max(static_cast<int32>(m_size.GetX()), 1),
+        math::Max(static_cast<int32>(m_size.GetY()), 1)
+    );
+
+    SetViewportTransform({0, 0}, sizePx);
     SetViewportBg(0.0f, 0.0f, 0.0f, 1.0f);
     m_picking->RenderSceneColored(m_graph, viewProjection);
 }

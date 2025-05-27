@@ -7,6 +7,18 @@
 
 #pragma endregion
 
+#pragma region Engine
+
+#include "engine/Engine.h"
+
+#pragma endregion
+
+#pragma region Sound
+
+#include "engine/sounds/AudioPlayer.h"
+
+#pragma endregion
+
 #include "engine/ConsoleLog.hpp"
 
 engine::SoundEngine* engine::SoundEngine::m_instance = nullptr;
@@ -54,6 +66,32 @@ void engine::SoundEngine::UpdateSoundEngine(void)
         return;
 
     m_soundImpl->m_system->update();
+
+    // We can store the graph in a local variable for
+    // readability
+    SceneGraph* graph = Engine::GetEngine()->GetGraph();
+
+    // The type used in a ranged for-loop is actually AudioPlayer,
+    // not an iterator
+    for (AudioPlayer& it : graph->GetComponentArray<AudioPlayer>())
+    {
+        // This check removes the need to check if the entity
+        // pointer is valid, and makes sure a deactivated
+        // component is not updated
+        if (!it.IsValid() || !it.IsActive())
+            continue;
+
+        // We can move on to the next component
+        // if this one doesn't have a sound
+        if (it.GetSound() == nullptr)
+            continue;
+
+        // Instead of checking if the entity has a transform, and then get the
+        // transform, we can check if the transform is non-null to achieve
+        // the same result
+        if (Transform* transform = graph->GetComponent<Transform>(it.GetOwner()))
+            it.SetSoundPosition(transform->GetPosition());
+    }
 }
 
 void engine::SoundEngine::CloseSoundEngine(void)
@@ -74,4 +112,10 @@ void engine::SoundEngine::CloseSoundEngine(void)
     m_instance = nullptr;
 
     PrintLog(SuccessPreset(), "Sound engine closed.");
+}
+
+void engine::SoundEngine::StopSounds(void)
+{
+    for (auto& sound : Engine::GetEngine()->GetGraph()->GetComponentArray<AudioPlayer>())
+        sound.StopSound();
 }
