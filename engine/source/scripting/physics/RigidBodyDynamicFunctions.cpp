@@ -11,14 +11,6 @@ extern "C"
 #include "core/systems/ScriptSystem.h"
 #include "scripting/physics/RigidBodyDynamicFunctions.h"
 
-static int GetLuaArgKey(lua_State* luaState)
-{
-    if (lua_gettop(luaState) != 1)
-        luaL_error(luaState, "Expected 1 argument (force mode)");
-
-    return static_cast<uint32>(lua_tointeger(luaState, 1));
-}
-
 int script_GetRigidBodyDynamicRef(lua_State* luaState)
 {
     engine::RigidBodyDynamic* rigidBody = nullptr;
@@ -356,11 +348,11 @@ int script_AddForce(lua_State* luaState)
         bool    autoWake    = true;
 
         if (argumentCount == 5)
-            forceMode       = static_cast<uint32>(GetLuaArgKey(luaState));
+            forceMode       = rigidBody->SetForceMode(static_cast<uint32>(lua_tointeger(luaState, 5)));
 
         if (argumentCount == 6)
         {
-            forceMode       = static_cast<uint32>(GetLuaArgKey(luaState));
+            forceMode       = rigidBody->SetForceMode(static_cast<uint32>(lua_tointeger(luaState, 5)));
             autoWake        = static_cast<bool>(lua_toboolean(luaState, 6));
         }
 
@@ -387,11 +379,11 @@ int script_AddTorque(lua_State* luaState)
         bool    autoWake    = true;
 
         if (argumentCount == 5)
-            forceMode       = static_cast<uint32>(GetLuaArgKey(luaState));
+            forceMode       = rigidBody->SetForceMode(static_cast<uint32>(lua_tointeger(luaState, 5)));
 
         if (argumentCount == 6)
         {
-            forceMode       = static_cast<uint32>(GetLuaArgKey(luaState));
+            forceMode       = rigidBody->SetForceMode(static_cast<uint32>(lua_tointeger(luaState, 5)));
             autoWake        = static_cast<bool>(lua_toboolean(luaState, 6));
         }
 
