@@ -44,6 +44,8 @@ namespace engine
         RegisterVector3Functions(GetInstance()->m_luaState);
         RegisterRaycastFunctions(GetInstance()->m_luaState);
         RegisterNavPointFunctions(GetInstance()->m_luaState);
+        RegisterRigidBodyDynamicFunctions(GetInstance()->m_luaState);
+        RegisterRigidBodyStaticFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
@@ -59,6 +61,8 @@ namespace engine
         RunConfigScript("vector/Vector3.lua");
 
         RunConfigScript("physics/Raycast.lua");
+        RunConfigScript("physics/RigidBodyDynamic.lua");
+        RunConfigScript("physics/RigidBodyStatic.lua");
 
         RunAllUserScripts();
     }

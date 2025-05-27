@@ -8,3 +8,5 @@
 #include "scripting/vector/Vector2Functions.h"
 #include "scripting/vector/Vector3Functions.h"
 #include "scripting/physics/RaycastFunctions.h"
+#include "scripting/physics/RigidBodyDynamicFunctions.h"
+#include "scripting/physics/RigidBodyStaticFunctions.h"
