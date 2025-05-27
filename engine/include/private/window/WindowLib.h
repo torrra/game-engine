@@ -65,6 +65,7 @@ namespace engine::wnd
     void ClearWindow(f32 red, f32 green, f32 blue, f32 alpha = 1.0f);
     void SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size);
     void Update(Wnd* window);
+    void CloseWindow(Wnd* window);
 
     // Callback functions
     void SizeCallback(GLFWwindow* window, int32 width, int32 height);

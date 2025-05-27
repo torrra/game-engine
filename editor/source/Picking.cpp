@@ -63,7 +63,7 @@ editor::Picking::Picking(engine::SceneGraph* graph)
 
 void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection)
 {
-    for (const auto& pickableEntity : m_pickableEntity)
+    for (auto const& pickableEntity : m_pickableEntity)
     {
         engine::EntityHandle handle = pickableEntity.second.GetEntityHandle();
         engine::Renderer* renderer = graph->GetComponent<engine::Renderer>(handle);
@@ -93,7 +93,7 @@ void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::
     }
 }
 
-engine::EntityHandle editor::Picking::FindSelectedEntity(std::string const& wndName) const
+engine::EntityHandle editor::Picking::FindSelectedEntity(std::string const& wndName)
 {
     engine::SendCmdsToGPU();
     engine::SetPixelStorageMode();
@@ -108,10 +108,10 @@ engine::EntityHandle editor::Picking::FindSelectedEntity(std::string const& wndN
     engine::GetPixelData(mousePos, {1, 1}, data);
 
     // Convert color back into picking ID
-    uint32 pickedID = data[0] + data[1] * 256 + data[2] * 256 * 256;
+    uint32 pickingID = data[0] + data[1] * 256 + data[2] * 256 * 256;
 
     // Attempt to find the related entity via its picking identifier
-    auto entity = m_pickableEntity.find(pickedID);
+    auto entity = m_pickableEntity.find(pickingID);
     return (entity != m_pickableEntity.end()) ? entity->second.GetEntityHandle() : INVALID_HANDLE;
 }
 
@@ -120,7 +120,12 @@ void editor::Picking::InitEntities(engine::SceneGraph* graph)
     // Create structure for each entity in scene
     for (engine::EntityHandle handle : graph->GetChildrenAllLevels(INVALID_HANDLE))
     {
-        PickableEntity entity(handle);
-        m_pickableEntity[entity.GetPickingID()] = entity;
+        AddEntity(handle);
     }
+}
+
+void editor::Picking::AddEntity(engine::EntityHandle const& handle)
+{
+    PickableEntity entity(handle);
+    m_pickableEntity[entity.GetPickingID()] = std::move(entity);
 }
