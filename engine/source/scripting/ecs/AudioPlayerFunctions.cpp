@@ -202,9 +202,9 @@ int script_GetListenerPosition(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerPosition.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerPosition.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerPosition.GetZ()));
+        return 3;
     }
-
-    return 3;
+    return 0;
 }
 
 int script_GetListenerForward(lua_State* luaState)
