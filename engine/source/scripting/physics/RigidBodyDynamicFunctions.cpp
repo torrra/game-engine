@@ -433,7 +433,9 @@ void engine::RegisterRigidBodyDynamicFunctions(lua_State* luaState)
         {"SetZAxisLock", script_SetZAxisLock},
 
         {"AddForce", script_AddForce},
-        {"AddTorque", script_AddTorque}
+        {"AddTorque", script_AddTorque},
+
+        {NULL, NULL}
     };
 
     lua_newtable(luaState);
