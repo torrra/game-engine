@@ -68,9 +68,9 @@ int script_GetSoundPosition(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(position.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(position.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(position.GetZ()));
+        return 3;
     }
-
-    return 3;
+    return 0;
 }
 
 int script_GetSoundVelocity(lua_State* luaState)
