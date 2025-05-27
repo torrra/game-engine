@@ -32,6 +32,12 @@
 
 #pragma endregion
 
+#pragma region System
+
+#include "core/systems/ScriptSystem.h"
+
+#pragma endregion
+
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene) :
     m_data{}
 {
@@ -233,6 +239,16 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
         delete m_rigidBodyImpl;
         m_rigidBodyImpl = nullptr;
     }
+}
+
+void engine::RigidBodyDynamic::Register(void)
+{
+    ScriptSystem::RegisterNewComponent("_NewRigidBodyDynamicComponent", m_owner);
+}
+
+void engine::RigidBodyDynamic::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveRigidBodyDynamicComponent", m_owner);
 }
 
 void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const

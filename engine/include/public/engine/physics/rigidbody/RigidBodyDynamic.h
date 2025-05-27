@@ -231,7 +231,9 @@ namespace engine
         ENGINE_API	
             void		        RigidBodyDynamicCleanUp(void);
         ENGINE_API	
-            void		        Register(void) override {}
+            void				Register(void) override;
+        ENGINE_API  
+            void                Unregister(void) override;
         /*
             Serialize rigidbody's member
             <param> [in] output : output stream
