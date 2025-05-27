@@ -259,9 +259,9 @@ int script_GetListenerVelocity(lua_State* luaState)
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerVelocity.GetX()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerVelocity.GetY()));
         lua_pushnumber(luaState, static_cast<lua_Number>(listenerVelocity.GetZ()));
+        return 3;
     }
-
-    return 3;
+    return 0;
 }
 
 int script_SetSound(lua_State* luaState)
