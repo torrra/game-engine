@@ -7,6 +7,7 @@
 #include "ui/SceneGraph.h"
 #include "ui/Viewport.h"
 #include "ui/Assets.h"
+#include "ui/AssetDetails.h"
 #include "ui/gizmos/GizmosUI.h"
 
 namespace editor
@@ -27,10 +28,13 @@ namespace editor
 
         void Shutdown(void) override;
 
+        AssetDetailsWnd& GetAssetDetailsWindow(void);
+
     private:
         void PickEntity(void);
 
         AssetsWnd                   m_assetWnd;
+        AssetDetailsWnd             m_assetDetails;
         PropertyWnd                 m_properties;
         EditorCamera                m_editorViewCamera;
         SceneGraphUI                m_graphView;

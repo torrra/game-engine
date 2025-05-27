@@ -10,6 +10,7 @@
 #include "engine/resource/animation/Animation.h"
 
 #include "serialization/TextSerializer.h"
+#include "ConsoleLog.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -42,7 +43,21 @@ bool engine::Model::LoadResource(const char* fileName)
     if (!fileName || *fileName == '\0')
         return false;
 
-    m_modelName = fileName;
+    std::string nameWithoutDir = fileName;
+    uint64 lastBackslash = nameWithoutDir.find_last_of('\\');
+    uint64 lastSlash = nameWithoutDir.find_last_of('/');
+
+    if (lastBackslash != std::string::npos && lastSlash != std::string::npos)
+        m_modelName = nameWithoutDir.substr(math::Max(lastSlash, lastBackslash) + 1);
+    
+    else if (lastBackslash != std::string::npos)
+        m_modelName = nameWithoutDir.substr(lastBackslash + 1);
+
+    else if (lastSlash != std::string::npos)
+        m_modelName = nameWithoutDir.substr(lastSlash + 1);
+
+    else
+        m_modelName = fileName;
 
     ThreadManager::AddTask(&Model::WorkerThreadLoad, this, std::string(fileName));
     return true;
@@ -87,28 +102,43 @@ void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
         {
-            const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
+            bool useDefaultMat = true;
 
-            if (currentMaterial)
-                currentMaterial->Use(0);
+            if (meshIndex < static_cast<uint32>(materials.size()))
+            {
+                const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
 
-            m_dynamicMeshes[meshIndex].Draw(!currentMaterial);
+                if (currentMaterial)
+                {
+                    currentMaterial->Use(0);
+                    useDefaultMat = false;
+                }
+            }
+
+            m_dynamicMeshes[meshIndex].Draw(useDefaultMat);
         }
     }
     else
     {
         for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
         {
-            const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
+            bool useDefaultMat = true;
 
-            if (currentMaterial)
-                currentMaterial->Use(0);
+            if (meshIndex < static_cast<uint32>(materials.size()))
+            {
+                const ResourceRef<MeshMaterial>& currentMaterial = materials[meshIndex];
 
-            m_staticMeshes[meshIndex].Draw(!currentMaterial);
+                if (currentMaterial)
+                {
+                    currentMaterial->Use(0);
+                    useDefaultMat = false;
+                }
+            }
+
+            m_staticMeshes[meshIndex].Draw(useDefaultMat);
         }
     } 
 }
-
 
 uint32 engine::Model::GetMeshCount(void) const
 {

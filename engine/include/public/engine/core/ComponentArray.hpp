@@ -58,6 +58,9 @@ namespace engine
         auto begin(void);
         auto end(void);
 
+        const auto begin(void) const;
+        const auto end(void) const;
+
         ComponentArray& operator=(ComponentArray&&) noexcept = default;
 
         uint64 GetThisIndex(TComponentType* component) const;
@@ -238,6 +241,18 @@ namespace engine
 
     template<CValidComponent TComponentType>
     inline auto ComponentArray<TComponentType>::end(void)
+    {
+        return m_components.end();
+    }
+
+    template<CValidComponent TComponentType>
+    inline const auto ComponentArray<TComponentType>::begin(void) const
+    {
+        return m_components.begin();
+    }
+
+    template<CValidComponent TComponentType>
+    inline const auto ComponentArray<TComponentType>::end(void) const
     {
         return m_components.end();
     }

@@ -32,6 +32,11 @@ void engine::Buffer::SetData(void* data, uint64 size)
 	glNamedBufferData(m_buffer, size, data, GL_STATIC_DRAW);
 }
 
+void engine::Buffer::SetData(void* data, uint64 size, uint32 offset)
+{
+    glNamedBufferSubData(m_buffer, offset, size, data);
+}
+
 void engine::Buffer::DeleteData(void)
 {
 	glDeleteBuffers(1, &m_buffer);

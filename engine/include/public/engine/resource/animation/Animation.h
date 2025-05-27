@@ -25,6 +25,15 @@ namespace engine
         int32          m_time = -1;       
     };
 
+    struct AnimTransform
+    {
+        
+        math::Quatf    m_quaternion = math::Quatf::Identity();
+        math::Vector3f  m_position = math::Vector3f::Zero();
+        math::Vector3f  m_scale = math::Vector3f::One();
+
+    };
+
     // All frame transformations for a given bone
     class BoneAnimData
     {

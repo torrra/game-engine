@@ -3,9 +3,11 @@
 
 #include <engine/resource/model/Model.h>
 #include <engine/resource/shader/Shader.h>
+#include <engine/resource/material/MeshMaterial.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
+#include <engine/ui/UIStyle.h>
 
 #define NO_MODEL_NAME "None##model"
 #define NO_FRAG_NAME "None##shader"
@@ -32,6 +34,13 @@ void editor::RendererComponent::SectionContent(void)
     {
         ModelInput(rendererData);
         ShaderInput(rendererData);
+        RenderMaterialList(rendererData);
+
+        if (ui::Button("Add material", { 100.f, 25.f }))
+        {
+            rendererData->SetMaterial(rendererData->GetMaterialCount(),
+                                      engine::ResourceRef<engine::MeshMaterial>());
+        }
     }
 }
 
@@ -54,7 +63,7 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
         {
             Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
             engine::ResourceManager::Load<engine::Model>(payloadData->m_path.string());
-            m_modelName = payloadData->m_path.string().c_str();
+            m_modelName = payloadData->m_path.filename().string().c_str();
             renderer->SetModel(payloadData->m_path.string().c_str());
         }
 
@@ -96,6 +105,75 @@ void editor::RendererComponent::ShaderInput(engine::Renderer* renderer)
 
                 renderer->SetShader(programName.c_str());
             }
+        }
+
+        ui::EndDragDropTarget();
+    }
+
+    ui::VerticalSpacing();
+
+}
+
+void editor::RendererComponent::RenderMaterialList(engine::Renderer* renderer)
+{
+    const uint32 count = renderer->GetMaterialCount();
+    const std::string matPrefix = "Material ";
+
+    if (!count)
+        return;
+
+    std::string name;
+
+    if (ui::TreeNode("Materials"))
+    {
+        ui::StartSection("##materials");
+        for (uint32 matNum = 0; matNum < count; ++matNum)
+        {
+            name = matPrefix + std::to_string(matNum);
+            MaterialInput(renderer, name, matNum);
+        }
+
+        ui::EndSection();
+        ui::TreePop();
+    }
+
+    ui::VerticalSpacing();
+}
+
+void editor::RendererComponent::MaterialInput(engine::Renderer* renderer, const std::string& name,
+                                               uint32 index)
+{
+    ui::Text(name.c_str());
+    ui::SameLine(150.f);
+
+    std::string matName;
+
+    const engine::ResourceRef<engine::MeshMaterial>& material = renderer->GetMaterial(index);
+
+    if (material)
+    {
+        matName = material->GetFilePath().filename().string();
+        matName.append(" (") += std::to_string(index);
+        matName.push_back(')');
+    }
+     else
+       matName = name;
+    
+    if (ui::Button(matName.c_str()))
+        renderer->SetMaterial(index, engine::ResourceRef<engine::MeshMaterial>());
+
+
+    // Drag / drop
+    if (ui::StartDragDropTarget())
+    {
+        // Check asset type
+        if (const ui::Payload payload = ui::AcceptPayload(MATERIAL_PAYLOAD, 0))
+        {
+            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+            std::string filePath = payloadData->m_path.string();
+
+            engine::ResourceManager::Load<engine::MeshMaterial>(filePath);
+            renderer->SetMaterial(index, filePath.c_str());      
         }
 
         ui::EndDragDropTarget();

@@ -46,6 +46,9 @@ namespace engine
         const ResourceRef<class MeshMaterial>& GetMaterial(uint32 index) const;
 
         ENGINE_API
+        uint32 GetMaterialCount(void) const;
+
+        ENGINE_API
         void SetMaterial(uint32 index, ResourceRef<class MeshMaterial>&& material);
 
         ENGINE_API

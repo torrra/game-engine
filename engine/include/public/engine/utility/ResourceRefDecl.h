@@ -1,11 +1,16 @@
 #pragma once
+
+#include "engine/CoreTypes.h"
 #include "ResourceContainer.h"
+#include <concepts>
+
 
 namespace engine
 {
     template <typename TResourceType>
     class ResourceRef
-    {
+    {  
+
     public:
 
         ResourceRef(void) = default;
@@ -17,6 +22,12 @@ namespace engine
         ResourceRef& operator=(const ResourceRef& rhs);
         ResourceRef& operator=(ResourceRef&& rhs) noexcept;
 
+        template <std::derived_from<TResourceType> TOtherType>
+        ResourceRef& operator=(const ResourceRef<TOtherType>& rhs);
+
+        template <std::derived_from<TResourceType> TOtherType>
+        ResourceRef& operator=(ResourceRef<TOtherType>&& rhs) noexcept;
+
         const TResourceType& operator*(void) const;
         const TResourceType* operator->(void) const;
 
@@ -27,6 +38,16 @@ namespace engine
         bool operator!=(const TResourceType* rhs) const;
 
         operator bool(void) const;
+
+
+        // Internal functions for type casting between refs
+
+        ResourceContainer* GetControlBlock(void);
+        TResourceType*     GetRaw(void);
+
+        void SetControlBLock(ResourceContainer* container);
+        void SetRaw(TResourceType* resource);
+        
 
     protected:
 
@@ -43,6 +64,12 @@ namespace engine
     public:
 
         using ResourceRef<TResourceType>::ResourceRef;
+
+        template <std::derived_from<TResourceType> TOtherType>
+        EditableRef& operator=(const EditableRef<TOtherType>& rhs);
+
+        template <std::derived_from<TResourceType> TOtherType>
+        EditableRef& operator=(EditableRef<TOtherType>&& rhs) noexcept;
 
         TResourceType& operator*(void);
         TResourceType* operator->(void);
@@ -90,6 +117,8 @@ namespace engine
     ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
                                                     const ResourceRef<TResourceType>& rhs)
     {
+        DecrementRefCount();
+
         m_controlBlock = rhs.m_controlBlock;
         m_raw = rhs.m_raw;
 
@@ -104,6 +133,8 @@ namespace engine
     ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
                                                      ResourceRef<TResourceType>&& rhs) noexcept
     {
+        DecrementRefCount();
+
         m_controlBlock = rhs.m_controlBlock;
         m_raw = rhs.m_raw;
 
@@ -156,5 +187,63 @@ namespace engine
         return m_raw != nullptr;
     }
 
-   
+    template<typename TResourceType>
+    template <std::derived_from<TResourceType> TOtherType> inline
+    ResourceRef<TResourceType>&
+    ResourceRef<TResourceType>::operator=(const ResourceRef<TOtherType>& rhs)
+    {
+        DecrementRefCount();
+
+        m_controlBlock = rhs.m_controlBlock;
+        m_raw = rhs.m_raw;
+
+        if (rhs.m_controlBlock)
+            rhs.m_controlBlock->AddRef();
+
+        return *this;
+    }
+
+    template<typename TResourceType>
+    template <std::derived_from<TResourceType> TOtherType> inline
+        ResourceRef<TResourceType>&
+        ResourceRef<TResourceType>::operator=(ResourceRef<TOtherType>&& rhs) noexcept
+    {
+        DecrementRefCount();
+
+        m_controlBlock = rhs.m_controlBlock;
+        m_raw = rhs.m_raw;
+
+        rhs.m_controlBlock = nullptr;
+        rhs.m_raw = nullptr;
+
+        return *this;
+    }
+
+    template<typename TResourceType>
+    template <std::derived_from<TResourceType> TOtherType> inline
+        EditableRef<TResourceType>&
+        EditableRef<TResourceType>::operator=(const EditableRef<TOtherType>& rhs)
+    {
+        ResourceRef<TResourceType>::DecrementRefCount();
+
+        memccpy(this, &rhs, sizeof(*this));
+
+        if (ResourceRef<TResourceType>::m_controlBlock)
+            ResourceRef<TResourceType>::m_controlBlock->AddRef();
+
+        return *this;
+    }
+
+    template<typename TResourceType>
+    template <std::derived_from<TResourceType> TOtherType> inline
+        EditableRef<TResourceType>&
+        EditableRef<TResourceType>::operator=(EditableRef<TOtherType>&& rhs) noexcept
+    {
+       ResourceRef<TResourceType>::DecrementRefCount();
+
+        memcpy(this, &rhs, sizeof(*this));
+        memset(&rhs, 0, sizeof(rhs));
+
+        return *this;
+    }
 }

@@ -56,7 +56,7 @@ math::Matrix4f engine::Transform::ToWorldMatrix(Transform& inTransform)
     return world * ToMatrixWithScale(inTransform);
 }
 
-math::Vector3f engine::Transform::ToWorldPosition(Transform& inTransform)
+math::Vector3f engine::Transform::ToWorldPosition(const Transform& inTransform)
 {
     math::Vector3f worldPosition = inTransform.m_position;
 
@@ -76,7 +76,7 @@ math::Vector3f engine::Transform::ToWorldPosition(Transform& inTransform)
     return worldPosition;
 }
 
-math::Quatf engine::Transform::ToWorldRotation(Transform& inTransform)
+math::Quatf engine::Transform::ToWorldRotation(const Transform& inTransform)
 {
     math::Quatf worldRotation = inTransform.m_rotation;
 

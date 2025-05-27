@@ -38,7 +38,7 @@ namespace engine
         static void CreateFromData(const std::string& name, TVariadicArgs&&... args);
 
 		template<typename TResourceType>
-		static const ResourceRef<TResourceType>	GetResource(std::string const& fileName);
+		static ResourceRef<TResourceType>	GetResource(std::string const& fileName);
 
         template<typename TResourceType>
         static EditableRef<TResourceType> GetEditableResource(std::string const& fileName);
@@ -125,7 +125,7 @@ namespace engine
     }
 
     template<typename TResourceType>
-	inline const ResourceRef<TResourceType> engine::ResourceManager::GetResource(std::string const& fileName)
+	inline ResourceRef<TResourceType> engine::ResourceManager::GetResource(std::string const& fileName)
 	{
         return static_cast<ResourceRef<TResourceType>>(GetEditableResource<TResourceType>(fileName));
 	}
@@ -157,6 +157,9 @@ namespace engine
     template <typename TResourceType> inline
     const std::string* ResourceManager::FindKeyByVal(const ResourceRef<TResourceType>& resource)
     {
+        if (!resource)
+            return nullptr;
+
         for (auto const& data : GetInstance()->m_resources)
         {
             if (resource == dynamic_cast<const TResourceType*>(data.second.GetResource()))
