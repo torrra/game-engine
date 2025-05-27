@@ -3,6 +3,7 @@
 #pragma region Engine
 
 #include "CoreTypes.h"
+#include "utility/ResourceRef.h"
 
 #pragma endregion
 
@@ -49,10 +50,10 @@ namespace engine
         void AddDebugLine(const math::Vector3f& inStart, const math::Vector3f& inEnd, const uint32& inColor);
 
 
-        const   ShaderProgram* m_debugDrawProgram   = nullptr;
-                DebugDrawImpl* m_debugDrawImpl      = nullptr;
-                uint32         m_debugDrawVAO       = 0;
-                uint32         m_debugDrawVBO       = 0;
+        ResourceRef<ShaderProgram>  m_debugDrawProgram;
+        DebugDrawImpl*              m_debugDrawImpl      = nullptr;
+        uint32                      m_debugDrawVAO       = 0;
+        uint32                      m_debugDrawVBO       = 0;
 
     }; // !Class DebugDraw
 } // !Namespace engine

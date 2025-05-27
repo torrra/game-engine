@@ -41,7 +41,7 @@ int script_GetSound(lua_State* luaState)
 
     else if (engine::AudioPlayer* audioPlayer = (engine::AudioPlayer*) lua_touserdata(luaState, 1))
     {
-        const engine::Sound* sound = audioPlayer->GetSound();
+        const engine::ResourceRef<engine::Sound>& sound = audioPlayer->GetSound();
 
         if (sound)
             lua_pushstring(luaState, sound->GetID().c_str());

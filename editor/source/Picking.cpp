@@ -61,11 +61,6 @@ editor::Picking::Picking(engine::SceneGraph* graph)
     InitEntities(graph);
 }
 
-editor::Picking::~Picking(void)
-{
-    m_pickingShader = nullptr;
-}
-
 void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::Matrix4f& viewProjection)
 {
     for (auto const& pickableEntity : m_pickableEntity)
@@ -78,7 +73,7 @@ void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::
         if (!renderer)
             continue;
         
-        const engine::Model* model = renderer->GetModel();
+        engine::ResourceRef<engine::Model> model = renderer->GetModel();
         if (!model)
             continue;
         
@@ -93,7 +88,7 @@ void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::
         m_pickingShader->Set("pickingColor", math::Vector3f(pickableEntity.second.GetColor()));
         
         // Render picking stage (render models as block colors based on their identifier)
-        std::vector<const engine::MeshMaterial*> materialArray(model->GetMeshCount());
+        std::vector<engine::ResourceRef<engine::MeshMaterial>> materialArray(model->GetMeshCount());
         model->Draw(materialArray);
     }
 }

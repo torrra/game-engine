@@ -3,6 +3,7 @@
 #pragma region Core
 
 #include "engine/core/Component.h"
+#include "engine/utility/ResourceRefDecl.h"
 
 #pragma endregion
 
@@ -71,7 +72,7 @@ namespace engine
             <return> [out] Sound : The sound
         */
         ENGINE_API [[nodiscard]]
-        const Sound*        GetSound(void) const;
+        const ResourceRef<Sound>&  GetSound(void) const;
 
         ENGINE_API [[nodiscard]]
             bool            GetIs3DSound(void) const;
@@ -179,20 +180,20 @@ namespace engine
             AudioPlayer&    operator=(const AudioPlayer& inOther) = delete;
 
         /// Setter
-            void            SetSound(const Sound* inSound);
+            void            SetSound(ResourceRef<Sound>&& inSound);
         /// Functions
         // Play sound without 3D 
             void            PlaySoundWithout3D(void);
         // Play a sound with 3D parameters
             void            PlaySound3D(void);
 
-        const Sound*    m_sound     = nullptr;
-        Listener*       m_listener  = nullptr;
-        math::Vector3f  m_position  = math::Vector3f::Zero();
-        math::Vector3f  m_velocity  = math::Vector3f::Zero();
-        f32             m_volume    = 1.f;
-        bool            m_is3DSound = false;
-        bool            m_isPlayed  = false;
+        ResourceRef<Sound>    m_sound;
+        Listener*             m_listener  = nullptr;
+        math::Vector3f        m_position  = math::Vector3f::Zero();
+        math::Vector3f        m_velocity  = math::Vector3f::Zero();
+        f32                   m_volume    = 1.f;
+        bool                  m_is3DSound = false;
+        bool                  m_isPlayed  = false;
 
     }; // !Class AudioPlayer
 

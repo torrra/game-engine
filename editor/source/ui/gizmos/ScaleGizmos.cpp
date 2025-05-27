@@ -10,10 +10,6 @@
 
 editor::ScaleGizmos::ScaleGizmos(void)
 {
-    m_xAxis = GizmosAxis({0.707f,   0.0f,   0.0f, 0.707f}, SCALE_GIZMOS_MODEL, {1.0f, 0.0f, 0.0f}, COLOR_MAX - 6);      // X axis
-    m_yAxis = GizmosAxis({0.707f,   0.0f, 0.707f,   0.0f}, SCALE_GIZMOS_MODEL, {0.0f, 0.0f, 1.0f}, COLOR_MAX - 7);  // Y axis
-    m_zAxis = GizmosAxis({-0.707f, 0.707f,   0.0f,   0.0f}, SCALE_GIZMOS_MODEL, {0.0f, 1.0f, 0.0f}, COLOR_MAX - 8);  // Z axis
-
     static bool isInit = false;
     if (!isInit)
     {
@@ -21,6 +17,10 @@ editor::ScaleGizmos::ScaleGizmos(void)
         engine::ResourceManager::Load<engine::Model>(SCALE_GIZMOS_MODEL, true);
         isInit = true;
     }
+
+    m_xAxis = GizmosAxis({0.707f,   0.0f,   0.0f, 0.707f}, SCALE_GIZMOS_MODEL, {1.0f, 0.0f, 0.0f}, COLOR_MAX - 6);      // X axis
+    m_yAxis = GizmosAxis({0.707f,   0.0f, 0.707f,   0.0f}, SCALE_GIZMOS_MODEL, {0.0f, 0.0f, 1.0f}, COLOR_MAX - 7);  // Y axis
+    m_zAxis = GizmosAxis({-0.707f, 0.707f,   0.0f,   0.0f}, SCALE_GIZMOS_MODEL, {0.0f, 1.0f, 0.0f}, COLOR_MAX - 8);  // Z axis
 }
 
 void editor::ScaleGizmos::IsAxisSelected(std::string const& wndName, engine::Transform* transform)

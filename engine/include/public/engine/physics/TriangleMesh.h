@@ -18,6 +18,7 @@
 
 #include "engine/EngineExport.h"
 #include "engine/CoreTypes.h"
+#include "engine/utility/ResourceRefDecl.h"
 
 #pragma endregion
 
@@ -70,7 +71,7 @@ namespace engine
                                                                  uint32 inCollisionMask);
 
         /// Private members
-        const   Model*                      m_model             = nullptr;
+                ResourceRef<Model>          m_model;
                 TriangleMeshImpl*           m_triangleMeshImpl  = nullptr;
                 RigidBodyData               m_data;
                 uint64                      m_shape             = 0;

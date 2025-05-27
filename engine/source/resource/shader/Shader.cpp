@@ -2,6 +2,7 @@
 #include "resource/shader/ShaderResource.h"
 #include "resource/ResourceManager.h"
 #include "utility/MemoryCheck.h"
+#include "utility/ResourceRef.h"
 #include "ConsoleLog.hpp"
 
 #include <glad/glad.h>
@@ -161,8 +162,8 @@ void engine::ShaderProgram::CreateProgram(bool isVertAbsolute, bool isFragAbsolu
 	ResourceManager::Load<Shader>(m_vertexShader, isVertAbsolute);
 	ResourceManager::Load<Shader>(m_fragShader, isFragAbsolute);
 	
-	const Shader* vShader = ResourceManager::GetResource<Shader>(m_vertexShader);
-	const Shader* fShader = ResourceManager::GetResource<Shader>(m_fragShader);
+	ResourceRef<Shader> vShader = ResourceManager::GetResource<Shader>(m_vertexShader);
+	ResourceRef<Shader> fShader = ResourceManager::GetResource<Shader>(m_fragShader);
 
     if (!vShader || !fShader)
     {

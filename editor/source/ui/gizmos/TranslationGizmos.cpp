@@ -12,10 +12,6 @@
 
 editor::TranslateGizmos::TranslateGizmos(void)
 {
-    m_xAxis = GizmosAxis({0.707f,   0.0f,   0.0f, 0.707f}, TRANSLATION_GIZMOS_MODEL, {1.0f, 0.0f, 0.0f}, COLOR_MAX);      // X axis
-    m_yAxis = GizmosAxis({0.707f,   0.0f, 0.707f,   0.0f}, TRANSLATION_GIZMOS_MODEL, {0.0f, 0.0f, 1.0f}, COLOR_MAX - 1);  // Y axis
-    m_zAxis = GizmosAxis({-0.707f, 0.707f,   0.0f,   0.0f}, TRANSLATION_GIZMOS_MODEL, {0.0f, 1.0f, 0.0f}, COLOR_MAX - 2); // Z axis
-
     // Init resources
     static bool isInit = false;
 
@@ -24,6 +20,10 @@ editor::TranslateGizmos::TranslateGizmos(void)
         engine::ResourceManager::Load<engine::Model>(TRANSLATION_GIZMOS_MODEL, true);
         isInit = true;
     }
+    m_xAxis = GizmosAxis({0.707f,   0.0f,   0.0f, 0.707f}, TRANSLATION_GIZMOS_MODEL, {1.0f, 0.0f, 0.0f}, COLOR_MAX);      // X axis
+    m_yAxis = GizmosAxis({0.707f,   0.0f, 0.707f,   0.0f}, TRANSLATION_GIZMOS_MODEL, {0.0f, 0.0f, 1.0f}, COLOR_MAX - 1);  // Y axis
+    m_zAxis = GizmosAxis({-0.707f, 0.707f,   0.0f,   0.0f}, TRANSLATION_GIZMOS_MODEL, {0.0f, 1.0f, 0.0f}, COLOR_MAX - 2); // Z axis
+
 }
 
 void editor::TranslateGizmos::IsAxisSelected(std::string const& wndName, engine::Transform* transform)
