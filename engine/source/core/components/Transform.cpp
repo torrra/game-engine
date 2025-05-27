@@ -233,7 +233,7 @@ void engine::Transform::AddRotation(f32 angleX, f32 angleY, f32 angleZ)
 
 void engine::Transform::AddRotation(const math::Quatf& rotation)
 {
-    m_rotation *= rotation;
+    m_rotation = rotation * m_rotation;
     m_dirty = true;
 }
 
