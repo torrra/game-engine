@@ -6,6 +6,8 @@
 #include "physics/PhysicsEngine.h"
 #include "physics/Raycast.h"
 
+#include "sounds/SoundEngine.h"
+
 #include <fstream>
 
 namespace engine
@@ -29,6 +31,7 @@ namespace engine
 
     void GameScene::Stop(void)
     {
+        SoundEngine::Get().StopSounds();
         m_state = EGameState::STOPPED;
     }
 
@@ -100,6 +103,7 @@ namespace engine
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
             PhysicsUpdate();
+            SoundEngine::Get().UpdateSoundEngine();
             ThreadManager::UpdateGameLogic(&m_graph, m_time.GetDeltaTime());
         }
 

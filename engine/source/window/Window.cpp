@@ -99,6 +99,11 @@ bool engine::Window::ShouldWindowClose(void) const noexcept
     return wnd::ShouldWindowClose(m_windowPtr);
 }
 
+void engine::Window::CloseWindow(void)
+{
+    wnd::CloseWindow(m_windowPtr);
+}
+
 void engine::Window::SetViewportTransform(math::Vector2i const& position, math::Vector2i const& size)
 {
     wnd::SetViewportTransform(position, size);

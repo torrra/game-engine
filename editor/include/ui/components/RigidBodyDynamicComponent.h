@@ -11,7 +11,6 @@
 #include <engine/CoreTypes.h>
 #include <engine/physics/geometry/Geometry.hpp>
 #include <engine/physics/rigidbody/RigidBodyDynamic.h>
-#include <engine/CoreTypes.h>
 
 #pragma endregion
 

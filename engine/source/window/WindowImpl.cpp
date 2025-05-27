@@ -80,10 +80,10 @@ engine::wnd::Wnd engine::wnd::CreateWindow(const char* title)
 
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    window = glfwCreateWindow(mode->width, mode->height, title, monitor, nullptr);
+    window = glfwCreateWindow(mode->width, mode->height, title, NULL, NULL);
     
-    glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-
+    glfwSetWindowMonitor(window, NULL, 0, 0, mode->width, mode->height, mode->refreshRate);
+    
     glfwSetWindowSizeCallback(window, SizeCallback);
 
     return window;
@@ -104,6 +104,12 @@ void engine::wnd::Update(Wnd* window)
 {
     glfwSwapBuffers(*window);
     glfwPollEvents();
+}
+
+void engine::wnd::CloseWindow(Wnd* window)
+{
+    if (window)
+        glfwSetWindowShouldClose(*window, true);
 }
 
 void engine::wnd::SizeCallback(GLFWwindow* window, int32 width, int32 height)

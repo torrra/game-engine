@@ -1,4 +1,5 @@
 #include "ui/EditorApplication.h"
+#include "Input.h"
 
 #include <engine/game/GameScene.h>
 #include <engine/thread/ThreadManager.h>
@@ -17,8 +18,9 @@ namespace editor
         : m_graphView("Scene Graph"), m_assetWnd("Assets", this), m_menuBar(this)
     {
         Startup(title);
-        m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
-        m_sceneEditorView = new Viewport(EDITOR_VIEW_WINDOW, scene, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, this, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_sceneEditorView = new Viewport(EDITOR_VIEW_WINDOW, scene, this, { 0.1f, 0.1f, 0.1f, 1.0f });
+        m_gizmosUI = new GizmosUI();
     }
 
     void EditorApplication::SetCurrentScene(::engine::GameScene* scene)
@@ -33,6 +35,9 @@ namespace editor
     {
         if (!m_currentScene)
             return;
+
+        static bool lockMouse = false;
+        LockMousePosition(SIMULATION_VIEW_WINDOW, lockMouse);
 
         // Render editor windows
         m_assetWnd.Render();
@@ -60,12 +65,16 @@ namespace editor
         // Editor viewport
         m_sceneEditorView->RenderPickingPass(m_editorViewCamera.ViewProjection());
         m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
+        
+        m_gizmosUI->Render();
         m_sceneEditorView->Render();
+
 
         if (engine::InputHandler::IsInputPressed(MOUSE_BUTTON_LEFT) &&
             ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             PickEntity();
 
+        m_gizmosUI->UpdateGizmos(EDITOR_VIEW_WINDOW);
     }
 
     void EditorApplication::ResetScene(::engine::GameScene& activeScene)
@@ -100,6 +109,7 @@ namespace editor
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         delete m_gameSimulationView;
         delete m_sceneEditorView;
+        delete m_gizmosUI;
         Application::Shutdown();
     }
 
@@ -111,6 +121,9 @@ namespace editor
         {
             m_graphView.SelectEntity(handle);
             m_properties.SetHandle(handle);
+
+            if (engine::Transform* transform = m_currentScene->GetGraph()->GetComponent<engine::Transform>(handle))
+                m_gizmosUI->SetSelectedTransform(transform);
         }
     }
 }

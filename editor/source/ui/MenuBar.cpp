@@ -8,6 +8,7 @@
 #include <engine/utility/MemoryCheck.h>
 #include <engine/ConsoleLog.hpp>
 #include <engine/input/InputHandler.h>
+#include <engine/ui/IconsLucide.h>
 
 #define CREATE_PROJECT_IN_PROGRESS 0
 #define CREATE_PROJECT_SUCCESS 1
@@ -29,6 +30,7 @@ void editor::MenuBar::Render(engine::GameScene& activeScene)
         DisplayCurrentProject();
         ProjectMenu(activeScene);
         UpdateStartButton(activeScene);
+        CloseProgram();
 
         ::ui::EndMainMenuBar();
     }
@@ -90,6 +92,15 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
         ui::EndMenu();
     }
     ui::EndDisabledSection();
+}
+
+void editor::MenuBar::CloseProgram(void)
+{
+    f32 width = ui::GetPos().GetX() + ui::GetAvailSpace().GetX();
+
+    ui::SameLine(width - 30.0f);
+    if (ui::Button(ICON_LC_X))
+        m_application->GetWindow()->CloseWindow();
 }
 
 void editor::MenuBar::OpenProject(::engine::GameScene& scene)

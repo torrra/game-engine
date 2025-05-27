@@ -3,7 +3,7 @@
 #include "Window.h"
 #include "ui/Canvas.h"
 #include "window/WindowLib.h"
-
+#include "ui/IconsLucide.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -141,7 +141,19 @@ void engine::UIManager::InitUI(wnd::Wnd* window)
 
     // Set UI theme
     ImGui::StyleColorsDark();
-    io.Fonts->AddFontFromFileTTF(".\\fonts\\Roboto-Regular.ttf", 19.0f);
+
+    constexpr f32 fontSize = 19.0f;
+
+    // Properties for icon font
+    static const ImWchar icons_ranges[] = {ICON_MIN_LC, ICON_MAX_LC, 0};
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    icons_config.GlyphMinAdvanceX = fontSize;
+    
+    // Add fonts for text & icons
+    io.Fonts->AddFontFromFileTTF(".\\fonts\\Roboto-Regular.ttf", fontSize);
+    io.Fonts->AddFontFromFileTTF(".\\fonts\\lucide.ttf", fontSize, &icons_config, icons_ranges);
 
     // Init
     ImGui_ImplGlfw_InitForOpenGL(*window, true);

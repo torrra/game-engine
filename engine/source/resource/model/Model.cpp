@@ -63,6 +63,24 @@ bool engine::Model::IsDynamic(void) const
     return m_isDynamic;
 }
 
+void engine::Model::Draw(void) const
+{
+    if (m_isDynamic)
+    {
+        for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
+        {
+            m_dynamicMeshes[meshIndex].Draw(false);
+        }
+    }
+    else
+    {
+        for (uint32 meshIndex = 0; meshIndex < m_staticMeshes.size(); ++meshIndex)
+        {
+            m_staticMeshes[meshIndex].Draw(false);
+        }
+    }
+}
+
 void engine::Model::Draw(const std::vector<const MeshMaterial*>& materials) const
 {
     if (m_isDynamic)

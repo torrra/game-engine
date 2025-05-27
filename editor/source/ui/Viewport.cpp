@@ -1,6 +1,6 @@
 #include "ui/Viewport.h"
 #include "Picking.h"
-
+#include "ui/EditorApplication.h"
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIWindow.h>
 #include <engine/thread/ThreadManager.h>
@@ -12,8 +12,8 @@
 #include <math/Vector2.hpp>
 
 
-editor::Viewport::Viewport(const char* title, engine::SceneGraph* graph, math::Vector4f const& bgColor)
-    : m_bgColor(bgColor)
+editor::Viewport::Viewport(const char* title, engine::SceneGraph* graph, EditorApplication* editorApp, math::Vector4f const& bgColor)
+    : m_bgColor(bgColor), m_editorApp(editorApp)
 {
     SetName(title);
     SetFlags(
@@ -37,11 +37,19 @@ editor::Viewport::~Viewport(void)
 
     m_picking = nullptr;
     m_graph = nullptr;
+    m_editorApp = nullptr;
 }
 
 void editor::Viewport::RenderToViewport(void)
 {
     m_fbo.Bind();
+
+    // Use the size of this viewport
+    SetViewportTransform({0, 0},
+    {
+        static_cast<int32>(m_size.GetX()),
+        static_cast<int32>(m_size.GetY())
+    });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
    
     engine::ThreadManager::RenderScene(m_graph);
@@ -56,15 +64,26 @@ void editor::Viewport::RenderInGameUI(void)
 
 void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)
 {
+    
     m_fbo.Bind();
+    // Use the size of this viewport
+    SetViewportTransform({0, 0}, 
+    {
+        static_cast<int32>(m_size.GetX()),
+        static_cast<int32>(m_size.GetY())
+    });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
     engine::ThreadManager::ExecuteRenderThreadTasks();
-
+    
     if (m_graph)
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
    engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);
 
+   for (auto& navPoint : m_graph->GetComponentArray<engine::NavigationPoint>())
+       navPoint.RenderNavPoint(viewProjection);
+
+    m_editorApp->m_gizmosUI->RenderGizmos(viewProjection, m_editorApp->m_editorViewCamera.GetPosition());
     m_fbo.Unbind();
 }
 
@@ -73,8 +92,15 @@ void editor::Viewport::RenderPickingPass(const math::Matrix4f& viewProjection)
     if (!m_enablePicking)
         return;
 
+    math::Vector2i sizePx(
+        math::Max(static_cast<int32>(m_size.GetX()), 1),
+        math::Max(static_cast<int32>(m_size.GetY()), 1)
+    );
+
+    SetViewportTransform({0, 0}, sizePx);
     SetViewportBg(0.0f, 0.0f, 0.0f, 1.0f);
     m_picking->RenderSceneColored(m_graph, viewProjection);
+    m_editorApp->m_gizmosUI->RenderGizmosPicking(viewProjection);
 }
 
 void editor::Viewport::SetBgColor(math::Vector4f const& bgColor)
@@ -121,7 +147,7 @@ void editor::Viewport::RenderContents(void)
         math::Max(static_cast<int32>(m_size.GetX()), 1),
         math::Max(static_cast<int32>(m_size.GetY()), 1)
     ); 
-    
+
     SetViewportTransform({0, 0}, sizePx);
     m_fbo.RescaleFBO(sizePx.GetX(), sizePx.GetY());
     ui::Image(m_fbo.GetFrameTexture(), m_size);

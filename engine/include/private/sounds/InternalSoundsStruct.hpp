@@ -1,5 +1,11 @@
 #pragma once
 
+#pragma region Resource
+
+#include "engine/core/TypesECS.h"
+
+#pragma endregion
+
 #pragma region FMOD
 
 #include <fmod/fmod.hpp>
@@ -15,7 +21,7 @@
 
 namespace engine
 {
-    using ChannelsMap   = std::unordered_map<std::string, FMOD::Channel*>;
+    using ChannelsMap   = std::unordered_map<EntityHandle, FMOD::Channel*>;
 
     struct SoundImpl
     {
