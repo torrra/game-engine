@@ -15,40 +15,42 @@ editor::TransformComponent::~TransformComponent(void)
 
 void editor::TransformComponent::SectionContent(void)
 {
-    engine::Transform* transform = GetData<engine::Transform>();
-        math::Vector3f& position = transform->SetPosition();
-    math::Vector3f& size = transform->SetScale();
-    
-    if (!m_isRotationSynced)
+    if (engine::Transform* transform = GetData<engine::Transform>())
     {
-        // Synchronise rotation
-        SyncRotation(transform);
-        m_isRotationSynced = true;
+        math::Vector3f& position = transform->SetPosition();
+        math::Vector3f& size = transform->SetScale();
+    
+        if (!m_isRotationSynced)
+        {
+            // Synchronise rotation
+            SyncRotation(transform);
+            m_isRotationSynced = true;
+        }
+
+        // Position
+        ui::Text("Position: ");
+        InputField("##X Position", &position[0], 0.05f);
+        InputField("##Y Position", &position[1], 0.05f);
+        InputField("##Z Position", &position[2], 0.05f);
+        ui::VerticalSpacing();
+
+        // Rotation
+        ui::Text("Rotation: ");
+        InputRotation(transform, "##X Rotation", 0);
+        InputRotation(transform, "##Y Rotation", 1);
+        InputRotation(transform, "##Z Rotation", 2);
+        ui::VerticalSpacing();
+
+        // Size
+        ui::Text("\tSize: ");
+        if (InputField("##X Size", &size[0], 0.05f))
+            size[0] = math::Clamp(size[0], 0.001f, FLT_MAX);
+        if (InputField("##Y Size", &size[1], 0.05f))
+            size[1] = math::Clamp(size[1], 0.001f, FLT_MAX);
+        if (InputField("##Z Size", &size[2], 0.05f))
+            size[2] = math::Clamp(size[2], 0.001f, FLT_MAX);
+        ui::VerticalSpacing();
     }
-
-    // Position
-    ui::Text("Position: ");
-    InputField("##X Position", &position[0], 0.05f);
-    InputField("##Y Position", &position[1], 0.05f);
-    InputField("##Z Position", &position[2], 0.05f);
-    ui::VerticalSpacing();
-
-    // Rotation
-    ui::Text("Rotation: ");
-    InputRotation(transform, "##X Rotation", 0);
-    InputRotation(transform, "##Y Rotation", 1);
-    InputRotation(transform, "##Z Rotation", 2);
-    ui::VerticalSpacing();
-
-    // Size
-    ui::Text("\tSize: ");
-    if (InputField("##X Size", &size[0], 0.05f))
-        size[0] = math::Clamp(size[0], 0.001f, FLT_MAX);
-    if (InputField("##Y Size", &size[1], 0.05f))
-        size[1] = math::Clamp(size[1], 0.001f, FLT_MAX);
-    if (InputField("##Z Size", &size[2], 0.05f))
-        size[2] = math::Clamp(size[2], 0.001f, FLT_MAX);
-    ui::VerticalSpacing();
 
 }
 
