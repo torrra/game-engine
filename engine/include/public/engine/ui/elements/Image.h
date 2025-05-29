@@ -4,6 +4,7 @@
 #include "engine/CoreTypes.h"
 #include "engine/ui/UIElement.h"
 #include "engine/resource/texture/Texture.h"
+#include "engine/utility/ResourceRefDecl.h"
 
 #include <string>
 
@@ -26,10 +27,10 @@ namespace engine
         bool				IsDataValid(void);
 
     private:
-        std::string			m_fileName;
-        const Texture*		m_data;
-        uint32				m_borderColor;
-        uint32				m_tint;
-        bool				m_keepAspectRatio;
+        std::string			    m_fileName;
+        ResourceRef<Texture>	m_data;
+        uint32				    m_borderColor;
+        uint32				    m_tint;
+        bool				    m_keepAspectRatio;
     };
 }

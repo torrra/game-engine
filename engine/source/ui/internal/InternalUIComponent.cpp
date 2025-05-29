@@ -20,6 +20,14 @@ void ui::Image(uint64 textureID, math::Vector2f const& size)
     ImGui::Image(textureID, size, {0.0f, 1.0f}, {1.0f, 0.0f});
 }
 
+void ui::Separator(const char* text)
+{
+    if (text)
+        ImGui::SeparatorText(text);
+    else
+        ImGui::Separator();
+}
+
 bool ui::Button(const char* text, math::Vector2f const& size)
 {
     return ImGui::Button(text, size);
@@ -30,6 +38,11 @@ bool ui::DropDown(const char* id, int32& selectedValue, std::vector<const char*>
     int32 arraySize = static_cast<int32>(options.size());
 
     return ImGui::Combo(id, &selectedValue, options.data(), arraySize);
+}
+
+bool ui::DropDown(const char* id, int32& selectedValue,const char** options, int32 size)
+{
+    return ImGui::Combo(id, &selectedValue, options, size);
 }
 
 bool ui::InputBox(const char* id, const char* hint, std::string& outStr, bool enterReturnTrue)
@@ -64,6 +77,14 @@ bool ui::Selectable(const char* text, bool* selected, math::Vector2f const& size
 bool ui::Checkbox(const char* text, bool* value)
 {
     return ImGui::Checkbox(text, value);
+}
+
+bool ui::ColorEdit(const char* id, f32* values)
+{
+    constexpr ImGuiColorEditFlags flags = ImGuiColorEditFlags_PickerHueBar |
+                                          ImGuiColorEditFlags_DisplayRGB;
+
+    return ImGui::ColorEdit3(id, values, flags);;
 }
 
 bool ui::StartMenuBar(void)

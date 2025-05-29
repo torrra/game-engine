@@ -40,6 +40,7 @@ namespace editor
         LockMousePosition(SIMULATION_VIEW_WINDOW, lockMouse);
 
         // Render editor windows
+        m_assetDetails.Render();
         m_assetWnd.Render();
         m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
@@ -111,6 +112,11 @@ namespace editor
         delete m_sceneEditorView;
         delete m_gizmosUI;
         Application::Shutdown();
+    }
+
+    AssetDetailsWnd& EditorApplication::GetAssetDetailsWindow(void)
+    {
+        return m_assetDetails;
     }
 
     void EditorApplication::PickEntity(void)

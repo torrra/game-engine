@@ -3,6 +3,7 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/resource/shader/Shader.h>
+#include <engine/utility/ResourceRef.h>
 #include <math/Vector3.hpp>
 #include <math/Matrix4.hpp>
 #include <unordered_map>
@@ -39,7 +40,7 @@ namespace editor
         Picking(engine::SceneGraph* graph);
         Picking(Picking const&) = delete;
         Picking(Picking&&) = default;
-        ~Picking(void);
+        ~Picking(void) = default;
 
         engine::EntityHandle FindSelectedEntity(std::string const& wndName);
         void InitEntities(engine::SceneGraph* graph);
@@ -48,6 +49,6 @@ namespace editor
 
     private:
         std::unordered_map<uint32, PickableEntity> m_pickableEntity;
-        const engine::ShaderProgram* m_pickingShader;
+        engine::ResourceRef<engine::ShaderProgram> m_pickingShader;
     };
 }

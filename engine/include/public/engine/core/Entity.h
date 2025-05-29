@@ -35,7 +35,8 @@ namespace engine
             CAMERA = (uint64) (1 << 5),
             AUDIO_PLAYER = (uint64) (1 << 6),
             TRIANGLE_MESH = (uint64) (1 << 7),
-            NAVIGATION_POINT = (uint64) (1 << 8)
+            NAVIGATION_POINT = (uint64) (1 << 8),
+            LIGHT_SOURCE = (uint64) (1 << 9)
         };
 
         friend class SceneGraph;

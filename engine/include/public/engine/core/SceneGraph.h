@@ -14,6 +14,7 @@
 #include "components/Script.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
+#include "components/LightSource.h"
 #include "components/Renderer.h"
 #include "components/NavigationPoint.h"
 
@@ -54,6 +55,7 @@ namespace engine
         {
             CopyableComponentArray<Transform>			m_transformRenderCache;
             CopyableComponentArray<Camera>				m_cameraRenderCache;
+            CopyableComponentArray<LightSource>         m_lightRenderCache;
         };
 
 
@@ -130,7 +132,7 @@ namespace engine
         // Permanently set an entity for destruction/overwrite.
         ENGINE_API
         void	DestroyEntity(EntityHandle entity);
-
+        
         // Give a new parent to an entity
         ENGINE_API
         void	ReparentEntity(EntityHandle toReparent, EntityHandle newParent);
@@ -166,6 +168,16 @@ namespace engine
         ENGINE_API
         void RenderFromCache(void);
 
+        // Get a cached transform if it exists
+        ENGINE_API
+        Transform* GetCachedTransform(EntityHandle owner);
+
+        ENGINE_API
+        void UpdateSceneLights(class Buffer& omniBuffer,
+                               class Buffer& directionalBuffer, class Buffer& spotBuffer);
+
+        ENGINE_API
+        const ComponentArray<LightSource>& GetCachedLights(void) const;
 
         ENGINE_API
         void RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection);
@@ -250,6 +262,11 @@ namespace engine
         template <CValidComponent TComponentType>
         void ReorderTextArray(Component::DeserializedArray<TComponentType>& array);
 
+
+        void UpdateLightCount(class Buffer& omniBuffer,
+                              class Buffer& directionalBuffer, class Buffer& spotBuffer);
+
+
         // All transform components in the scene
         CopyableComponentArray<Transform>			m_sceneTransforms;
 
@@ -258,6 +275,9 @@ namespace engine
 
         // All cameras components in the scene
         CopyableComponentArray<Camera>				m_sceneCameras;
+
+        // All light source components in the scene
+        CopyableComponentArray<LightSource>  m_sceneLights;
 
         // All renderer components in the scene
         ComponentArray<Renderer>			m_sceneRenderers;
@@ -351,6 +371,18 @@ namespace engine
     inline ComponentArray<AudioPlayer>& SceneGraph::GetComponentArray<AudioPlayer>(void)
     {
         return m_sceneAudioPlayer;
+    }
+
+    template<>
+    inline ComponentArray<LightSource>& SceneGraph::GetComponentArray<LightSource>(void)
+    {
+        return m_sceneLights;
+    }
+
+    template<> inline
+    const ComponentArray<LightSource>& SceneGraph::GetComponentArray<LightSource>(void) const
+    {
+        return m_sceneLights;
     }
 
     template<> inline

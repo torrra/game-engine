@@ -82,40 +82,34 @@ void editor::Gizmos::SetPosition(math::Vector3f const& position)
 }
 
 editor::GizmosAxis::GizmosAxis(void)
-    : m_modelMatrix(1.0f), m_modelPath("./"), m_direction(1.0f, 0.0f, 0.0f, 0.0f), 
+    : m_modelMatrix(1.0f), m_direction(1.0f, 0.0f, 0.0f, 0.0f), 
       m_color(1.0f), m_pickingID(0)
 {}
 
 editor::GizmosAxis::GizmosAxis(math::Quatf const& direction, std::string const& modelPath, math::Vector3f const& color, uint32 pickingID)
-    : m_direction(direction), m_modelPath(modelPath), m_color(color), m_pickingID(pickingID)
+    : m_direction(direction), m_color(color), m_pickingID(pickingID)
 {
     m_modelMatrix = m_direction.Inverse().RotationMatrix();
+    m_model = engine::ResourceManager::GetResource<engine::Model>(modelPath);
+    m_shader = engine::ResourceManager::GetResource<engine::ShaderProgram>("GizmosShader");
+    m_pickingShader = engine::ResourceManager::GetResource<engine::ShaderProgram>("Picking Shader");
 }
 
 void editor::GizmosAxis::RenderPass(const math::Matrix4f& projViewMatrix)
 {
-    const engine::Model* model = engine::ResourceManager::GetResource<engine::Model>(m_modelPath);
-    const engine::ShaderProgram* shader = engine::ResourceManager::GetResource<engine::ShaderProgram>("GizmosShader");
-
     math::Matrix3f normalMatrix(1.0f);
     const math::Matrix4f& mvpMatrix = projViewMatrix * m_modelMatrix;
-    mvpMatrix;
-    shader->Use();
-    shader->Set("mvp", &mvpMatrix);
-    shader->Set("normalMat", &normalMatrix);
-    shader->Set("objectColor", m_color);
 
-    engine::Draw(
-        model->GetStaticMeshes()[0].GetVertexArrayID(), 
-        model->GetStaticMeshes()[0].GetIndexCount()
-    );
+    m_shader->Use();
+    m_shader->Set("mvp", &mvpMatrix);
+    m_shader->Set("normalMat", &normalMatrix);
+    m_shader->Set("objectColor", m_color);
+
+    m_model->Draw();
 }
 
 void editor::GizmosAxis::RenderPickingPass(const math::Matrix4f& projViewMatrix)
 {
-    const engine::Model* model = engine::ResourceManager::GetResource<engine::Model>(m_modelPath);
-    const engine::ShaderProgram* pickingShader = engine::ResourceManager::GetResource<engine::ShaderProgram>("Picking Shader");
-
     // Calculate the color via the entities picking identifier
     uint8 r = static_cast<uint8>((m_pickingID & 0x000000FF) >> 0);
     uint8 g = static_cast<uint8>((m_pickingID & 0x0000FF00) >> 8);
@@ -131,14 +125,11 @@ void editor::GizmosAxis::RenderPickingPass(const math::Matrix4f& projViewMatrix)
     };
 
     const math::Matrix4f& mvp = projViewMatrix * m_modelMatrix;
-    pickingShader->Use();
-    pickingShader->Set("mvp", &mvp);
-    pickingShader->Set("pickingColor", color);
+    m_pickingShader->Use();
+    m_pickingShader->Set("mvp", &mvp);
+    m_pickingShader->Set("pickingColor", color);
 
-    engine::Draw(
-        model->GetStaticMeshes()[0].GetVertexArrayID(),
-        model->GetStaticMeshes()[0].GetIndexCount()
-    );
+    m_model->Draw();
 }
 
 bool editor::GizmosAxis::OnSelectedPosition(math::Vector3f& position, math::Vector3f const& axis, f32 moveIncrement)

@@ -10,11 +10,7 @@
 #define ROTATION_GIZMOS_MODEL ".\\assets\\RotationGizmosAxis.obj"
 
 editor::RotationGizmos::RotationGizmos(void)
-{
-    m_xAxis = GizmosAxis({-0.000f,  0.707f, 0.707f, 0.0f}, ROTATION_GIZMOS_MODEL, {1.0f, 0.0f, 0.0f}, COLOR_MAX - 3);  // X axis
-    m_yAxis = GizmosAxis({0.707f,  0.000f, 0.707f, 0.0f}, ROTATION_GIZMOS_MODEL, {0.0f, 0.0f, 1.0f}, COLOR_MAX - 4);  // Y axis
-    m_zAxis = GizmosAxis({-0.707f, 0.707f,  0.000f, 0.0f}, ROTATION_GIZMOS_MODEL, {0.0f, 1.0f, 0.0f}, COLOR_MAX - 5); // Z axis
-    
+{  
     static bool isInit = false;
     if (!isInit)
     {
@@ -22,6 +18,10 @@ editor::RotationGizmos::RotationGizmos(void)
         engine::ResourceManager::Load<engine::Model>(ROTATION_GIZMOS_MODEL, true);
         isInit = true;
     }
+
+    m_xAxis = GizmosAxis({-0.000f,  0.707f, 0.707f, 0.0f}, ROTATION_GIZMOS_MODEL, {1.0f, 0.0f, 0.0f}, COLOR_MAX - 3);  // X axis
+    m_yAxis = GizmosAxis({0.707f,  0.000f, 0.707f, 0.0f}, ROTATION_GIZMOS_MODEL, {0.0f, 0.0f, 1.0f}, COLOR_MAX - 4);  // Y axis
+    m_zAxis = GizmosAxis({-0.707f, 0.707f,  0.000f, 0.0f}, ROTATION_GIZMOS_MODEL, {0.0f, 1.0f, 0.0f}, COLOR_MAX - 5); // Z axis
 }
 
 void editor::RotationGizmos::IsAxisSelected(std::string const& wndName, engine::Transform* transform)
