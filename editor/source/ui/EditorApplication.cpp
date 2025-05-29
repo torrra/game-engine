@@ -103,7 +103,7 @@ namespace editor
 
     void EditorApplication::Shutdown(void)
     {
-        //RigidBodyDynamicComponent::ReleaseStaticData();
+        m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         delete m_gizmosUI;
