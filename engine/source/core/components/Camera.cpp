@@ -23,11 +23,11 @@ void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 delt
     }
 }
 
-void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
+void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
 {
-    m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch, rotationSpeed);	// Pitch
-    m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw, rotationSpeed);	// Yaw
-    m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll, rotationSpeed);	// Roll
+    m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
+    m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);	    // Yaw
+    m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);	    // Roll
 
     // Clamp pitch // TODO: fix pitch
     if (m_rotation[0] > 90.0f)
@@ -225,7 +225,7 @@ void engine::Camera::GetProjectionMatrix(void)
     m_projectionMatrix[3][3] = 0.0f;
 }
 
-f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed)
+f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle)
 {
     f32 maxDelta = 5.0f;
 
@@ -235,7 +235,7 @@ f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSp
     else if (deltaAngle > maxDelta)
         deltaAngle = maxDelta;
 
-    existingAngle += deltaAngle * rotationSpeed;
+    existingAngle += deltaAngle;
 
     // Wrap angle
     return existingAngle;
