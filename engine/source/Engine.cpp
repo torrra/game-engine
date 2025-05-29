@@ -37,33 +37,33 @@ engine::Engine::Engine(bool withEditor)
        g_defaultEngine = this;
 }
 
-int16 engine::Engine::Startup(const char* projectName, const char* projectDir, uint32 threadCount)
-{
-    if (!projectDir)
-        std::printf("No project opened\n");
-
-    m_application->Startup(projectName);
-
-    ThreadManager::Startup(threadCount);
-
-    if (InitScriptSystem(projectDir) != SUCCESS)
-        return ERROR;
-
-    if (InputHandler::StartUp() != SUCCESS)
-        return ERROR;
-
-    InputHandler::SetCursorMode(ECursorMode::MODE_NORMAL);
-
-    // Load default resources
-    if (LoadEngineResources() != SUCCESS)
-        return ERROR;
-
-    
-    m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
-    PhysicsEngine::Get().Init();
-    SoundEngine::Get().InitSoundEngine();
-    return SUCCESS;
-}
+//int16 engine::Engine::Startup(const char* projectName, const char* projectDir, uint32 threadCount)
+//{
+//    if (!projectDir)
+//        std::printf("No project opened\n");
+//
+//    m_application->Startup(projectName);
+//
+//    ThreadManager::Startup(threadCount);
+//
+//    if (InitScriptSystem(projectDir) != SUCCESS)
+//        return ERROR;
+//
+//    if (InputHandler::StartUp() != SUCCESS)
+//        return ERROR;
+//
+//    InputHandler::SetCursorMode(ECursorMode::MODE_NORMAL);
+//
+//    // Load default resources
+//    if (LoadEngineResources() != SUCCESS)
+//        return ERROR;
+//
+//    
+//    m_uiManager = UIManager(m_application->GetWindow()->GetPtr());
+//    PhysicsEngine::Get().Init();
+//    SoundEngine::Get().InitSoundEngine();
+//    return SUCCESS;
+//}
 
 int16 engine::Engine::Startup(uint32 threadCount)
 {
@@ -97,6 +97,7 @@ int16 engine::Engine::Startup(uint32 threadCount)
 void engine::Engine::ShutDown(void)
 {
     m_activeScene.GetGraph()->CleanRigidBodies();
+    m_activeScene.Reset(false);
     ThreadManager::Shutdown();
     ScriptSystem::Shutdown();
     ResourceManager::ShutDown();
@@ -111,10 +112,10 @@ void engine::Engine::ShutDown(void)
 }
 
 
-void engine::Engine::SetProject(const char* projectDir)
-{
-    InitScriptSystem(projectDir);
-}
+//void engine::Engine::SetProject(const char* projectDir)
+//{
+//    InitScriptSystem(projectDir);
+//}
 
 void engine::Engine::SetEditorApplication(Application* ptr)
 {
@@ -301,28 +302,28 @@ void engine::Engine::SaveProjectFile(void)
 
 }
 
-inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
-{
-    static bool initialized = false;
-
-    ScriptSystem::SetCurrentScene(m_activeScene.GetGraph());
-
-    if (!initialized)
-    {
-        ScriptSystem::Startup();
-        initialized = true;
-    }
-    /*
-    * TODO: probably dont need this line, as you should not be able to 
-    *		open script files if no projects were selected. 
-    */
-    std::string path((projectDir) ? projectDir : ".\\");
-
-    ScriptSystem::SetUserScriptLocation(path.c_str());
-    ScriptSystem::RunAllUserScripts();
-    
-    return SUCCESS;
-}
+//inline int16 engine::Engine::InitScriptSystem(const char* projectDir)
+//{
+//    static bool initialized = false;
+//
+//    ScriptSystem::SetCurrentScene(m_activeScene.GetGraph());
+//
+//    if (!initialized)
+//    {
+//        ScriptSystem::Startup();
+//        initialized = true;
+//    }
+//    /*
+//    * TODO: probably dont need this line, as you should not be able to 
+//    *		open script files if no projects were selected. 
+//    */
+//    std::string path((projectDir) ? projectDir : ".\\");
+//
+//    ScriptSystem::SetUserScriptLocation(path.c_str());
+//    ScriptSystem::RunAllUserScripts();
+//    
+//    return SUCCESS;
+//}
 
 
 inline int16 engine::Engine::LoadEngineResources(void)
