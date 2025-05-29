@@ -29,6 +29,7 @@ namespace editor
         void RenderGizmos(math::Matrix4f const& viewProj, math::Vector3f const& cameraPos);
         void RenderGizmosPicking(math::Matrix4f const& viewProj);
         void UpdateGizmos(const char* wndName);
+        void DeselectEntity(void);
 
         void SetSelectedTransform(engine::Transform* transform);
 

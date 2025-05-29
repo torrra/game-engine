@@ -93,6 +93,7 @@ namespace editor
 
         m_graphView.ClearGraph();
         m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+        m_gizmosUI->DeselectEntity();
         activeScene.GetGraph()->CleanRigidBodies();
 
         activeScene.LoadNewScene(false, filePath);
