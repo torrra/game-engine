@@ -26,26 +26,20 @@
    string | scriptObject="PlayerController"
    uint64 | flags=0
 [Entity]
-   string | name="SceneEntities"
-   int64 | handle=1
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=0
-[Entity]
    string | name="Ground"
-   int64 | handle=2
+   int64 | handle=1
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=21
 [Transform]
     uint64 | index=1
-    int64 | owner=2
+    int64 | owner=1
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,-2.5,0}
-    vec3f32 | scale={15,0.5,15}
+    vec3f32 | position={0,-0.5,0}
+    vec3f32 | scale={15,1,15}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=2
+    int64 | owner=1
     string | model="\cube_simple.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
@@ -54,10 +48,10 @@
     string | material="\GroundMat.mmat"
     uint64 | flags=0
 [RigidBodyStatic]
-     int64 | owner=2
+     int64 | owner=1
      uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=3
-     vec3f32 | box half extents={7.5,0.25,7.5}
+     vec3f32 | box half extents={7.5,0.5,7.5}
      bool | trigger=0
      uint64 | flags=0

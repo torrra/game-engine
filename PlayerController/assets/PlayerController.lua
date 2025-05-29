@@ -9,23 +9,31 @@ end
 
 -- Is executed every tick
 function PlayerController:Update(deltaTime)
-    
     -- Camera rotation
-    local x, y = GetCursorDeltaPos()
-    self.camera:Rotate(y, x, 0, 0.15)
-    
+    local xCursor, yCursor = GetCursorDeltaPos()
+    self.camera:Rotate(yCursor, xCursor, 0, 0.15)
+
     -- Movement
+    local xRot, yRot, zRot = 0
     local movementSpeed = 5
     if IsInputDown(InputCode.KEY_W) then
-        self.camera:Move(0, 0, -1, movementSpeed, deltaTime) 
+        local translation = Vector3.new(0, 0, -1 * movementSpeed * deltaTime)
+        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_S) then
-        self.camera:Move(0, 0, 1, movementSpeed, deltaTime)
+        local translation = Vector3.new(0, 0, 1 * movementSpeed * deltaTime)
+        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end
 
     if IsInputDown(InputCode.KEY_A) then
-        self.camera:Move(-1, 0, 0, movementSpeed, deltaTime)
+        local translation = Vector3.new(-1 * movementSpeed * deltaTime, 0, 0)
+        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_D) then
-        self.camera:Move(1, 0, 0, movementSpeed, deltaTime)
+        local translation = Vector3.new(1 * movementSpeed * deltaTime, 0, 0)
+        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end
 end
 
