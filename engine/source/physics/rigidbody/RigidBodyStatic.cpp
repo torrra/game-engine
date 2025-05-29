@@ -145,6 +145,11 @@ bool engine::RigidBodyStatic::GetIsTrigger(void) const
     return m_isTrigger;
 }
 
+engine::EGeometryType engine::RigidBodyStatic::GetShape(void) const
+{
+    return static_cast<EGeometryType>(m_rigidBodyShape);
+}
+
 void engine::RigidBodyStatic::SetBoxHalfExtents(const math::Vector3f& inHalfExtents)
 {
     // Set the box half extents by using the shape of rigid body to access the good geometry

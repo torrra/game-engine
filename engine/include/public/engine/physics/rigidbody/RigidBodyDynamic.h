@@ -127,6 +127,18 @@ namespace engine
         */
         ENGINE_API [[nodiscard]]
             bool                GetIsZAxisLock(void) const;
+        
+        /*
+            Get the shape of the rigidbody
+            <return> [out] EGeometryType :
+                - Box = 0
+                - Sphere = 1
+                - Capsule = 2
+                - Plane = 3
+                - Triangle mesh = 4
+        */
+        ENGINE_API
+            EGeometryType GetShape(void) const;
 
         /// Setter
         /*

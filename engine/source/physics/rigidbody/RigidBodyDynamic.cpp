@@ -365,7 +365,6 @@ math::Vector3f engine::RigidBodyDynamic::GetBoxHalfExtents(void)
 
                 m_halfExtents = math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                     boxGeometry.halfExtents.z);
-
                 return math::Vector3f(boxGeometry.halfExtents.x, boxGeometry.halfExtents.y,
                     boxGeometry.halfExtents.z);
             }
@@ -469,6 +468,11 @@ bool engine::RigidBodyDynamic::GetIsYAxisLock(void) const
 bool engine::RigidBodyDynamic::GetIsZAxisLock(void) const
 {
     return m_isZLock;
+}
+
+engine::EGeometryType engine::RigidBodyDynamic::GetShape(void) const
+{
+    return static_cast<EGeometryType>(m_rigidBodyShape);
 }
 
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)

@@ -159,10 +159,18 @@ void editor::PropertyWnd::RenderMenuBar(void)
                 AddComponent<RendererComponent, engine::Renderer>();
 
             else if (ui::MenuItem("RigidbodyStatic"))
+            {
                 AddComponent<RigidBodyStaticComponent, engine::RigidBodyStatic>();
+                if (engine::RigidBodyStatic* rbStatic = m_graph->GetComponent<engine::RigidBodyStatic>(m_handle))
+                    rbStatic->SwitchShape(rbStatic->GetShape());
+            }
 
             else if (ui::MenuItem("RigidbodyDynamic"))
+            {
                 AddComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
+                if (engine::RigidBodyDynamic* rbDynamic = m_graph->GetComponent<engine::RigidBodyDynamic>(m_handle))
+                    rbDynamic->SwitchShape(rbDynamic->GetShape());
+            }
 
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
