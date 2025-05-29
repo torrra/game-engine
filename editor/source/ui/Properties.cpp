@@ -167,9 +167,6 @@ void editor::PropertyWnd::RenderMenuBar(void)
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
 
-            else if (ui::MenuItem("Script"))
-                printf("Adding script...\n"); // TODO: implement for script object
-
             else if (ui::MenuItem("Transform"))
                 AddComponent<TransformComponent, engine::Transform>();
 
