@@ -186,6 +186,7 @@ namespace engine
         if (numPhysicsUpdate < 1)
             return;
 
+        m_graph.SyncRigidbodiesPrePhysics();
         f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
 
         for (int32 updateNum = 0; updateNum < numPhysicsUpdate; ++updateNum)
