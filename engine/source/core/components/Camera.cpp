@@ -11,17 +11,17 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
     m_currentScene = scene;
     GetProjectionMatrix();
     
-    
-
+    m_transform = m_currentScene->GetComponent<engine::Transform>(m_owner);
 }
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
-    // Get or add transform
-
-
-    math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
-    m_transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
+    if (m_transform)
+    {
+        // Add to transform trasnslation
+        math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
+        m_transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
+    }
 }
 
 void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
