@@ -77,6 +77,11 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
     
     if (ui::StartMenu("Project"))
     {
+        if (ui::MenuItem("Save project", "Ctrl+S"))
+        {
+            engine::Engine::GetEngine()->SaveProject();
+        }
+
         if (ui::MenuItem("Create project"))
         {
             m_isCreateWndOpened = true;
@@ -85,6 +90,11 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
         if (ui::MenuItem("Open project"))
         {
             OpenProject(scene);
+        }
+
+        if (ui::MenuItem("Build project", "Ctrl+B"))
+        {
+            engine::Engine::GetEngine()->BuildProjectExecutable("..\\testProjectBuildFolder");
         }
 
         ui::EndMenu();
