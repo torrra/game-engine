@@ -9,59 +9,32 @@
 
 namespace engine
 {
-    // Position / scale bone transform
-    struct Vec3BoneTransform
-    {
-        math::Vector3f  m_vector = math::Vector3f::One();
-        
-        // Tick index
-        int32           m_time = -1;
-    };
-
-    // Rotation bone transform
-    struct QuatBoneTransform
-    {
-        math::Quatf    m_quaternion = math::Quatf::Identity();
-        int32          m_time = -1;       
-    };
-
-    struct AnimTransform
-    {
-        
-        math::Quatf    m_quaternion = math::Quatf::Identity();
+ 
+    struct BoneTransform
+    {   
+        math::Quatf     m_rotation = math::Quatf::Identity();
         math::Vector3f  m_position = math::Vector3f::Zero();
-        math::Vector3f  m_scale = math::Vector3f::One();
+        math::Vector3f  m_scaling = math::Vector3f::One();
 
     };
 
-    // All frame transformations for a given bone
-    class BoneAnimData
+    struct AnimBone
     {
+        std::string                 m_boneName;
+        std::vector<BoneTransform>  m_keyframes;
 
-    public:
-
-        BoneAnimData(void) = default;
-        BoneAnimData(BoneAnimData&&) noexcept = default;
-        BoneAnimData(const BoneAnimData&) = delete;
-        ~BoneAnimData(void) = default;
-
-        BoneAnimData& operator=(BoneAnimData&&) noexcept = default;
-
-    private:
-    
-        std::vector<QuatBoneTransform>  m_rotations;
-        std::vector<Vec3BoneTransform>  m_positions;
-        std::vector<Vec3BoneTransform>  m_scales;
-
-        std::string                     m_boneName;
-
-        friend class Animation;
+        const BoneTransform& operator[](int32 index) const;
     };
+
+    BoneTransform Interpolate(const BoneTransform& transformA,
+                              const BoneTransform& transformB, f32 ratio);
+
+    BoneTransform operator*(const BoneTransform& transformA, const BoneTransform& transformB);
+    BoneTransform operator-(const BoneTransform& transform);
 
 
     class Animation final : public IResource
     {
-
     public:
 
         ENGINE_API Animation(void) = default;
@@ -71,21 +44,29 @@ namespace engine
         ENGINE_API ~Animation(void) = default;
 
         ENGINE_API bool LoadResource(const char* filePath) override;
+        ENGINE_API const std::vector<AnimBone>& GetBoneData(void) const;
 
         // When one or several animations are stored with a model,
         // or when several animations are in a single file, load
         // secondary animations from that data
         ENGINE_API static void LoadExtraAnimations(const void* anims, uint32 offset = 0);
-     
+
+        ENGINE_API uint64 GetBoneCount(void) const;
+        ENGINE_API int32 GetTickCount(void) const;
+        ENGINE_API f32 GetTicksPerSecond(void) const;
+
     private:
 
         // Read entire animation
         void ReadAnimation(const void* animation);
 
         // Read a single bone's transformations
-        void ReadBoneAnim(void* boneAnim);
 
-        std::vector<BoneAnimData>   m_animData;
+        void ReadBonePositions(AnimBone& newBone, void* boneAnim);
+        void ReadBoneScalings(AnimBone& newBone, void* boneAnim);
+        void ReadBoneRotations(AnimBone& newBone, void* boneAnim);
+
+        std::vector<AnimBone>       m_boneData;
         int32                       m_tickCount = -1;
         f32                         m_ticksPerSecond = 0.f;
     };
