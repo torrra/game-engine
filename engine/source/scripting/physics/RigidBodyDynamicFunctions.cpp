@@ -89,8 +89,8 @@ int script_GetCapsuleFormat(lua_State* luaState)
     else if (engine::RigidBodyDynamic* rigidBody =
              (engine::RigidBodyDynamic*)lua_touserdata(luaState, 1))
     {
-        lua_pushnumber(luaState, rigidBody->GetBoxHalfExtents().GetX());
-        lua_pushnumber(luaState, rigidBody->GetBoxHalfExtents().GetY());
+        lua_pushnumber(luaState, rigidBody->GetCapsuleFormat().GetX());
+        lua_pushnumber(luaState, rigidBody->GetCapsuleFormat().GetY());
 
         return 2;
     }
