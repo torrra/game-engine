@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <vector>
+#include <unordered_map>
 
 #include "engine/resource/Resource.h"
 
@@ -20,7 +21,7 @@ namespace engine
 
     struct AnimBone
     {
-        std::string                 m_boneName;
+       // std::string                 m_boneName;
         std::vector<BoneTransform>  m_keyframes;
 
         const BoneTransform& operator[](int32 index) const;
@@ -55,6 +56,8 @@ namespace engine
         ENGINE_API int32 GetTickCount(void) const;
         ENGINE_API f32 GetTicksPerSecond(void) const;
 
+        ENGINE_API const AnimBone* GetBoneAnimData(const std::string& boneName) const;
+
     private:
 
         // Read entire animation
@@ -66,6 +69,7 @@ namespace engine
         void ReadBoneScalings(AnimBone& newBone, void* boneAnim);
         void ReadBoneRotations(AnimBone& newBone, void* boneAnim);
 
+        std::unordered_map<std::string, AnimBone> m_boneMap;
         std::vector<AnimBone>       m_boneData;
         int32                       m_tickCount = -1;
         f32                         m_ticksPerSecond = 0.f;

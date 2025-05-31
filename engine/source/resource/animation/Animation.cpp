@@ -100,9 +100,9 @@ namespace engine
         for (uint32 boneNum = 0; boneNum < animImpl->mNumChannels; ++boneNum)
         {
             aiNodeAnim* boneAnim = animImpl->mChannels[boneNum];
-            AnimBone& newBone = m_boneData.emplace_back();
+            AnimBone& newBone = m_boneMap[boneAnim->mNodeName.C_Str()];
 
-            newBone.m_boneName = boneAnim->mNodeName.C_Str();
+            //newBone.m_boneName = boneAnim->mNodeName.C_Str();
             newBone.m_keyframes.resize(static_cast<uint32>(animImpl->mDuration));
 
             ReadBonePositions(newBone, boneAnim);
@@ -247,6 +247,16 @@ namespace engine
     f32 Animation::GetTicksPerSecond(void) const
     {
         return m_ticksPerSecond;
+    }
+
+    const AnimBone* Animation::GetBoneAnimData(const std::string& boneName) const
+    {
+        auto bone = m_boneMap.find(boneName);
+
+        if (bone != m_boneMap.end())
+            return &(bone->second);
+        else
+            return nullptr;
     }
 
 }
