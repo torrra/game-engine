@@ -350,7 +350,7 @@ int script_AddForce(lua_State* luaState)
         if (argumentCount == 5)
             forceMode       = rigidBody->SetForceMode(static_cast<uint32>(lua_tointeger(luaState, 5)));
 
-        if (argumentCount == 6)
+        else if (argumentCount == 6)
         {
             forceMode       = rigidBody->SetForceMode(static_cast<uint32>(lua_tointeger(luaState, 5)));
             autoWake        = static_cast<bool>(lua_toboolean(luaState, 6));
