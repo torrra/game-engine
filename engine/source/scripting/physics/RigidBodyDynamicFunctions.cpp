@@ -44,7 +44,7 @@ int script_GetIsGravityDisabled(lua_State* luaState)
     }
 
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetBoxHalfExtents(lua_State* luaState)
@@ -62,7 +62,7 @@ int script_GetBoxHalfExtents(lua_State* luaState)
         return 3;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetSphereRadius(lua_State* luaState)
@@ -78,7 +78,7 @@ int script_GetSphereRadius(lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetCapsuleFormat(lua_State* luaState)
@@ -95,7 +95,7 @@ int script_GetCapsuleFormat(lua_State* luaState)
         return 2;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetLinearVelocity(lua_State* luaState)
@@ -113,7 +113,7 @@ int script_GetLinearVelocity(lua_State* luaState)
         return 3;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetAngularVelocity(lua_State* luaState)
@@ -131,7 +131,7 @@ int script_GetAngularVelocity(lua_State* luaState)
         return 3;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetIsTrigger(lua_State* luaState)
@@ -146,7 +146,7 @@ int script_GetIsTrigger(lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetIsXAxisLock(lua_State* luaState)
@@ -161,7 +161,7 @@ int script_GetIsXAxisLock(lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetIsYAxisLock(lua_State* luaState)
@@ -176,7 +176,7 @@ int script_GetIsYAxisLock(lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetIsZAxisLock(lua_State* luaState)
@@ -191,7 +191,7 @@ int script_GetIsZAxisLock(lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_SetGravityDisabled(lua_State* luaState)
