@@ -4,7 +4,9 @@
 #include "engine/core/Component.h"
 #include "engine/core/ComponentArray.hpp"
 #include "engine/core/components/Transform.h"
+#include "engine/resource/animation/SkeletonAnimator.h"
 #include "engine/utility/ResourceRefDecl.h"
+
 #include <math/Matrix4.hpp>
 #include <fstream>
 
@@ -18,10 +20,11 @@ namespace engine
 
     public:
 
-        using Component::Component;
-
         ENGINE_API
         Renderer(const Renderer&) = default;
+
+        ENGINE_API
+        Renderer(EntityHandle owner, class SceneGraph* scene);
 
         ENGINE_API
         Renderer(Renderer&&) = default;
@@ -71,6 +74,9 @@ namespace engine
                            EntityHandle owner,
                            uint64 index) const;
 
+       ENGINE_API
+       SkeletonAnimator& GetAnimator(void);
+
         ENGINE_API
         const char* DeserializeText(const char* text, const char* end) override;
 
@@ -81,6 +87,8 @@ namespace engine
         Renderer& operator=(Renderer&&) noexcept = default;
 
     private:
+
+        SkeletonAnimator                    m_animator;
         MaterialArray                       m_materials;
         ResourceRef<class Model>            m_model;
         ResourceRef<class ShaderProgram>    m_shader;

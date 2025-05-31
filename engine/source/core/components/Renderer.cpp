@@ -19,6 +19,12 @@
 
 namespace engine
 {
+    Renderer::Renderer(EntityHandle owner, SceneGraph* scene)
+        : Component(owner, scene)
+    {
+
+    }
+
     void Renderer::Register(void)
     {
     }
@@ -55,6 +61,14 @@ namespace engine
             m_shader->Set("mvp", &viewProjection);
             m_shader->Set("normalMat", &identity3x3);
         }
+
+        if (m_model->IsDynamic() && (m_animator.IsPlaying() || m_animator.IsPaused()))
+        {
+            m_animator.UseSkinningBuffer();
+            m_shader->Set("isRigged", true);
+        }
+        else
+            m_shader->Set("isRigged", false);
 
         m_model->Draw(m_materials);
         OpenGLError();
@@ -98,6 +112,7 @@ namespace engine
     void Renderer::SetModel(ResourceRef<Model>&& model)
     {
         m_model = std::forward<ResourceRef<Model>>(model);
+        m_animator.SetModel(m_model);
     }
 
     void Renderer::SetModel(const char* key)
@@ -162,6 +177,11 @@ namespace engine
         output << '\n';
     }
 
+    SkeletonAnimator& Renderer::GetAnimator(void)
+    {
+        return m_animator;
+    }
+
     const char* Renderer::DeserializeText(const char* text, const char* end)
     {
         MOVE_TEXT_CURSOR(text, end);
@@ -174,6 +194,7 @@ namespace engine
         {
             ResourceManager::Load<Model>(key);
             m_model = ResourceManager::GetResource<Model>(key);
+            m_animator.SetModel(m_model);
         }
 
         key.clear();
