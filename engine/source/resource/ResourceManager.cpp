@@ -29,10 +29,13 @@ void engine::ResourceManager::LoadShader(
 
 void engine::ResourceManager::Unload(std::string const& fileName)
 {
+    std::lock_guard lock(m_mutex);
+
 	// Check resource exists
 	if (!HasResource(fileName))
 		return;
 
+    printf("Unloaded %s\n", fileName.c_str());
     GetInstance()->m_resources.erase(fileName);
 }
 
