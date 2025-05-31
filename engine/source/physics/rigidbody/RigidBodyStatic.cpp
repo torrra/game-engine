@@ -31,6 +31,12 @@
 
 #pragma endregion
 
+#pragma region System
+
+#include "core/systems/ScriptSystem.h"
+
+#pragma endregion
+
 /// <summary>
 /// TODO :  Clean and comment
 ///         Comment on git
@@ -564,6 +570,16 @@ void engine::RigidBodyStatic::SetTrigger(bool inIsTrigger)
             }
         }
     }
+}
+
+void engine::RigidBodyStatic::Register(void)
+{
+    ScriptSystem::RegisterNewComponent("_NewRigidBodyStaticComponent", m_owner);
+}
+
+void engine::RigidBodyStatic::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveRigidBodyStaticComponent", m_owner);
 }
 
 void engine::RigidBodyStatic::SwitchShape(const EGeometryType& inGeometry)

@@ -127,8 +127,10 @@ namespace engine
             void                SetTrigger(bool inIsTrigger);
 
 		/// Functions
-		ENGINE_API	
-            void		        Register(void) override {}
+        ENGINE_API
+            void				Register(void) override;
+        ENGINE_API
+            void                Unregister(void) override;
 
         // Update the entity transform in reference to the dynamic rigid body
         ENGINE_API  

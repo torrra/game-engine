@@ -63,6 +63,9 @@ namespace engine
 
     private :
 
+        /// Friend class
+        friend class TriangleMeshStaticFactory;
+
         /// Functions
         // Cook the triangle mesh
         void                            CookTriangleMesh(void);
@@ -81,6 +84,21 @@ namespace engine
                 bool                        m_isDrawn           = false;
 
     }; // !Class TriangleMesh
+
+    class TriangleMeshStaticFactory
+    {
+    public:
+
+        /// Functions
+        /*
+            Fonction to create a dynamic rigid body
+            <param> [in] inScene : the scene
+            <param> [in] inOwner : the entity owner
+            <param> [in] inGeometry : the geometry type
+        */
+        ENGINE_API static TriangleMesh* CreateStatic(class SceneGraph* inScene,
+                                                     EntityHandle inOwner);
+    }; // !Class RigidBodyStaticFactory
 
     template<>
     inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<TriangleMesh>()

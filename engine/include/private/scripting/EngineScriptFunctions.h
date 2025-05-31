@@ -12,4 +12,6 @@
 #include "scripting/ui/Button.h"
 #include "scripting/ui/ProgressBar.h"
 #include "scripting/physics/RaycastFunctions.h"
+#include "scripting/physics/RigidBodyDynamicFunctions.h"
+#include "scripting/physics/RigidBodyStaticFunctions.h"
 #include "scripting/ecs/AudioPlayerFunctions.h"

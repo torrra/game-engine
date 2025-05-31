@@ -28,7 +28,8 @@ namespace editor
         SCRIPT,
         TRANSFORM, 
         LIGHT_SOURCE,
-        NAVIGATION_POINT
+        NAVIGATION_POINT,
+        TRIANGLE_MESH
     };
 
     class BaseComponent
