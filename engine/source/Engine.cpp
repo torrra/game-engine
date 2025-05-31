@@ -146,6 +146,11 @@ void engine::Engine::UpdateApplicationWindow(void)
     m_uiManager.NewFrame();
 
     m_application->Render(m_activeScene.GetGraph());
+    
+    if (!HasEditor())
+    {
+        m_uiManager.RenderCanvases({0.0f, 0.0f}, m_application->GetWindow()->GetSize<f32>());
+    }
 
     m_uiManager.EndFrame();
     m_application->EndFrame();
@@ -166,6 +171,11 @@ const std::filesystem::path& engine::Engine::GetProjectDir(void) const
 std::string engine::Engine::GetProjectName(void) const
 {
     return m_projectName;
+}
+
+engine::UIManager& engine::Engine::GetUIManager(void)
+{
+    return m_uiManager;
 }
 
 void engine::Engine::LoadNewScene(bool serialize, const std::filesystem::path& path)

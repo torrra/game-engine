@@ -50,8 +50,10 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene)
         m_gameRunning = false;
         m_application->ResetScene(activeScene);
         
+        
         // Re-select the previously selected entity for property window
         m_application->m_properties.SetHandle(m_application->m_graphView.GetSelectedEntity());
+
         printf("Game running: false\n");
     }
     else if (!m_gameRunning && ::ui::Button("Start"))
