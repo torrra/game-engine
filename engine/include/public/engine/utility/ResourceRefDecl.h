@@ -16,7 +16,7 @@ namespace engine
         ResourceRef(void) = default;
         ResourceRef(ResourceContainer* controlBlock, TResourceType* rawVal);
         ResourceRef(const ResourceRef& other);
-        ResourceRef(ResourceRef&&) noexcept = default;
+        ResourceRef(ResourceRef&&) noexcept;
         ~ResourceRef(void);
 
         ResourceRef& operator=(const ResourceRef& rhs);
@@ -38,17 +38,7 @@ namespace engine
         bool operator!=(const TResourceType* rhs) const;
 
         operator bool(void) const;
-
-
-        // Internal functions for type casting between refs
-
-        ResourceContainer* GetControlBlock(void);
-        TResourceType*     GetRaw(void);
-
-        void SetControlBLock(ResourceContainer* container);
-        void SetRaw(TResourceType* resource);
         
-
     protected:
 
         void DecrementRefCount(void);
@@ -104,6 +94,16 @@ namespace engine
     {
         if (m_controlBlock)
             m_controlBlock->AddRef();
+    }
+
+    template<typename TResourceType>
+    inline ResourceRef<TResourceType>::ResourceRef(ResourceRef&& rhs) noexcept
+    {
+        m_controlBlock = rhs.m_controlBlock;
+        m_raw = rhs.m_raw;
+
+        rhs.m_controlBlock = nullptr;
+        rhs.m_raw = nullptr;
     }
 
     template<typename TResourceType> inline
