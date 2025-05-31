@@ -16,7 +16,7 @@ namespace engine
     void DynamicMesh::ProcessMesh(const void* mesh)
     {
         Mesh::ProcessMesh(mesh);    
-        ProcessSkeleton(mesh);
+        //ProcessSkeleton(mesh);
     }
 
     void DynamicMesh::DeleteMesh(void)
@@ -33,12 +33,17 @@ namespace engine
 
     int32 DynamicMesh::GetBoneIndex(const std::string& name) const
     {
-        auto indexIt = m_boneMap.find(std::hash<std::string>{}(name));
+        auto indexIt = m_boneMap.find(/*std::hash<std::string>{}*/(name));
 
         if (indexIt != m_boneMap.end())
             return indexIt->second;
 
         return -1;
+    }
+
+     uint64 DynamicMesh::GetBoneCount(void) const
+    {
+        return m_skeleton.size();
     }
 
     void DynamicMesh::RenderThreadSkeletonSetup(void)
@@ -54,13 +59,22 @@ namespace engine
 
         if (weightBuffer && indexBuffer)
         {
+            uint64 indexOffset = 0;
+            uint64 weightOffset = 0;
+
             for (const BoneWeight& weight : m_weights)
             {
-                new(weightBuffer) math::Vector4f(weight.m_weights);
-                new(indexBuffer) math::Vector4<uint32>(weight.m_boneIndices);
+                new(weightBuffer + weightOffset) math::Vector4f(weight.m_weights);
+                new(indexBuffer + indexOffset) math::Vector4<uint32>(weight.m_boneIndices);
+
+                /*indexOffset += sizeof(math::Vector4<uint32>);
+                weightOffset += sizeof(math::Vector4f);*/
+
+                ++indexOffset;
+                ++weightOffset;
             }
-            m_weights.clear();
-            m_weights.shrink_to_fit();
+            //m_weights.clear();
+            //m_weights.shrink_to_fit();
             SetupSkeletonVertexBuffers(indexBuffer, indexSize, weightBuffer, weightSize);
         }
 
@@ -131,10 +145,10 @@ namespace engine
         if (!meshImpl->HasBones())
             return false;
    
-        std::unordered_map<void*, int64> nodes;
+        BoneIndexMap nodes;
         nodes.reserve(meshImpl->mNumBones);
 
-        for (uint64 boneIndex = 0; boneIndex < static_cast<uint64>(meshImpl->mNumBones); ++boneIndex)
+        for (int32 boneIndex = 0; boneIndex < static_cast<int32>(meshImpl->mNumBones); ++boneIndex)
         {
             aiBone* bone = meshImpl->mBones[boneIndex];
             nodes[bone->mNode] = boneIndex;
@@ -147,11 +161,16 @@ namespace engine
             aiBone* bone = meshImpl->mBones[boneIndex];
             Bone& newBone = unorderedSkeleton[nodes.at(bone->mNode)];
 
-            ProcessWeights(bone, boneIndex);
             ProcessBone(newBone, bone, nodes);
         }
 
-        SortSkeleton(unorderedSkeleton);
+        std::vector<int32> unsortedIndices = SortSkeleton(unorderedSkeleton);
+
+        for (int32 sortedIndex = 0; sortedIndex < unsortedIndices.size(); ++sortedIndex)
+        {
+            ProcessWeights(meshImpl->mBones[unsortedIndices[sortedIndex]], sortedIndex);
+        }
+
         PopulateBoneNameMap();
         return true;
     }
@@ -163,6 +182,7 @@ namespace engine
         // Transpose as assimp's matrices are row major
         newBone.m_inverseBindPose = reinterpret_cast<f32*>(&boneImpl->mOffsetMatrix.Transpose());
         newBone.m_name = boneImpl->mName.C_Str();
+        newBone.m_localTransform = reinterpret_cast<f32*>(&boneImpl->mNode->mTransformation.Transpose());
 
         auto parentIterator = nodes.find(boneImpl->mNode->mParent);
 
@@ -185,16 +205,17 @@ namespace engine
     void DynamicMesh::PopulateBoneNameMap(void)
     {
         int32 boneIndex = 0;
-        std::hash<std::string> hashFunctor;
+        //std::hash<std::string> hashFunctor;
 
         for (const Bone& bone : m_skeleton)
         {
-            uint64 hashedName = hashFunctor(bone.m_name);
-            m_boneMap[hashedName] = boneIndex++;
+           // uint64 hashedName = hashFunctor(bone.m_name);
+            m_boneMap[bone.m_name] = boneIndex++;
+            std::cout << bone;
         }
     }
 
-    void DynamicMesh::SortSkeleton(std::vector<Bone>& boneArray)
+    std::vector<int32> DynamicMesh::SortSkeleton(std::vector<Bone>& boneArray)
     {
         // This vector maps old unordered indices to
         // new positions that guarantee they will be updated
@@ -212,6 +233,8 @@ namespace engine
     
         for (int32 arrayIndex = 0; arrayIndex < static_cast<int32>(arraySize); ++arrayIndex)
            SortChildrenBones(indexArray[arrayIndex], arrayIndex, boneArray, indexArray);
+
+        return indexArray;
     }
 
     void DynamicMesh::SortChildrenBones(int32 oldParentIndex, int32 newIndex,
@@ -232,8 +255,13 @@ namespace engine
 
     std::ostream& operator<<(std::ostream& lhs, const Bone& rhs)
     {
-        lhs << "[Bone]\nname: " << rhs.m_name << '\n';
-        lhs << "parent: " << rhs.m_parent << "\n\n";
+        lhs << "[Bone]\nname: " << rhs.m_name << "\nparent: " << rhs.m_parent <<
+        "\ninverse bind pose:\n";
+
+        for (int32 columnIndex = 0; columnIndex < 4; ++columnIndex)
+            lhs << rhs.m_inverseBindPose[columnIndex] << '\n';
+
+        lhs << '\n';
 
         return lhs;
     }
