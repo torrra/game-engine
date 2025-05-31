@@ -9,6 +9,7 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
 #include <engine/ui/UIStyle.h>
+#include <engine/ConsoleLog.hpp>
 
 #define NO_MODEL_NAME "None##model"
 #define NO_FRAG_NAME "None##shader"
@@ -84,12 +85,16 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
         if (const ui::Payload payload = ui::AcceptPayload(MODEL_PAYLOAD, 0))
         {
             Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
-            engine::ResourceManager::Load<engine::Animation>(payloadData->m_path.string());
+            std::string pathStr = payloadData->m_path.string();
+            engine::ResourceManager::Load<engine::Animation>(pathStr);
             
-            auto ref = engine::ResourceManager::GetResource<engine::Animation>(payloadData->m_path.string());
+            auto ref = engine::ResourceManager::GetResource<engine::Animation>(pathStr);
 
             if (ref)
+            {
+                engine::PrintLog(engine::SuccessPreset(), "Set " + pathStr + " as current animation");
                 renderer->GetAnimator().SetAnimation(std::move(ref), false);
+            }
         }
 
         ui::EndDragDropTarget();
