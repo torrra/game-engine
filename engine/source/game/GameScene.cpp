@@ -117,6 +117,7 @@ namespace engine
         if (m_state == EGameState::RUNNING)
         {
             ThreadManager::SynchronizeGameThread(&m_graph);
+            ThreadManager::TickAnimations(&m_graph, m_time.GetDeltaTime());
             m_graph.UpdateSceneLights(m_lightBuffers.m_omnidirectionalBuffer,
                                       m_lightBuffers.m_directionalBuffer,
                                       m_lightBuffers.m_spotlightBuffer);
@@ -185,6 +186,8 @@ namespace engine
 
         if (numPhysicsUpdate < 1)
             return;
+
+        m_graph.SyncRigidbodiesPrePhysics();
 
         f32 interval = m_timeSincePhysicsTick / static_cast<f32>(numPhysicsUpdate);
 
