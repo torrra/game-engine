@@ -28,7 +28,6 @@ editor::AssetDetailsWnd::~AssetDetailsWnd(void)
 void editor::AssetDetailsWnd::SelectAsset(const std::string& path, EAssetType type)
 {
     ResetData();
-    engine::EditableRef<engine::MeshMaterial> mat;
 
     switch (type)
     {
@@ -43,6 +42,7 @@ void editor::AssetDetailsWnd::SelectAsset(const std::string& path, EAssetType ty
         break;
 
     default:
+        m_selectedResource = engine::EditableRef<engine::IResource>();
         break;
     }
 

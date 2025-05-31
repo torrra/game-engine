@@ -96,11 +96,14 @@ int16 engine::Engine::Startup(uint32 threadCount)
 
 void engine::Engine::ShutDown(void)
 {
+    ThreadManager::SynchronizeAnimationThread();
+    ThreadManager::ExecuteRenderThreadTasks();
     m_activeScene.GetGraph()->CleanRigidBodies();
+    m_activeScene.Reset(false);
     ThreadManager::Shutdown();
     ScriptSystem::Shutdown();
-    ResourceManager::ShutDown();
     m_application->Shutdown();
+    ResourceManager::ShutDown();
     InputHandler::ShutDown();
     m_uiManager.ShutDown();
     PhysicsEngine::Get().CleanUp();

@@ -78,6 +78,8 @@ namespace editor
     void EditorApplication::ResetScene(::engine::GameScene& activeScene)
     {
         engine::ThreadManager::SynchronizeGameThread(nullptr);
+        engine::ThreadManager::SynchronizeAnimationThread();
+        engine::ThreadManager::ExecuteRenderThreadTasks();
         activeScene.Stop();
 
         m_graphView.ClearGraph();
@@ -104,6 +106,7 @@ namespace editor
     void EditorApplication::Shutdown(void)
     {
         //RigidBodyDynamicComponent::ReleaseStaticData();
+        m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         delete m_gizmosUI;
