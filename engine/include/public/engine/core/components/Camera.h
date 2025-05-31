@@ -66,7 +66,7 @@ namespace engine
         Camera& operator=(Camera&&) noexcept = default;
 
     private:
-        math::Matrix4f GetViewMatrix(void);
+        math::Matrix4f GetViewMatrix(Transform* inTransform);
         void GetProjectionMatrix(void);
 
         f32 RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed);
