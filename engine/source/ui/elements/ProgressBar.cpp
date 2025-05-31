@@ -23,11 +23,13 @@ engine::ProgressBar::ProgressBar(math::Vector2f const& position, math::Vector2f 
 
 void engine::ProgressBar::Render(void)
 {
+    static const f32 denominator = 1.0f / (m_range[1] - m_range[0]);
+
     ImGui::PushStyleColor(ImGuiCol_FrameBg, m_bgColor);
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, m_fillColor);
     
     ImGui::SetCursorPos(m_transform.m_position);
-    ImGui::ProgressBar(m_value, m_range, NO_TEXT);
+    ImGui::ProgressBar(m_value * denominator, m_range, NO_TEXT);
 
     ImGui::PopStyleColor(2);
 }
@@ -47,3 +49,4 @@ void engine::ProgressBar::SetFillColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
     m_fillColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
+

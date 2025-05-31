@@ -1,8 +1,9 @@
 #pragma once
 
 #include "engine/EngineExport.h"
-
+#include <math/Vector2.hpp>
 #include <string>
+#include <unordered_map>
 
 struct ImGuiIO;
 namespace engine::wnd
@@ -30,8 +31,18 @@ namespace engine
 		ENGINE_API void	ShutDown(void);
 
         ENGINE_API bool IsWindowFocused(std::string const& name);
+
+        ENGINE_API void CreateCanvas(std::string const& name, math::Vector2f const& size);
+        ENGINE_API class Canvas* GetCanvas(std::string const& name);
+        ENGINE_API void ClearAllCanvases(void);
+        ENGINE_API void DeleteAllCanvases(void);
+        ENGINE_API void DeleteCanvas(std::string const& name);
+        ENGINE_API void RenderCanvases(math::Vector2f const& position, math::Vector2f const& viewportSize);
+        
 	
 	private:
 		void			InitUI(wnd::Wnd* window);
+
+        std::unordered_map<std::string, class Canvas*> m_canvasMap;
 	};
 }

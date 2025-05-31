@@ -4,13 +4,14 @@
 #include <engine/CoreTypes.h>
 #include <engine/core/components/Transform.h>
 
+
 namespace editor
 {
     class TransformComponent : public BaseComponent
     {
     public:
         TransformComponent(void);
-        ~TransformComponent(void);
+        ~TransformComponent(void) = default;
 
     protected:
         virtual void SectionContent(void) override;
@@ -21,6 +22,5 @@ namespace editor
 
         math::Vector3f m_lastRot;
         math::Vector3f m_rotation;
-        bool m_isRotationSynced;
     };
 }

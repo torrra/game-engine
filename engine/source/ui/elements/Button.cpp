@@ -10,6 +10,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
+#include "ui/elements/Button.h"
 
 engine::Button::Button(const char* text, math::Vector2f const& position, math::Vector2f const& size)
     : m_text(text), m_rounding(0.0f), m_padding(0)
@@ -31,8 +32,7 @@ void engine::Button::Render(void)
         CalcSize();
     
     ImGuiWindow* window = ImGui::GetCurrentWindow();
-    const ImGuiID& id = window->GetID(m_text.c_str());
-    
+    const ImGuiID& id = window->GetID(m_uid);
     ImRect box(
         window->Pos + m_transform.m_position,
         window->Pos + m_transform.m_position + m_transform.m_sizePx

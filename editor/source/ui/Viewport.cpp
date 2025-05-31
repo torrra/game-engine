@@ -2,6 +2,7 @@
 #include "Picking.h"
 #include "ui/EditorApplication.h"
 #include <engine/ui/UIComponent.h>
+#include <engine/ui/UIWindow.h>
 #include <engine/thread/ThreadManager.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/utility/MemoryCheck.h>
@@ -9,6 +10,7 @@
 #include <engine/resource/model/Model.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/utility/Colors.h>
+#include <engine/Engine.h>
 
 #include <math/Vector2.hpp>
 
@@ -52,8 +54,15 @@ void editor::Viewport::RenderToViewport(void)
         static_cast<int32>(m_size.GetY())
     });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
+   
     engine::ThreadManager::RenderScene(m_graph);
+
     m_fbo.Unbind();
+}
+
+void editor::Viewport::RenderInGameUI(void)
+{
+    engine::Engine::GetEngine()->GetUIManager().RenderCanvases({0.0f, 0.0f}, m_size);
 }
 
 void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)

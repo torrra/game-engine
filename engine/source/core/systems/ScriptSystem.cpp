@@ -40,6 +40,10 @@ namespace engine
         RegisterCameraFunctions(GetInstance()->m_luaState);
         RegisterTransformFunctions(GetInstance()->m_luaState);
         RegisterInputFunctions(GetInstance()->m_luaState);
+        RegisterUIFunctions(GetInstance()->m_luaState);
+        RegisterUITextFunctions(GetInstance()->m_luaState);
+        RegisterUIButtonFunctions(GetInstance()->m_luaState);
+        RegisterUIProgressBarFunctions(GetInstance()->m_luaState);
         RegisterVector2Functions(GetInstance()->m_luaState);
         RegisterVector3Functions(GetInstance()->m_luaState);
         RegisterRaycastFunctions(GetInstance()->m_luaState);
@@ -57,6 +61,12 @@ namespace engine
         RunConfigScript("Transform.lua");
         RunConfigScript("Input.lua");
         RunConfigScript("NavPoint.lua");
+
+        RunConfigScript("ui/Canvas.lua");
+        RunConfigScript("ui/Text.lua");
+        RunConfigScript("ui/Image.lua");
+        RunConfigScript("ui/Button.lua");
+        RunConfigScript("ui/ProgressBar.lua");
 
         RunConfigScript("vector/Vector2.lua");
         RunConfigScript("vector/Vector3.lua");
