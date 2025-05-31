@@ -72,6 +72,10 @@ namespace engine
         // rendering into a separate cache
         ENGINE_API
         static void SynchronizeGameThread(class SceneGraph* scene = nullptr);
+
+
+        ENGINE_API
+        static void TickAnimations(class SceneGraph* scene, f32 deltaTime);
         
         // Render active scene using its previously cached values.
         // Should be optimally called after SynchronizeGameThread() and
@@ -83,6 +87,9 @@ namespace engine
         // NOTE: This function should only be called from the render thread
         ENGINE_API
         static void ExecuteRenderThreadTasks(void);
+
+        ENGINE_API
+        static void SynchronizeAnimationThread(void);
 
     private:
 
@@ -110,6 +117,7 @@ namespace engine
         TaskQueue                           m_renderThreadTasks;
         std::vector<std::thread>            m_workers;
         std::future<void>                   m_gameUpdateFinished;
+        std::future<void>                   m_animationUpdateFinished;
         bool                                m_stopThreads = false;
 
         static std::once_flag               m_instanceCreatedFlag;
