@@ -40,17 +40,23 @@ int appMain(void)
             else if (engine::InputHandler::IsInputReleased(KEY_S))
                 engine.SaveProject();
         }
-
-        /*if (engine::Input::IsInputDown(KEY_R))
+        if (engine::InputHandler::IsInputReleased(KEY_U))
         {
-            auto size = engine.GetWindow()->GetSize<f32>();
+            if (engine::Entity* padoru = engine.GetGraph()->GetEntity("Padoru"))
+            {
+                engine::Renderer* renderer = engine.GetGraph()->GetComponent<engine::Renderer>(padoru->GetHandle());
+                engine::SkeletonAnimator& animator = renderer->GetAnimator();
 
-            engine::Canvas* sceneCanvas = new engine::Canvas(size, math::Vector4f::Zero());
+                //engine::ResourceRef anim = engine::ResourceManager::GetResource<engine::Animation>("mixamo.com");
 
-            auto rec = sceneCanvas->AddRectangle(size / 2.f, { 2.f, 2.f });
-
-            rec->SetColor(1.f, 1.f, 1.f, 1.f);
-        }*/
+                //if (anim)
+                
+                    animator.PlayAnimation();
+                    animator.SetLooped(true);
+               //}
+            }
+        }
+            
 
         engine.UpdateApplicationWindow();
 	}

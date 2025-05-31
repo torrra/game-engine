@@ -3,6 +3,7 @@
 
 #include <engine/resource/model/Model.h>
 #include <engine/resource/shader/Shader.h>
+#include <engine/resource/animation/Animation.h>
 #include <engine/resource/material/MeshMaterial.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/ui/UIComponent.h>
@@ -65,6 +66,30 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
             engine::ResourceManager::Load<engine::Model>(payloadData->m_path.string());
             m_modelName = payloadData->m_path.filename().string().c_str();
             renderer->SetModel(payloadData->m_path.string().c_str());
+        }
+
+        ui::EndDragDropTarget();
+    }
+
+    ui::VerticalSpacing();
+
+    ui::Text("Anim: ");
+    ui::SameLine(150.0f);
+    ui::Button("animation input");
+
+    // Drag / drop
+    if (ui::StartDragDropTarget())
+    {
+        // Check asset type
+        if (const ui::Payload payload = ui::AcceptPayload(MODEL_PAYLOAD, 0))
+        {
+            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+            engine::ResourceManager::Load<engine::Animation>(payloadData->m_path.string());
+            
+            auto ref = engine::ResourceManager::GetResource<engine::Animation>(payloadData->m_path.string());
+
+            if (ref)
+                renderer->GetAnimator().SetAnimation(std::move(ref), false);
         }
 
         ui::EndDragDropTarget();
