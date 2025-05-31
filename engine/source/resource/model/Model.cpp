@@ -80,6 +80,9 @@ bool engine::Model::IsDynamic(void) const
 
 void engine::Model::Draw(void) const
 {
+    if (!CanRender())
+        return;
+
     if (m_isDynamic)
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
@@ -98,6 +101,9 @@ void engine::Model::Draw(void) const
 
 void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials) const
 {
+    if (!CanRender())
+        return;
+
     if (m_isDynamic)
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
@@ -117,6 +123,9 @@ void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials
 
             m_dynamicMeshes[meshIndex].Draw(useDefaultMat);
         }
+
+        // Unbind skinning matrix buffer
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, 0);
     }
     else
     {
@@ -137,7 +146,8 @@ void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials
 
             m_staticMeshes[meshIndex].Draw(useDefaultMat);
         }
-    } 
+    }
+
 }
 
 uint32 engine::Model::GetMeshCount(void) const
@@ -152,6 +162,11 @@ uint32 engine::Model::GetMeshCount(void) const
 std::string engine::Model::GetName(void) const
 {
     return m_modelName;
+}
+
+uint64 engine::Model::GetBoneCount(void) const
+{
+    return m_boneCount;
 }
 
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const
@@ -294,6 +309,16 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
 
     if (scene->HasAnimations())
         Animation::LoadExtraAnimations(scene);
+
+    uint64 meshIndex = 0;
+    for (DynamicMesh& mesh : m_dynamicMeshes)
+    {   
+        if (mesh.ProcessSkeleton(scene->mMeshes[meshIndex++]))
+        {
+            m_boneCount = mesh.GetBoneCount();
+            break;
+        }
+    }
 
     m_loadStatus |= LOADED;
 
