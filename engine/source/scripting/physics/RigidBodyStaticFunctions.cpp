@@ -45,7 +45,7 @@ int script_GetStaticBoxHalfExtents(struct lua_State* luaState)
         return 3;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetStaticSphereRadius(struct lua_State* luaState)
@@ -61,7 +61,7 @@ int script_GetStaticSphereRadius(struct lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetStaticCapsuleFormat(struct lua_State* luaState)
@@ -78,7 +78,7 @@ int script_GetStaticCapsuleFormat(struct lua_State* luaState)
         return 2;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_GetStaticIsTrigger(struct lua_State* luaState)
@@ -93,7 +93,7 @@ int script_GetStaticIsTrigger(struct lua_State* luaState)
         return 1;
     }
     lua_pushnil(luaState);
-    return 0;
+    return 1;
 }
 
 int script_SetStaticBoxHalfExtents(struct lua_State* luaState)
