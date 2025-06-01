@@ -68,18 +68,8 @@ namespace engine
 
         if (m_animState == EAnimationState::PLAYING)
         {
-           //m_elapsed += deltaTime;
-           //
-           //if (m_elapsed >= deltaTime && UpdateNextKeyFrame() != EAnimationState::STOPPED)
-           //{
-           //    f32 lerpTime = m_elapsed / m_targetInterval;
-            m_elapsed += deltaTime;
 
-            /*if (m_elapsed >= m_targetInterval)
-            {
-                UpdateNextKeyFrame();
-                m_elapsed = 0.f;
-            }*/
+            m_elapsed += deltaTime;
             
            int32 boneCount = static_cast<int32>(m_currentAnimIndices.size());
            m_transforms.clear();
@@ -87,7 +77,6 @@ namespace engine
 
                 for (int32 boneNum = 0; boneNum < boneCount; ++boneNum)
                     UpdateSingleBone(boneNum, 0);
-           // }
         }
 
         if (m_animState != EAnimationState::STOPPED)
@@ -168,64 +157,14 @@ namespace engine
 
         if (!anim)
             return;
-        //ResizeIndexArrays();
-
-       /* for (const AnimBone& data : animData)
-        {
-            uint64 meshOffset = 0;
-            int32 meshIndex = 0;
-
-            for (const DynamicMesh& mesh : m_model->GetDynamicMeshes())
-            {
-                if (memcmp(data.m_boneName.c_str(), "ik_", 3) == 0)
-                    continue;
-
-                int32 boneIndex = mesh.GetBoneIndex(data.m_boneName);
-
-                if (boneIndex != -1)
-                {
-                    uint64 arrayLocation = meshOffset + boneIndex;
-                    const Bone& bone = mesh.GetBone(boneIndex);
-
-                    indices[arrayLocation].m_animDataIndex = animDataIndex;
-                    indices[arrayLocation].m_meshIndex = meshIndex;
-                    indices[arrayLocation].m_boneIndex = boneIndex;
-                    indices[arrayLocation].m_parentIndex = bone.m_parent;
-
-                    break;
-                }
-
-                meshOffset += mesh.GetBoneCount();
-                ++meshIndex;
-            }
-
-            ++animDataIndex;
-        }*/
-
 
         for (int32 boneNum = 0; boneNum < static_cast<int32>(m_model->GetBoneCount()); ++boneNum)
         {
-            const Bone& bone = m_model->GetDynamicMeshes()[0].GetBone(boneNum);
+            const Bone& bone = m_model->GetDynamicMeshes()[0].GetBone(boneNum);              // get bone by index
             indices[boneNum].m_bone = &bone;
-            indices[boneNum].m_animDataIndex = anim->GetBoneAnimData(bone.m_name);
+            indices[boneNum].m_animDataIndex = anim->GetBoneAnimData(bone.m_name);         // get keyframes matching with bone name
             indices[boneNum].m_parentIndex = bone.m_parent;
         }
-
-
-        /*for (BoneIndex& index : indices)
-        {
-            int32 existingIndex = 0;
-            for (BoneIndex& parent : indices)
-            {
-                if (index.m_meshIndex == parent.m_meshIndex && index.m_parentIndex == parent.m_boneIndex)
-                {
-                    index.m_parentIndex = existingIndex;
-                    break;
-                }
-
-                ++existingIndex;
-            }
-        }*/
     }
 
     void SkeletonAnimator::UpdateSingleBone(int32 index, f32 lerpTime)
@@ -250,14 +189,8 @@ namespace engine
         else
             keyFrame = boneKeyFrames[m_currentKeyFrame];
 
-        /*if (indices.m_parentIndex != -1)
-            m_transforms[index] = m_transforms[indices.m_parentIndex] * keyFrame;
-
-        else
-            m_transforms[index] = keyFrame;*/
-
     }
-
+ 
     SkeletonAnimator::EAnimationState SkeletonAnimator::UpdateNextKeyFrame(void)
     {
         m_currentKeyFrame = CalculateNextKeyFrameIndex();
@@ -274,10 +207,6 @@ namespace engine
 
     void SkeletonAnimator::ResizeIndexArrays(void)
     {
-        //m_currentAnimIndices.clear();
-        //m_nextAnimIndices.clear();
-        //m_transforms.clear();
-
         if (m_model && m_model->IsDynamic())
         {
             m_currentAnimIndices.resize(m_model->GetBoneCount());
@@ -319,6 +248,7 @@ namespace engine
 
 
                 ++currentBone;
+                skinning.emplace_back(indices.m_bone->m_inverseBindPose * animMatrix);
                 continue;
             }
 
@@ -365,64 +295,6 @@ namespace engine
             ++currentBone;
         }
         
-
-        //for (const BoneTransform& transform : m_transforms)
-        //{
-        //    BoneIndex& indices = m_currentAnimIndices[currentBone];
-
-        //    if (indices.m_meshIndex == -1)
-        //    {
-        //        ++currentBone;
-        //        continue;
-        //    }
-
-        //    const Bone& bone = m_model->GetDynamicMeshes()[indices.m_meshIndex].GetBone(indices.m_boneIndex);
-        //    
-        //    math::Matrix4f& animMatrix = matrices[currentBone];
-
-        //    if (indices.m_parentIndex != -1)                                                          
-        //    {
-        //        animMatrix = matrices[indices.m_parentIndex] *           // parent anim matrix
-        //                     bone.m_localTransform *                     // current bone local matrix
-        //                     math::TransformMatrix(transform.m_rotation, // keyframe transform matrix
-        //                                            transform.m_position,
-        //                                           transform.m_scaling);
-
-
-        //        math::Vector3f start =
-        //        {
-        //            animMatrix[3][0],
-        //            animMatrix[3][1],
-        //            animMatrix[3][2],
-        //        };
-
-        //        math::Matrix4f& parentPose = matrices[indices.m_parentIndex];
-
-        //        math::Vector3f end =
-        //        {
-        //            parentPose[3][0],
-        //            parentPose[3][1],
-        //            parentPose[3][2],
-        //        };
-        //        
-        //        PhysicsEngine::Get().AddDebugLine(start, end, (uint32)-1);
-
-        //    }
-
-        //    else
-        //    {
-        //        animMatrix = math::TransformMatrix(transform.m_rotation,
-        //                                          transform.m_position,
-        //                                          transform.m_scaling);
-        //    }
-
-        //    skinning.emplace_back(bone.m_inverseBindPose * animMatrix);
-
-        //    ++currentBone;
-        //}
-
         m_skinningSSBO.SetData(skinning.data(), skinning.size() * sizeof(f32));
-
-
     }
 }
