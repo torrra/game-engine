@@ -32,6 +32,12 @@
 
 #pragma endregion
 
+#pragma region System
+
+#include "core/systems/ScriptSystem.h"
+
+#pragma endregion
+
 engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inScene) :
     m_data{}
 {
@@ -233,6 +239,16 @@ void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
         delete m_rigidBodyImpl;
         m_rigidBodyImpl = nullptr;
     }
+}
+
+void engine::RigidBodyDynamic::Register(void)
+{
+    ScriptSystem::RegisterNewComponent("_NewRigidBodyDynamicComponent", m_owner);
+}
+
+void engine::RigidBodyDynamic::Unregister(void)
+{
+    ScriptSystem::UnregisterComponent("_RemoveRigidBodyDynamicComponent", m_owner);
 }
 
 void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle owner, uint64 index) const
@@ -672,6 +688,23 @@ void engine::RigidBodyDynamic::SetZAxisLock(bool inAxisLock)
     m_rigidBodyImpl->m_rigidBodyDynamic->setRigidDynamicLockFlag(
         physx::PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, inAxisLock);
     m_isZLock = inAxisLock;
+}
+
+engine::EForceMode engine::RigidBodyDynamic::SetForceMode(uint32 inForceMode)
+{
+    switch (inForceMode)
+    {
+    case 0:
+        return EForceMode::FORCE;
+    case 1:
+        return EForceMode::IMPULSE;
+    case 2:
+        return EForceMode::VELOCITY_CHANGE;
+    case 3:
+        return EForceMode::ACCELERATION;
+    default:
+        return EForceMode::FORCE;
+    }
 }
 
 void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)

@@ -44,12 +44,10 @@ void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
 
 math::Matrix4f engine::Camera::ViewProjection(void)
 {
-    m_transform = m_currentScene->GetComponent<Transform>(m_owner);
+    if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+        return m_projectionMatrix * GetViewMatrix(transform);
 
-    if (!m_transform)
-        m_transform = m_currentScene->CreateComponent<Transform>(m_owner);
-
-    return m_projectionMatrix * GetViewMatrix();
+    return m_projectionMatrix;
 }
 
 void engine::Camera::Register(void)
@@ -98,8 +96,10 @@ f32 engine::Camera::GetFarPlane(void) const noexcept
 
 math::Vector3f& engine::Camera::Position(void)
 {
-    m_transform = m_currentScene->GetComponent<Transform>(m_owner);
-    return m_transform->SetPosition();
+    if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+        return transform->SetPosition();
+    Transform* transform = m_currentScene->CreateComponent<Transform>(m_owner);
+    return transform->SetPosition();
 }
 
 math::Vector3f& engine::Camera::Rotation(void)
@@ -187,16 +187,18 @@ const char* engine::Camera::DeserializeText(const char* text, const char* end)
 	return text::DeserializeInteger(text, m_flags);
 }
 
-math::Matrix4f engine::Camera::GetViewMatrix(void)
+math::Matrix4f engine::Camera::GetViewMatrix(Transform* inTransform)
 {
     math::Matrix4f matrix(1.0f);
-    math::Vector3f position = GetPosition();
+    math::Vector3f position = Transform::ToWorldPosition(*inTransform);
 
     matrix[3][0] = -position.X();
     matrix[3][1] = -position.Y();
     matrix[3][2] = -position.Z();
 
-    return m_rotQuat.Inverse().RotationMatrix() * matrix;
+    math::Quatf quat = Transform::ToWorldRotation(*inTransform) * m_rotQuat;
+
+    return quat.Inverse().RotationMatrix() * matrix;
 }
 
 void engine::Camera::GetProjectionMatrix(void)

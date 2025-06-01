@@ -25,6 +25,8 @@
 
 #pragma endregion
 
+#include "engine/ConsoleLog.hpp"
+
 engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inScene)
 {
     // Initialize the triangle mesh implementation
@@ -42,6 +44,14 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
 
 void engine::TriangleMesh::CreateTriangleMesh(void)
 {
+    if (m_triangleMeshImpl == nullptr)
+    {
+        // Initialize the triangle mesh implementation
+        m_triangleMeshImpl = new TriangleMeshImpl();
+
+        m_data.m_index = 0;
+        m_data.m_type = EShapeType::STATIC;
+    }
     // Get the model and return if failed
     if (engine::Renderer* renderer = m_currentScene->GetComponent<engine::Renderer>(m_owner))
         m_model = renderer->GetModel();
@@ -230,3 +240,14 @@ engine::TriangleMeshImpl* engine::TriangleMesh::GetTriangleMeshImpl(void)
     return m_triangleMeshImpl;
 }
 
+engine::TriangleMesh* engine::TriangleMeshStaticFactory::CreateStatic(SceneGraph* inScene, EntityHandle inOwner)
+{
+    // Create static rigid body in regard to the geometry and give it an owner and a scene
+    if (TriangleMesh* temp = inScene->CreateComponent<TriangleMesh>(inOwner))
+    {
+        temp->CreateTriangleMesh();
+        return temp;
+    }
+    PrintLog(ErrorPreset(), "Failed to create triangle mesh.");
+    return nullptr;
+}

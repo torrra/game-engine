@@ -40,10 +40,16 @@ namespace engine
         RegisterCameraFunctions(GetInstance()->m_luaState);
         RegisterTransformFunctions(GetInstance()->m_luaState);
         RegisterInputFunctions(GetInstance()->m_luaState);
+        RegisterUIFunctions(GetInstance()->m_luaState);
+        RegisterUITextFunctions(GetInstance()->m_luaState);
+        RegisterUIButtonFunctions(GetInstance()->m_luaState);
+        RegisterUIProgressBarFunctions(GetInstance()->m_luaState);
         RegisterVector2Functions(GetInstance()->m_luaState);
         RegisterVector3Functions(GetInstance()->m_luaState);
         RegisterRaycastFunctions(GetInstance()->m_luaState);
         RegisterNavPointFunctions(GetInstance()->m_luaState);
+        RegisterRigidBodyDynamicFunctions(GetInstance()->m_luaState);
+        RegisterRigidBodyStaticFunctions(GetInstance()->m_luaState);
         RegisterAudioPlayerFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
@@ -56,10 +62,18 @@ namespace engine
         RunConfigScript("Input.lua");
         RunConfigScript("NavPoint.lua");
 
+        RunConfigScript("ui/Canvas.lua");
+        RunConfigScript("ui/Text.lua");
+        RunConfigScript("ui/Image.lua");
+        RunConfigScript("ui/Button.lua");
+        RunConfigScript("ui/ProgressBar.lua");
+
         RunConfigScript("vector/Vector2.lua");
         RunConfigScript("vector/Vector3.lua");
 
         RunConfigScript("physics/Raycast.lua");
+        RunConfigScript("physics/RigidBodyDynamic.lua");
+        RunConfigScript("physics/RigidBodyStatic.lua");
 
         RunConfigScript("AudioPlayer.lua");
 

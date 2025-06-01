@@ -90,6 +90,9 @@ void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::PLANE);
             break;
+        case engine::EGeometryType::TRIANGLE_MESH:
+            engine::TriangleMeshStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
+                                                            inRigidBodyStatic->GetOwner());
         default:
             break;
         }

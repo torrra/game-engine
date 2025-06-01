@@ -16,7 +16,7 @@ namespace engine
         ResourceRef(void) = default;
         ResourceRef(ResourceContainer* controlBlock, TResourceType* rawVal);
         ResourceRef(const ResourceRef& other);
-        ResourceRef(ResourceRef&& other) noexcept;
+        ResourceRef(ResourceRef&&) noexcept;
         ~ResourceRef(void);
 
         ResourceRef& operator=(const ResourceRef& rhs);
@@ -107,11 +107,13 @@ namespace engine
     }
 
     template<typename TResourceType>
-    inline engine::ResourceRef<TResourceType>::ResourceRef(ResourceRef&& other) noexcept
-        : m_controlBlock(other.m_controlBlock), m_raw(other.m_raw)
+    inline ResourceRef<TResourceType>::ResourceRef(ResourceRef&& rhs) noexcept
     {
-        other.m_controlBlock = nullptr;
-        other.m_raw = nullptr;
+        m_controlBlock = rhs.m_controlBlock;
+        m_raw = rhs.m_raw;
+
+        rhs.m_controlBlock = nullptr;
+        rhs.m_raw = nullptr;
     }
 
     template<typename TResourceType> inline

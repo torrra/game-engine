@@ -231,6 +231,8 @@ namespace engine
         */
         ENGINE_API  
             void                SetZAxisLock(bool inAxisLock);
+        ENGINE_API
+            EForceMode          SetForceMode(uint32 inForceMode);
 
         /// Functions
         // Update the entity transform in reference to the dynamic rigid body
@@ -243,7 +245,9 @@ namespace engine
         ENGINE_API	
             void		        RigidBodyDynamicCleanUp(void);
         ENGINE_API	
-            void		        Register(void) override {}
+            void				Register(void) override;
+        ENGINE_API  
+            void                Unregister(void) override;
         /*
             Serialize rigidbody's member
             <param> [in] output : output stream

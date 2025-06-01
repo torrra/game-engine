@@ -3,14 +3,9 @@
 #include <math/Vector3.hpp>
 
 editor::TransformComponent::TransformComponent(void)
-    : m_isRotationSynced(false)
 {
     SetName("Transform");
     SetType(TRANSFORM);
-}
-
-editor::TransformComponent::~TransformComponent(void)
-{
 }
 
 void editor::TransformComponent::SectionContent(void)
@@ -20,12 +15,7 @@ void editor::TransformComponent::SectionContent(void)
         math::Vector3f& position = transform->SetPosition();
         math::Vector3f& size = transform->SetScale();
     
-        if (!m_isRotationSynced)
-        {
-            // Synchronise rotation
-            SyncRotation(transform);
-            m_isRotationSynced = true;
-        }
+    SyncRotation(transform);
 
         // Position
         ui::Text("Position: ");
@@ -64,8 +54,6 @@ void editor::TransformComponent::SyncRotation(engine::Transform* transform)
     m_rotation[2] = math::Wrap(m_rotation[2], 0.0f, 360.0f);
 
     m_lastRot = m_rotation;
-
-
 }
 
 void editor::TransformComponent::InputRotation(engine::Transform* transform, const char* uid, uint8 index)

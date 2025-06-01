@@ -82,10 +82,10 @@ engine::wnd::Wnd engine::wnd::CreateWindow(const char* title)
 
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    window = glfwCreateWindow(mode->width, mode->height, title, monitor, nullptr);
+    window = glfwCreateWindow(mode->width, mode->height, title, NULL, NULL);
     
-    glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-
+    glfwSetWindowMonitor(window, NULL, 0, 0, mode->width, mode->height, mode->refreshRate);
+    
     glfwSetWindowSizeCallback(window, SizeCallback);
 
     return window;

@@ -21,6 +21,7 @@ namespace editor
 
         // The scene which the viewport should render
         void RenderToViewport(void);
+        void RenderInGameUI(void);
         void RenderToDebugViewport(const math::Matrix4f& viewProjection);
         void RenderPickingPass(const math::Matrix4f& viewProjection);
 

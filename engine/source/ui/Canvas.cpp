@@ -1,5 +1,6 @@
 #include "ui/Canvas.h"
 #include "ui/elements/Label.h"
+#include "engine/Engine.h"
 
 #undef new
 #include <imgui/imgui.h>
@@ -9,41 +10,74 @@
 #include <functional>
 
 engine::Canvas::Canvas(math::Vector2f const& windowSize, math::Vector4f const& color)
-    : m_size(windowSize), m_prevSize(windowSize), m_uidCounter(0)
+    : m_size(windowSize), m_prevSize(windowSize), m_uidCounter(0), m_isFirstUpdate(true)
 {
     SetColor(color[0], color[1], color[2], color[3]);
 }
 
-void engine::Canvas::Render(void)
+void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const& size)
 {
+    // Re-introduce window position
+    (void) position;
+
     // Make canvas uninteractable & allow inputs to pass through
-    ImGuiWindowFlags flags =
+    constexpr ImGuiWindowFlags flags =
         ImGuiWindowFlags_NoDecoration |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoSavedSettings |
         ImGuiWindowFlags_NoFocusOnAppearing |
+        ImGuiWindowFlags_NoNavInputs |
         ImGuiWindowFlags_NoDocking;
 
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-    ImGui::SetNextWindowViewport(viewport->ID);
-    ImGui::SetNextWindowPos(viewport->Pos);
-    ImGui::SetNextWindowSize(viewport->Size);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, m_bgColor);
-    ImGui::Begin("Canvas", nullptr, flags);
-
-    // Scale all UI elements to be consistent with screen size
-    RescaleCanvas();
-
-    // Update all UI elements on this canvas
-    for (UIElement* element : m_elements)
+    // Window needs to be different if the scene is rendered is
+    if (engine::Engine::GetEngine()->HasEditor())
     {
-        element->Render();
-    }
+        
+        ImGui::Begin("Simulation view", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::SetCursorPos(ImGui::GetWindowContentRegionMin());
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, m_bgColor);
+        
+        ImGui::BeginChild("Canvas", size, ImGuiChildFlags_NavFlattened, flags);
+        
+        ImGui::SetWindowSize(size);
+        
+        // Scale all UI elements to be consistent with screen size
+        RescaleCanvas();
 
-    ImGui::End();
-    ImGui::PopStyleColor();
+        // Update all UI elements on this canvas
+        for (UIElement* element : m_elements)
+        {
+            element->Render();
+        }
+
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::End();
+    }
+    else
+    {
+        printf("No Editor\n");
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, {1.0f, 0.0f, 0.0f, 1.0f});
+        
+        ImGui::Begin("Canvas", nullptr, flags);
+        
+        // Scale all UI elements to be consistent with screen size
+        RescaleCanvas();
+        
+        // Update all UI elements on this canvas
+        for (UIElement* element : m_elements)
+        {
+            element->Render();
+        }
+        
+        ImGui::End();
+        ImGui::PopStyleColor();
+    }
 }
 
 void engine::Canvas::RemoveElement(UIElement* element)
@@ -66,6 +100,16 @@ void engine::Canvas::RemoveElement(UIElement* element)
     }
 
     std::printf("Warning: failed to delete UI element\n");
+}
+
+void engine::Canvas::RemoveAllEntities(void)
+{
+    for (UIElement* element : m_elements)
+    {
+        delete element;
+    }
+
+    m_elements.clear();
 }
 
 void engine::Canvas::Clear(void)
@@ -159,11 +203,18 @@ void engine::Canvas::RescaleCanvas(void)
 {
     m_size = ImGui::GetContentRegionAvail();
 
+    // Prevent canvas invalid aspect ratio
+    if (m_isFirstUpdate)
+    {
+        m_prevSize = m_size;
+        m_isFirstUpdate = false;
+    }
+
     // Screen size has not changed
     if (m_size == m_prevSize)
         return;
 
-    const f32 regionRatio = m_size.GetX() / m_prevSize.GetX();
+    f32 regionRatio = m_size.GetX() / m_prevSize.GetX();
 
     // Update scale for all UI elements
     for (UIElement* element : m_elements)

@@ -60,6 +60,8 @@ namespace engine
 
         ENGINE_API std::string GetProjectName(void) const;
 
+        ENGINE_API UIManager& GetUIManager(void);
+
         ENGINE_API void SetExecutableName(const std::string& name);
         ENGINE_API void SetDefaultGameScene(const std::string& relativePath);
         ENGINE_API void SetDefaultEditorScene(const std::string& relativePath);
