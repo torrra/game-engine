@@ -105,6 +105,23 @@ namespace editor
         m_graphView.SetGraph(activeScene.GetGraph());
     }
 
+    void EditorApplication::ResetApplication(void)
+    {
+        if (!m_isResetScheduled) 
+        {
+            engine::ThreadManager::AddTask<engine::ThreadManager::ETaskType::GRAPHICS>
+                ([this]()
+                    {
+                        m_graphView.ClearGraph();
+                        m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+                        m_graphView.SetGraph(m_currentScene->GetGraph());
+                        m_isResetScheduled = false;
+                    });
+
+            m_isResetScheduled = true;
+        }
+    }
+
     void EditorApplication::Shutdown(void)
     {
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
