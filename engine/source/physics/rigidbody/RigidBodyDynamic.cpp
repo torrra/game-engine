@@ -46,6 +46,8 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
     // Set the owner and the current scene
     m_owner			= inOwner;
     m_currentScene	= inScene;
+
+    //SwitchShape(EGeometryType::BOX);
 }
 
 void engine::RigidBodyDynamic::Invalidate(void)
@@ -211,13 +213,16 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
     {
         Transform worldTransform;
 
-        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+        Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner);
 
-        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+        if (entityTransform != nullptr)
+        {
+            worldTransform.SetPosition(Transform::ToWorldPosition(*entityTransform));
+            worldTransform.SetRotation(Transform::ToWorldRotation(*entityTransform));
 
-        // Update the transform of the rigid body in regard to the entity
-        m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
+            // Update the transform of the rigid body in regard to the entity
+            m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
+        }
     }
 }
 

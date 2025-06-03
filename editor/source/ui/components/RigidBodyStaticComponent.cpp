@@ -25,6 +25,15 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
 {
     if (engine::RigidBodyStatic* rigidBodyStatic = GetData<engine::RigidBodyStatic>())
     {
+        if (!m_isInitialized)
+        {
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
+                rigidBodyStatic->GetOwner(),
+                engine::EGeometryType::BOX);
+
+            m_isInitialized = true;
+        }
+
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_rigidBodyShape);
         
         int32 currentIndex = static_cast<int32>(currentShape);

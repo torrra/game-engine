@@ -6,6 +6,7 @@ namespace engine
 
 	enum EGeometryType : uint64
 	{
+        NONE = -1,
 		BOX = 0,
 		SPHERE = 1,
 		CAPSULE = 2,
