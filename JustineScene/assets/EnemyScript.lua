@@ -66,7 +66,7 @@ function EnemyScript:Start()
     self.speed = 3.0
     self.goingToPoint1 = false
 
-    -- Nouveaux états : "moving", "pauseBeforeTurn", "rotating", "pauseAfterTurn"
+    -- New state : "moving", "pauseBeforeTurn", "rotating", "pauseAfterTurn"
     self.state = "moving"
 
     self.pauseBeforeDuration = 1.0
@@ -78,7 +78,7 @@ function EnemyScript:Start()
     self.currentRotation = {w=w, x=x, y=y, z=z}
     self.targetRotation = {w=w, x=x, y=y, z=z}
     self.rotationProgress = 0
-    self.rotationSpeed = 1.5 -- durée rotation en secondes
+    self.rotationSpeed = 1.5 -- rotation duration in second
 end
 
 function EnemyScript:Update(deltaTime)
@@ -90,11 +90,11 @@ function EnemyScript:Update(deltaTime)
 
     if self.state == "moving" then
         if distance < 0.1 then
-            -- Arrivé au point, on passe en pause avant rotation
+            -- Pause before rotation 
             self.state = "pauseBeforeTurn"
             self.pauseTimer = self.pauseBeforeDuration
         else
-            -- Avancer vers la cible
+            -- Move to the target 
             direction:Normalize()
             local move = Vector3.new(direction.x * self.speed * deltaTime, 0, direction.z * self.speed * deltaTime)
             local newPosition = currentPos + move
@@ -104,7 +104,7 @@ function EnemyScript:Update(deltaTime)
     elseif self.state == "pauseBeforeTurn" then
         self.pauseTimer = self.pauseTimer - deltaTime
         if self.pauseTimer <= 0 then
-            -- Calcul rotation cible
+            -- Calcul target rotation 
             self.goingToPoint1 = not self.goingToPoint1
             local newTargetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
             local newTargetPos = Vector3.new(newTargetPoint:GetPosition())
