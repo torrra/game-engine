@@ -24,7 +24,7 @@
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
-    string | material="\LevelMat.mmat"
+    string | material="\Level\Level1\Material\LevelMat.mmat"
     uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=1
@@ -60,7 +60,7 @@
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
-    string | material="\Level2Mat.mmat"
+    string | material="\Level\Level2\Material\Level2Mat.mmat"
     uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=2
@@ -102,9 +102,9 @@
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=3
-    string | material="\DoorMat.mmat"
-    string | material="\DoorMat2.mmat"
-    string | material="\DoorMat3.mmat"
+    string | material="\Level\Door\Material\DoorMat.mmat"
+    string | material="\Level\Door\Material\DoorMat2.mmat"
+    string | material="\Level\Door\Material\DoorMat3.mmat"
     uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=4
@@ -201,7 +201,7 @@
     uint64 | flags=0
 [Renderer]
     int64 | owner=4294967305
-    string | model="\Ch44_nonPBR.fbx"
+    string | model="\Character\Ch44_nonPBR.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
@@ -239,3 +239,46 @@
      int64 | owner=13
      vec3f32 | position={30,0,-14}
      uint64 | flags=0
+[Entity]
+   string | name="Rifle"
+   int64 | handle=14
+   int64 | parent=8
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=6
+    int64 | owner=14
+    quat32 | rotation={-5.76204e-08,0,-1,0}
+    vec3f32 | position={0.7,0.15,0.04}
+    vec3f32 | scale={0.05,0.05,0.05}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=14
+    string | model="\Rifle\sci fi m254 gun - high poly.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=1
+    string | material="\RifleMat0.mmat"
+    uint64 | flags=0
+[Entity]
+   string | name="Camera"
+   int64 | handle=15
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=33
+[Transform]
+    uint64 | index=7
+    int64 | owner=15
+    quat32 | rotation={0.678858,-0.197869,-0.678858,-0.197869}
+    vec3f32 | position={4.65,8.75,-14}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Camera]
+    int64 | owner=15
+    f32 | near=0.005
+    f32 | far=250
+    f32 | fov=1.0472
+    f32 | aspectRatio=1.77778
+    vec3f32 | rotationEuler={0,0,0}
+    uint64 | flags=0
