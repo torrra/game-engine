@@ -74,6 +74,55 @@ namespace engine
         OpenGLError();
     }
 
+    void Renderer::Render(const math::Matrix4f& view, const math::Matrix4f& projection,
+        ComponentArray<class Transform>& transforms)
+    {
+        if (!m_model || !m_shader)
+            return;
+
+        if (!m_model->CanRender())
+            return;
+
+        math::Matrix4f viewProjection = projection * view;
+
+        m_shader->Use();
+
+        if (Transform* transform = transforms.GetComponent(m_owner))
+        {
+            math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
+            math::Matrix4f mvp = viewProjection * transformMat;
+
+            math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
+            math::Matrix3f normalMat3x3 = math::Matrix3f(normalMat4x4);
+
+            m_shader->Set("model", &transformMat);
+            m_shader->Set("mvp", &mvp);
+            m_shader->Set("normalMat", &normalMat3x3);
+            m_shader->Set("view", &view);
+            m_shader->Set("projection", &projection);
+        }
+        else
+        {
+            math::Matrix4f identity4x4{ 1.f };
+            math::Matrix3f identity3x3{ 1.f };
+
+            m_shader->Set("model", &identity4x4);
+            m_shader->Set("mvp", &viewProjection);
+            m_shader->Set("normalMat", &identity3x3);
+        }
+
+        if (m_model->IsDynamic() && (m_animator.IsPlaying() || m_animator.IsPaused()))
+        {
+            m_animator.UseSkinningBuffer();
+            m_shader->Set("isRigged", true);
+        }
+        else
+            m_shader->Set("isRigged", false);
+
+        m_model->Draw(m_materials);
+        OpenGLError();
+    }
+
     const ResourceRef<Model>& Renderer::GetModel(void) const
     {
         return m_model;

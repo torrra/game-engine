@@ -184,7 +184,7 @@ namespace engine
         const ComponentArray<LightSource>& GetCachedLights(void) const;
 
         ENGINE_API
-        void RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection);
+        void RenderFromCacheSingleCamera(const math::Matrix4f& view, const math::Matrix4f& projection);
 
         // Copy all data from transform component array to a separate cache
         // This function is used after the game logic update, allowing to start the next

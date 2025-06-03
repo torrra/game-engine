@@ -39,6 +39,9 @@ namespace engine
         void Render(const math::Matrix4f& viewProjection,
                     ComponentArray<Transform>& transforms);
 
+        void Render(const math::Matrix4f& view, const math::Matrix4f& projection,
+            ComponentArray<class Transform>& transforms);
+
         ENGINE_API
         const ResourceRef<class Model>& GetModel(void) const;
 
