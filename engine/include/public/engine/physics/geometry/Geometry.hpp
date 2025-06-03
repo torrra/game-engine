@@ -17,7 +17,8 @@ namespace engine
     enum EShapeType : uint32
     {
         DYNAMIC = 0,
-        STATIC = 1
+        STATIC = 1,
+        TRIANGLE = 2
     };
 
     enum EErrorGeometryType

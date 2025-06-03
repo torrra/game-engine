@@ -25,16 +25,6 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
 {
     if (engine::RigidBodyStatic* rigidBodyStatic = GetData<engine::RigidBodyStatic>())
     {
-        if (engine::ResourceRef<engine::Model> model = 
-            engine::Engine::GetEngine()->GetGraph()->GetComponent<engine::Renderer>(
-                rigidBodyStatic->GetOwner())->GetModel())
-        {
-            m_shapeTypes = { "Box", "Sphere", "Capsule", "Plane", "TriangleMesh" };
-        }
-        else
-        {
-            m_shapeTypes = { "Box", "Sphere", "Capsule", "Plane" };
-        }
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_rigidBodyShape);
         
         int32 currentIndex = static_cast<int32>(currentShape);
@@ -100,10 +90,6 @@ void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
             engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::PLANE);
-            break;
-        case engine::EGeometryType::TRIANGLE_MESH:
-                engine::TriangleMeshStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
-                    inRigidBodyStatic->GetOwner());
             break;
         default:
             engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),

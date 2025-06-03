@@ -33,7 +33,7 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
     m_triangleMeshImpl  = new TriangleMeshImpl();
 
     m_data.m_index = 0;
-    m_data.m_type = EShapeType::STATIC;
+    m_data.m_type = EShapeType::TRIANGLE;
 
     // Set the owner and the current scene
     m_owner             = inOwner;
@@ -50,7 +50,7 @@ void engine::TriangleMesh::CreateTriangleMesh(void)
         m_triangleMeshImpl = new TriangleMeshImpl();
 
         m_data.m_index = 0;
-        m_data.m_type = EShapeType::STATIC;
+        m_data.m_type = EShapeType::TRIANGLE;
     }
     // Get the model and return if failed
     if (engine::Renderer* renderer = m_currentScene->GetComponent<engine::Renderer>(m_owner))
@@ -222,7 +222,7 @@ void engine::TriangleMesh::CookTriangleMesh(void)
         m_triangleMeshImpl->m_actor->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
         m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-        m_data.m_type = EShapeType::STATIC;
+        m_data.m_type = EShapeType::TRIANGLE;
         void** dataPtr = reinterpret_cast<void**>(&m_data);
         m_triangleMeshImpl->m_actor->userData = *dataPtr;
 

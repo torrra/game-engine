@@ -27,7 +27,7 @@ namespace engine
     class Model;
     struct TriangleMeshImpl;
 
-    class TriangleMesh : public Component
+    class TriangleMesh : public ICollisionListener, public Component
     {
     public :
 
@@ -61,6 +61,38 @@ namespace engine
 
         ENGINE_API void                 UpdateTriangleMesh(void);
 
+        /*
+            Check the collision at the begining
+            <param> [in] inOther : The other entity which collides with this
+        */
+        ENGINE_API
+            void                OnCollisionEnter([[maybe_unused]] EntityHandle inOther) override {};
+
+        ENGINE_API [[maybe_unused]]
+            void                OnCollisionStay([[maybe_unused]] EntityHandle inOther) override {};
+        /*
+            Check the collision at the end
+            <param> [in] inOther : The other entity which collides with this
+        */
+        ENGINE_API
+            void                OnCollisionExit([[maybe_unused]] EntityHandle inOther) override {};
+        /*
+            Check the trigger collision at the begining
+            <param> [in] inOther : The other entity which enter in this trigger
+        */
+        ENGINE_API
+            void                OnTriggerEnter([[maybe_unused]] EntityHandle inOther) override {};
+
+        ENGINE_API [[maybe_unused]] [[deprecated]]
+            void                OnTriggerStay([[maybe_unused]] EntityHandle inOther) override {};
+        /*
+            Check the trigger collision at the end
+            <param> [in] inOther : The other entity which enter in this trigger
+        */
+        ENGINE_API
+            void                OnTriggerExit([[maybe_unused]] EntityHandle inOther) override {};
+
+                RigidBodyData               m_data;
     private :
 
         /// Friend class
@@ -76,9 +108,8 @@ namespace engine
         /// Private members
                 ResourceRef<Model>          m_model;
                 TriangleMeshImpl*           m_triangleMeshImpl  = nullptr;
-                RigidBodyData               m_data;
                 uint64                      m_shape             = 0;
-                uint32                      m_type              = EShapeType::STATIC;
+                uint32                      m_type              = EShapeType::TRIANGLE;
                 collision::ECollisionGroup  m_collisionGroup    = 
                                                 collision::ECollisionGroup::ENVIRONMENT_COLLISION;
                 bool                        m_isDrawn           = false;

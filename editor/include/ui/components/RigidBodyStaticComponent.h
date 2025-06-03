@@ -52,7 +52,7 @@ namespace editor
                                   engine::RigidBodyStatic* inRigidBodyStatic);
 
         /// Private members
-        std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule", "Plane", "TriangleMesh"};
+        std::vector<const char*> m_shapeTypes = { "Box", "Sphere", "Capsule", "Plane" };
         std::string m_geometryName;
 
     }; // !Class RigidBodyStaticComponent

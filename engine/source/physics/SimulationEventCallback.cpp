@@ -27,7 +27,7 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
     }
-    else
+    else if (data0->m_type == EShapeType::STATIC)
     {
         RigidBodyStatic& rigidbody =
             *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + 
@@ -35,6 +35,15 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
 
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
+    }
+    else if (data0->m_type == EShapeType::TRIANGLE)
+    {
+        TriangleMesh& triangleMesh =
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<TriangleMesh>().begin() +
+                data0->m_index);
+
+        ownerA = triangleMesh.GetOwner();
+        listenerA = dynamic_cast<ICollisionListener*>(&triangleMesh);
     }
 
     if (data1->m_type == EShapeType::DYNAMIC)
@@ -46,7 +55,7 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
     }
-    else
+    else if (data1->m_type == EShapeType::STATIC)
     {
         RigidBodyStatic& rigidbody =
             *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() +
@@ -54,6 +63,15 @@ void engine::SimulationEventCallback::onContact(const physx::PxContactPairHeader
 
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
+    }
+    else if (data1->m_type == EShapeType::TRIANGLE)
+    {
+        TriangleMesh& triangleMesh =
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<TriangleMesh>().begin() +
+                data1->m_index);
+
+        ownerB = triangleMesh.GetOwner();
+        listenerB = dynamic_cast<ICollisionListener*>(&triangleMesh);
     }
 
     if (!listenerA || !listenerB)
@@ -109,7 +127,7 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs,
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
     }
-    else
+    else if (data0->m_type == EShapeType::STATIC)
     {
         RigidBodyStatic& rigidbody =
             *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() + 
@@ -117,6 +135,15 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs,
 
         ownerA = rigidbody.GetOwner();
         listenerA = dynamic_cast<ICollisionListener*>(&rigidbody);
+    }
+    else if (data0->m_type == EShapeType::TRIANGLE)
+    {
+        TriangleMesh& triangleMesh =
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<TriangleMesh>().begin() +
+                data0->m_index);
+
+        ownerA = triangleMesh.GetOwner();
+        listenerA = dynamic_cast<ICollisionListener*>(&triangleMesh);
     }
 
     if (data1->m_type == EShapeType::DYNAMIC)
@@ -128,7 +155,7 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs,
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
     }
-    else
+    else if (data1->m_type == EShapeType::STATIC)
     {
         RigidBodyStatic& rigidbody =
             *(Engine::GetEngine()->GetGraph()->GetComponentArray<RigidBodyStatic>().begin() +
@@ -136,6 +163,15 @@ void engine::SimulationEventCallback::onTrigger(physx::PxTriggerPair* inPairs,
 
         ownerB = rigidbody.GetOwner();
         listenerB = dynamic_cast<ICollisionListener*>(&rigidbody);
+    }
+    else if (data1->m_type == EShapeType::TRIANGLE)
+    {
+        TriangleMesh& triangleMesh =
+            *(Engine::GetEngine()->GetGraph()->GetComponentArray<TriangleMesh>().begin() +
+                data1->m_index);
+
+        ownerB = triangleMesh.GetOwner();
+        listenerB = dynamic_cast<ICollisionListener*>(&triangleMesh);
     }
 
     if (!listenerA || !listenerB)
