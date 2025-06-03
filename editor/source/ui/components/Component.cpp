@@ -23,7 +23,10 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
             graph->DestroyComponent<engine::Camera>(handle);
             break;
         case editor::RENDERER:
-            graph->DestroyComponent<engine::Renderer>(handle);
+            if (!graph->GetEntity(handle)->HasComponent<engine::TriangleMesh>())
+            {
+                graph->DestroyComponent<engine::Renderer>(handle);
+            }
             break;
         case editor::RIGIDBODY_STATIC:
             graph->DestroyComponent<engine::RigidBodyStatic>(handle);
@@ -32,11 +35,18 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
             graph->DestroyComponent<engine::RigidBodyDynamic>(handle);
             break;
         case editor::TRANSFORM:
-            graph->DestroyComponent<engine::Transform>(handle);
+            if (!graph->GetEntity(handle)->HasComponent<engine::TriangleMesh>())
+            {
+                graph->DestroyComponent<engine::Transform>(handle);
+            }
             break;
 
         case editor::LIGHT_SOURCE:
             graph->DestroyComponent<engine::LightSource>(handle);
+            break;
+
+        case editor::TRIANGLE_MESH:
+            graph->DestroyComponent<engine::TriangleMesh>(handle);
             break;
 
         case editor::INVALID_COMPONENT_TYPE:

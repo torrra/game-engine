@@ -9,6 +9,7 @@
 #include "ui/components/RigidBodyDynamicComponent.h"
 #include "ui/components/NavigationPointComponent.h"
 #include "ui/components/AudioComponent.h"
+#include "ui/components/TriangleMeshComponent.h"
 
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
@@ -16,6 +17,7 @@
 #include <engine/ui/UIStyle.h>
 #include <engine/ui/InternalUIWindow.h>
 
+#include <engine/resource/model/Model.h>
 #include <engine/core/SceneGraph.h>
 #include <engine/core/components/LightSource.h>
 #include <engine/utility/MemoryCheck.h>
@@ -119,8 +121,7 @@ void editor::PropertyWnd::InitComponents(void)
         InitComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
 
     if (entity->HasComponent<engine::LightSource>())
-        InitComponent<LightSourceComponent, engine::LightSource>();
-    
+        InitComponent<LightSourceComponent, engine::LightSource>();    
 
     // AudioPlayer
     if (entity->HasComponent<engine::AudioPlayer>())
@@ -146,6 +147,12 @@ void editor::PropertyWnd::InitComponents(void)
     // Navigation point
     if (entity->HasComponent<engine::NavigationPoint>())
         InitComponent<NavigationPointComponent, engine::NavigationPoint>();
+    
+    // Triangle mesh
+    
+            if (entity->HasComponent<engine::TriangleMesh>())
+                InitComponent<TriangleMeshComponent, engine::TriangleMesh>();
+        
 }
 
 void editor::PropertyWnd::RenderMenuBar(void)
@@ -178,7 +185,21 @@ void editor::PropertyWnd::RenderMenuBar(void)
 
             else if (ui::MenuItem("AudioPlayer"))
                 AddComponent<AudioComponent, engine::AudioPlayer>();
-
+            
+            else if (ui::MenuItem("TriangleMesh"))
+            {
+                if (engine::Engine::GetEngine()->GetGraph()->GetEntity(
+                    m_handle)->HasComponent<engine::Transform>() &&
+                    engine::Engine::GetEngine()->GetGraph()->GetEntity(
+                        m_handle)->HasComponent<engine::Renderer>())
+                {
+                    if (engine::ResourceRef<engine::Model> model =
+                        engine::Engine::GetEngine()->GetGraph()->GetComponent<engine::Renderer>(m_handle)->GetModel())
+                    {
+                        AddComponent<TriangleMeshComponent, engine::TriangleMesh>();
+                    }
+                }
+            }
             ui::EndMenu();
         }
         
@@ -248,7 +269,7 @@ void editor::PropertyWnd::ClearComponentArray(void)
             delete dynamic_cast<CameraComponent*>(component);
             break;
         case editor::RENDERER:
-            delete dynamic_cast<RendererComponent*>(component);
+                delete dynamic_cast<RendererComponent*>(component);
             break;
         case editor::RIGIDBODY_STATIC:
             delete dynamic_cast<RigidBodyStaticComponent*>(component);
@@ -260,7 +281,7 @@ void editor::PropertyWnd::ClearComponentArray(void)
             delete dynamic_cast<ScriptComponent*>(component);
             break;
         case editor::TRANSFORM:
-            delete dynamic_cast<TransformComponent*>(component);
+                delete dynamic_cast<TransformComponent*>(component);
             break;
         case editor::LIGHT_SOURCE:
             delete dynamic_cast<LightSourceComponent*>(component);
@@ -270,6 +291,9 @@ void editor::PropertyWnd::ClearComponentArray(void)
             break;
         case editor::AUDIO:
             delete dynamic_cast<AudioComponent*>(component);
+            break;
+        case editor::TRIANGLE_MESH:
+            delete dynamic_cast<TriangleMeshComponent*>(component);
             break;
         case editor::INVALID_COMPONENT_TYPE:
         default:

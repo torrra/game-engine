@@ -354,11 +354,12 @@ void engine::PhysicsEngine::UpdateDebugDraw(const math::Matrix4f* inProjViewMatr
 
     if (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines() != nullptr)
     {
-        color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
+        //color = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getLines()->color0);
     }
     if (m_debugDraw->GetDebugDrawImpl()->m_customLines.size() > 0)
     {
-        math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
+        //math::Vector4f color2 = ConvertPhysxColorToVector4f(m_debugDraw->GetDebugDrawImpl()->m_customLines.data()->color0);
+        math::Vector4f color2 = math::Vector4f(0.0f, 1.0f, 0.0f, 1.0f);
         m_debugDraw->RenderDebugDraw(inProjViewMatrix,
             (m_debugDraw->GetDebugDrawImpl()->m_renderBuffer->getNbLines() +
                 (uint32)m_debugDraw->GetDebugDrawImpl()->m_customLines.size()) * 2,
