@@ -237,9 +237,9 @@ namespace engine
 
     int32 Animation::GetTickCount(void) const
     {
-        if (!m_boneData.empty())
-            return static_cast<int32>(m_boneData[0].m_keyframes.size());
 
+        if (!m_boneMap.empty())
+            return static_cast<int32>(m_boneMap.begin()->second.m_keyframes.size());
         else
             return 0;
     }
