@@ -1,6 +1,7 @@
 #include "ui/UIManager.h"
 #include "ui/UIComponent.h"
 #include "Window.h"
+#include "ui/Canvas.h"
 #include "window/WindowLib.h"
 #include "ui/IconsLucide.h"
 #include <imgui/imgui.h>
@@ -11,6 +12,7 @@
 
 #include "utility/MemoryCheck.h"
 #include "Engine.h"
+#include "ConsoleLog.hpp"
 
 #define ENABLE_UI_DEBUG 0
 
@@ -35,6 +37,7 @@ void engine::UIManager::NewFrame(void)
 
 void engine::UIManager::EndFrame(void)
 {
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -49,6 +52,11 @@ void engine::UIManager::EndFrame(void)
 
 void engine::UIManager::ShutDown(void)
 {
+    for (auto& canvas : m_canvasMap)
+    {
+        delete canvas.second;
+    }
+
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
@@ -57,6 +65,63 @@ void engine::UIManager::ShutDown(void)
 bool engine::UIManager::IsWindowFocused(std::string const& name)
 {
     return ::ui::IsWindowSelected(name);
+}
+
+void engine::UIManager::CreateCanvas(std::string const& name, math::Vector2f const& size)
+{
+    if (!m_canvasMap.contains(name))
+        m_canvasMap[name] = new Canvas(size, {0.0f, 0.0f, 0.0f, 0.0f});
+}
+
+engine::Canvas* engine::UIManager::GetCanvas(std::string const& name)
+{
+    if (m_canvasMap.contains(name.c_str()))
+        return m_canvasMap[name];
+    else
+    {
+        PrintLog(WarningPreset(), "Canvas does not exist.");
+        return nullptr;
+    }
+
+}
+
+void engine::UIManager::RenderCanvases(math::Vector2f const& position, math::Vector2f const& viewportSize)
+{
+    for (auto canvas : m_canvasMap)
+    {
+        canvas.second->Render(position, viewportSize);
+    }
+}
+
+void engine::UIManager::ClearAllCanvases(void)
+{
+    for (auto& canvas : m_canvasMap)
+    {
+        canvas.second->RemoveAllEntities();
+    }
+}
+
+void engine::UIManager::DeleteAllCanvases(void)
+{
+    ClearAllCanvases();
+    
+    for (auto& canvas : m_canvasMap)
+    {
+        delete canvas.second;
+    }
+
+    m_canvasMap.clear();
+}
+
+void engine::UIManager::DeleteCanvas(std::string const& name)
+{
+    if (m_canvasMap.contains(name))
+    {
+        m_canvasMap[name]->Clear();
+        m_canvasMap.erase(name);
+    }
+    else
+        PrintLog(WarningPreset(), "Attempted to delete an invalid canvas");
 }
 
 void engine::UIManager::InitUI(wnd::Wnd* window)

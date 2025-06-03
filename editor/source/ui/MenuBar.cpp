@@ -50,8 +50,10 @@ void editor::MenuBar::UpdateStartButton(engine::GameScene& activeScene)
         m_gameRunning = false;
         m_application->ResetScene(activeScene);
         
+        
         // Re-select the previously selected entity for property window
         m_application->m_properties.SetHandle(m_application->m_graphView.GetSelectedEntity());
+
         printf("Game running: false\n");
     }
     else if (!m_gameRunning && ::ui::Button("Start"))
@@ -77,6 +79,11 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
     
     if (ui::StartMenu("Project"))
     {
+        if (ui::MenuItem("Save project", "Ctrl+S"))
+        {
+            engine::Engine::GetEngine()->SaveProject();
+        }
+
         if (ui::MenuItem("Create project"))
         {
             m_isCreateWndOpened = true;
@@ -85,6 +92,13 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
         if (ui::MenuItem("Open project"))
         {
             OpenProject(scene);
+        }
+
+        if (ui::MenuItem("Build project"))
+        {
+            std::filesystem::path buildPath;
+            SelectFolder(buildPath);
+            engine::Engine::GetEngine()->BuildProjectExecutable(buildPath);
         }
 
         ui::EndMenu();
@@ -196,7 +210,11 @@ void editor::MenuBar::CreateProject(void)
         static uint8 createProjectStatus = CREATE_PROJECT_IN_PROGRESS;
 
         if (engine::InputHandler::IsInputPressed(KEY_ESCAPE))
+        {
+            // Explicitly call destructor to prevent memory leaks
+            table.~Table();
             CloseCreateMenu(projectName, projectPath, createProjectStatus);
+        }
 
         // Use table for alignment
         if (table.StartTable())
@@ -246,6 +264,8 @@ void editor::MenuBar::CreateProject(void)
                         }
                     }
                     
+                    // Explicitly call destructor to prevent memory leaks
+                    table.~Table();
                     CloseCreateMenu(projectName, projectPath, createProjectStatus);
                 }
                 else
@@ -365,6 +385,12 @@ void editor::MenuBar::CloseCreateMenu(std::string& projectName, std::filesystem:
 {
     projectName.clear();
     projectPath.clear();
+    
+    projectName.~basic_string();
+    projectPath.~path();
+
     m_isCreateWndOpened = false;
     status = CREATE_PROJECT_IN_PROGRESS;
+
+
 }

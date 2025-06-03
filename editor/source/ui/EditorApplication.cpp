@@ -5,6 +5,7 @@
 #include <engine/thread/ThreadManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/input/InputHandler.h>
+#include <engine/Engine.h>
 
 #include "ui/components/RigidBodyDynamicComponent.h"
 
@@ -44,7 +45,7 @@ namespace editor
         m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
 
-        // Get selected entity to dislay its components
+        // Get selected entity to display its components
         if (m_graphView.IsNewEntitySelected())
             m_properties.SetHandle(m_graphView.GetSelectedEntity());
 
@@ -52,7 +53,9 @@ namespace editor
 
         m_gameSimulationView->RenderToViewport();
         m_gameSimulationView->Render();
+        m_gameSimulationView->RenderInGameUI();
 
+        
         // Editor camera
         if (m_sceneEditorView->HasWindowResized())
             m_editorViewCamera.UpdateAspectRatio(m_sceneEditorView->GetViewportSize());
@@ -84,6 +87,7 @@ namespace editor
 
         m_graphView.ClearGraph();
         activeScene.Reset();
+        engine::Engine::GetEngine()->GetUIManager().DeleteAllCanvases();
         engine::ThreadManager::SynchronizeGameThread(activeScene.GetGraph());
         m_graphView.SetGraph(activeScene.GetGraph());
     }
@@ -107,6 +111,7 @@ namespace editor
     {
         //RigidBodyDynamicComponent::ReleaseStaticData();
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
+        engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         delete m_gizmosUI;
