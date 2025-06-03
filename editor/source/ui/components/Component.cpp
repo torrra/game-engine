@@ -35,7 +35,9 @@ void editor::BaseComponent::RenderSection(engine::SceneGraph* graph, engine::Ent
             graph->DestroyComponent<engine::RigidBodyDynamic>(handle);
             break;
         case editor::TRANSFORM:
-            if (!graph->GetEntity(handle)->HasComponent<engine::TriangleMesh>())
+            if (!graph->GetEntity(handle)->HasComponent<engine::TriangleMesh>() &&
+                !graph->GetEntity(handle)->HasComponent<engine::RigidBodyDynamic>() &&
+                !graph->GetEntity(handle)->HasComponent<engine::RigidBodyStatic>())
             {
                 graph->DestroyComponent<engine::Transform>(handle);
             }

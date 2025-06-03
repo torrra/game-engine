@@ -166,10 +166,22 @@ void editor::PropertyWnd::RenderMenuBar(void)
                 AddComponent<RendererComponent, engine::Renderer>();
 
             else if (ui::MenuItem("RigidbodyStatic"))
+            {
                 AddComponent<RigidBodyStaticComponent, engine::RigidBodyStatic>();
+                if (!m_graph->GetEntity(m_handle)->HasComponent<engine::Transform>())
+                {
+                    AddComponent<TransformComponent, engine::Transform>();
+                }
+            }
 
             else if (ui::MenuItem("RigidbodyDynamic"))
+            {
                 AddComponent<RigidBodyDynamicComponent, engine::RigidBodyDynamic>();
+                if (!m_graph->GetEntity(m_handle)->HasComponent<engine::Transform>())
+                {
+                    AddComponent<TransformComponent, engine::Transform>();
+                }
+            }
 
             else if (ui::MenuItem("Camera"))
                 AddComponent<CameraComponent, engine::Camera>();
@@ -269,7 +281,7 @@ void editor::PropertyWnd::ClearComponentArray(void)
             delete dynamic_cast<CameraComponent*>(component);
             break;
         case editor::RENDERER:
-                delete dynamic_cast<RendererComponent*>(component);
+            delete dynamic_cast<RendererComponent*>(component);
             break;
         case editor::RIGIDBODY_STATIC:
             delete dynamic_cast<RigidBodyStaticComponent*>(component);
@@ -281,7 +293,7 @@ void editor::PropertyWnd::ClearComponentArray(void)
             delete dynamic_cast<ScriptComponent*>(component);
             break;
         case editor::TRANSFORM:
-                delete dynamic_cast<TransformComponent*>(component);
+            delete dynamic_cast<TransformComponent*>(component);
             break;
         case editor::LIGHT_SOURCE:
             delete dynamic_cast<LightSourceComponent*>(component);

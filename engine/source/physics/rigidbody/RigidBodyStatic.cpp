@@ -227,13 +227,14 @@ void engine::RigidBodyStatic::UpdateEntity(void)
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
         m_rigidBodyShape != EGeometryType::PLANE)
     {
-        // Update the entity transform in regard to the rigid body
-        Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+        // Update the entity transform in regard to the rigid body        
+        if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+        {
+            Transform updatedTransform = ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
 
-        Transform updatedTransform = ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
-
-        transform->CopyPosition(updatedTransform);
-        transform->CopyRotation(updatedTransform);
+            transform->CopyPosition(updatedTransform);
+            transform->CopyRotation(updatedTransform);
+        }
     }
 }
 
@@ -244,13 +245,14 @@ void engine::RigidBodyStatic::UpdateRigidBody(void)
     {
         Transform worldTransform;
 
-        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+        if (Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner))
+        {
+            worldTransform.SetPosition(Transform::ToWorldPosition(*entityTransform));
+            worldTransform.SetRotation(Transform::ToWorldRotation(*entityTransform));
 
-        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
-
-        // Update the transform of the rigid body in regard to the entity
-        m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));
+            // Update the transform of the rigid body in regard to the entity
+            m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));
+        }
     }
 }
 
