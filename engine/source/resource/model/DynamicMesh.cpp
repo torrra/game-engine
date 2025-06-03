@@ -16,7 +16,7 @@ namespace engine
     void DynamicMesh::ProcessMesh(const void* mesh)
     {
         Mesh::ProcessMesh(mesh);    
-        //ProcessSkeleton(mesh);
+        ProcessSkeleton(mesh);
     }
 
     void DynamicMesh::DeleteMesh(void)
@@ -89,14 +89,14 @@ namespace engine
     {
         glEnableVertexArrayAttrib(m_vao, 6);
         glVertexArrayAttribFormat(m_vao, 6, 4, GL_UNSIGNED_INT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(m_vao, 6, 1);
+        glVertexArrayAttribBinding(m_vao, 6, 2);
     }
 
     void DynamicMesh::SetBoneWeightAttribute()
     {
         glEnableVertexArrayAttrib(m_vao, 7);
         glVertexArrayAttribFormat(m_vao, 7, 4, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(m_vao, 7, 2);
+        glVertexArrayAttribBinding(m_vao, 7, 3);
 
     }
 
@@ -131,9 +131,12 @@ namespace engine
             if (newWeight.m_weightCount > 3)
                 continue;
 
-            newWeight.m_boneIndices[newWeight.m_weightCount] = boneIndex;
-            newWeight.m_weights[newWeight.m_weightCount] = weight.mWeight;
-            ++newWeight.m_weightCount;
+            if (!math::AlmostEqual(weight.mWeight, 0.f))
+            {
+                newWeight.m_boneIndices[newWeight.m_weightCount] = boneIndex;
+                newWeight.m_weights[newWeight.m_weightCount] = weight.mWeight;
+                ++newWeight.m_weightCount;
+            }
         }
     }
 

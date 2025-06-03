@@ -310,15 +310,8 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     if (scene->HasAnimations())
         Animation::LoadExtraAnimations(scene);
 
-    uint64 meshIndex = 0;
     for (DynamicMesh& mesh : m_dynamicMeshes)
-    {   
-        if (mesh.ProcessSkeleton(scene->mMeshes[meshIndex++]))
-        {
-            m_boneCount = mesh.GetBoneCount();
-            break;
-        }
-    }
+        m_boneCount += mesh.GetBoneCount();
 
     m_loadStatus |= LOADED;
 
