@@ -13,8 +13,7 @@
 
 namespace engine
 {
-    void SkeletonAnimator::SetAnimation(ResourceRef<class Animation>&& anim,
-                                        bool crossfade)
+    void SkeletonAnimator::SetAnimation(ResourceRef<class Animation>&& anim, bool crossfade)
     {
         if (crossfade)
         {
@@ -34,6 +33,7 @@ namespace engine
     {
         StopAnimation();
         m_model = model;
+        ResizeIndexArrays();
     }
 
     void SkeletonAnimator::PauseAnimation(void)
@@ -66,17 +66,27 @@ namespace engine
         if (!m_model || !m_model->IsDynamic())
             return;
 
+        if (!m_currentAnim)
+            return;
+
         if (m_animState == EAnimationState::PLAYING)
         {
-
             m_elapsed += deltaTime;
+
+            if (m_elapsed >= m_targetInterval)
+            {
+                if (UpdateNextKeyFrame() == EAnimationState::STOPPED)
+                    return;
+            }
             
            int32 boneCount = static_cast<int32>(m_currentAnimIndices.size());
+           f32 lerpTime = math::Clamp(m_elapsed / m_targetInterval, 0.f, 1.f);
+
            m_transforms.clear();
            m_transforms.resize(m_currentAnimIndices.size());
 
                 for (int32 boneNum = 0; boneNum < boneCount; ++boneNum)
-                    UpdateSingleBone(boneNum, 0);
+                    UpdateSingleBone(boneNum, lerpTime);
         }
 
         if (m_animState != EAnimationState::STOPPED)
@@ -130,6 +140,7 @@ namespace engine
     {
         m_skinningSSBO.Init();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_skinningSSBO.GetBufferID());
+        std::cout << m_skinningSSBO.GetBufferID() << '\n';
     }
 
     void SkeletonAnimator::InitAnimation(bool current)
@@ -139,7 +150,13 @@ namespace engine
 
         if (current)
         {
-            m_targetInterval = m_currentAnim->GetTicksPerSecond();
+            constexpr float defaultInterval = 1.f / 30.f;
+
+            if (!math::AlmostEqual(m_currentAnim->GetTicksPerSecond(), 0.0f))
+                m_targetInterval = 1.f / m_currentAnim->GetTicksPerSecond();
+            else
+                m_targetInterval = defaultInterval;
+
             MapBonesByName(m_currentAnimIndices, m_currentAnim);
         }
         
@@ -158,12 +175,25 @@ namespace engine
         if (!anim)
             return;
 
-        for (int32 boneNum = 0; boneNum < static_cast<int32>(m_model->GetBoneCount()); ++boneNum)
+       uint64 meshBoneOffset = 0;
+
+        for (uint64 meshNum = 0; meshNum < m_model->GetDynamicMeshes().size(); ++meshNum)
         {
-            const Bone& bone = m_model->GetDynamicMeshes()[0].GetBone(boneNum);              // get bone by index
-            indices[boneNum].m_bone = &bone;
-            indices[boneNum].m_animDataIndex = anim->GetBoneAnimData(bone.m_name);         // get keyframes matching with bone name
-            indices[boneNum].m_parentIndex = bone.m_parent;
+            const DynamicMesh& mesh = m_model->GetDynamicMeshes()[meshNum];
+
+            for (int32 boneNum = 0; boneNum < static_cast<int32>(mesh.GetBoneCount()); ++boneNum)
+            {
+                const Bone& bone = mesh.GetBone(boneNum);              // get bone by index
+                indices[boneNum + meshBoneOffset].m_bone = &bone;
+
+                if (memcmp(bone.m_name.c_str(), "ik_", 3) != 0)
+                {
+                    indices[boneNum + meshBoneOffset].m_animDataIndex = anim->GetBoneAnimData(bone.m_name);         // get keyframes matching with bone name
+                    indices[boneNum + meshBoneOffset].m_parentIndex = bone.m_parent;
+                }
+            }
+
+            meshBoneOffset += mesh.GetBoneCount();
         }
     }
 
@@ -176,8 +206,8 @@ namespace engine
             return;
 
         BoneTransform& keyFrame = m_transforms[index];
-        //int32 nextKeyFrameIndex = CalculateNextKeyFrameIndex();
-        int32 nextKeyFrameIndex = -1;
+        int32 nextKeyFrameIndex = CalculateNextKeyFrameIndex();
+        //int32 nextKeyFrameIndex = -1;
 
         const AnimBone& boneKeyFrames = *indices.m_animDataIndex;
 
@@ -209,15 +239,26 @@ namespace engine
     {
         if (m_model && m_model->IsDynamic())
         {
+            m_currentAnimIndices.clear();
+            m_nextAnimIndices.clear();
+            m_transforms.clear();
+
             m_currentAnimIndices.resize(m_model->GetBoneCount());
             m_nextAnimIndices.resize(m_model->GetBoneCount());
             m_transforms.resize(m_model->GetBoneCount());
         }
     }
 
+    void SkeletonAnimator::RetrieveDataFromCache(const SkeletonAnimator& cached)
+    {
+        m_animState = cached.m_animState;
+        m_currentKeyFrame = cached.m_currentKeyFrame;
+        m_elapsed = cached.m_elapsed;
+    }
+
     int32 SkeletonAnimator::CalculateNextKeyFrameIndex(void)
     {
-        if (m_currentKeyFrame + 1 < m_currentAnim->GetTickCount() - 1)
+        if ((m_currentKeyFrame + 1) < (m_currentAnim->GetTickCount() - 1))
             return m_currentKeyFrame + 1;
 
         else if (m_looped)
@@ -233,7 +274,7 @@ namespace engine
         std::vector<math::Matrix4f> skinning;
 
         matrices.resize(m_transforms.size(), {1.f});
-        skinning.reserve(m_transforms.size());
+        skinning.resize(m_transforms.size(), {1.f});
 
         int64 currentBone = 0;
 
@@ -247,8 +288,8 @@ namespace engine
                     animMatrix = matrices[indices.m_parentIndex] * indices.m_bone->m_localTransform;
 
 
+                skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix;
                 ++currentBone;
-                skinning.emplace_back(indices.m_bone->m_inverseBindPose * animMatrix);
                 continue;
             }
 
@@ -257,7 +298,6 @@ namespace engine
             if (indices.m_parentIndex != -1)
             {
                 animMatrix = matrices[indices.m_parentIndex] *           // parent anim matrix
-                    indices.m_bone->m_localTransform *                     // current bone local matrix
                     math::TransformMatrix(transform.m_rotation, // keyframe transform matrix
                         transform.m_position,
                         transform.m_scaling);
@@ -290,11 +330,10 @@ namespace engine
                     transform.m_scaling);
             }
 
-            skinning.emplace_back(indices.m_bone->m_inverseBindPose * animMatrix);
-
+            skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix;
             ++currentBone;
         }
         
-        m_skinningSSBO.SetData(skinning.data(), skinning.size() * sizeof(f32));
+        m_skinningSSBO.SetData(skinning.data(), skinning.size() * sizeof(math::Matrix4f));
     }
 }

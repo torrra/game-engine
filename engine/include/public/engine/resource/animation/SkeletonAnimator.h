@@ -28,6 +28,7 @@ namespace engine
             const AnimBone* m_animDataIndex = nullptr;
             const Bone* m_bone = nullptr;
             int32 m_parentIndex = -1;
+            bool m_ignore = false;
         };
         
     public:
@@ -57,6 +58,8 @@ namespace engine
         ENGINE_API void InitBuffer(void);
         ENGINE_API void UseSkinningBuffer(void);
         ENGINE_API void ResizeIndexArrays(void);
+
+        ENGINE_API void RetrieveDataFromCache(const SkeletonAnimator& cached);
 
         ENGINE_API SkeletonAnimator& operator=(SkeletonAnimator&&) noexcept = default;
 
