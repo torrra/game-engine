@@ -53,14 +53,14 @@ namespace engine
         RegisterAudioPlayerFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
-        RunConfigScript("Component.lua");
-        RunConfigScript("Entity.lua");
+        RunConfigScript("ecs/Component.lua");
+        RunConfigScript("ecs/Entity.lua");
         RunConfigScript("ScriptObject.lua");
-        RunConfigScript("Script.lua");
-        RunConfigScript("Camera.lua");
-        RunConfigScript("Transform.lua");
+        RunConfigScript("ecs/Script.lua");
+        RunConfigScript("ecs/Camera.lua");
+        RunConfigScript("ecs/Transform.lua");
         RunConfigScript("Input.lua");
-        RunConfigScript("NavPoint.lua");
+        RunConfigScript("ecs/NavPoint.lua");
 
         RunConfigScript("ui/Canvas.lua");
         RunConfigScript("ui/Text.lua");
@@ -75,7 +75,7 @@ namespace engine
         RunConfigScript("physics/RigidBodyDynamic.lua");
         RunConfigScript("physics/RigidBodyStatic.lua");
 
-        RunConfigScript("AudioPlayer.lua");
+        RunConfigScript("ecs/AudioPlayer.lua");
 
         RunAllUserScripts();
     }
