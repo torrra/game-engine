@@ -107,19 +107,9 @@ namespace editor
 
     void EditorApplication::ResetApplication(void)
     {
-        if (!m_isResetScheduled) 
-        {
-            engine::ThreadManager::AddTask<engine::ThreadManager::ETaskType::GRAPHICS>
-                ([this]()
-                    {
-                        m_graphView.ClearGraph();
-                        m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
-                        m_graphView.SetGraph(m_currentScene->GetGraph());
-                        m_isResetScheduled = false;
-                    });
-
-            m_isResetScheduled = true;
-        }
+        m_graphView.ClearGraph();
+        m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+        m_graphView.SetGraph(m_currentScene->GetGraph());
     }
 
     void EditorApplication::Shutdown(void)
