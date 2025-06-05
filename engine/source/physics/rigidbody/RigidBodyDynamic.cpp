@@ -46,8 +46,6 @@ engine::RigidBodyDynamic::RigidBodyDynamic(EntityHandle inOwner, SceneGraph* inS
     // Set the owner and the current scene
     m_owner			= inOwner;
     m_currentScene	= inScene;
-
-    //SwitchShape(EGeometryType::BOX);
 }
 
 void engine::RigidBodyDynamic::Invalidate(void)

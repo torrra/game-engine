@@ -36,7 +36,7 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         {
             engine::RigidBodyDynamicFactory::CreateDynamic(engine::Engine::GetEngine()->GetGraph(),
                 rigidBodyDynamic->GetOwner(),
-                engine::EGeometryType::BOX);
+                static_cast<engine::EGeometryType>(rigidBodyDynamic->m_rigidBodyShape));
             m_isInitialize = true;
         }
 

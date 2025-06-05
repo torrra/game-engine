@@ -29,7 +29,7 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
         {
             engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
                 rigidBodyStatic->GetOwner(),
-                engine::EGeometryType::BOX);
+                static_cast<engine::EGeometryType>(rigidBodyStatic->m_rigidBodyShape));
 
             m_isInitialized = true;
         }
