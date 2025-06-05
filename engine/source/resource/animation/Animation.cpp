@@ -100,9 +100,12 @@ namespace engine
         for (uint32 boneNum = 0; boneNum < animImpl->mNumChannels; ++boneNum)
         {
             aiNodeAnim* boneAnim = animImpl->mChannels[boneNum];
+
+            if (memcmp(boneAnim->mNodeName.C_Str(), "ik_", 3) == 0)
+                continue;
+
             AnimBone& newBone = m_boneMap[boneAnim->mNodeName.C_Str()];
 
-            //newBone.m_boneName = boneAnim->mNodeName.C_Str();
             newBone.m_keyframes.resize(static_cast<uint32>(animImpl->mDuration));
 
             ReadBonePositions(newBone, boneAnim);
