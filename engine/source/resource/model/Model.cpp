@@ -305,8 +305,6 @@ void engine::Model::ProcessMeshes(const void* scene, const void* node, const std
         ProcessMeshes(scene, nodeImpl->mChildren[childIndex], name);
 }
 
-#include <chrono>
-
 void engine::Model::WorkerThreadLoad(const std::string& name)
 {
     // Read file
@@ -334,12 +332,8 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     std::string dir = GetDirectory(name);
 
     ProcessTextures(scene); 
-
-    auto start = std::chrono::high_resolution_clock::now();
-
     ProcessMeshes(scene, scene->mRootNode, dir);
 
-    std::cout << "process time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start) << '\n';
 
     if (scene->HasAnimations())
         Animation::LoadExtraAnimations(scene);
