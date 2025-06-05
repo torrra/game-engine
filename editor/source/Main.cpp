@@ -35,24 +35,6 @@ int appMain(void)
             if (engine::InputHandler::IsInputReleased(KEY_S))
                 engine.SaveProject();
         }
-        if (engine::InputHandler::IsInputReleased(KEY_U))
-        {
-            if (engine::Entity* padoru = engine.GetGraph()->GetEntity("Padoru"))
-            {
-                engine::Renderer* renderer = engine.GetGraph()->GetComponent<engine::Renderer>(padoru->GetHandle());
-                engine::SkeletonAnimator& animator = renderer->GetAnimator();
-
-                //engine::ResourceRef anim = engine::ResourceManager::GetResource<engine::Animation>("mixamo.com");
-
-                //if (anim)
-                
-                    animator.PlayAnimation();
-                    animator.SetLooped(true);
-               //}
-            }
-        }
-            
-
         engine.UpdateApplicationWindow();
 	}
 
