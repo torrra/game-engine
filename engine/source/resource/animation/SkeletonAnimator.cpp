@@ -43,6 +43,9 @@ namespace engine
 
     void SkeletonAnimator::PlayAnimation(void)
     {
+        if (!m_currentAnim)
+            return;
+
         if (m_animState == EAnimationState::PAUSED)
             m_animState = EAnimationState::PLAYING;
 
@@ -145,8 +148,12 @@ namespace engine
 
     void SkeletonAnimator::InitAnimation(bool current)
     {
-        if (!m_model)
+        if (!m_model || !m_model->CanRender())
+        {
+            PrintLog(ErrorPreset(), "Unable to init animation, model is invalid \
+or has not finished loading!");
             return;
+        }
 
         if (current)
         {
@@ -169,7 +176,7 @@ namespace engine
     void SkeletonAnimator::MapBonesByName(std::vector<BoneIndex>& indices,
                                          const ResourceRef<class Animation>& anim)
     {
-        if (indices.empty())
+        //if (indices.empty())
             ResizeIndexArrays();
 
         if (!anim)
@@ -277,60 +284,63 @@ namespace engine
         skinning.resize(m_transforms.size(), {1.f});
 
         int64 currentBone = 0;
-
+        
         for (BoneIndex& indices : m_currentAnimIndices)
         {
             math::Matrix4f& animMatrix = matrices[currentBone];
-
+        
             if (!indices.m_animDataIndex)
             {
+                if (!indices.m_bone)
+                    continue;
+
                 if (indices.m_parentIndex != -1)
-                    animMatrix = matrices[indices.m_parentIndex] * indices.m_bone->m_localTransform;
-
-
-                skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix;
+                    animMatrix = matrices[indices.m_parentIndex] * indices.m_bone->m_localTransform.Transpose();
+        
+        
+                skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
                 ++currentBone;
                 continue;
             }
-
+        
             const BoneTransform& transform = m_transforms[currentBone];
-
+        
             if (indices.m_parentIndex != -1)
             {
                 animMatrix = matrices[indices.m_parentIndex] *           // parent anim matrix
                     math::TransformMatrix(transform.m_rotation, // keyframe transform matrix
                         transform.m_position,
                         transform.m_scaling);
-
-
+        
+        
                 math::Vector3f start =
                 {
                     animMatrix[3][0],
                     animMatrix[3][1],
                     animMatrix[3][2],
                 };
-
+        
                 math::Matrix4f& parentPose = matrices[indices.m_parentIndex];
-
+        
                 math::Vector3f end =
                 {
                     parentPose[3][0],
                     parentPose[3][1],
                     parentPose[3][2],
                 };
-
+        
                 PhysicsEngine::Get().AddDebugLine(start, end, (uint32)-1);
-
+        
             }
-
+        
             else
             {
                 animMatrix = math::TransformMatrix(transform.m_rotation,
                     transform.m_position,
                     transform.m_scaling);
             }
-
-            skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix;
+        
+            skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
             ++currentBone;
         }
         
