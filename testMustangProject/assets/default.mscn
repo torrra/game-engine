@@ -7,16 +7,16 @@
 [Transform]
     uint64 | index=2
     int64 | owner=0
-    quat32 | rotation={1,-4.94458e-11,0.000392575,1.78958e-11}
+    quat32 | rotation={0.705771,-0.704441,0.043445,0.0613517}
     vec3f32 | position={-1.905,4.6,-5.00181}
     vec3f32 | scale={0.01,0.01,0.01}
     uint64 | flags=0
 [Renderer]
     int64 | owner=0
     string | model="\SKM_Manny.fbx"
-    string | shader="ModelTextured"
-        string | vertexShader="shaders/ModelTextured.vert"
-        string | fragmentShader="ModelTextured.frag"
+    string | shader="programModel"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\Model.frag"
     uint64 | materialCount=0
     uint64 | flags=0
 [Script]
@@ -31,7 +31,7 @@
      uint64 | shape=0
      uint32 | collision group=3
      vec3f32 | box half extents={0.5,0.5,0.5}
-     uint32 | gravity=0
+     uint32 | gravity=1
      uint32 | trigger=0
      uint32 | lock X axis=1
      uint32 | lock Y axis=1
@@ -90,7 +90,7 @@
    int64 | handle=3
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=529
+   uint64 | components=17
 [Transform]
     uint64 | index=3
     int64 | owner=3
@@ -106,14 +106,6 @@
      vec3f32 | box half extents={0.5,0.2,0.5}
      bool | trigger=1
      uint64 | flags=0
-[LightSource]
-    int64 | owner=3
-    vec3f32 | ambientColor={1,1,1}
-    vec3f32 | diffuseColor={1,1,1}
-    vec3f32 | specularColor={1,1,1}
-    vec3f32 | attenuation={1,0.007,0.0002}
-    uint32 | type=0
-    uint64 | flags=0
 [Entity]
    string | name="New Entity 1"
    int64 | handle=4
