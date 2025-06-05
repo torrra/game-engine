@@ -130,19 +130,27 @@ namespace engine
     {
         const aiBone* boneImpl = reinterpret_cast<const aiBone*>(bone);
 
+        if (memcmp(boneImpl->mName.C_Str(), "ik_", 3) == 0)
+            return;
+
         for (uint32 weightIndex = 0; weightIndex < boneImpl->mNumWeights; ++weightIndex)
         {
             const aiVertexWeight& weight = boneImpl->mWeights[weightIndex];
             BoneWeight& newWeight = m_weights[weight.mVertexId];
 
-            if (newWeight.m_weightCount > 3)
-                continue;
 
             if (!math::AlmostEqual(weight.mWeight, 0.f))
             {
-                newWeight.m_boneIndices[newWeight.m_weightCount] = boneIndex;
-                newWeight.m_weights[newWeight.m_weightCount] = weight.mWeight;
-                ++newWeight.m_weightCount;
+                int32 smallestIndex = 0;
+
+                for (int32 vectorIndex = 0; vectorIndex < 4; ++vectorIndex)
+                {
+                    if (newWeight.m_boneIndices[vectorIndex] < newWeight.m_boneIndices[smallestIndex])
+                        smallestIndex = vectorIndex;
+                }
+
+                newWeight.m_boneIndices[smallestIndex] = boneIndex;
+                newWeight.m_weights[smallestIndex] = weight.mWeight;
             }
         }
     }

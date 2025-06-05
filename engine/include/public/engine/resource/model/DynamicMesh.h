@@ -13,7 +13,6 @@ namespace engine
     {
         math::Vector4i          m_boneIndices{ -1 };
         math::Vector4f          m_weights{ 0.f };
-        uint32                  m_weightCount = 0;
     };
 
     struct Bone
