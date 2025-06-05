@@ -306,11 +306,7 @@ namespace engine
             if (!camera.IsValid() || !camera.IsActive())
                 continue;
 
-            if (Transform* camTransform = GetComponent<Transform>(camera.GetOwner()))
-            {
-                math::Matrix4f view = camera.GetViewMatrix(camTransform);
-                RenderFromCacheSingleCamera(view, camera.GetProjectionMatrix());
-            }
+            RenderFromCacheSingleCamera(camera.ViewProjection());
         }
     }
 
@@ -374,14 +370,14 @@ namespace engine
         return m_renderCache.m_lightRenderCache;
     }
 
-    void SceneGraph::RenderFromCacheSingleCamera(const math::Matrix4f& view, const math::Matrix4f& projection)
+    void SceneGraph::RenderFromCacheSingleCamera(const math::Matrix4f& viewProjection)
     {
         for (Renderer& renderer : m_sceneRenderers)
         {
             if (!renderer.IsValid() || !renderer.IsActive())
                 continue;
 
-            renderer.Render(view, projection, m_renderCache.m_transformRenderCache);
+            renderer.Render(viewProjection, m_renderCache.m_transformRenderCache);
             OpenGLError();
         }
     }

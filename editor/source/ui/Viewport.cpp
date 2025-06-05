@@ -65,7 +65,7 @@ void editor::Viewport::RenderInGameUI(void)
     engine::Engine::GetEngine()->GetUIManager().RenderCanvases({0.0f, 0.0f}, m_size);
 }
 
-void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& view, const math::Matrix4f& projection)
+void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjection)
 {
     
     m_fbo.Bind();
@@ -78,11 +78,10 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& view, const m
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
 
     engine::ThreadManager::ExecuteRenderThreadTasks(); 
-    math::Matrix4f viewProjection = projection * view;
 
     if (m_graph)
     {
-        m_graph->RenderFromCacheSingleCamera(view, projection);
+        m_graph->RenderFromCacheSingleCamera(viewProjection);
 
         engine::ResourceRef<engine::Model> lightBall =
         engine::ResourceManager::GetResource<engine::Model>("./assets/lightBall.obj");

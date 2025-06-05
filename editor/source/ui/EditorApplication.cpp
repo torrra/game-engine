@@ -63,11 +63,11 @@ namespace editor
         if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
 
-        math::Matrix4f view = m_editorViewCamera.GetViewMatrix();
+        math::Matrix4f viewProjection = m_editorViewCamera.ViewProjection();
 
         // Editor viewport
-        m_sceneEditorView->RenderPickingPass(m_editorViewCamera.ViewProjection());
-        m_sceneEditorView->RenderToDebugViewport(view, m_editorViewCamera.GetProjectionMatrix());
+        m_sceneEditorView->RenderPickingPass(viewProjection);
+        m_sceneEditorView->RenderToDebugViewport(viewProjection);
         
         m_gizmosUI->Render();
         m_sceneEditorView->Render();
