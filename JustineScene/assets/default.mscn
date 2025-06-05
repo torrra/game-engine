@@ -9,7 +9,7 @@
    int64 | handle=1
    int64 | parent=0
    uint64 | flags=0
-   uint64 | components=149
+   uint64 | components=133
 [Transform]
     uint64 | index=0
     int64 | owner=1
@@ -26,14 +26,6 @@
     uint64 | materialCount=1
     string | material="\Level\Level1\Material\LevelMat.mmat"
     uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=1
-     uint32 | type=1
-     uint64 | shape=0
-     uint32 | collision group=3
-     vec3f32 | box half extents={0.5,0.5,0.5}
-     bool | trigger=0
-     uint64 | flags=0
 [TriangleMesh]
      int64 | owner=1
      uint32 | type=1
@@ -45,7 +37,7 @@
    int64 | handle=2
    int64 | parent=0
    uint64 | flags=0
-   uint64 | components=149
+   uint64 | components=133
 [Transform]
     uint64 | index=1
     int64 | owner=2
@@ -62,14 +54,6 @@
     uint64 | materialCount=1
     string | material="\Level\Level2\Material\Level2Mat.mmat"
     uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=2
-     uint32 | type=1
-     uint64 | shape=0
-     uint32 | collision group=3
-     vec3f32 | box half extents={0.5,0.5,0.5}
-     bool | trigger=0
-     uint64 | flags=0
 [TriangleMesh]
      int64 | owner=2
      uint32 | type=1
@@ -150,7 +134,7 @@
 [Entity]
    string | name="Enemy1"
    int64 | handle=8
-   int64 | parent=7
+   int64 | parent=-1
    uint64 | flags=0
    uint64 | components=27
 [Transform]
@@ -171,7 +155,7 @@
      uint32 | type=0
      uint64 | shape=2
      uint32 | collision group=3
-     vec2f32 | capsule format={0.35,0.6}
+     vec2f32 | capsule format={0.3,0.65}
      uint32 | gravity=0
      uint32 | trigger=0
      uint32 | lock X axis=1
@@ -183,24 +167,24 @@
      uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=4
-     vec3f32 | box half extents={6,0.5,3.6}
+     vec3f32 | box half extents={5,0.5,4}
      bool | trigger=1
      uint64 | flags=0
 [Entity]
    string | name="Mesh"
-   int64 | handle=4294967305
+   int64 | handle=9
    int64 | parent=8
    uint64 | flags=0
    uint64 | components=5
 [Transform]
     uint64 | index=5
-    int64 | owner=4294967305
+    int64 | owner=9
     quat32 | rotation={0.707107,0,0.707107,0}
-    vec3f32 | position={0,-1,0}
+    vec3f32 | position={0,-0.95,0}
     vec3f32 | scale={0.01,0.01,0.01}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=4294967305
+    int64 | owner=9
     string | model="\Character\Ch44_nonPBR.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
@@ -214,46 +198,40 @@
    uint64 | flags=0
    uint64 | components=0
 [Entity]
-   string | name="RigidbodyEnemy1"
-   int64 | handle=11
-   int64 | parent=8
-   uint64 | flags=0
-   uint64 | components=0
-[Entity]
    string | name="NavPoint1"
+   int64 | handle=11
+   int64 | parent=10
+   uint64 | flags=0
+   uint64 | components=256
+[NavigationPoint]
+     int64 | owner=11
+     vec3f32 | position={10,0,-14}
+     uint64 | flags=0
+[Entity]
+   string | name="NavPoint2"
    int64 | handle=12
    int64 | parent=10
    uint64 | flags=0
    uint64 | components=256
 [NavigationPoint]
      int64 | owner=12
-     vec3f32 | position={10,0,-14}
-     uint64 | flags=0
-[Entity]
-   string | name="NavPoint2"
-   int64 | handle=13
-   int64 | parent=10
-   uint64 | flags=0
-   uint64 | components=256
-[NavigationPoint]
-     int64 | owner=13
      vec3f32 | position={30,0,-14}
      uint64 | flags=0
 [Entity]
    string | name="Rifle"
-   int64 | handle=14
+   int64 | handle=13
    int64 | parent=8
    uint64 | flags=0
    uint64 | components=5
 [Transform]
     uint64 | index=6
-    int64 | owner=14
+    int64 | owner=13
     quat32 | rotation={-5.76204e-08,0,-1,0}
     vec3f32 | position={0.7,0.15,0.04}
     vec3f32 | scale={0.05,0.05,0.05}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=14
+    int64 | owner=13
     string | model="\Rifle\sci fi m254 gun - high poly.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
@@ -263,22 +241,75 @@
     uint64 | flags=0
 [Entity]
    string | name="Camera"
-   int64 | handle=15
+   int64 | handle=14
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=33
 [Transform]
     uint64 | index=7
-    int64 | owner=15
-    quat32 | rotation={0.678858,-0.197869,-0.678858,-0.197869}
-    vec3f32 | position={4.65,8.75,-14}
+    int64 | owner=14
+    quat32 | rotation={0.675602,-0.212818,-0.674988,-0.206547}
+    vec3f32 | position={4.15,6.7,-14}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Camera]
-    int64 | owner=15
+    int64 | owner=14
     f32 | near=0.005
     f32 | far=250
     f32 | fov=1.0472
     f32 | aspectRatio=1.77778
     vec3f32 | rotationEuler={0,0,0}
+    uint64 | flags=0
+[Entity]
+   string | name="Player"
+   int64 | handle=15
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=11
+[Transform]
+    uint64 | index=9
+    int64 | owner=15
+    quat32 | rotation={0.707107,0,0.707107,0}
+    vec3f32 | position={3.2,0.5,-14}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=1
+   int64 | owner=15
+   uint64 | count=1
+   string | scriptObject="ControllerScript"
+   uint64 | flags=0
+[RigidBodyDynamic]
+     int64 | owner=15
+     uint32 | type=0
+     uint64 | shape=2
+     uint32 | collision group=3
+     vec2f32 | capsule format={0.5,0}
+     uint32 | gravity=0
+     uint32 | trigger=0
+     uint32 | lock X axis=1
+     uint32 | lock Y axis=0
+     uint32 | lock Z axis=1
+     uint64 | flags=0
+[Entity]
+   string | name="PlayerMesh"
+   int64 | handle=16
+   int64 | parent=15
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=8
+    int64 | owner=16
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={0,0,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=16
+    string | model="\Character\padoru.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=1
+    string | material="\Character\Material\padoru.mmat"
     uint64 | flags=0

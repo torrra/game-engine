@@ -50,8 +50,8 @@ local function QuaternionSlerp(q1, q2, t)
     }
 end
 
-function EnemyScript:Start()
-    
+function EnemyScript:Initialize()
+
     self.transform = GetTransformComponent(self.entity.handle)
     self.navPoint1 = GetNavigationPointComponent(GetEntity("NavPoint.NavPoint1").handle)
     self.navPoint2 = GetNavigationPointComponent(GetEntity("NavPoint.NavPoint2").handle)
@@ -59,9 +59,10 @@ function EnemyScript:Start()
     self.navPoint2:RefreshRef()
     self.transform:RefreshRef()
 
-    self.height = Vector3.new(self.transform:GetPosition())
-    local x, y, z = self.navPoint1:GetPosition()
-    self.transform:SetPosition(x, self.height.y, z)
+    local _, yHeight, _ = self.transform:GetPosition()
+    self.height = yHeight
+    local x, _, z = self.navPoint1:GetPosition()
+    self.transform:SetPosition(x, self.height, z)
 
     self.speed = 3.0
     self.goingToPoint1 = false
@@ -79,13 +80,17 @@ function EnemyScript:Start()
     self.targetRotation = {w=w, x=x, y=y, z=z}
     self.rotationProgress = 0
     self.rotationSpeed = 1.5 -- rotation duration in second
+
+    
+
 end
 
-function EnemyScript:Update(deltaTime)
+function EnemyScript:Move(deltaTime)
+
     local currentPos = Vector3.new(self.transform:GetPosition())
     local targetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
     local targetPos = Vector3.new(targetPoint:GetPosition())
-    local direction = Vector3.new(targetPos.x - currentPos.x, 0, targetPos.z - currentPos.z)
+    local direction = Vector3.new(targetPos.x - currentPos.x, self.height, targetPos.z - currentPos.z)
     local distance = Length(targetPos, currentPos)
 
     if self.state == "moving" then
@@ -96,9 +101,9 @@ function EnemyScript:Update(deltaTime)
         else
             -- Move to the target 
             direction:Normalize()
-            local move = Vector3.new(direction.x * self.speed * deltaTime, 0, direction.z * self.speed * deltaTime)
+            local move = Vector3.new(direction.x * self.speed * deltaTime, self.height, direction.z * self.speed * deltaTime)
             local newPosition = currentPos + move
-            self.transform:SetPosition(newPosition.x, self.height.y, newPosition.z)
+            self.transform:SetPosition(newPosition.x, self.height, newPosition.z)
         end
 
     elseif self.state == "pauseBeforeTurn" then
@@ -108,11 +113,14 @@ function EnemyScript:Update(deltaTime)
             self.goingToPoint1 = not self.goingToPoint1
             local newTargetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
             local newTargetPos = Vector3.new(newTargetPoint:GetPosition())
-            local newDir = Vector3.new(newTargetPos.x - currentPos.x, 0, newTargetPos.z - currentPos.z)
+            local newDir = Vector3.new(newTargetPos.x - currentPos.x, self.height, newTargetPos.z - currentPos.z)
             newDir:Normalize()
 
             local angleY = math.deg(Atan2(newDir.z, newDir.x))
-            if angleY < 0 then angleY = angleY + 360 end
+            if angleY < 0 then 
+                angleY = angleY + 360 
+
+            end
             local angleRad = math.rad(angleY)
             local halfAngle = angleRad / 2
 
@@ -146,6 +154,72 @@ function EnemyScript:Update(deltaTime)
             self.state = "moving"
         end
     end
+end
+
+function EnemyScript:Attack(deltaTime)
+
+    local currentPosition = Vector3.new(self.transform:GetPosition())
+    local targetPosition = Vector3.new(self.playerTransform:GetPosition())
+    local direction = Vector3.new(targetPosition.x - currentPosition.x, 0, targetPosition.z - currentPosition.z)
+    local distance = Length(targetPosition, currentPosition)
+
+    local targetDistance = 4.0
+
+    if self.hasDetected then
+        if direction.x ~= 0 or direction.z ~= 0 then
+
+            direction:Normalize()
+            local angleY = Atan2(direction.z, direction.x)
+            local halfAngle = angleY / 2
+            local rot = {
+                w = math.cos(-halfAngle),
+                x = 0,
+                y = math.sin(-halfAngle),
+                z = 0
+            }
+            self.transform:SetRotation(rot.w, rot.x, rot.y, rot.z)
+
+        end
+        local moveDirection = Vector3.new(0, 0, 0)
+
+        if distance > targetDistance + 0.2 then
+            moveDirection = direction
+        elseif distance < targetDistance - 0.2 then
+            moveDirection = Vector3.new(-direction.x, -direction.y, -direction.z)
+        else 
+            moveDirection = Vector3.new(0, 0, 0)
+        end
+
+        local move = Vector3.new(moveDirection.x * self.speed * deltaTime, self.height, moveDirection.z * self.speed * deltaTime)
+        local newPosition = currentPosition + move
+        self.transform:SetPosition(newPosition.x, self.height, newPosition.z)
+    end
+    
+end
+
+function EnemyScript:Start()
+    
+    self:Initialize()
+
+    self.playerTransform = GetTransformComponent(GetEntity("Player").handle)
+    self.hasDetected = false
+end
+
+function EnemyScript:Update(deltaTime)
+    
+    if self.hasDetected then
+        self:Attack(deltaTime)
+    else
+        self:Move(deltaTime)
+    end
+
+
+end
+
+function EnemyScript:OnTriggerEnter(otherEntity)
+
+    self.hasDetected = true
+
 end
 
 ScriptObjectTypes.EnemyScript = EnemyScript
