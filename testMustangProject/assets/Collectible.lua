@@ -1,16 +1,40 @@
 Collectible = ScriptObject:_new()
 
-CollectibleType = 
-{
-    LIFE = 1,
-    LIGHT_AMMO = 2,
-    SHELL_AMMO = 3,
-    ROCKET_AMMO = 4
-}
+function Collectible:new(obj)
 
-Collectible.type = CollectibleType.LIFE
-Collectible.value = 1
+    local object = obj or {}
+    self.__index = self
+    setmetatable(object, self)
+    return object
+end
 
+
+function Collectible:RegenHealth(script)
+
+    local lifeComponent = script["Life"]
+
+    if lifeComponent then
+        lifeComponent.health = self.value + lifeComponent.health
+        print("adding health")
+    end
+end
+
+function Collectible:AddLightAmmo(script)
+
+    local gun = script["BaseGun"]
+
+    if gun then
+        
+        if gun.backupAmmoCount + self.value > gun.magazineSize then
+            gun.backupAmmoCount = gun.magazineSize
+        else
+            gun.backupAmmoCount = gun.backupAmmoCount + self.value
+        end
+
+        print("adding light ammo")
+    end
+
+end
 
 -- Is executed once when the object becomes active
 function Collectible:Start()
@@ -23,20 +47,28 @@ function Collectible:Update(deltaTime)
 
 end
 
-function Collectible:AddLife()
-
 function Collectible:OnTriggerEnter(otherEntity)
 
-    local script = GetScriptComponent(otherEntity.handle)
+    local script = GetScriptComponent(otherEntity)
 
     if not script then
         return
     end
 
-    
-
+    self:type(script)
+    DestroyEntity(self.entity)
 end
 
+CollectibleType = 
+{
+    LIFE = Collectible.RegenHealth,
+    LIGHT_AMMO = Collectible.AddLightAmmo,
+    SHELL_AMMO = function() print("Adding shell ammo") end,
+    ROCKET_AMMO = function() print("Adding rocket ammo") end
+}
+
+Collectible.type = function(_) print("collectible action") end
+Collectible.value = 0
 
 -- Engine definitions
 ScriptObjectTypes.Collectible = Collectible
