@@ -83,18 +83,18 @@ void engine::ThreadManager::ExecuteRenderThreadTasks(void)
     ThreadManager* instance = GetInstance();
     TaskQueue& tasks = instance->GetQueue<ETaskType::GRAPHICS>();
 
-    instance->m_poolMutex.lock();
 
     while (!tasks.empty())
     {
-        std::function<void()>& function = tasks.front();
+        instance->m_poolMutex.lock();
+        std::function<void()> function = std::move(tasks.front());
+        tasks.pop();
+        instance->m_poolMutex.unlock();
 
         function();
-        tasks.pop();
         OpenGLError();
     }
 
-    instance->m_poolMutex.unlock();
 }
 
 void engine::ThreadManager::SynchronizeAnimationThread(void)
