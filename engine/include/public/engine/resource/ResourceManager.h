@@ -32,6 +32,8 @@ namespace engine
 										const char* fragShader,
                                         bool isVertAbsolute = false, bool isFragAbsolute = false);
 
+        ENGINE_API static std::string LoadShaderFromFrag(const std::string& fragShader);
+
         // Create a resource from data that already exists in memory instead
         // of loading a file from disk
         template <typename TResourceType, typename... TVariadicArgs>
