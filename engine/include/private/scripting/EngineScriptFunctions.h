@@ -15,3 +15,5 @@
 #include "scripting/physics/RigidBodyDynamicFunctions.h"
 #include "scripting/physics/RigidBodyStaticFunctions.h"
 #include "scripting/ecs/AudioPlayerFunctions.h"
+#include "scripting/ecs/RendererFunctions.h"
+#include "scripting/ResourceFunctions.h"
