@@ -295,8 +295,7 @@ or has not finished loading!");
                     continue;
 
                 if (indices.m_parentIndex != -1)
-                    animMatrix = matrices[indices.m_parentIndex] * indices.m_bone->m_localTransform.Transpose();
-        
+                    animMatrix = matrices[indices.m_parentIndex] * indices.m_bone->m_localTransform.Transpose();      
         
                 skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
                 ++currentBone;
