@@ -28,7 +28,6 @@ namespace engine
             const AnimBone* m_animDataIndex = nullptr;
             const Bone* m_bone = nullptr;
             int32 m_parentIndex = -1;
-            bool m_ignore = false;
         };
         
     public:
