@@ -75,11 +75,12 @@ namespace engine
         void UpdateSingleBone(int32 index, f32 lerpTime);
         EAnimationState UpdateNextKeyFrame(void);
         int32 CalculateNextKeyFrameIndex(void);
-        void SetSkinningMatrices(void);
+        void CalculateSkinningMatrices(void);
 
         std::vector<BoneIndex>          m_currentAnimIndices;
         std::vector<BoneIndex>          m_nextAnimIndices;
         std::vector<BoneTransform>      m_transforms;
+        std::vector<math::Matrix4f>     m_skinningMatrices;
 
         ResourceRef<Animation>          m_currentAnim;
         ResourceRef<Animation>          m_nextAnim;
@@ -95,5 +96,6 @@ namespace engine
         Buffer                          m_skinningSSBO = 0;
         EAnimationState                 m_animState = EAnimationState::STOPPED;
         bool                            m_looped = false;
+        bool                            m_forceNextUpdate = false;
     };
 }

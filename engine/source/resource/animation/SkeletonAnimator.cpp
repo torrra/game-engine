@@ -5,8 +5,7 @@
 #include "thread/ThreadManager.h"
 #include "utility/ResourceRef.h"
 
-#include "physics/InternalPhysxDebugDraw.h"
-
+#include "InternalOpenGLError.hpp"
 #include "ConsoleLog.hpp"
 
 #include <glad/glad.h>
@@ -72,7 +71,7 @@ namespace engine
         if (!m_currentAnim)
             return;
 
-        if (m_animState == EAnimationState::PLAYING)
+        if (m_animState == EAnimationState::PLAYING || m_forceNextUpdate)
         {
             m_elapsed += deltaTime * m_speedMultiplier;
 
@@ -88,14 +87,17 @@ namespace engine
            m_transforms.clear();
            m_transforms.resize(m_currentAnimIndices.size());
 
-                for (int32 boneNum = 0; boneNum < boneCount; ++boneNum)
-                    UpdateSingleBone(boneNum, lerpTime);
-        }
+           for (int32 boneNum = 0; boneNum < boneCount; ++boneNum)
+               UpdateSingleBone(boneNum, lerpTime);
 
-        if (m_animState != EAnimationState::STOPPED)
-        {
-            ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(
-                &SkeletonAnimator::SetSkinningMatrices, this);
+            CalculateSkinningMatrices();
+            ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>([this]()
+                {
+                    InitBuffer();
+                    m_skinningSSBO.SetData(m_skinningMatrices.data(), m_skinningMatrices.size() * sizeof(math::Matrix4f));
+                    OpenGLError(); });
+
+            m_forceNextUpdate = false;
         }
     }
 
@@ -104,7 +106,10 @@ namespace engine
         PauseAnimation();
 
         if (keyIndex >= 0 && keyIndex < m_currentAnim->GetTickCount())
+        {
             m_currentKeyFrame = keyIndex;
+            m_forceNextUpdate = true;
+        }
         else
             PrintLog(ErrorPreset(), "Invalid key frame");
     }
@@ -158,7 +163,6 @@ namespace engine
     {
         m_skinningSSBO.Init();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_skinningSSBO.GetBufferID());
-        std::cout << m_skinningSSBO.GetBufferID() << '\n';
     }
 
     void SkeletonAnimator::InitAnimation(bool current)
@@ -191,8 +195,8 @@ or has not finished loading!");
     void SkeletonAnimator::MapBonesByName(std::vector<BoneIndex>& indices,
                                          const ResourceRef<class Animation>& anim)
     {
-        //if (indices.empty())
-            ResizeIndexArrays();
+
+       ResizeIndexArrays();
 
         if (!anim)
             return;
@@ -210,7 +214,8 @@ or has not finished loading!");
 
                 if (memcmp(bone.m_name.c_str(), "ik_", 3) != 0)
                 {
-                    indices[boneNum + meshBoneOffset].m_animDataIndex = anim->GetBoneAnimData(bone.m_name);         // get keyframes matching with bone name
+                    // get keyframes matching with bone name
+                    indices[boneNum + meshBoneOffset].m_animDataIndex = anim->GetBoneAnimData(bone.m_name);
                     indices[boneNum + meshBoneOffset].m_parentIndex = bone.m_parent;
                 }
             }
@@ -229,7 +234,6 @@ or has not finished loading!");
 
         BoneTransform& keyFrame = m_transforms[index];
         int32 nextKeyFrameIndex = CalculateNextKeyFrameIndex();
-        //int32 nextKeyFrameIndex = -1;
 
         const AnimBone& boneKeyFrames = *indices.m_animDataIndex;
 
@@ -290,13 +294,12 @@ or has not finished loading!");
             return -1;
     }
 
-    void SkeletonAnimator::SetSkinningMatrices(void)
+    void SkeletonAnimator::CalculateSkinningMatrices(void)
     {
         std::vector<math::Matrix4f> matrices;
-        std::vector<math::Matrix4f> skinning;
-
+        
         matrices.resize(m_transforms.size(), {1.f});
-        skinning.resize(m_transforms.size(), {1.f});
+        m_skinningMatrices.resize(m_transforms.size(), {1.f});
 
         int64 currentBone = 0;
         
@@ -312,7 +315,7 @@ or has not finished loading!");
                 if (indices.m_parentIndex != -1)
                     animMatrix = matrices[indices.m_parentIndex] * indices.m_bone->m_localTransform.Transpose();      
         
-                skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
+                m_skinningMatrices[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
                 ++currentBone;
                 continue;
             }
@@ -321,30 +324,10 @@ or has not finished loading!");
         
             if (indices.m_parentIndex != -1)
             {
-                animMatrix = matrices[indices.m_parentIndex] *           // parent anim matrix
+                animMatrix = matrices[indices.m_parentIndex] *  // parent anim matrix
                     math::TransformMatrix(transform.m_rotation, // keyframe transform matrix
                         transform.m_position,
-                        transform.m_scaling);
-        
-        
-                math::Vector3f start =
-                {
-                    animMatrix[3][0],
-                    animMatrix[3][1],
-                    animMatrix[3][2],
-                };
-        
-                math::Matrix4f& parentPose = matrices[indices.m_parentIndex];
-        
-                math::Vector3f end =
-                {
-                    parentPose[3][0],
-                    parentPose[3][1],
-                    parentPose[3][2],
-                };
-        
-                PhysicsEngine::Get().AddDebugLine(start, end, (uint32)-1);
-        
+                        transform.m_scaling);    
             }
         
             else
@@ -354,10 +337,8 @@ or has not finished loading!");
                     transform.m_scaling);
             }
         
-            skinning[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
+            m_skinningMatrices[currentBone] = indices.m_bone->m_inverseBindPose * animMatrix.Transpose();
             ++currentBone;
         }
-        
-        m_skinningSSBO.SetData(skinning.data(), skinning.size() * sizeof(math::Matrix4f));
     }
 }
