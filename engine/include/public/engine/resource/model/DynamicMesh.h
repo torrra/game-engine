@@ -11,7 +11,7 @@ namespace engine
 {
     struct BoneWeight
     {
-        math::Vector4<uint32>   m_boneIndices{ 0 };
+        math::Vector4i          m_boneIndices{ -1 };
         math::Vector4f          m_weights{ 0.f };
         uint32                  m_weightCount = 0;
     };
@@ -32,7 +32,7 @@ namespace engine
     private:
 
         using BoneIndexMap = std::unordered_map<void*, int32>;
-        using BoneNameMap = std::unordered_map<std::string, int32>;
+        using BoneNameMap = std::unordered_map<uint64, int32>;
 
     public:
 

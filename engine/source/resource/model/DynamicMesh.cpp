@@ -11,6 +11,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "InternalOpenGLError.hpp"
+
 namespace engine
 {
     void DynamicMesh::ProcessMesh(const void* mesh)
@@ -33,7 +35,7 @@ namespace engine
 
     int32 DynamicMesh::GetBoneIndex(const std::string& name) const
     {
-        auto indexIt = m_boneMap.find(/*std::hash<std::string>{}*/(name));
+        auto indexIt = m_boneMap.find(std::hash<std::string>{}(name));
 
         if (indexIt != m_boneMap.end())
             return indexIt->second;
@@ -48,14 +50,14 @@ namespace engine
 
     void DynamicMesh::RenderThreadSkeletonSetup(void)
     {
-        uint64 indexSize = m_weights.size() * sizeof(math::Vector4<uint32>);
+        uint64 indexSize = m_weights.size() * sizeof(math::Vector4i);
         uint64 weightSize = m_weights.size() * sizeof(math::Vector4f);
 
-        if (indexSize < sizeof(math::Vector4<uint32>) || weightSize < sizeof(math::Vector4f))
+        if (indexSize < sizeof(math::Vector4i) || weightSize < sizeof(math::Vector4f))
             return;
 
         math::Vector4f* weightBuffer = (math::Vector4f*)malloc(weightSize);
-        math::Vector4<uint32>* indexBuffer = (math::Vector4<uint32>*)malloc(indexSize);
+        math::Vector4i* indexBuffer = (math::Vector4i*)malloc(indexSize);
 
         if (weightBuffer && indexBuffer)
         {
@@ -65,30 +67,35 @@ namespace engine
             for (const BoneWeight& weight : m_weights)
             {
                 new(weightBuffer + weightOffset) math::Vector4f(weight.m_weights);
-                new(indexBuffer + indexOffset) math::Vector4<uint32>(weight.m_boneIndices);
+                new(indexBuffer + indexOffset) math::Vector4i(weight.m_boneIndices);
 
-                /*indexOffset += sizeof(math::Vector4<uint32>);
-                weightOffset += sizeof(math::Vector4f);*/
 
                 ++indexOffset;
                 ++weightOffset;
             }
-            //m_weights.clear();
-            //m_weights.shrink_to_fit();
-            SetupSkeletonVertexBuffers(indexBuffer, indexSize, weightBuffer, weightSize);
+
+            m_weights.clear();
+            m_weights.shrink_to_fit();
+            
         }
 
-        if (weightBuffer)
-            free(weightBuffer);
+        ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>([=]()
+            {
+                if (weightBuffer && indexBuffer)
+                    SetupSkeletonVertexBuffers(indexBuffer, indexSize, weightBuffer, weightSize);
 
-        if (indexBuffer)
-            free(indexBuffer);
+                if (weightBuffer)
+                    free(weightBuffer);
+
+                if (indexBuffer)
+                    free(indexBuffer);
+            });
     }
 
     void engine::DynamicMesh::SetBoneIndexAttribute()
     {
         glEnableVertexArrayAttrib(m_vao, 6);
-        glVertexArrayAttribFormat(m_vao, 6, 4, GL_UNSIGNED_INT, GL_FALSE, 0);
+        glVertexArrayAttribIFormat(m_vao, 6, 4, GL_INT, 0);
         glVertexArrayAttribBinding(m_vao, 6, 2);
     }
 
@@ -113,7 +120,7 @@ namespace engine
         SetBoneWeightAttribute();
 
         glVertexArrayVertexBuffer(m_vao, 2, m_boneIndexVBO.GetBufferID(), 0,
-            sizeof(math::Vector4<uint32>));
+            sizeof(math::Vector4i));
 
         glVertexArrayVertexBuffer(m_vao, 3, m_boneWeightVBO.GetBufferID(), 0,
             sizeof(math::Vector4f));
@@ -182,10 +189,9 @@ namespace engine
     {
         aiBone* boneImpl = reinterpret_cast<aiBone*>(bonePtr);
 
-        // Transpose as assimp's matrices are row major
-        newBone.m_inverseBindPose = reinterpret_cast<f32*>(&boneImpl->mOffsetMatrix.Transpose());
+        newBone.m_inverseBindPose = reinterpret_cast<f32*>(&boneImpl->mOffsetMatrix);
         newBone.m_name = boneImpl->mName.C_Str();
-        newBone.m_localTransform = reinterpret_cast<f32*>(&boneImpl->mNode->mTransformation.Transpose());
+        newBone.m_localTransform = reinterpret_cast<f32*>(&boneImpl->mNode->mTransformation);
 
         auto parentIterator = nodes.find(boneImpl->mNode->mParent);
 
@@ -208,13 +214,13 @@ namespace engine
     void DynamicMesh::PopulateBoneNameMap(void)
     {
         int32 boneIndex = 0;
-        //std::hash<std::string> hashFunctor;
+        std::hash<std::string> hashFunctor;
 
         for (const Bone& bone : m_skeleton)
         {
-           // uint64 hashedName = hashFunctor(bone.m_name);
-            m_boneMap[bone.m_name] = boneIndex++;
-            std::cout << bone;
+           uint64 hashedName = hashFunctor(bone.m_name);
+            m_boneMap[hashedName] = boneIndex++;
+            //std::cout << bone;
         }
     }
 
