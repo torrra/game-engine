@@ -433,6 +433,12 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         if (!std::filesystem::exists(GetInstance()->m_userScriptsLocation))
             return;
 
+        lua_getglobal(GetInstance()->m_luaState, "SetCurrentFolder");
+        lua_pushstring(GetInstance()->m_luaState, GetInstance()->m_userScriptsLocation.c_str());
+
+        if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
+            LogLuaError();
+
         for (auto& file : std::filesystem::recursive_directory_iterator(GetInstance()->m_userScriptsLocation))
         {
             if (!file.exists())
