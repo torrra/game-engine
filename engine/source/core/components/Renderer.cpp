@@ -10,6 +10,7 @@
 #include "utility/ResourceRef.h"
 
 #include "core/SceneGraph.h"
+#include "core/systems/ScriptSystem.h"
 
 #include "serialization/TextSerializer.h"
 
@@ -27,6 +28,12 @@ namespace engine
 
     void Renderer::Register(void)
     {
+        engine::ScriptSystem::RegisterNewComponent("_NewRendererComponent", m_owner);
+    }
+
+    void Renderer::Unregister(void)
+    {
+        engine::ScriptSystem::UnregisterComponent("_RemoveRendererComponent", m_owner);
     }
 
     void Renderer::Render(const math::Matrix4f& viewProjection,

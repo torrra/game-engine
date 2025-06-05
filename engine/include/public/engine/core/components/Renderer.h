@@ -36,6 +36,9 @@ namespace engine
         void Register(void) override;
 
         ENGINE_API
+        void Unregister(void) override;
+
+        ENGINE_API
         void Render(const math::Matrix4f& viewProjection,
                     ComponentArray<Transform>& transforms);
 
