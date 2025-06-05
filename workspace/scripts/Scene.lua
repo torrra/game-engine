@@ -40,18 +40,16 @@ end
 
 function CreateTransformComponent(owner)
 
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.TRANSFORM)
+	Scene.CreateCompomemt(owner.handle, ComponentType.TRANSFORM)
 	local newComponent = GetTransformComponent(owner.handle)
-	newComponent.ref = componentRef
 
 	return newComponent
 end	
 
 function CreateScriptComponent(owner)
 	
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.SCRIPT)
+	Scene.CreateCompomemt(owner.handle, ComponentType.SCRIPT)
 	local newComponent = GetScriptComponent(owner.handle)
-	newComponent.ref = componentRef
 
 	return newComponent
 end
@@ -63,27 +61,24 @@ end
 
 function CreateRigidBodyStaticComponent(owner)
 
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.RIGIDBODY_STATIC)
+	Scene.CreateCompomemt(owner.handle, ComponentType.RIGIDBODY_STATIC)
 	local newComponent = GetRigidBodyStaticComponent(owner.handle)
-	newComponent.ref = componentRef
 
 	return newComponent
 end
 
 function CreateRigidBodyDynamicComponent(owner)
 
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.RIGIDBODY_DYNAMIC)
+	Scene.CreateCompomemt(owner.handle, ComponentType.RIGIDBODY_DYNAMIC)
 	local newComponent = GetRigidBodyDynamicComponent(owner.handle)
-	newComponent.ref = componentRef
 
 	return newComponent
 end
 
 function CreateCameraComponent(owner)
 
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.CAMERA)
+	Scene.CreateCompomemt(owner.handle, ComponentType.CAMERA)
 	local newComponent = GetCameraComponent(owner.handle)
-	newComponent.ref = componentRef
 
 	return newComponent
 end
@@ -95,18 +90,16 @@ end
 
 function CreateAudioPlayerComponent(owner)
 
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.AUDIO_PLAYER)
+	Scene.CreateCompomemt(owner.handle, ComponentType.AUDIO_PLAYER)
 	local newComponent = GetAudioPlayerComponent(owner.handle)
-	newComponent.ref = componentRef
 
 	return newComponent
 end
 
 function CreateNavigationPointComponent(owner)
 
-	local componentRef = Scene.CreateCompomemt(owner.handle, ComponentType.NAVIGATION_POINT)
+	Scene.CreateCompomemt(owner.handle, ComponentType.NAVIGATION_POINT)
 	local newComponent = GetNavigationPointComponent(owner.handle)
-	newComponent.ref = componentRef
 
 return newComponent
 end
