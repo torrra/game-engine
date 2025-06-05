@@ -14,6 +14,7 @@ function ControllerScript:Start()
     local cameraEntity = GetEntity("Camera")
 
     self.camera = GetCameraComponent(cameraEntity.handle)
+    self.renderer = GetRendererComponent(self.entity.handle)
 
 end
 
@@ -46,6 +47,14 @@ function ControllerScript:Update(deltaTime)
         local result = self.gunRay:HasHit()
     end
     --]]
+
+    if IsInputPressed(InputCode.KEY_K) then
+        LoadResource(ResourceTypes.ANIMATION, "MM_Walk_Fwd.fbx")
+        self.renderer:SetAnimation("MM_Walk_Fwd.fbx")
+        self.renderer:SetAnimationLooped(true)
+        self.renderer:PlayAnimation()
+    end
+
 end
 
 function ControllerScript:OnCollisionEnter(otherEntity)
