@@ -37,7 +37,7 @@ namespace engine
         SkeletonAnimator(SkeletonAnimator&&) = default;
         SkeletonAnimator(const SkeletonAnimator&) = default;
 
-        ENGINE_API void SetAnimation(ResourceRef<class Animation>&& anim, bool crossfade);
+        ENGINE_API void SetAnimation(ResourceRef<Animation>&& anim, bool crossfade);
         ENGINE_API void SetModel(const ResourceRef<class Model>& model);
 
         ENGINE_API void PauseAnimation(void);
@@ -50,6 +50,10 @@ namespace engine
 
         ENGINE_API bool IsLooped(void) const;
         ENGINE_API void SetLooped(bool looped);
+
+        ENGINE_API const ResourceRef<Animation>& GetAnimation(void) const;
+        ENGINE_API f32 GetAnimationSpeed(void) const;
+        ENGINE_API int32 GetCurrentKeyFrame(void) const;
 
         ENGINE_API bool IsPlaying(void) const;
         ENGINE_API bool IsPaused(void) const;
@@ -66,7 +70,7 @@ namespace engine
 
         void InitAnimation(bool current);
        
-        void MapBonesByName(std::vector<BoneIndex>& indices, const ResourceRef<class Animation>& anim);
+        void MapBonesByName(std::vector<BoneIndex>& indices, const ResourceRef<Animation>& anim);
 
         void UpdateSingleBone(int32 index, f32 lerpTime);
         EAnimationState UpdateNextKeyFrame(void);

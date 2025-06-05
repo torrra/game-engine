@@ -74,7 +74,7 @@ namespace engine
 
         if (m_animState == EAnimationState::PLAYING)
         {
-            m_elapsed += deltaTime;
+            m_elapsed += deltaTime * m_speedMultiplier;
 
             if (m_elapsed >= m_targetInterval)
             {
@@ -122,6 +122,21 @@ namespace engine
     void SkeletonAnimator::SetLooped(bool looped)
     {
         m_looped = looped;
+    }
+
+    const ResourceRef<Animation>& SkeletonAnimator::GetAnimation(void) const
+    {
+        return m_currentAnim;
+    }
+
+    f32 SkeletonAnimator::GetAnimationSpeed(void) const
+    {
+        return m_speedMultiplier;
+    }
+
+    int32 SkeletonAnimator::GetCurrentKeyFrame(void) const
+    {
+        return m_currentKeyFrame;
     }
 
     bool SkeletonAnimator::IsPlaying(void) const
