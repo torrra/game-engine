@@ -51,6 +51,7 @@ namespace engine
 
         // Change canvas's background color. All values between 0 - 1.
         ENGINE_API void			SetColor(f32 red, f32 green, f32 blue, f32 alpha);
+        ENGINE_API math::Vector2f GetSize(void) const;
 
     private:
         void					RescaleCanvas(void);

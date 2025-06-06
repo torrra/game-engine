@@ -199,6 +199,11 @@ void engine::Canvas::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
     m_bgColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
+math::Vector2f engine::Canvas::GetSize(void) const
+{
+    return m_size;
+}
+
 void engine::Canvas::RescaleCanvas(void)
 {
     m_size = ImGui::GetContentRegionAvail();

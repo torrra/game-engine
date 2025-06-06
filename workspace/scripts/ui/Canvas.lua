@@ -46,3 +46,7 @@ function Canvas:AddProgressBar(xPos, yPos, width, height, minRange, maxRange)
 	newProgressBarRef = CanvasRef.AddProgressBar(self._name, xPos, yPos, width, height, minRange, maxRange)
 	return ProgressBar:_new(newProgressBarRef)
 end
+
+function Canvas:GetScreenSize()
+	return CanvasRef:GetScreenSize()
+end

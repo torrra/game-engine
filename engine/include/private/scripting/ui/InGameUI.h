@@ -11,6 +11,7 @@ extern "C"
     int script_AddButton(struct lua_State* luaState);
     int script_AddProgressBar(struct lua_State* luaState);
     int script_RemoveElement(struct lua_State* luaState);
+    int script_GetScreenSize(struct lua_State* luaState);
 }
 
 namespace engine
