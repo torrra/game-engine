@@ -1,6 +1,8 @@
 Life = ScriptObject:_new()
 
 Life.health = 3
+Life.CustomDamageFunction = nil
+Life.CustomDeathFunction = nil
 
 -- Is executed once when the object becomes active
 function Life:Start()
@@ -14,12 +16,21 @@ function Life:Update(deltaTime)
 end
 
 function Life:OnDeath()
+
+    if self.CustomDeathFunction then
+        self:CustomDeathFunction()
+    end
+    
     print("Entity has died")
     DestroyEntity(self.entity)
     self.entity = nil
 end
 
 function Life:TakeDamage(damage)
+
+    if self.CustomDamageFunction then
+        self:CustomDamageFunction(damage)
+    end
 
     self.health = self.health - damage
     print("Health: "..self.health)
