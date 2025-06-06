@@ -8,13 +8,14 @@ AmmoTypes =
 }
 
 BaseGun.ammoType = AmmoTypes.LIGHT
-BaseGun.magazineSize = 15
+BaseGun.magazineSize = 30
 BaseGun.ammoCount = BaseGun.magazineSize
 BaseGun.backupAmmoCount = BaseGun.magazineSize
 BaseGun.fireRate = 0.3
 BaseGun.lastFireTime = 0.0
 BaseGun.canFire = true
 BaseGun.range = 10.0
+BaseGun.name = "Gun"
 
 function BaseGun:new(obj)
     obj = obj or {}
@@ -50,7 +51,7 @@ function BaseGun:Fire()
         return
     end
 
-    self.lastFireTime = os.clock()
+    self.lastFireTime = os.clock() 
     self.ammoCount = self.ammoCount - 1
 
     local direction = Vector3.new(0.0, 0.0, 1.0):Rotate(self.transform:GetRotation())
