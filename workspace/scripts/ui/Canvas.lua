@@ -13,8 +13,8 @@ function Canvas:CreateCanvas(canvasName, canvasWidth, canvasHeight)
 	return canvas
 end
 
-function Canvas:DeleteCanvas()
-	CanvasRef = CanvasRef.DeleteCanvas(self._name)
+function Canvas:DestroyCanvas()
+	CanvasRef = CanvasRef.DestroyCanvas(self._name)
 
 	return nil
 end
