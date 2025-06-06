@@ -31,7 +31,7 @@
      uint64 | shape=2
      uint32 | collision group=3
      vec2f32 | capsule format={0.5,0.75}
-     uint32 | gravity=1
+     uint32 | gravity=0
      uint32 | trigger=0
      uint32 | lock X axis=1
      uint32 | lock Y axis=1
