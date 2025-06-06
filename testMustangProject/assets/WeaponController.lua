@@ -10,15 +10,16 @@ WeaponController.reloadKey = InputCode.KEY_R
 
 WeaponController.currentGun = nil
 
-WeaponController.ammoTextPosition = Vector2.new(400, 300)
+WeaponController.ammoTextPosition = Vector2.new(100, 125)
 WeaponController.lifeBarPosition = Vector2.new(100, 100)
+WeaponController.lifeBarDimensions = Vector2.new(100, 50)
 
 function WeaponController:UpdateAmmoText()
 
     local canvasString = string.format(
        "%s   |   Ammo: %d / %d   |   %d",
-        self.currentGun.name, self.currentGun.ammoCount, self.currentGun.backupAmmoCount,
-        self.currentGun.magazineSize
+        self.currentGun.name, self.currentGun.ammoCount, self.currentGun.magazineSize,
+        self.currentGun.backupAmmoCount  
     )
 
     if self.ammoText then
@@ -37,8 +38,27 @@ function WeaponController:OnLifeUpdated(delta)
         return
     end
 
-    self.lifeValue = self.life.health
+    self.lifeValue = self.lifeValue - delta
+
+    if self.lifeValue < 0 then
+        self.lifeValue = 0
+    end
+
     self.lifeBar:SetValue(self.lifeValue)
+end
+
+function WeaponController:OnDeath()
+
+    self.uiCanvas:DeleteCanvas()
+    self.uiCanvas = nil
+
+    self.lifeBar = nil
+    self.ammoText = nil
+    self.currentGun = nil
+    self.baseGun = nil
+    self.shotgun = nil
+    self.life = nil
+
 end
 
 -- Is executed once when the object becomes active
@@ -53,17 +73,24 @@ function WeaponController:Start()
     self.life = script.Life
     self.lifeValue = self.life.health
 
-    self.life.CustomDamageFunction = function(damage)
+    self.life.CustomDamageFunction = function(_, damage)
         self:OnLifeUpdated(damage)
     end
 
-    self.uiCanvas = Canvas:CreateCanvas("WeaponControllerUI", 100, 100)
+    self.life.CustomDeathFunction = function()
+        self:OnDeath()
+    end
+
+    self.uiCanvas = Canvas:CreateCanvas("WeaponControllerUI", 1920, 1080)
 
     self:UpdateAmmoText()
-    self.lifeBar = self.uiCanvas:AddProgressBar(self.lifeBarPosition.x,
-                                                self.lifeBarPosition.y, 200, 20, 0, self.lifeValue)
+    self.lifeBar = self.uiCanvas:AddProgressBar(self.lifeBarPosition.x, self.lifeBarPosition.y, 
+                                                self.lifeBarDimensions.x, self.lifeBarDimensions.y,
+                                                0, self.lifeValue)
 
     self.lifeBar:SetFillColor(0.0, 1.0, 0.0, 1.0)
+
+    self.crossHair = self.uiCanvas:AddImage("crosshair.png", 960, 540)
 
 end
 
@@ -96,6 +123,10 @@ function WeaponController:Update(deltaTime)
     if IsInputPressed(self.reloadKey) and self.currentGun then
         self.currentGun:Reload()
         self:UpdateAmmoText()
+    end
+
+    if IsInputPressed(InputCode.MOUSE_BUTTON_RIGHT) then
+        self.life:TakeDamage(1)
     end
 
 end
