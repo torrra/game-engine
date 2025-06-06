@@ -14,7 +14,8 @@
 engine::Image::Image(const char* fileName, math::Vector2f const& position)
     : m_fileName(fileName), m_keepAspectRatio(true)
 {
-    m_data = ResourceManager::GetResource<Texture>(m_fileName.c_str());
+    ResourceManager::Load<Texture>(fileName);
+    m_data = ResourceManager::GetResource<Texture>(m_fileName);
     
     // Set transform
     SetPosition(position);
