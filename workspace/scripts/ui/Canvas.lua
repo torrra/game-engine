@@ -48,5 +48,5 @@ function Canvas:AddProgressBar(xPos, yPos, width, height, minRange, maxRange)
 end
 
 function Canvas:GetScreenSize()
-	return CanvasRef:GetScreenSize()
+	return CanvasRef.GetScreenSize(self._name)
 end
