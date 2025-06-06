@@ -11,7 +11,7 @@ BaseGun.ammoType = AmmoTypes.LIGHT
 BaseGun.magazineSize = 30
 BaseGun.ammoCount = BaseGun.magazineSize
 BaseGun.backupAmmoCount = BaseGun.magazineSize
-BaseGun.fireRate = 0.3
+BaseGun.fireRate = 0.2
 BaseGun.lastFireTime = 0.0
 BaseGun.canFire = true
 BaseGun.range = 10.0
@@ -93,8 +93,6 @@ function BaseGun:Reload()
     self.ammoCount = self.ammoCount + toReload
     self.backupAmmoCount = self.backupAmmoCount - toReload
 
-    print("Reloaded: " .. toReload .. " bullets. Current ammo: "
-         .. self.ammoCount .. ", Backup ammo: " .. self.backupAmmoCount)
 end
 
 -- Is executed once when the object becomes active
@@ -103,8 +101,6 @@ function BaseGun:Start()
     self.transform = GetTransformComponent(self.entity.handle)
     self.gunRay = Raycast.new()
     self.gunRay:SetDistance(self.range)
-    self.camera = GetCameraComponent(GetEntity("Camera").handle)
-
 end
 
 
