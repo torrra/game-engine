@@ -11,9 +11,9 @@ function ControllerScript:Start()
 
     self.camera = GetCameraComponent(cameraEntity.handle)
 
-    local script = GetScriptComponent(self.entity.handle)
-    self.gun = script.BaseGun
-
+    -- local script = GetScriptComponent(self.entity.handle)
+    -- self.gun = script.BaseGun
+    -- self.shotgun = script.Shotgun
 end
 
 
@@ -34,22 +34,22 @@ function ControllerScript:Update(deltaTime)
     end
     ]]--
 
-    if IsInputDown(InputCode.KEY_Q) then
-        self.transform:AddEulerRotation(0, 90 * deltaTime, 0)
-    elseif IsInputDown(InputCode.KEY_E) then
-        self.transform:AddEulerRotation(0, -90 * deltaTime, 0)
-    end
+    -- if IsInputDown(InputCode.KEY_Q) then
+    --     self.transform:AddEulerRotation(0, 90 * deltaTime, 0)
+    -- elseif IsInputDown(InputCode.KEY_E) then
+    --     self.transform:AddEulerRotation(0, -90 * deltaTime, 0)
+    -- end
     
-    --self.transform:SetRotation(self.camera:GetRotation())
+    -- --self.transform:SetRotation(self.camera:GetRotation())
 
-    if (IsInputPressed(InputCode.MOUSE_BUTTON_LEFT)) then
+    -- if (IsInputPressed(InputCode.MOUSE_BUTTON_LEFT)) then
         
-        self.gun:Fire()
-    end
+    --     self.gun:Fire()
+    -- end
     
-    if IsInputPressed(InputCode.KEY_R) then
-        self.gun:Reload()
-    end
+    -- if IsInputPressed(InputCode.KEY_R) then
+    --     self.gun:Reload()
+    -- end
 
 end
 
