@@ -32,12 +32,7 @@ int appMain(void)
             engine::InputHandler::IsInputDown(KEY_RIGHT_CONTROL))
 
         {
-            if (engine::InputHandler::IsInputReleased(KEY_B))
-            {
-                engine.BuildProjectExecutable("..\\testProjectBuildFolder");
-            }
-
-            else if (engine::InputHandler::IsInputReleased(KEY_S))
+            if (engine::InputHandler::IsInputReleased(KEY_S))
                 engine.SaveProject();
         }
 

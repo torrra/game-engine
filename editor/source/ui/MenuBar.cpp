@@ -94,9 +94,11 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
             OpenProject(scene);
         }
 
-        if (ui::MenuItem("Build project", "Ctrl+B"))
+        if (ui::MenuItem("Build project"))
         {
-            engine::Engine::GetEngine()->BuildProjectExecutable("..\\testProjectBuildFolder");
+            std::filesystem::path buildPath;
+            SelectFolder(buildPath);
+            engine::Engine::GetEngine()->BuildProjectExecutable(buildPath);
         }
 
         ui::EndMenu();
