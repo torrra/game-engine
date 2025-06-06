@@ -36,6 +36,23 @@ function Collectible:AddLightAmmo(script)
 
 end
 
+function Collectible:AddShellAmmo(script)
+
+    local gun = script.Shotgun
+
+    if gun then
+        
+        if gun.backupAmmoCount + self.value > gun.magazineSize then
+            gun.backupAmmoCount = gun.magazineSize
+        else
+            gun.backupAmmoCount = gun.backupAmmoCount + self.value
+        end
+
+        print("adding shell ammo")
+    end
+
+end
+
 -- Is executed once when the object becomes active
 function Collectible:Start()
 
@@ -63,8 +80,7 @@ CollectibleType =
 {
     LIFE = Collectible.RegenHealth,
     LIGHT_AMMO = Collectible.AddLightAmmo,
-    SHELL_AMMO = function() print("Adding shell ammo") end,
-    ROCKET_AMMO = function() print("Adding rocket ammo") end
+    SHELL_AMMO = Collectible.AddShellAmmo,
 }
 
 Collectible.type = function(_) print("collectible action") end
