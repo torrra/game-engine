@@ -90,7 +90,7 @@ function EnemyScript:Move(deltaTime)
     local currentPos = Vector3.new(self.transform:GetPosition())
     local targetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
     local targetPos = Vector3.new(targetPoint:GetPosition())
-    local direction = Vector3.new(targetPos.x - currentPos.x, self.height, targetPos.z - currentPos.z)
+    local direction = Vector3.new(targetPos.x - currentPos.x, currentPos.y, targetPos.z - currentPos.z)
     local distance = Length(targetPos, currentPos)
 
     if self.state == "moving" then
@@ -101,9 +101,9 @@ function EnemyScript:Move(deltaTime)
         else
             -- Move to the target 
             direction:Normalize()
-            local move = Vector3.new(direction.x * self.speed * deltaTime, self.height, direction.z * self.speed * deltaTime)
+            local move = Vector3.new(direction.x * self.speed * deltaTime, currentPos.y, direction.z * self.speed * deltaTime)
             local newPosition = currentPos + move
-            self.transform:SetPosition(newPosition.x, self.height, newPosition.z)
+            self.transform:SetPosition(newPosition.x, currentPos.y, newPosition.z)
         end
 
     elseif self.state == "pauseBeforeTurn" then
@@ -113,7 +113,7 @@ function EnemyScript:Move(deltaTime)
             self.goingToPoint1 = not self.goingToPoint1
             local newTargetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
             local newTargetPos = Vector3.new(newTargetPoint:GetPosition())
-            local newDir = Vector3.new(newTargetPos.x - currentPos.x, self.height, newTargetPos.z - currentPos.z)
+            local newDir = Vector3.new(newTargetPos.x - currentPos.x, currentPos.y, newTargetPos.z - currentPos.z)
             newDir:Normalize()
 
             local angleY = math.deg(Atan2(newDir.z, newDir.x))
@@ -160,7 +160,7 @@ function EnemyScript:Attack(deltaTime)
 
     local currentPosition = Vector3.new(self.transform:GetPosition())
     local targetPosition = Vector3.new(self.playerTransform:GetPosition())
-    local direction = Vector3.new(targetPosition.x - currentPosition.x, 0, targetPosition.z - currentPosition.z)
+    local direction = Vector3.new(targetPosition.x - currentPosition.x, currentPosition.y, targetPosition.z - currentPosition.z)
     local distance = Length(targetPosition, currentPosition)
 
     local targetDistance = 4.0
@@ -190,9 +190,9 @@ function EnemyScript:Attack(deltaTime)
             moveDirection = Vector3.new(0, 0, 0)
         end
 
-        local move = Vector3.new(moveDirection.x * self.speed * deltaTime, self.height, moveDirection.z * self.speed * deltaTime)
+        local move = Vector3.new(moveDirection.x * self.speed * deltaTime, currentPosition.y, moveDirection.z * self.speed * deltaTime)
         local newPosition = currentPosition + move
-        self.transform:SetPosition(newPosition.x, self.height, newPosition.z)
+        self.transform:SetPosition(newPosition.x, currentPosition.y, newPosition.z)
     end
     
 end

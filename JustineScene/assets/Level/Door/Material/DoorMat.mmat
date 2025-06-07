@@ -13,6 +13,6 @@
     bool | hasSpecularMap=1
     string | specularMap="\Level\Door\Texture\MAT_Scifi_Door_5_Metallic.png"
     bool | hasAmbientOcclusionMap=1
-    string | ambientOcclusionMap="\Level\Door\Texture\MAT_Scifi_Door_5_Emissive.png"
+    string | ambientOcclusionMap="\Level\Door\Texture\MAT_Scifi_Door_5_Roughness.png"
     bool | hasDiffuseRoughnessMap=1
-    string | diffuseRoughnessMap="\Level\Door\Texture\MAT_Scifi_Door_5_Roughness.png"
+    string | diffuseRoughnessMap="\Level\Door\Texture\MAT_Scifi_Door_5_Emissive.png"

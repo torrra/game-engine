@@ -7,11 +7,12 @@
     f32 | refractionIndex=1
     f32 | opacity=1
     bool | hasDiffuseMap=1
-    string | diffuseMap="\Level\Door\DoorTexture\Material__28_Base_Color.png"
+    string | diffuseMap="\Level\Door\Texture\MAT_Scifi_Door_5_Base_Color.png"
     bool | hasNormalMap=1
-    string | normalMap="\Level\Door\DoorTexture\Material__28_Normal_DirectX.png"
+    string | normalMap="\Level\Door\Texture\MAT_Scifi_Door_5_Normal_DirectX.png"
     bool | hasSpecularMap=1
-    string | specularMap="\Level\Door\DoorTexture\Material__28_Metallic.png"
-    bool | hasAmbientOcclusionMap=0
+    string | specularMap="\Level\Door\Texture\MAT_Scifi_Door_5_Metallic.png"
+    bool | hasAmbientOcclusionMap=1
+    string | ambientOcclusionMap="\Level\Door\Texture\MAT_Scifi_Door_5_Emissive.png"
     bool | hasDiffuseRoughnessMap=1
-    string | diffuseRoughnessMap="\Level\Door\DoorTexture\Material__28_Roughness.png"
+    string | diffuseRoughnessMap="\Level\Door\Texture\MAT_Scifi_Door_5_Roughness.png"

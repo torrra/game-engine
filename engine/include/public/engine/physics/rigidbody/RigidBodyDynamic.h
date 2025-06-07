@@ -391,6 +391,12 @@ namespace engine
 
     }; // !Class RigidBodyDynamic
 
+    //template <>
+    //struct UpdateAfterParent<RigidBodyDynamic>
+    //{
+    //    static constexpr bool m_value = true;
+    //};
+
     template<>
     inline constexpr Entity::EComponentFlags Entity::GetComponentFlag<RigidBodyDynamic>()
     {
