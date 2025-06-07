@@ -31,6 +31,7 @@ namespace engine
         ENGINE_API virtual void  Shutdown(void);
         ENGINE_API virtual void  SetCurrentScene(class GameScene*);
         ENGINE_API virtual void  ResetScene(class ::engine::GameScene&);
+        ENGINE_API virtual void  ResetApplication(void);
 
         ENGINE_API virtual void  LoadNewScene(class GameScene& activeScene,
                                               const std::filesystem::path& filePath);

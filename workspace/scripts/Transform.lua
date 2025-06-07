@@ -53,9 +53,9 @@ function Transform:SetPosition(x, y, z)
 	TransformRef.SetPosition(self.ref, x, y, z)
 end
 
-function Transform:SetRotation(w, x, y, z)
+function Transform:SetRotation(x, y, z)
 
-	TransformRef.SetRotation(self.ref, w, x, y, z)
+	TransformRef.SetRotation(self.ref, x, y, z)
 end
 
 function Transform:SetScale(x, y, z)

@@ -13,6 +13,9 @@ namespace engine
     class Image : public UIElement
     {
     public:
+
+        using UIElement::UIElement;
+
         ENGINE_API			Image(const char* fileName, math::Vector2f const& position);
         ENGINE_API			Image(void) = delete;
         ENGINE_API virtual	~Image(void) override = default;

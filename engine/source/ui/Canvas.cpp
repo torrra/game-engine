@@ -20,6 +20,8 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
     // Re-introduce window position
     (void) position;
 
+    std::lock_guard lock(m_canvasMutex);
+
     // Make canvas uninteractable & allow inputs to pass through
     constexpr ImGuiWindowFlags flags =
         ImGuiWindowFlags_NoDecoration |
@@ -86,6 +88,8 @@ void engine::Canvas::RemoveElement(UIElement* element)
     if (!element)
         return;
 
+    std::lock_guard lock(m_canvasMutex);
+
     // Check element is in array
     for (int elementIndex = 0; elementIndex < m_elements.size(); ++elementIndex)
     {
@@ -104,6 +108,8 @@ void engine::Canvas::RemoveElement(UIElement* element)
 
 void engine::Canvas::RemoveAllEntities(void)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     for (UIElement* element : m_elements)
     {
         delete element;
@@ -114,6 +120,8 @@ void engine::Canvas::RemoveAllEntities(void)
 
 void engine::Canvas::Clear(void)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     // Remove all elements
     for (UIElement* element : m_elements)
     {
@@ -125,6 +133,8 @@ void engine::Canvas::Clear(void)
 
 engine::Label* engine::Canvas::AddLabel(const char* text, math::Vector2f const& position)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     m_elements.push_back(new Label(text, position));
 
     UIElement* element = m_elements[m_elements.size() - 1];
@@ -137,6 +147,8 @@ engine::Image* engine::Canvas::AddImage(
     const char* fileName, 
     math::Vector2f const& position)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     m_elements.push_back(new Image(fileName, position));
 
     UIElement* element = m_elements[m_elements.size() - 1];
@@ -160,6 +172,8 @@ engine::Button* engine::Canvas::AddButton(
     math::Vector2f const& position, 
     math::Vector2f const& size)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     m_elements.push_back(new Button(text, position, size));
 
     UIElement* element = m_elements[m_elements.size() - 1];
@@ -173,6 +187,8 @@ engine::ProgressBar* engine::Canvas::AddProgressBar(
     math::Vector2f const& size, 
     math::Vector2f const& range)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     m_elements.push_back(new ProgressBar(position, size, range));
 
     UIElement* element = m_elements[m_elements.size() - 1];
@@ -185,6 +201,8 @@ engine::Rectangle* engine::Canvas::AddRectangle(
     math::Vector2f const& position, 
     math::Vector2f const& size)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     m_elements.push_back(new Rectangle(position, size));
     
     UIElement* element = m_elements[m_elements.size() - 1];
@@ -195,8 +213,15 @@ engine::Rectangle* engine::Canvas::AddRectangle(
 
 void engine::Canvas::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_canvasMutex);
+
     // Store color as int to reduce memory usage
     m_bgColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
+}
+
+math::Vector2f engine::Canvas::GetSize(void) const
+{
+    return m_size;
 }
 
 void engine::Canvas::RescaleCanvas(void)

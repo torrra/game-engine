@@ -43,6 +43,7 @@ namespace engine
         RegisterUIFunctions(GetInstance()->m_luaState);
         RegisterUITextFunctions(GetInstance()->m_luaState);
         RegisterUIButtonFunctions(GetInstance()->m_luaState);
+        RegisterUIImageFunctions(GetInstance()->m_luaState);
         RegisterUIProgressBarFunctions(GetInstance()->m_luaState);
         RegisterVector2Functions(GetInstance()->m_luaState);
         RegisterVector3Functions(GetInstance()->m_luaState);
@@ -51,6 +52,7 @@ namespace engine
         RegisterRigidBodyDynamicFunctions(GetInstance()->m_luaState);
         RegisterRigidBodyStaticFunctions(GetInstance()->m_luaState);
         RegisterAudioPlayerFunctions(GetInstance()->m_luaState);
+        RegisterSceneFunctions(GetInstance()->m_luaState);
 
         RunConfigScript("Utils.lua");
         RunConfigScript("Component.lua");
@@ -76,6 +78,7 @@ namespace engine
         RunConfigScript("physics/RigidBodyStatic.lua");
 
         RunConfigScript("AudioPlayer.lua");
+        RunConfigScript("Scene.lua");
 
         RunAllUserScripts();
     }
@@ -430,6 +433,12 @@ ScriptObjectTypes.%s = %s\nreturn %s";
     {	
         if (!std::filesystem::exists(GetInstance()->m_userScriptsLocation))
             return;
+
+        lua_getglobal(GetInstance()->m_luaState, "SetCurrentFolder");
+        lua_pushstring(GetInstance()->m_luaState, GetInstance()->m_userScriptsLocation.c_str());
+
+        if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
+            LogLuaError();
 
         for (auto& file : std::filesystem::recursive_directory_iterator(GetInstance()->m_userScriptsLocation))
         {

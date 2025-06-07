@@ -157,6 +157,11 @@ void engine::Engine::UpdateApplicationWindow(void)
     InputHandler::UpdateKeyState();
 }
 
+void engine::Engine::ResetApplication(void)
+{
+    m_application->ResetApplication();
+}
+
 bool engine::Engine::HasEditor(void)
 {
     return g_defaultEngine->m_hasEditor;

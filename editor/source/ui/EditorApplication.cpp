@@ -105,6 +105,13 @@ namespace editor
         m_graphView.SetGraph(activeScene.GetGraph());
     }
 
+    void EditorApplication::ResetApplication(void)
+    {
+        m_graphView.ClearGraph();
+        m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+        m_graphView.SetGraph(m_currentScene->GetGraph());
+    }
+
     void EditorApplication::Shutdown(void)
     {
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
