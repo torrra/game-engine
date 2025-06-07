@@ -224,35 +224,70 @@ void engine::RigidBodyStatic::SetCapsuleFormat(f32 inRadius, f32 inHalfHeight)
 
 void engine::RigidBodyStatic::UpdateEntity(void)
 {
-    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
-        m_rigidBodyShape != EGeometryType::PLANE)
-    {
-        // Update the entity transform in regard to the rigid body        
-        if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
-        {
-            Transform updatedTransform = ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
+    //if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr &&
+    //    m_rigidBodyShape != EGeometryType::PLANE)
+    //{
+    //    // Update the entity transform in regard to the rigid body        
+    //    if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+    //    {
+    //        Transform updatedTransform = ToTransform(m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose());
 
-            transform->CopyPosition(updatedTransform);
-            transform->CopyRotation(updatedTransform);
-        }
+    //        transform->CopyPosition(updatedTransform);
+    //        transform->CopyRotation(updatedTransform);
+    //    }
+    //}
+
+    if (!m_rigidBodyStaticImpl || !m_rigidBodyStaticImpl->m_rigidBodyStatic || m_rigidBodyShape == EGeometryType::PLANE)
+        return;
+
+    Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner);
+    if (entityTransform)
+        return;
+
+    EntityHandle parent = m_currentScene->GetEntity(m_owner)->GetParent();
+    physx::PxTransform updatedTransform = m_rigidBodyStaticImpl->m_rigidBodyStatic->getGlobalPose();
+
+    if (parent)
+    {
+        physx::PxTransform parentTransform = ToPxTransform(*m_currentScene->GetComponent<Transform>(parent));
+
+        entityTransform->CopyPosition(ToTransform(parentTransform * updatedTransform));
+        entityTransform->CopyRotation(ToTransform(parentTransform * updatedTransform));
+    }
+    else
+    {
+        entityTransform->CopyPosition(ToTransform(updatedTransform));
+        entityTransform->CopyRotation(ToTransform(updatedTransform));
     }
 }
 
 void engine::RigidBodyStatic::UpdateRigidBody(void)
 {
-    if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic != nullptr && 
-        m_rigidBodyShape != EGeometryType::PLANE)
+    if (!m_rigidBodyStaticImpl || !m_rigidBodyStaticImpl->m_rigidBodyStatic || m_rigidBodyShape == EGeometryType::PLANE)
+        return;
+
+    // Récupérer transform entité
+    physx::PxTransform pose = physx::PxTransform(physx::PxIdentity);
+
+    const Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner);
+    if (!entityTransform)
+        return;
+
+    pose = ToPxTransform(*entityTransform);
+
+    // Récupérer transform parent s'il existe
+    physx::PxTransform parentPose = physx::PxTransform(physx::PxIdentity);
+    EntityHandle parent = m_currentScene->GetEntity(m_owner)->GetParent();
+    if (parent)
     {
-        Transform worldTransform;
-
-        if (Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner))
-        {
-            worldTransform.SetPosition(Transform::ToWorldPosition(*entityTransform));
-            worldTransform.SetRotation(Transform::ToWorldRotation(*entityTransform));
-
-            // Update the transform of the rigid body in regard to the entity
-            m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(ToPxTransform(worldTransform));
-        }
+        const Transform* parentTransform = m_currentScene->GetComponent<Transform>(parent);
+        if (parentTransform)
+            parentPose = ToPxTransform(*parentTransform);
+        m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(parentPose * pose);
+    }
+    else
+    {
+        m_rigidBodyStaticImpl->m_rigidBodyStatic->setGlobalPose(pose);
     }
 }
 

@@ -1,5 +1,7 @@
 EnemyScript = ScriptObject:_new()
 
+EnemyScript.hasDetected = false
+
 local function Length(a, b)
     local dx = a.x - b.x
     local dz = a.z - b.z
@@ -80,8 +82,6 @@ function EnemyScript:Initialize()
     self.targetRotation = {w=w, x=x, y=y, z=z}
     self.rotationProgress = 0
     self.rotationSpeed = 1.5 -- rotation duration in second
-
-    
 
 end
 
@@ -202,7 +202,6 @@ function EnemyScript:Start()
     self:Initialize()
 
     self.playerTransform = GetTransformComponent(GetEntity("Player").handle)
-    self.hasDetected = false
 end
 
 function EnemyScript:Update(deltaTime)
@@ -213,12 +212,6 @@ function EnemyScript:Update(deltaTime)
         self:Move(deltaTime)
     end
 
-
-end
-
-function EnemyScript:OnTriggerEnter(otherEntity)
-
-    self.hasDetected = true
 
 end
 
