@@ -34,22 +34,22 @@ function PlayerController:Update(deltaTime)
     
     -- Movement (forward & back)
     if IsInputDown(InputCode.KEY_W) then
-        local translationVec3 = Vector3.new(0, 0, -1 * forwardMovementSpeed * deltaTime)
-        local localTranslation = translationVec3:Rotate(rotationX, rotationY, rotationZ)
+        local translation = Vector3.new(0, 0, -1 * forwardMovementSpeed * deltaTime)
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_S) then
-        local translationVec3 = Vector3.new(0, 0, 1 * backMovementSpeed * deltaTime)
-        local localTranslation = translationVec3:Rotate(rotationX, rotationY, rotationZ)
+        local translation = Vector3.new(0, 0, 1 * backMovementSpeed * deltaTime)
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end 
     -- Movement (left & right)
     if IsInputDown(InputCode.KEY_A) then
-        local translationVec3 = Vector3.new(-1 * sideMovementSpeed * deltaTime, 0, 0)
-        local localTranslation = translationVec3:Rotate(rotationX, rotationY, rotationZ)
+        local translation = Vector3.new(-1 * sideMovementSpeed * deltaTime, 0, 0)
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_D) then
-        local translationVec3 = Vector3.new(1 * sideMovementSpeed * deltaTime, 0, 0)
-        local localTranslation = translationVec3:Rotate(rotationX, rotationY, rotationZ)
+        local translation = Vector3.new(1 * sideMovementSpeed * deltaTime, 0, 0)
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end
 
