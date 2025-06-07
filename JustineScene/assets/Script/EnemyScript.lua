@@ -32,32 +32,23 @@ local function Atan2(y, x)
     end
 end
 
-local function QuaternionSlerp(q1, q2, t)
-    local dot = q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z
-    if dot < 0 then
-        q2 = {w = -q2.w, x = -q2.x, y = -q2.y, z = -q2.z}
-        dot = -dot
+local function Lerp(a, b, t)
+    
+    return a + (b - a) * t
+
+end
+
+local function LerpAngle(a, b, t)
+    local delta = (b - a + math.pi) % (2 * math.pi) - math.pi
+    return a + delta * t
+end
+
+local function NormalizeAngle(angle)
+    angle = (angle + math.pi) % (2 * math.pi)
+    if angle < 0 then
+        angle = angle + 2 * math.pi
     end
-    if dot > 0.9995 then
-        local w = q1.w + t * (q2.w - q1.w)
-        local x = q1.x + t * (q2.x - q1.x)
-        local y = q1.y + t * (q2.y - q1.y)
-        local z = q1.z + t * (q2.z - q1.z)
-        local len = math.sqrt(w*w + x*x + y*y + z*z)
-        return {w = w/len, x = x/len, y = y/len, z = z/len}
-    end
-    local theta0 = math.acos(dot)
-    local theta = theta0 * t
-    local sinTheta = math.sin(theta)
-    local sinTheta0 = math.sin(theta0)
-    local s0 = math.cos(theta) - dot * sinTheta / sinTheta0
-    local s1 = sinTheta / sinTheta0
-    return {
-        w = s0 * q1.w + s1 * q2.w,
-        x = s0 * q1.x + s1 * q2.x,
-        y = s0 * q1.y + s1 * q2.y,
-        z = s0 * q1.z + s1 * q2.z
-    }
+    return angle - math.pi
 end
 
 function EnemyScript:Initialize()
@@ -85,8 +76,8 @@ function EnemyScript:Initialize()
 
     -- Rotation
     local w, x, y, z = self.transform:GetRotation()
-    self.currentRotation = {w=w, x=x, y=y, z=z}
-    self.targetRotation = {w=w, x=x, y=y, z=z}
+    self.currentRotation = {x=x, y=y, z=z}
+    self.targetRotation = {x=x, y=y, z=z}
     self.rotationProgress = 0
     self.rotationSpeed = 1.5 -- rotation duration in second
 
@@ -116,34 +107,34 @@ function EnemyScript:Move(deltaTime)
     elseif self.state == State.PauseBeforeTurn then
         self.pauseTimer = self.pauseTimer - deltaTime
         if self.pauseTimer <= 0 then
-            -- Calcul target rotation 
             self.goingToPoint1 = not self.goingToPoint1
             local newTargetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
             local newTargetPos = Vector3.new(newTargetPoint:GetPosition())
             local newDir = Vector3.new(newTargetPos.x - currentPos.x, currentPos.y, newTargetPos.z - currentPos.z)
             newDir:Normalize()
 
-            local angleY = math.deg(Atan2(newDir.z, newDir.x))
-            if angleY < 0 then 
-                angleY = angleY + 360 
-
-            end
-            local angleRad = math.rad(angleY)
-            local halfAngle = angleRad / 2
+            local angleY = -Atan2(newDir.z, newDir.x)
 
             self.targetRotation = {
-                w = math.cos(halfAngle),
                 x = 0,
-                y = math.sin(halfAngle),
+                y = angleY,
                 z = 0
             }
 
-            local w,x,y,z = self.transform:GetRotation()
-            self.currentRotation = {w=w, x=x, y=y, z=z}
-            self.rotationProgress = 0
+            -- Récupérer la rotation actuelle du transform pour bien commencer l'interpolation
+            local currentY = NormalizeAngle(self.currentRotation.y)
+            angleY = NormalizeAngle(angleY)
 
+            self.currentRotation = {
+                x = 0,
+                y = currentY,
+                z = 0
+            }
+
+            self.rotationProgress = 0
             self.state = State.Rotating
         end
+
 
     elseif self.state == State.Rotating then
         self.rotationProgress = self.rotationProgress + deltaTime / self.rotationSpeed
@@ -151,9 +142,19 @@ function EnemyScript:Move(deltaTime)
             self.rotationProgress = 1
             self.state = State.PauseAfterTurn
             self.pauseTimer = self.pauseAfterDuration
+            -- Fixer la rotation pour éviter erreurs d'interpolation
+            self.currentRotation = {
+                x = self.targetRotation.x,
+                y = self.targetRotation.y,
+                z = self.targetRotation.z
+            }
         end
-        local newRot = QuaternionSlerp(self.currentRotation, self.targetRotation, self.rotationProgress)
-        self.transform:SetRotation(newRot.w, newRot.x, newRot.y, newRot.z)
+        -- Interpoler la rotation entre currentRotation (début) et targetRotation (fin)
+        local newX = Lerp(self.currentRotation.x, self.targetRotation.x, self.rotationProgress)
+        local newY = LerpAngle(self.currentRotation.y, self.targetRotation.y, self.rotationProgress)
+        local newZ = Lerp(self.currentRotation.z, self.targetRotation.z, self.rotationProgress)
+        
+        self.transform:SetRotation(newX, newY, newZ)
 
     elseif self.state == State.PauseAfterTurn then
         self.pauseTimer = self.pauseTimer - deltaTime
@@ -177,14 +178,7 @@ function EnemyScript:Attack(deltaTime)
 
             direction:Normalize()
             local angleY = Atan2(direction.z, direction.x)
-            local halfAngle = angleY / 2
-            local rot = {
-                w = math.cos(-halfAngle),
-                x = 0,
-                y = math.sin(-halfAngle),
-                z = 0
-            }
-            self.transform:SetRotation(rot.w, rot.x, rot.y, rot.z)
+            self.transform:SetRotation(0.0, -angleY, 0.0)
 
         end
         local moveDirection = Vector3.new(0, 0, 0)

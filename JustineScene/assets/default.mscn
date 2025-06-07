@@ -121,9 +121,9 @@
      int64 | owner=6
      uint32 | type=1
      uint64 | shape=0
-     uint32 | collision group=4
-     vec3f32 | box half extents={2.2,3.4,2.1}
-     bool | trigger=1
+     uint32 | collision group=3
+     vec3f32 | box half extents={2,3,0.9}
+     bool | trigger=0
      uint64 | flags=0
 [Entity]
    string | name="Enemy"
@@ -167,7 +167,7 @@
     uint64 | index=4
     int64 | owner=11
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={10,1.5,-14}
+    vec3f32 | position={10,1,-14}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Script]
@@ -293,7 +293,7 @@
 [Transform]
     uint64 | index=9
     int64 | owner=16
-    quat32 | rotation={0.66758,-0.23309,-0.667588,-0.233087}
+    quat32 | rotation={0.669588,-0.227255,-0.669596,-0.227252}
     vec3f32 | position={1,10,-14}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
