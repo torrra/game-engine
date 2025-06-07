@@ -24,24 +24,28 @@ function PlayerController:Update(deltaTime)
 
     -- Set camera rotation
     self.camera:Rotate(yCursor * vSpeed, xCursor * hSpeed, 0, deltaTime)
+    
+    local forwardMovementSpeed = 5
+    local backMovementSpeed = forwardMovementSpeed * 0.75
+    local sideMovementSpeed = forwardMovementSpeed * 0.85
+    
     -- Movement (forward & back)
-    local movementSpeed = 5
     if IsInputDown(InputCode.KEY_W) then
-        local translation = Vector3.new(0, 0, -1 * movementSpeed * deltaTime)
+        local translation = Vector3.new(0, 0, -1 * forwardMovementSpeed * deltaTime)
         local localTranslation = translation:Rotate(self.camera:GetRotation())
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_S) then
-        local translation = Vector3.new(0, 0, 1 * movementSpeed * 0.75 * deltaTime)
+        local translation = Vector3.new(0, 0, 1 * backMovementSpeed * deltaTime)
         local localTranslation = translation:Rotate(self.camera:GetRotation())
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end 
     -- Movement (left & right)
     if IsInputDown(InputCode.KEY_A) then
-        local translation = Vector3.new(-1 * movementSpeed * 0.85 * deltaTime, 0, 0)
+        local translation = Vector3.new(-1 * sideMovementSpeed * deltaTime, 0, 0)
         local localTranslation = translation:Rotate(self.camera:GetRotation())
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_D) then
-        local translation = Vector3.new(1 * movementSpeed * 0.85 * deltaTime, 0, 0)
+        local translation = Vector3.new(1 * sideMovementSpeed * deltaTime, 0, 0)
         local localTranslation = translation:Rotate(self.camera:GetRotation())
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end

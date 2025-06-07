@@ -25,8 +25,8 @@ void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 delt
 void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
 {
     m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
-    m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);	    // Yaw
-    m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);	    // Roll
+    m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);	// Yaw
+    m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);	// Roll
 
     // Clamp pitch // TODO: fix pitch
     if (m_rotation[0] > 90.0f)
