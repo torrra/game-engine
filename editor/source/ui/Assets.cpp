@@ -29,28 +29,47 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-bool DirUpdated(std::string const& path)
+bool DirUpdated(std::string const& projectPath, std::string const& path)
 {
-    HANDLE handles[1] = { nullptr };
+    HANDLE handles[2] = { nullptr, nullptr };
 
-    handles[0] = FindFirstChangeNotificationA(path.c_str(), false, FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME);
-    if (handles[0] == INVALID_HANDLE_VALUE || handles[0] == nullptr)
+    if (!path.empty())
+    {
+        handles[0] = FindFirstChangeNotificationA(path.c_str(), false, FILE_NOTIFY_CHANGE_FILE_NAME);
+        if (handles[0] == INVALID_HANDLE_VALUE || handles[0] == nullptr)
+        {
+            printf("[ERROR]: FindFirstChangeNotificationA failed, error code: %lu.\n", GetLastError());
+            return false;
+        }
+
+    }
+
+    handles[1] = FindFirstChangeNotificationA(projectPath.c_str(), true, FILE_NOTIFY_CHANGE_DIR_NAME);
+    if (handles[1] == INVALID_HANDLE_VALUE || handles[1] == nullptr)
     {
         printf("[ERROR]: FindFirstChangeNotificationA failed, error code: %lu.\n", GetLastError());
         return false;
     }
-
-    DWORD result = WaitForMultipleObjects(1, handles, false, 500);
+    
+    
+    DWORD result = WaitForMultipleObjects(2, handles, false, 500);
     bool newChanges = false;
 
     switch (result)
     {
     case WAIT_OBJECT_0:
-        // Refresh directory
-        printf("Refresh required\n");
+        printf("Refresh required (file)\n");
         newChanges = true;
-
+        printf("DIR UPDATE\n");
         if (!FindNextChangeNotification(handles[0]))
+            printf("[ERROR]: FindNextChangeNotification failed, error code %lu.\n", GetLastError());
+        break;
+    case WAIT_OBJECT_0 + 1:
+        // Refresh directory
+        printf("Refresh required (dir)\n");
+        newChanges = true;
+        printf("DIR UPDATE\n");
+        if (!FindNextChangeNotification(handles[1]))
             printf("[ERROR]: FindNextChangeNotification failed, error code %lu.\n", GetLastError());
 
         break;
@@ -131,19 +150,26 @@ void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
 
     m_path = projectDir;
     m_rootNode = InitDirectoryRecursively(m_path);
+    m_selectedDirectory = m_rootNode;
 }
 
 void editor::AssetsWnd::RenderContents(void)
 {
     bool shouldRefresh = false;
-
-    if (m_isDirUpdated.valid() && m_isDirUpdated.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+    if ((m_isDirUpdated.valid() && m_isDirUpdated.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready))
     {
         if (m_isDirUpdated.get())
+        {
             shouldRefresh = true;
-
+        }
         else if (m_selectedDirectory)
-            m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_selectedDirectory->m_path.string());
+        {
+            m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_path.string(), m_selectedDirectory->m_path.string());
+        }
+        else
+        {
+           m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_path.string(), std::string(""));
+        }
     }
 
     math::Vector2f windowSize = ::ui::GetAvailSpace();
@@ -156,7 +182,7 @@ void editor::AssetsWnd::RenderContents(void)
     if (m_layout->StartTable())
     {
         if (m_layout->NextColumn(150.0f))
-            RenderDirectorySection(windowSize);
+            RenderDirectorySection();
     
         if (m_layout->NextColumn())
         {
@@ -188,10 +214,20 @@ void editor::AssetsWnd::RenderContents(void)
     }
 
     if (shouldRefresh)
+    {
+        if (m_rootNode)
+            delete m_rootNode;
+
+        m_selectedDirectory = nullptr;
+        m_rootNode = nullptr;
+
+        SetPath(m_path);
+        m_selectedDirectory = m_rootNode;
         OnSelectDir();
+    }
 }
 
-void editor::AssetsWnd::RenderDirectorySection(math::Vector2f const& windowSize)
+void editor::AssetsWnd::RenderDirectorySection(void)
 {
     RenderDirectories(m_rootNode);
 }
@@ -261,7 +297,6 @@ void editor::AssetsWnd::RenderAssets(void)
         // Asset variables
         static const math::Vector2f assetSize(ASSET_WIDTH, ASSET_HEIGHT);
         static const f32 sizeDenominator = 1.0f / (assetSize.GetX() + ASSET_PADDING);
-        int32 index = 0;
 
         // Window variables
         const math::Vector2f& minPos = ui::GetWindowPos();
@@ -288,29 +323,29 @@ void editor::AssetsWnd::RenderAssets(void)
                         0.0f,
                         startPos.GetY() + lineNumber * (assetSize.GetY() + ASSET_PADDING)
                 );
-
+                //printf("id = %d\n", minIdCurrentRow);
                 // Iterate through items in current row
                 for (int32 item = minIdCurrentRow; item < maxIdCurrentRow; ++item)
                 {
-                    ui::SetID(index);
-
+                    ui::SetID(item);
+                    
                     position.X() = startPos.GetX() + float(item % itemPerRow) * (assetSize.GetX() + ASSET_PADDING);
                     ui::SetScreenPosition(position);
 
                     bool isItemVisible = ui::IsRectVisible(minPos, maxPos);
-                    bool isSelected = index == m_selectedIndex; // TODO: use index to get selected value from asset struct
-
+                    bool isSelected = item == m_selectedIndex;
+                    
                     if (ui::Selectable("", &isSelected, assetSize))
                     {
-                        m_selectedIndex = index;
+                        m_selectedIndex = item;
                         SelectResource();
                     }
 
                     // Create drag & drop payload 
                     if (::ui::StartDragDropSource(0))
                     {
-                        ::ui::CreatePayload(m_assets[index].m_payloadType.c_str(), &m_assets[index], sizeof(Asset));
-                        ::ui::Text("%s", m_assets[index].m_fileName.c_str());
+                        ::ui::CreatePayload(m_assets[item].m_payloadType.c_str(), &m_assets[item], sizeof(Asset));
+                        ::ui::Text("%s", m_assets[item].m_fileName.c_str());
                         ::ui::EndDragDropSource();
                     }
 
@@ -318,9 +353,9 @@ void editor::AssetsWnd::RenderAssets(void)
                     {
                         math::Vector2f max = position + assetSize;
                         drawList.AddRectFilled(position, max, {0.1f, 0.1f, 0.1f, 1.0f}, 15.0f);
-                        
+                       
                         // Label
-                        std::string text = m_assets[index].m_fileName;
+                        std::string text = m_assets[item].m_fileName;
 
                         if (text.length() > MAX_LABEL_LINE_LENGTH)
                             text.insert(MAX_LABEL_LINE_LENGTH, "\n");
@@ -330,11 +365,9 @@ void editor::AssetsWnd::RenderAssets(void)
                             position.GetX() + ((assetSize.GetX() - ui::GetTextSize(text.c_str()).GetX()) * 0.5f), // Center aligned
                             max.GetY() - (ASSET_PADDING + ui::GetFontSize())                                      // Bottom aligned
                         );
-
                         drawList.AddText(text.c_str(), textPosition, isSelected);
                     }
                     ui::UnsetID();
-                    index++;
                 }
             }
         }
@@ -354,6 +387,9 @@ void editor::AssetsWnd::OnSelectDir(void)
     m_selectedIndex = -1;
 
     // Append file to array
+    if (!m_selectedDirectory)
+        return;
+
     for (auto file : std::filesystem::directory_iterator(m_selectedDirectory->m_path))
     {
         const std::filesystem::path& filePath = file.path();
@@ -371,7 +407,7 @@ void editor::AssetsWnd::OnSelectDir(void)
     if (m_isDirUpdated.valid())
         m_isDirUpdated.get();
 
-    m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_selectedDirectory->m_path.string());
+    m_isDirUpdated = engine::ThreadManager::AddTaskWithResult(&DirUpdated, m_path.string(), m_selectedDirectory->m_path.string());
 
 }
 

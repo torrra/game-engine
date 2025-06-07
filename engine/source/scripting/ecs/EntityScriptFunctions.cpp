@@ -92,6 +92,36 @@ int script_InvalidateEntity(lua_State* luaState)
     return 0;
 }
 
+int script_GetParent(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+    engine::EntityHandle parent = engine::Entity::INVALID_HANDLE;
+
+    if (argumentCount != 1)
+        luaL_error(luaState, "Expected 1 argument (self)");
+
+    else if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
+        parent = entity->GetParent();
+
+    lua_pushinteger(luaState, parent);
+    return 1;
+}
+
+int script_HasParent(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+    bool hasParent = false;
+
+    if (argumentCount != 1)
+        luaL_error(luaState, "Expected 1 argument (self)");
+
+    else if (engine::Entity* entity = (engine::Entity*)lua_touserdata(luaState, 1))
+        hasParent = entity->HasParent();
+
+    lua_pushboolean(luaState, hasParent);
+    return 1;
+}
+
 namespace engine
 {
     void RegisterEntityFunctions(lua_State* luaState)
@@ -103,6 +133,8 @@ namespace engine
             {"Activate", script_ActivateEntity},
             {"IsActive", script_IsEntityActive},
             {"Invalidate", script_InvalidateEntity},
+            {"GetParent", script_GetParent},
+            {"HasParent", script_HasParent},
             {NULL, NULL}
         };
 

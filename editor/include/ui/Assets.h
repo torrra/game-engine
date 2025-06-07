@@ -99,7 +99,7 @@ namespace editor
 
     private:
         // Directory section
-        void RenderDirectorySection(math::Vector2f const& windowSize);
+        void RenderDirectorySection(void);
         void RenderDirectories(DirTreeNode* node);
         DirTreeNode* InitDirectoryRecursively(std::filesystem::path const& path, DirTreeNode* parentNode = nullptr);
         int32 GetTreeNodeFlags(DirTreeNode* node);
