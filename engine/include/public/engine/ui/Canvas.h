@@ -12,6 +12,8 @@
 #include <math/Vector2.hpp>
 
 #include <vector>
+#include <mutex>
+#include <atomic>
 
 namespace engine
 {
@@ -31,13 +33,19 @@ namespace engine
         */
         ENGINE_API				Canvas(math::Vector2f const& windowSize, math::Vector4f const& color);
         ENGINE_API				Canvas(void) = delete;
+
+                                Canvas(const Canvas&) = delete;
+        ENGINE_API              Canvas(Canvas&&) noexcept = default;
+
         ENGINE_API				~Canvas(void) = default;
 
         // Render function used to display UI to screen. It should be placed at the end of the update loop.
         ENGINE_API void			Render(math::Vector2f const& position, math::Vector2f const& size);
 
         ENGINE_API void			RemoveElement(UIElement* element);
-        void RemoveAllEntities(void);
+
+
+        ENGINE_API void         RemoveAllEntities(void);
 
         // Clear function used to destroy a canvas & clear all associated UI elements.
         ENGINE_API void			Clear(void);
@@ -56,6 +64,7 @@ namespace engine
     private:
         void					RescaleCanvas(void);
 
+        std::mutex              m_canvasMutex;
         std::vector<UIElement*> m_elements;
         math::Vector2f			m_size;
         math::Vector2f			m_prevSize;

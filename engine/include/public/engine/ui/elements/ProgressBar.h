@@ -12,6 +12,9 @@ namespace engine
     class ProgressBar : public UIElement
     {
     public:
+
+        using UIElement::UIElement;
+
         ENGINE_API			ProgressBar(void) = delete;
         ENGINE_API			ProgressBar(math::Vector2f const& position, math::Vector2f const& size, math::Vector2f const& range);
         ENGINE_API virtual ~ProgressBar(void) override = default;
