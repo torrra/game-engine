@@ -81,6 +81,11 @@ function EnemyScript:Initialize()
     self.rotationProgress = 0
     self.rotationSpeed = 1.5 -- rotation duration in second
 
+    self.attackCurrentRotation = nil
+    self.attackTargetRotation = nil
+    self.attackRotationProgress = 0
+    self.attackRotationSpeed = 0.5 -- rotation rapide vers le joueur en 0.5s par exemple
+
 end
 
 function EnemyScript:Move(deltaTime)
@@ -121,7 +126,6 @@ function EnemyScript:Move(deltaTime)
                 z = 0
             }
 
-            -- Récupérer la rotation actuelle du transform pour bien commencer l'interpolation
             local currentY = NormalizeAngle(self.currentRotation.y)
             angleY = NormalizeAngle(angleY)
 
@@ -142,7 +146,6 @@ function EnemyScript:Move(deltaTime)
             self.rotationProgress = 1
             self.state = State.PauseAfterTurn
             self.pauseTimer = self.pauseAfterDuration
-            -- Fixer la rotation pour éviter erreurs d'interpolation
             self.currentRotation = {
                 x = self.targetRotation.x,
                 y = self.targetRotation.y,
@@ -175,12 +178,51 @@ function EnemyScript:Attack(deltaTime)
 
     if self.hasDetected then
         if direction.x ~= 0 or direction.z ~= 0 then
-
             direction:Normalize()
-            local angleY = Atan2(direction.z, direction.x)
-            self.transform:SetRotation(0.0, -angleY, 0.0)
+            local angleY = -Atan2(direction.z, direction.x) -- cible angle rotation
 
+            -- Initialiser la rotation d'attaque si pas déjà initialisée
+            if not self.attackCurrentRotation then
+                local _, currentY, _ = self.transform:GetRotation()
+                currentY = NormalizeAngle(currentY)
+                angleY = NormalizeAngle(angleY)
+
+                self.attackCurrentRotation = {
+                    x = 0,
+                    y = currentY,
+                    z = 0
+                }
+                self.attackTargetRotation = {
+                    x = 0,
+                    y = angleY,
+                    z = 0
+                }
+                self.attackRotationProgress = 0
+            else
+                -- Mettre à jour la cible à chaque frame pour suivre le joueur
+                self.attackTargetRotation.y = angleY
+            end
+
+            -- Avancer interpolation
+            self.attackRotationProgress = math.min(self.attackRotationProgress + deltaTime / self.attackRotationSpeed, 1)
+
+            local newX = Lerp(self.attackCurrentRotation.x, self.attackTargetRotation.x, self.attackRotationProgress)
+            local newY = LerpAngle(self.attackCurrentRotation.y, self.attackTargetRotation.y, self.attackRotationProgress)
+            local newZ = Lerp(self.attackCurrentRotation.z, self.attackTargetRotation.z, self.attackRotationProgress)
+            self.transform:SetRotation(newX, newY, newZ)
+
+            -- Si interpolation terminée, on met à jour current pour permettre continuité la prochaine frame
+            if self.attackRotationProgress >= 1 then
+                self.attackCurrentRotation = {
+                    x = newX,
+                    y = newY,
+                    z = newZ
+                }
+                self.attackRotationProgress = 0 -- on peut reset pour réinterpoler vers nouvelle cible
+            end
         end
+
+        -- Déplacement vers ou depuis joueur (inchangé)
         local moveDirection = Vector3.new(0, 0, 0)
 
         if distance > targetDistance + 0.2 then
@@ -194,9 +236,15 @@ function EnemyScript:Attack(deltaTime)
         local move = Vector3.new(moveDirection.x * self.speed * deltaTime, currentPosition.y, moveDirection.z * self.speed * deltaTime)
         local newPosition = currentPosition + move
         self.transform:SetPosition(newPosition.x, currentPosition.y, newPosition.z)
+    else
+        -- Reset rotation attaque si plus de détection
+        self.attackCurrentRotation = nil
+        self.attackTargetRotation = nil
+        self.attackRotationProgress = 0
     end
-    
+
 end
+
 
 function EnemyScript:Start()
     
