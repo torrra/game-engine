@@ -9,7 +9,7 @@ function TriggerScript:Start()
     return
   end
 
-  self.enemyScript = parentScript.EnemyScript
+  self.enemyScript = parentScript.EnemyScript2
   
 end
 
@@ -22,7 +22,7 @@ function TriggerScript:OnTriggerEnter(otherEntity)
 
     if self.enemyScript then
       self.enemyScript.hasDetected = true
-      print("Trigger")
+      print("Trigger player")
     end
 
 end
