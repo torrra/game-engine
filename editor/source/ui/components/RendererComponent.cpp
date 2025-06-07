@@ -73,35 +73,6 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
     }
 
     ui::VerticalSpacing();
-
-    ui::Text("Anim: ");
-    ui::SameLine(150.0f);
-    ui::Button("animation input");
-
-    // Drag / drop
-    if (ui::StartDragDropTarget())
-    {
-        // Check asset type
-        if (const ui::Payload payload = ui::AcceptPayload(MODEL_PAYLOAD, 0))
-        {
-            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
-            std::string pathStr = payloadData->m_path.string();
-            engine::ResourceManager::Load<engine::Animation>(pathStr);
-            
-            auto ref = engine::ResourceManager::GetResource<engine::Animation>(pathStr);
-
-            if (ref)
-            {
-                engine::PrintLog(engine::SuccessPreset(), "Set " + pathStr + " as current animation");
-                renderer->GetAnimator().SetAnimation(std::move(ref), false);
-            }
-        }
-
-        ui::EndDragDropTarget();
-    }
-
-    // Formatting
-    ui::VerticalSpacing();
 }
 
 void editor::RendererComponent::ShaderInput(engine::Renderer* renderer)
