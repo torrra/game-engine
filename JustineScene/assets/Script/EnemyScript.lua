@@ -2,6 +2,14 @@ EnemyScript = ScriptObject:_new()
 
 EnemyScript.hasDetected = false
 
+local State = 
+{
+    Moving = 0,
+    PauseBeforeTurn = 1,
+    Rotating = 2,
+    PauseAfterTurn = 3
+}
+
 local function Length(a, b)
     local dx = a.x - b.x
     local dz = a.z - b.z
@@ -69,8 +77,7 @@ function EnemyScript:Initialize()
     self.speed = 3.0
     self.goingToPoint1 = false
 
-    -- New state : "moving", "pauseBeforeTurn", "rotating", "pauseAfterTurn"
-    self.state = "moving"
+    self.state = State.Moving
 
     self.pauseBeforeDuration = 1.0
     self.pauseAfterDuration = 1.0
@@ -93,10 +100,10 @@ function EnemyScript:Move(deltaTime)
     local direction = Vector3.new(targetPos.x - currentPos.x, currentPos.y, targetPos.z - currentPos.z)
     local distance = Length(targetPos, currentPos)
 
-    if self.state == "moving" then
+    if self.state == State.Moving then
         if distance < 0.1 then
             -- Pause before rotation 
-            self.state = "pauseBeforeTurn"
+            self.state = State.PauseBeforeTurn
             self.pauseTimer = self.pauseBeforeDuration
         else
             -- Move to the target 
@@ -106,7 +113,7 @@ function EnemyScript:Move(deltaTime)
             self.transform:SetPosition(newPosition.x, currentPos.y, newPosition.z)
         end
 
-    elseif self.state == "pauseBeforeTurn" then
+    elseif self.state == State.PauseBeforeTurn then
         self.pauseTimer = self.pauseTimer - deltaTime
         if self.pauseTimer <= 0 then
             -- Calcul target rotation 
@@ -135,23 +142,23 @@ function EnemyScript:Move(deltaTime)
             self.currentRotation = {w=w, x=x, y=y, z=z}
             self.rotationProgress = 0
 
-            self.state = "rotating"
+            self.state = State.Rotating
         end
 
-    elseif self.state == "rotating" then
+    elseif self.state == State.Rotating then
         self.rotationProgress = self.rotationProgress + deltaTime / self.rotationSpeed
         if self.rotationProgress >= 1 then
             self.rotationProgress = 1
-            self.state = "pauseAfterTurn"
+            self.state = State.PauseAfterTurn
             self.pauseTimer = self.pauseAfterDuration
         end
         local newRot = QuaternionSlerp(self.currentRotation, self.targetRotation, self.rotationProgress)
         self.transform:SetRotation(newRot.w, newRot.x, newRot.y, newRot.z)
 
-    elseif self.state == "pauseAfterTurn" then
+    elseif self.state == State.PauseAfterTurn then
         self.pauseTimer = self.pauseTimer - deltaTime
         if self.pauseTimer <= 0 then
-            self.state = "moving"
+            self.state = State.Moving
         end
     end
 end
