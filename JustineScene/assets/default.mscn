@@ -1,301 +1,86 @@
 [Entity]
-   string | name="Padoru"
+   string | name="Level"
    int64 | handle=0
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=13
+   uint64 | components=0
+[Entity]
+   string | name="Part1"
+   int64 | handle=1
+   int64 | parent=0
+   uint64 | flags=0
+   uint64 | components=133
 [Transform]
     uint64 | index=0
-    int64 | owner=0
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,5,-5}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[Renderer]
-    int64 | owner=0
-    string | model="\padoru.obj"
-    string | shader="programModelTextured"
-        string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\ModelTextured.frag"
-    uint64 | materialCount=0
-    uint64 | flags=0
-[RigidBodyDynamic]
-     int64 | owner=0
-     uint32 | type=0
-     uint64 | shape=2
-     uint32 | collision group=3
-     vec2f32 | capsule format={0.5,0}
-     uint32 | gravity=0
-     uint32 | trigger=0
-     uint32 | lock X axis=0
-     uint32 | lock Y axis=0
-     uint32 | lock Z axis=0
-     uint64 | flags=0
-[Entity]
-   string | name="Floor"
-   int64 | handle=1
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=17
-[Transform]
-    uint64 | index=1
     int64 | owner=1
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,0,-5}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=1
-     uint32 | type=1
-     uint64 | shape=0
-     uint32 | collision group=3
-     vec3f32 | box half extents={5,0.5,5}
-     bool | trigger=0
-     uint64 | flags=0
-[Entity]
-   string | name="Trigger"
-   int64 | handle=2
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=17
-[Transform]
-    uint64 | index=2
-    int64 | owner=2
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,2,-5}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=2
-     uint32 | type=1
-     uint64 | shape=0
-     uint32 | collision group=4
-     vec3f32 | box half extents={2.5,0.1,2.5}
-     bool | trigger=1
-     uint64 | flags=0
-[Entity]
-   string | name="NavPoint"
-   int64 | handle=3
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=258
-[Script]
-   uint64 | index=0
-   int64 | owner=3
-   uint64 | count=1
-   string | scriptObject="NavigationPointScript"
-   uint64 | flags=0
-[NavigationPoint]
-     int64 | owner=3
-     vec3f32 | position={0,0,0}
-     uint64 | flags=0
-[Entity]
-   string | name="Level"
-   int64 | handle=4
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=149
-[Transform]
-    uint64 | index=5
-    int64 | owner=4
     quat32 | rotation={1,0,0,0}
     vec3f32 | position={0,0,0}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=4
+    int64 | owner=1
     string | model="\Level\Level1\Room4_low.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
-    string | material="\LevelMat.mmat"
+    string | material="\Level\Level1\Material\LevelMat.mmat"
     uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=4
-     uint32 | type=1
-     uint64 | shape=0
-     uint32 | collision group=3
-     vec3f32 | box half extents={0.5,0.5,0.5}
-     bool | trigger=0
-     uint64 | flags=0
 [TriangleMesh]
-     int64 | owner=4
-     uint32 | type=1
+     int64 | owner=1
+     uint32 | type=2
      uint64 | shape=4
      uint32 | collision group=3
      uint64 | flags=0
 [Entity]
-   string | name="Light"
-   int64 | handle=5
-   int64 | parent=-1
+   string | name="Part2"
+   int64 | handle=2
+   int64 | parent=0
    uint64 | flags=0
-   uint64 | components=513
+   uint64 | components=133
 [Transform]
-    uint64 | index=3
-    int64 | owner=5
-    quat32 | rotation={2.5332e-07,0,0,0.999999}
-    vec3f32 | position={2.8,6.95,-14.8}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[LightSource]
-    int64 | owner=5
-    vec3f32 | ambientColor={1,1,1}
-    vec3f32 | diffuseColor={1,1,1}
-    vec3f32 | specularColor={1,1,1}
-    vec3f32 | attenuation={1,0.007,0.0002}
-    uint32 | type=0
-    uint64 | flags=0
-[Entity]
-   string | name="Light2"
-   int64 | handle=6
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=513
-[Transform]
-    uint64 | index=4
-    int64 | owner=6
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={35.65,33.45,-59.85}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[LightSource]
-    int64 | owner=6
-    vec3f32 | ambientColor={1,1,1}
-    vec3f32 | diffuseColor={1,1,1}
-    vec3f32 | specularColor={1,1,1}
-    vec3f32 | attenuation={1,0.007,0.0002}
-    uint32 | type=0
-    uint64 | flags=0
-[Entity]
-   string | name="Enemy"
-   int64 | handle=7
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=11
-[Transform]
-    uint64 | index=6
-    int64 | owner=7
-    quat32 | rotation={1,5.80985e-06,-8.62958e-08,-7.45797e-07}
-    vec3f32 | position={-2,0.95,-14}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
-[Script]
-   uint64 | index=1
-   int64 | owner=7
-   uint64 | count=1
-   string | scriptObject="EnemyScript"
-   uint64 | flags=0
-[RigidBodyDynamic]
-     int64 | owner=7
-     uint32 | type=0
-     uint64 | shape=2
-     uint32 | collision group=3
-     vec2f32 | capsule format={0.3,0.65}
-     uint32 | gravity=1
-     uint32 | trigger=0
-     uint32 | lock X axis=1
-     uint32 | lock Y axis=0
-     uint32 | lock Z axis=1
-     uint64 | flags=0
-[Entity]
-   string | name="Mesh"
-   int64 | handle=8
-   int64 | parent=7
-   uint64 | flags=0
-   uint64 | components=5
-[Transform]
-    uint64 | index=7
-    int64 | owner=8
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,-0.95,0}
-    vec3f32 | scale={0.01,0.01,0.01}
-    uint64 | flags=0
-[Renderer]
-    int64 | owner=8
-    string | model="\Ch44_nonPBR.fbx"
-    string | shader="programModelTextured"
-        string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\ModelTextured.frag"
-    uint64 | materialCount=0
-    uint64 | flags=0
-[Entity]
-   string | name="Camera"
-   int64 | handle=9
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=35
-[Transform]
-    uint64 | index=8
-    int64 | owner=9
-    quat32 | rotation={1,-7.45058e-09,2.98023e-08,-2.98023e-08}
-    vec3f32 | position={-2,3,-20}
-    vec3f32 | scale={0.1,0.1,0.1}
-    uint64 | flags=0
-[Camera]
-    int64 | owner=9
-    f32 | near=0.005
-    f32 | far=250
-    f32 | fov=0.698132
-    f32 | aspectRatio=1.77778
-    vec3f32 | rotationEuler={-22,-177,0}
-    uint64 | flags=0
-[Script]
-   uint64 | index=2
-   int64 | owner=9
-   uint64 | count=1
-   string | scriptObject="CameraController"
-   uint64 | flags=0
-[Entity]
-   string | name="Level2"
-   int64 | handle=10
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=149
-[Transform]
-    uint64 | index=9
-    int64 | owner=10
+    uint64 | index=1
+    int64 | owner=2
     quat32 | rotation={0.707107,0,0.707107,0}
-    vec3f32 | position={50,24,-145.55}
+    vec3f32 | position={50,24,-146}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=10
+    int64 | owner=2
     string | model="\Level\Level2\Room_1.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
-    string | material="\Level2Mat.mmat"
+    string | material="\Level\Level2\Material\Level2Mat.mmat"
     uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=10
-     uint32 | type=1
-     uint64 | shape=3
-     uint32 | collision group=3
-     bool | trigger=0
-     uint64 | flags=0
 [TriangleMesh]
-     int64 | owner=10
-     uint32 | type=1
+     int64 | owner=2
+     uint32 | type=2
      uint64 | shape=4
      uint32 | collision group=3
      uint64 | flags=0
 [Entity]
-   string | name="Light3"
-   int64 | handle=11
-   int64 | parent=-1
+   string | name="Light"
+   int64 | handle=3
+   int64 | parent=0
+   uint64 | flags=0
+   uint64 | components=0
+[Entity]
+   string | name="Light1"
+   int64 | handle=4
+   int64 | parent=3
    uint64 | flags=0
    uint64 | components=513
 [Transform]
-    uint64 | index=10
-    int64 | owner=11
+    uint64 | index=2
+    int64 | owner=4
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={38,33,-150.4}
+    vec3f32 | position={15,10,-14}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [LightSource]
-    int64 | owner=11
+    int64 | owner=4
     vec3f32 | ambientColor={1,1,1}
     vec3f32 | diffuseColor={1,1,1}
     vec3f32 | specularColor={1,1,1}
@@ -304,83 +89,246 @@
     uint64 | flags=0
 [Entity]
    string | name="Door"
-   int64 | handle=12
-   int64 | parent=-1
+   int64 | handle=5
+   int64 | parent=0
    uint64 | flags=0
-   uint64 | components=1
-[Transform]
-    uint64 | index=11
-    int64 | owner=12
-    quat32 | rotation={0.707107,0,0.707107,0}
-    vec3f32 | position={0.05,1.45,-14}
-    vec3f32 | scale={1,1,1}
-    uint64 | flags=0
+   uint64 | components=0
 [Entity]
-   string | name="DoorMesh"
-   int64 | handle=13
-   int64 | parent=12
+   string | name="Door1"
+   int64 | handle=6
+   int64 | parent=5
    uint64 | flags=0
-   uint64 | components=5
+   uint64 | components=21
 [Transform]
-    uint64 | index=12
-    int64 | owner=13
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,-1.45,0}
-    vec3f32 | scale={0.0145,0.01,0.01}
+    uint64 | index=3
+    int64 | owner=6
+    quat32 | rotation={0.707107,0,0.707107,0}
+    vec3f32 | position={0,0,-14}
+    vec3f32 | scale={0.02,0.011,0.0155}
     uint64 | flags=0
 [Renderer]
-    int64 | owner=13
+    int64 | owner=6
     string | model="\Level\Door\Scifi Door.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
         string | fragmentShader="\ModelTextured.frag"
-    uint64 | materialCount=1
-    string | material="\DoorMat.mmat"
-    uint64 | flags=0
-[Entity]
-   string | name="DoorRigidbody"
-   int64 | handle=14
-   int64 | parent=12
-   uint64 | flags=0
-   uint64 | components=17
-[Transform]
-    uint64 | index=13
-    int64 | owner=14
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,0.15,0}
-    vec3f32 | scale={1,1,1}
+    uint64 | materialCount=3
+    string | material="\Level\Door\Material\DoorMat.mmat"
+    string | material="\Level\Door\Material\DoorMat2.mmat"
+    string | material="\Level\Door\Material\DoorMat3.mmat"
     uint64 | flags=0
 [RigidBodyStatic]
-     int64 | owner=14
+     int64 | owner=6
      uint32 | type=1
      uint64 | shape=0
-     uint32 | collision group=4
-     vec3f32 | box half extents={1.45,1.6,0.97}
-     bool | trigger=1
+     uint32 | collision group=3
+     vec3f32 | box half extents={2,3,0.9}
+     bool | trigger=0
      uint64 | flags=0
 [Entity]
-   string | name="NaviPoint"
-   int64 | handle=15
+   string | name="Enemy"
+   int64 | handle=7
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=0
+[Entity]
+   string | name="NavPoint"
+   int64 | handle=8
    int64 | parent=-1
    uint64 | flags=0
    uint64 | components=0
 [Entity]
    string | name="NavPoint1"
-   int64 | handle=16
-   int64 | parent=15
+   int64 | handle=9
+   int64 | parent=8
    uint64 | flags=0
    uint64 | components=256
 [NavigationPoint]
-     int64 | owner=16
-     vec3f32 | position={8.05,0,-14}
+     int64 | owner=9
+     vec3f32 | position={10,0,-14}
      uint64 | flags=0
 [Entity]
    string | name="NavPoint2"
-   int64 | handle=17
-   int64 | parent=15
+   int64 | handle=10
+   int64 | parent=8
    uint64 | flags=0
    uint64 | components=256
 [NavigationPoint]
+     int64 | owner=10
+     vec3f32 | position={30,0,-14}
+     uint64 | flags=0
+[Entity]
+   string | name="Enemy1"
+   int64 | handle=11
+   int64 | parent=7
+   uint64 | flags=0
+   uint64 | components=11
+[Transform]
+    uint64 | index=4
+    int64 | owner=11
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={10,1,-14}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=0
+   int64 | owner=11
+   uint64 | count=1
+   string | scriptObject="EnemyScript"
+   uint64 | flags=0
+[RigidBodyDynamic]
+     int64 | owner=11
+     uint32 | type=0
+     uint64 | shape=2
+     uint32 | collision group=3
+     vec2f32 | capsule format={0.3,0.65}
+     uint32 | gravity=0
+     uint32 | trigger=0
+     uint32 | lock X axis=1
+     uint32 | lock Y axis=0
+     uint32 | lock Z axis=1
+     uint64 | flags=0
+[Entity]
+   string | name="Enemy1Mesh"
+   int64 | handle=12
+   int64 | parent=11
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=5
+    int64 | owner=12
+    quat32 | rotation={0.707107,0,0.707107,0}
+    vec3f32 | position={0,-0.95,0}
+    vec3f32 | scale={0.01,0.01,0.01}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=12
+    string | model="\Character\Ch44_nonPBR.fbx"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=0
+    uint64 | flags=0
+[Entity]
+   string | name="Rifle"
+   int64 | handle=13
+   int64 | parent=11
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=6
+    int64 | owner=13
+    quat32 | rotation={-1.39094e-08,1.49012e-08,0.999999,1.49012e-08}
+    vec3f32 | position={0.65,0.2,0.04}
+    vec3f32 | scale={0.05,0.05,0.05}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=13
+    string | model="\Rifle\sci fi m254 gun - high poly.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=1
+    string | material="\RifleMat0.mmat"
+    uint64 | flags=0
+[Entity]
+   string | name="Player"
+   int64 | handle=14
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=11
+[Transform]
+    uint64 | index=7
+    int64 | owner=14
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={5,0.5,-14}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=1
+   int64 | owner=14
+   uint64 | count=1
+   string | scriptObject="ControllerScript"
+   uint64 | flags=0
+[RigidBodyDynamic]
+     int64 | owner=14
+     uint32 | type=0
+     uint64 | shape=2
+     uint32 | collision group=3
+     vec2f32 | capsule format={0.5,0}
+     uint32 | gravity=0
+     uint32 | trigger=0
+     uint32 | lock X axis=1
+     uint32 | lock Y axis=0
+     uint32 | lock Z axis=1
+     uint64 | flags=0
+[Entity]
+   string | name="PlayerMesh"
+   int64 | handle=15
+   int64 | parent=14
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=8
+    int64 | owner=15
+    quat32 | rotation={0.707107,0,0.707107,0}
+    vec3f32 | position={0,0,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=15
+    string | model="\Character\padoru.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=1
+    string | material="\Character\Material\padoru.mmat"
+    uint64 | flags=0
+[Entity]
+   string | name="Camera"
+   int64 | handle=16
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=33
+[Transform]
+    uint64 | index=9
+    int64 | owner=16
+    quat32 | rotation={0.669588,-0.227255,-0.669596,-0.227252}
+    vec3f32 | position={1,10,-14}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Camera]
+    int64 | owner=16
+    f32 | near=0.005
+    f32 | far=250
+    f32 | fov=1.0472
+    f32 | aspectRatio=1.77778
+    vec3f32 | rotationEuler={0,0,0}
+    uint64 | flags=0
+[Entity]
+   string | name="Enemy1Trigger"
+   int64 | handle=17
+   int64 | parent=11
+   uint64 | flags=0
+   uint64 | components=19
+[Transform]
+    uint64 | index=10
+    int64 | owner=17
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={0,-2.943e-07,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=2
+   int64 | owner=17
+   uint64 | count=1
+   string | scriptObject="TriggerScript"
+   uint64 | flags=0
+[RigidBodyStatic]
      int64 | owner=17
-     vec3f32 | position={29.35,0,-14}
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={4,0.5,4}
+     bool | trigger=1
      uint64 | flags=0

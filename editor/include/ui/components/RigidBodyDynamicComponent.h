@@ -53,6 +53,7 @@ namespace editor
         /*static*/  std::vector<const char*>    m_shapeTypes = { "Box", "Sphere", "Capsule" };
                 std::string                 m_geometryName;
                 bool                        m_isClosed      = false;
+                bool                        m_isInitialize = false;
 
     }; // !Class RigidBodyDynamicComponent
 } // !Namespace editor

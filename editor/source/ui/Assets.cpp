@@ -23,7 +23,7 @@
 #define ASSET_HEIGHT 130.0f
 #define ASSET_PADDING 15.0f
 #define MAX_LABEL_LINE_LENGTH 16
-#define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag", ".mmat", ".mscn", ".ogg", ".mp3", ".jpg"}
+#define SUPPORTED_EXTENSIONS {".obj", ".fbx", ".dae", ".png", ".ttf", ".lua", ".vert", ".frag", ".mmat", ".mscn", ".ogg", ".mp3", ".jpg", ".jpeg"}
 
 
 #define WIN32_LEAN_AND_MEAN
@@ -461,6 +461,8 @@ std::string editor::AssetsWnd::GetPayloadType(std::string const& extension) cons
     else if (extension == supportedExtensions[11])
         payloadType = AUDIO_PAYLOAD;
     else if (extension == supportedExtensions[12])
+        payloadType = TEXTURE_PAYLOAD;
+    else if (extension == supportedExtensions[13])
         payloadType = TEXTURE_PAYLOAD;
 
     return payloadType;
