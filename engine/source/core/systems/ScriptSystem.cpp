@@ -446,7 +446,6 @@ ScriptObjectTypes.%s = %s\nreturn %s";
             if (filenameLength <= 4 || memcmp(filename.data() + filenameLength - 4, ".lua", 4))
                 continue;
 
-            std::cout << "Running file: " << filename << '\n';
             RunUserScript(filename);
         }	
     }

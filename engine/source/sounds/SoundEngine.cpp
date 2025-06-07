@@ -103,7 +103,12 @@ void engine::SoundEngine::CloseSoundEngine(void)
         FMOD_RESULT result = m_soundImpl->m_system->close();
 
         if (result != FMOD_OK)
-            return;
+            PrintLog(ErrorPreset(), "Failed to close sound engine.");
+        
+        result = m_soundImpl->m_system->release();
+
+        if (result != FMOD_OK)
+            PrintLog(ErrorPreset(), "Failed to release sound system.");
     }
 
     m_soundImpl->m_system = nullptr;
