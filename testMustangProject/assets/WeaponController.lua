@@ -10,9 +10,10 @@ WeaponController.reloadKey = InputCode.KEY_R
 
 WeaponController.currentGun = nil
 
-WeaponController.ammoTextPosition = Vector2.new(100, 125)
+WeaponController.ammoTextPosition = Vector2.new(100, 150)
 WeaponController.lifeBarPosition = Vector2.new(100, 100)
-WeaponController.lifeBarDimensions = Vector2.new(100, 50)
+WeaponController.lifeBarSize = Vector2.new(200, 25)
+WeaponController.crosshairSize = Vector2.new(50, 50)
 
 function WeaponController:UpdateAmmoText()
 
@@ -31,6 +32,7 @@ function WeaponController:UpdateAmmoText()
                                           self.ammoTextPosition.y)
 
     self.ammoText:SetTextColor(1.0, 1.0, 1.0, 1.0)
+
 end
 
 function WeaponController:OnLifeUpdated(delta)
@@ -49,7 +51,7 @@ end
 
 function WeaponController:OnDeath()
 
-    self.uiCanvas:DeleteCanvas()
+    self.uiCanvas:DestroyCanvas()
     self.uiCanvas = nil
 
     self.lifeBar = nil
@@ -58,6 +60,24 @@ function WeaponController:OnDeath()
     self.baseGun = nil
     self.shotgun = nil
     self.life = nil
+
+end
+
+function WeaponController:UpdateCrosshair()
+
+    local xSize, ySize = self.uiCanvas:GetScreenSize()
+
+    if (xSize ~= self.screenSize.x) or (ySize ~= self.screenSize.y) then
+
+        self.screenSize.x = xSize
+        self.screenSize.y = ySize
+
+        local xPos = (xSize * 0.5) - (self.crosshairSize.x * 0.5)
+        local yPos = (ySize * 0.5) - (self.crosshairSize.y * 0.5)
+
+        self.crosshair:SetPosition(xPos, yPos)
+
+    end
 
 end
 
@@ -85,18 +105,25 @@ function WeaponController:Start()
 
     self:UpdateAmmoText()
     self.lifeBar = self.uiCanvas:AddProgressBar(self.lifeBarPosition.x, self.lifeBarPosition.y, 
-                                                self.lifeBarDimensions.x, self.lifeBarDimensions.y,
+                                                self.lifeBarSize.x, self.lifeBarSize.y,
                                                 0, self.lifeValue)
 
     self.lifeBar:SetFillColor(0.0, 1.0, 0.0, 1.0)
 
-    self.crossHair = self.uiCanvas:AddImage("crosshair.png", 960, 540)
+    
+    self.screenSize = Vector2.new(self.uiCanvas:GetScreenSize())
+
+
+    self.crosshair = self.uiCanvas:AddImage("crosshair.png", 0, 0)
+    self.crosshair:SetScale(self.crosshairSize.x, self.crosshairSize.y)
 
 end
 
 
 -- Is executed every tick
 function WeaponController:Update(deltaTime)
+
+    self:UpdateCrosshair()
 
     if IsInputPressed(self.baseGunKey) then
         self.currentGun = self.baseGun
