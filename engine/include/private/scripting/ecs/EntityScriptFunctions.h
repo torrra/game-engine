@@ -16,6 +16,10 @@ extern "C"
 
     // Entity:Invalidate() native implementation. Calls Entity::Invalidate()
     int script_InvalidateEntity(struct lua_State* luaState);
+
+    int script_GetParent(struct lua_State* luaState);
+
+    int script_HasParent(struct lua_State* luaState);
 }
 
 namespace engine
