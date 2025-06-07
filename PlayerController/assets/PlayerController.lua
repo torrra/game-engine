@@ -24,25 +24,28 @@ function PlayerController:Update(deltaTime)
 
     -- Set camera rotation
     self.camera:Rotate(yCursor * vSpeed, xCursor * hSpeed, 0, deltaTime)
+
+    local rotationX, rotationY, rotationZ = self.camera:GetRotation()
+
     -- Movement (forward & back)
     local movementSpeed = 5
     if IsInputDown(InputCode.KEY_W) then
         local translation = Vector3.new(0, 0, -1 * movementSpeed * deltaTime)
-        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_S) then
         local translation = Vector3.new(0, 0, 1 * movementSpeed * 0.75 * deltaTime)
-        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end 
     -- Movement (left & right)
     if IsInputDown(InputCode.KEY_A) then
         local translation = Vector3.new(-1 * movementSpeed * 0.85 * deltaTime, 0, 0)
-        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     elseif IsInputDown(InputCode.KEY_D) then
         local translation = Vector3.new(1 * movementSpeed * 0.85 * deltaTime, 0, 0)
-        local localTranslation = translation:Rotate(self.camera:GetRotation())
+        local localTranslation = translation:Rotate(rotationX, rotationY, rotationZ)
         self.transform:AddTranslation(localTranslation.x, 0.0, localTranslation.z) 
     end
 
@@ -58,6 +61,9 @@ function PlayerController:Update(deltaTime)
             self.rigidbody:AddForce(0, 7.5, 0, ForceMode.IMPULSE, false)
         end
     end
+
+    self.transform:SetRotation(0, rotationY, 0)
+
 end
 
 
