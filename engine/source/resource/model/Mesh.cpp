@@ -63,7 +63,9 @@ void engine::Mesh::DeleteMesh(void)
 
 void engine::Mesh::SetupGraphics(void)
 {
-    glCreateVertexArrays(1, &m_vao);
+    if (!m_vao)
+        glCreateVertexArrays(1, &m_vao);
+
     CreateVBO();
     CreateEBO();
 

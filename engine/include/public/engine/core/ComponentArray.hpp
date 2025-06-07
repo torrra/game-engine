@@ -49,6 +49,11 @@ namespace engine
 
         void AddDeserializedComponent(TComponentType&& component);
 
+        // Get valid component count
+        uint64 GetSize(void) const;
+
+        const TComponentType& operator[](uint64 index) const;
+        TComponentType& operator[](uint64 index);
 
         // Standard functions necessary to use ranged for loops.
         // Cannot use PascalCase for these two functions as they must
@@ -231,6 +236,32 @@ namespace engine
     {
         m_entityIndexMap[component.GetOwner()] = m_components.size();
         m_components.emplace_back(std::forward<TComponentType>(component));
+    }
+
+    template<CValidComponent TComponentType>
+    inline uint64 ComponentArray<TComponentType>::GetSize(void) const
+    {
+        uint64 size = 0;
+
+        for (const TComponentType& component : m_components)
+        {
+            if (component.IsValid())
+                ++size;
+        }
+
+        return size;
+    }
+
+    template<CValidComponent TComponentType>
+    inline const TComponentType& ComponentArray<TComponentType>::operator[](uint64 index) const
+    {
+        return m_components[index];
+    }
+
+    template<CValidComponent TComponentType>
+    inline TComponentType& ComponentArray<TComponentType>::operator[](uint64 index)
+    {
+        return m_components[index];
     }
 
     template<CValidComponent TComponentType>

@@ -126,9 +126,11 @@ namespace engine
 
         static void RunUserScript(const std::string& filename);
         static void LogLuaError(void);
+        static void RegisterEngineFunctions(void);
 
         // Run an internal lua file
         static void RunConfigScript(const char* script);
+        static void RunAllConfigScripts(void);
 
         static std::string FormatLuaClassName(const char* name);
 

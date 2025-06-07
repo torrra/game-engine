@@ -10,6 +10,7 @@
 #include "utility/ResourceRef.h"
 
 #include "core/SceneGraph.h"
+#include "core/systems/ScriptSystem.h"
 
 #include "serialization/TextSerializer.h"
 
@@ -19,8 +20,20 @@
 
 namespace engine
 {
+    Renderer::Renderer(EntityHandle owner, SceneGraph* scene)
+        : Component(owner, scene)
+    {
+
+    }
+
     void Renderer::Register(void)
     {
+        engine::ScriptSystem::RegisterNewComponent("_NewRendererComponent", m_owner);
+    }
+
+    void Renderer::Unregister(void)
+    {
+        engine::ScriptSystem::UnregisterComponent("_RemoveRendererComponent", m_owner);
     }
 
     void Renderer::Render(const math::Matrix4f& viewProjection,
@@ -55,6 +68,63 @@ namespace engine
             m_shader->Set("mvp", &viewProjection);
             m_shader->Set("normalMat", &identity3x3);
         }
+
+        if (m_model->IsDynamic() && (m_animator.IsPlaying() || m_animator.IsPaused()))
+        {
+            m_animator.UseSkinningBuffer();
+            m_shader->Set("isRigged", true);
+        }
+        else
+            m_shader->Set("isRigged", false);
+
+        m_model->Draw(m_materials);
+        OpenGLError();
+    }
+
+    void Renderer::Render(const math::Matrix4f& view, const math::Matrix4f& projection,
+        ComponentArray<class Transform>& transforms)
+    {
+        if (!m_model || !m_shader)
+            return;
+
+        if (!m_model->CanRender())
+            return;
+
+        math::Matrix4f viewProjection = projection * view;
+
+        m_shader->Use();
+
+        if (Transform* transform = transforms.GetComponent(m_owner))
+        {
+            math::Matrix4f transformMat = Transform::ToWorldMatrix(*transform);
+            math::Matrix4f mvp = viewProjection * transformMat;
+
+            math::Matrix4f normalMat4x4 = transformMat.Inverse().Transpose();
+            math::Matrix3f normalMat3x3 = math::Matrix3f(normalMat4x4);
+
+            m_shader->Set("model", &transformMat);
+            m_shader->Set("mvp", &mvp);
+            m_shader->Set("normalMat", &normalMat3x3);
+            m_shader->Set("view", &view);
+            m_shader->Set("projection", &projection);
+        }
+        else
+        {
+            math::Matrix4f identity4x4{ 1.f };
+            math::Matrix3f identity3x3{ 1.f };
+
+            m_shader->Set("model", &identity4x4);
+            m_shader->Set("mvp", &viewProjection);
+            m_shader->Set("normalMat", &identity3x3);
+        }
+
+        if (m_model->IsDynamic() && (m_animator.IsPlaying() || m_animator.IsPaused()))
+        {
+            m_animator.UseSkinningBuffer();
+            m_shader->Set("isRigged", true);
+        }
+        else
+            m_shader->Set("isRigged", false);
 
         m_model->Draw(m_materials);
         OpenGLError();
@@ -98,6 +168,7 @@ namespace engine
     void Renderer::SetModel(ResourceRef<Model>&& model)
     {
         m_model = std::forward<ResourceRef<Model>>(model);
+        m_animator.SetModel(m_model);
     }
 
     void Renderer::SetModel(const char* key)
@@ -162,6 +233,11 @@ namespace engine
         output << '\n';
     }
 
+    SkeletonAnimator& Renderer::GetAnimator(void)
+    {
+        return m_animator;
+    }
+
     const char* Renderer::DeserializeText(const char* text, const char* end)
     {
         MOVE_TEXT_CURSOR(text, end);
@@ -174,6 +250,7 @@ namespace engine
         {
             ResourceManager::Load<Model>(key);
             m_model = ResourceManager::GetResource<Model>(key);
+            m_animator.SetModel(m_model);
         }
 
         key.clear();

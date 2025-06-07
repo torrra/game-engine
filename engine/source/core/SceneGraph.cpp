@@ -79,6 +79,7 @@ namespace engine
     void SceneGraph::RegisterAllComponents(void)
     {
         RegisterComponents<Transform>();
+        RegisterComponents<Renderer>();
         RegisterComponents<Script>();
         RegisterComponents<Camera>();
         RegisterComponents<RigidBodyDynamic>();
@@ -305,9 +306,7 @@ namespace engine
             if (!camera.IsValid() || !camera.IsActive())
                 continue;
 
-            math::Matrix4f viewProjection = camera.ViewProjection();
-
-            RenderFromCacheSingleCamera(viewProjection);
+            RenderFromCacheSingleCamera(camera.ViewProjection());
         }
     }
 
@@ -355,6 +354,17 @@ namespace engine
         }
     }
 
+    void SceneGraph::UpdateAnimators(f32 deltaTime)
+    {
+        uint64 index = 0;
+
+        for (SkeletonAnimator& animator : m_renderCache.m_animatorCache)
+        {
+            animator.Update(deltaTime);
+            m_sceneRenderers[index++].GetAnimator().RetrieveDataFromCache(animator);
+        }
+    }
+
     const ComponentArray<LightSource>& SceneGraph::GetCachedLights(void) const
     {
         return m_renderCache.m_lightRenderCache;
@@ -377,12 +387,23 @@ namespace engine
         m_renderCache.m_cameraRenderCache = m_sceneCameras;
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
         m_renderCache.m_lightRenderCache = m_sceneLights;
+
+        m_renderCache.m_animatorCache.clear();
+        m_renderCache.m_animatorCache.reserve(m_sceneRenderers.GetSize());
+
+        for (Renderer& renderer : m_sceneRenderers)
+        {
+            m_renderCache.m_animatorCache.emplace_back(renderer.GetAnimator());
+        }
+
     }
 
     void SceneGraph::ClearCache(void)
     {
         m_renderCache.m_cameraRenderCache = CopyableComponentArray<Camera>();
         m_renderCache.m_transformRenderCache = CopyableComponentArray<Transform>();
+        m_renderCache.m_lightRenderCache = CopyableComponentArray<LightSource>();
+        m_renderCache.m_animatorCache.clear();
     }
 
     EntityHandle SceneGraph::MakeHandle(int32 index, int32 uid)

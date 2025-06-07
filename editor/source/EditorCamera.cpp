@@ -34,22 +34,31 @@ void editor::EditorCamera::UpdateAspectRatio(const math::Vector2f& size)
     CalculateProjectionMatrix();
 }
 
-math::Matrix4f editor::EditorCamera::ViewProjection(void)
+math::Matrix4f editor::EditorCamera::GetViewMatrix(void) const
 {
     math::Matrix4f view{ 1.f };
 
-    view[3][0] = -m_position.X();
-    view[3][1] = -m_position.Y();
-    view[3][2] = -m_position.Z();
+    view[3][0] = -m_position.GetX();
+    view[3][1] = -m_position.GetY();
+    view[3][2] = -m_position.GetZ();
 
     view = m_rotationQuat.Inverse().RotationMatrix() * view;
+    return view;
+}
 
-    return m_projectionMatrix * view;
+math::Matrix4f editor::EditorCamera::ViewProjection(void)
+{
+    return m_projectionMatrix * GetViewMatrix();
 }
 
 math::Vector3f editor::EditorCamera::GetPosition(void) const
 {
     return m_position;
+}
+
+const math::Matrix4f& editor::EditorCamera::GetProjectionMatrix(void) const
+{
+    return m_projectionMatrix;
 }
 
 void editor::EditorCamera::UpdatePosition(f32 deltaTime)

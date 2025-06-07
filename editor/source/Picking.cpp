@@ -88,8 +88,7 @@ void editor::Picking::RenderSceneColored(engine::SceneGraph* graph, const math::
         m_pickingShader->Set("pickingColor", math::Vector3f(pickableEntity.second.GetColor()));
         
         // Render picking stage (render models as block colors based on their identifier)
-        std::vector<engine::ResourceRef<engine::MeshMaterial>> materialArray(model->GetMeshCount());
-        model->Draw(materialArray);
+        model->Draw();
     }
 }
 

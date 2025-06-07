@@ -11,6 +11,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "InternalOpenGLError.hpp"
+
 namespace engine
 {
     void DynamicMesh::ProcessMesh(const void* mesh)
@@ -41,48 +43,67 @@ namespace engine
         return -1;
     }
 
+     uint64 DynamicMesh::GetBoneCount(void) const
+    {
+        return m_skeleton.size();
+    }
+
     void DynamicMesh::RenderThreadSkeletonSetup(void)
     {
-        uint64 indexSize = m_weights.size() * sizeof(math::Vector4<uint32>);
+        uint64 indexSize = m_weights.size() * sizeof(math::Vector4i);
         uint64 weightSize = m_weights.size() * sizeof(math::Vector4f);
 
-        if (indexSize < sizeof(math::Vector4<uint32>) || weightSize < sizeof(math::Vector4f))
+        if (indexSize < sizeof(math::Vector4i) || weightSize < sizeof(math::Vector4f))
             return;
 
         math::Vector4f* weightBuffer = (math::Vector4f*)malloc(weightSize);
-        math::Vector4<uint32>* indexBuffer = (math::Vector4<uint32>*)malloc(indexSize);
+        math::Vector4i* indexBuffer = (math::Vector4i*)malloc(indexSize);
 
         if (weightBuffer && indexBuffer)
         {
+            uint64 indexOffset = 0;
+            uint64 weightOffset = 0;
+
             for (const BoneWeight& weight : m_weights)
             {
-                new(weightBuffer) math::Vector4f(weight.m_weights);
-                new(indexBuffer) math::Vector4<uint32>(weight.m_boneIndices);
+                new(weightBuffer + weightOffset) math::Vector4f(weight.m_weights);
+                new(indexBuffer + indexOffset) math::Vector4i(weight.m_boneIndices);
+
+
+                ++indexOffset;
+                ++weightOffset;
             }
+
             m_weights.clear();
             m_weights.shrink_to_fit();
-            SetupSkeletonVertexBuffers(indexBuffer, indexSize, weightBuffer, weightSize);
+            
         }
 
-        if (weightBuffer)
-            free(weightBuffer);
+        ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>([=]()
+            {
+                if (weightBuffer && indexBuffer)
+                    SetupSkeletonVertexBuffers(indexBuffer, indexSize, weightBuffer, weightSize);
 
-        if (indexBuffer)
-            free(indexBuffer);
+                if (weightBuffer)
+                    free(weightBuffer);
+
+                if (indexBuffer)
+                    free(indexBuffer);
+            });
     }
 
     void engine::DynamicMesh::SetBoneIndexAttribute()
     {
         glEnableVertexArrayAttrib(m_vao, 6);
-        glVertexArrayAttribFormat(m_vao, 6, 4, GL_UNSIGNED_INT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(m_vao, 6, 1);
+        glVertexArrayAttribIFormat(m_vao, 6, 4, GL_INT, 0);
+        glVertexArrayAttribBinding(m_vao, 6, 2);
     }
 
     void DynamicMesh::SetBoneWeightAttribute()
     {
         glEnableVertexArrayAttrib(m_vao, 7);
         glVertexArrayAttribFormat(m_vao, 7, 4, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(m_vao, 7, 2);
+        glVertexArrayAttribBinding(m_vao, 7, 3);
 
     }
 
@@ -99,7 +120,7 @@ namespace engine
         SetBoneWeightAttribute();
 
         glVertexArrayVertexBuffer(m_vao, 2, m_boneIndexVBO.GetBufferID(), 0,
-            sizeof(math::Vector4<uint32>));
+            sizeof(math::Vector4i));
 
         glVertexArrayVertexBuffer(m_vao, 3, m_boneWeightVBO.GetBufferID(), 0,
             sizeof(math::Vector4f));
@@ -109,17 +130,28 @@ namespace engine
     {
         const aiBone* boneImpl = reinterpret_cast<const aiBone*>(bone);
 
+        if (memcmp(boneImpl->mName.C_Str(), "ik_", 3) == 0)
+            return;
+
         for (uint32 weightIndex = 0; weightIndex < boneImpl->mNumWeights; ++weightIndex)
         {
             const aiVertexWeight& weight = boneImpl->mWeights[weightIndex];
             BoneWeight& newWeight = m_weights[weight.mVertexId];
 
-            if (newWeight.m_weightCount > 3)
-                continue;
 
-            newWeight.m_boneIndices[newWeight.m_weightCount] = boneIndex;
-            newWeight.m_weights[newWeight.m_weightCount] = weight.mWeight;
-            ++newWeight.m_weightCount;
+            if (!math::AlmostEqual(weight.mWeight, 0.f))
+            {
+                int32 smallestIndex = 0;
+
+                for (int32 vectorIndex = 0; vectorIndex < 4; ++vectorIndex)
+                {
+                    if (newWeight.m_boneIndices[vectorIndex] < newWeight.m_boneIndices[smallestIndex])
+                        smallestIndex = vectorIndex;
+                }
+
+                newWeight.m_boneIndices[smallestIndex] = boneIndex;
+                newWeight.m_weights[smallestIndex] = weight.mWeight;
+            }
         }
     }
 
@@ -131,10 +163,10 @@ namespace engine
         if (!meshImpl->HasBones())
             return false;
    
-        std::unordered_map<void*, int64> nodes;
+        BoneIndexMap nodes;
         nodes.reserve(meshImpl->mNumBones);
 
-        for (uint64 boneIndex = 0; boneIndex < static_cast<uint64>(meshImpl->mNumBones); ++boneIndex)
+        for (int32 boneIndex = 0; boneIndex < static_cast<int32>(meshImpl->mNumBones); ++boneIndex)
         {
             aiBone* bone = meshImpl->mBones[boneIndex];
             nodes[bone->mNode] = boneIndex;
@@ -147,11 +179,16 @@ namespace engine
             aiBone* bone = meshImpl->mBones[boneIndex];
             Bone& newBone = unorderedSkeleton[nodes.at(bone->mNode)];
 
-            ProcessWeights(bone, boneIndex);
             ProcessBone(newBone, bone, nodes);
         }
 
-        SortSkeleton(unorderedSkeleton);
+        std::vector<int32> unsortedIndices = SortSkeleton(unorderedSkeleton);
+
+        for (int32 sortedIndex = 0; sortedIndex < unsortedIndices.size(); ++sortedIndex)
+        {
+            ProcessWeights(meshImpl->mBones[unsortedIndices[sortedIndex]], sortedIndex);
+        }
+
         PopulateBoneNameMap();
         return true;
     }
@@ -160,9 +197,9 @@ namespace engine
     {
         aiBone* boneImpl = reinterpret_cast<aiBone*>(bonePtr);
 
-        // Transpose as assimp's matrices are row major
-        newBone.m_inverseBindPose = reinterpret_cast<f32*>(&boneImpl->mOffsetMatrix.Transpose());
+        newBone.m_inverseBindPose = reinterpret_cast<f32*>(&boneImpl->mOffsetMatrix);
         newBone.m_name = boneImpl->mName.C_Str();
+        newBone.m_localTransform = reinterpret_cast<f32*>(&boneImpl->mNode->mTransformation);
 
         auto parentIterator = nodes.find(boneImpl->mNode->mParent);
 
@@ -189,12 +226,13 @@ namespace engine
 
         for (const Bone& bone : m_skeleton)
         {
-            uint64 hashedName = hashFunctor(bone.m_name);
+           uint64 hashedName = hashFunctor(bone.m_name);
             m_boneMap[hashedName] = boneIndex++;
+            //std::cout << bone;
         }
     }
 
-    void DynamicMesh::SortSkeleton(std::vector<Bone>& boneArray)
+    std::vector<int32> DynamicMesh::SortSkeleton(std::vector<Bone>& boneArray)
     {
         // This vector maps old unordered indices to
         // new positions that guarantee they will be updated
@@ -212,6 +250,8 @@ namespace engine
     
         for (int32 arrayIndex = 0; arrayIndex < static_cast<int32>(arraySize); ++arrayIndex)
            SortChildrenBones(indexArray[arrayIndex], arrayIndex, boneArray, indexArray);
+
+        return indexArray;
     }
 
     void DynamicMesh::SortChildrenBones(int32 oldParentIndex, int32 newIndex,
@@ -232,8 +272,13 @@ namespace engine
 
     std::ostream& operator<<(std::ostream& lhs, const Bone& rhs)
     {
-        lhs << "[Bone]\nname: " << rhs.m_name << '\n';
-        lhs << "parent: " << rhs.m_parent << "\n\n";
+        lhs << "[Bone]\nname: " << rhs.m_name << "\nparent: " << rhs.m_parent <<
+        "\ninverse bind pose:\n";
+
+        for (int32 columnIndex = 0; columnIndex < 4; ++columnIndex)
+            lhs << rhs.m_inverseBindPose[columnIndex] << '\n';
+
+        lhs << '\n';
 
         return lhs;
     }

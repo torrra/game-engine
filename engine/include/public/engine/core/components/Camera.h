@@ -19,8 +19,8 @@ namespace engine
         f32 m_ratio = 1.77777777778f;
 
     };
-
     class Camera : public Component
+
     {
     public:
        
@@ -65,9 +65,14 @@ namespace engine
         ENGINE_API
         Camera& operator=(Camera&&) noexcept = default;
 
-    private:
+        ENGINE_API
         math::Matrix4f GetViewMatrix(Transform* inTransform);
-        void GetProjectionMatrix(void);
+
+        ENGINE_API
+        const math::Matrix4f& GetProjectionMatrix(void) const;
+
+    private:
+        void CalculateProjectionMatrix(void);
 
         f32 RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed);
 

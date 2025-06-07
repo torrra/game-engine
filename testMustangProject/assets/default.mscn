@@ -3,20 +3,37 @@
    int64 | handle=0
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=11
+   uint64 | components=15
 [Transform]
     uint64 | index=2
     int64 | owner=0
-    quat32 | rotation={-0.998848,-0.0479781,-8.09766e-08,1.11728e-07}
-    vec3f32 | position={0.095751,1.25438,-0.145993}
-    vec3f32 | scale={1,1,1}
+    quat32 | rotation={-0.704419,0.705792,-0.0435624,-0.0612683}
+    vec3f32 | position={-1.905,4.75,-5.00181}
+    vec3f32 | scale={0.01,0.01,0.01}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=0
+    string | model="\SKM_Manny.fbx"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=8
+    string | material="\white.mmat"
+    string | material="\white.mmat"
+    string | material="\white.mmat"
+    string | material="\white.mmat"
+    string | material="\white.mmat"
+    string | material="\white.mmat"
+    string | material="\white.mmat"
+    string | material="\white.mmat"
     uint64 | flags=0
 [Script]
    uint64 | index=0
    int64 | owner=0
-   uint64 | count=4
-   string | scriptObject="Life"
+   uint64 | count=5
+   string | scriptObject="ControllerScript"
    string | scriptObject="BaseGun"
+   string | scriptObject="Life"
    string | scriptObject="Shotgun"
    string | scriptObject="WeaponController"
    uint64 | flags=0
@@ -69,7 +86,7 @@
     uint64 | index=1
     int64 | owner=2
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,2,-5}
+    vec3f32 | position={-0.25,2,-5}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [RigidBodyStatic]
@@ -77,11 +94,11 @@
      uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=3
-     vec3f32 | box half extents={22.75,0.2,14.3}
+     vec3f32 | box half extents={0.5,0.5,0.5}
      bool | trigger=0
      uint64 | flags=0
 [Entity]
-   string | name="Test"
+   string | name="light"
    int64 | handle=3
    int64 | parent=-1
    uint64 | flags=0
@@ -90,7 +107,7 @@
     uint64 | index=3
     int64 | owner=3
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={-0.7,4.65,-3.45}
+    vec3f32 | position={-1.9,5.85,-3.45}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [RigidBodyStatic]
@@ -132,35 +149,21 @@
    int64 | handle=7
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=23
+   uint64 | components=17
 [Transform]
     uint64 | index=4
     int64 | owner=7
     quat32 | rotation={1,-7.7685e-08,-1.22174e-07,0}
-    vec3f32 | position={-7.15,9.25,0}
+    vec3f32 | position={-7.15,1.75,0}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
-[Renderer]
-    int64 | owner=7
-    string | model="\bunny.obj"
-    string | shader="programModelTextured"
-        string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\ModelTextured.frag"
-    uint64 | materialCount=0
-    uint64 | flags=0
-[Script]
-   uint64 | index=3
-   int64 | owner=7
-   uint64 | count=1
-   string | scriptObject="Life"
-   uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=7
      uint32 | type=1
      uint64 | shape=0
-     uint32 | collision group=3
-     vec3f32 | box half extents={1.65,4.2,10.05}
-     bool | trigger=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={0.35,0.5,0.5}
+     bool | trigger=1
      uint64 | flags=0
 [Entity]
    string | name="NavPoint"
@@ -177,66 +180,4 @@
 [NavigationPoint]
      int64 | owner=8
      vec3f32 | position={2.15,0,0}
-     uint64 | flags=0
-[Entity]
-   string | name="New Entity 0"
-   int64 | handle=9
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=0
-[Entity]
-   string | name="manny"
-   int64 | handle=10
-   int64 | parent=0
-   uint64 | flags=0
-   uint64 | components=5
-[Transform]
-    uint64 | index=5
-    int64 | owner=10
-    quat32 | rotation={-0.707106,0.707106,4.56348e-08,-4.56348e-08}
-    vec3f32 | position={0,-0.55,0}
-    vec3f32 | scale={0.01,0.01,0.01}
-    uint64 | flags=0
-[Renderer]
-    int64 | owner=10
-    string | model="\SKM_Manny.fbx"
-    string | shader="programModelTextured"
-        string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\ModelTextured.frag"
-    uint64 | materialCount=0
-    uint64 | flags=0
-[Entity]
-   string | name="life"
-   int64 | handle=11
-   int64 | parent=-1
-   uint64 | flags=0
-   uint64 | components=23
-[Transform]
-    uint64 | index=6
-    int64 | owner=11
-    quat32 | rotation={1,0,0,0}
-    vec3f32 | position={0,0,0}
-    vec3f32 | scale={0.03,0.3,0.3}
-    uint64 | flags=0
-[Renderer]
-    int64 | owner=11
-    string | model="\GARFY.fbx"
-    string | shader="programModelTextured"
-        string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\ModelTextured.frag"
-    uint64 | materialCount=0
-    uint64 | flags=0
-[Script]
-   uint64 | index=4
-   int64 | owner=11
-   uint64 | count=1
-   string | scriptObject="LightAmmoCollectible"
-   uint64 | flags=0
-[RigidBodyStatic]
-     int64 | owner=11
-     uint32 | type=1
-     uint64 | shape=1
-     uint32 | collision group=4
-     f32 | sphere radius=0.5
-     bool | trigger=1
      uint64 | flags=0

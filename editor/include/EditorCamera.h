@@ -18,8 +18,12 @@ namespace editor
 
        void             Update(f32 deltaTime);
        void             UpdateAspectRatio(const math::Vector2f& size);
+
        math::Matrix4f   ViewProjection(void);
+       math::Matrix4f   GetViewMatrix(void) const;
        math::Vector3f   GetPosition(void) const;
+
+       const math::Matrix4f& GetProjectionMatrix(void) const;
 
        EditorCamera& operator=(EditorCamera&&) noexcept = default;
 

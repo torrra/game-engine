@@ -38,17 +38,7 @@ namespace engine
         bool operator!=(const TResourceType* rhs) const;
 
         operator bool(void) const;
-
-
-        // Internal functions for type casting between refs
-
-        ResourceContainer* GetControlBlock(void);
-        TResourceType*     GetRaw(void);
-
-        void SetControlBLock(ResourceContainer* container);
-        void SetRaw(TResourceType* resource);
         
-
     protected:
 
         void DecrementRefCount(void);

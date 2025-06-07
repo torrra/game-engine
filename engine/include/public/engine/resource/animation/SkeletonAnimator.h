@@ -1,10 +1,14 @@
 #pragma once
 #include "engine/CoreTypes.h"
-#include "engine/utility/ResourceRef.h"
+#include "engine/utility/ResourceRefDecl.h"
+#include "engine/resource/model/Buffer.h"
+#include "engine/resource/animation/Animation.h"
+#include "engine/resource/model/DynamicMesh.h"
+
+#include <math/Matrix4.hpp>
 
 #include <vector>
-#include <utility>
-#include <atomic>
+#include <mutex>
 
 namespace engine
 {
@@ -12,37 +16,86 @@ namespace engine
     {
     private:
 
-        struct BoneFrameIndex
+        enum class EAnimationState
         {
-            int32 m_animDataIndex = -1;
-            int32 m_nextFrameIndex = 0;
+            STOPPED,
+            PLAYING,
+            PAUSED
+        };
 
-            // When to update each component
-            int32 m_nextPosTick = -1;
-            int32 m_nextScaleTick = -1;
-            int32 m_nextRotationTick = -1;
+        struct BoneIndex
+        {
+            const AnimBone* m_animDataIndex = nullptr;
+            const Bone* m_bone = nullptr;
+            int32 m_parentIndex = -1;
         };
         
     public:
 
-        SkeletonAnimator(void) = default;
-        SkeletonAnimator(const SkeletonAnimator&) = delete;
-        SkeletonAnimator(SkeletonAnimator&&) noexcept = default;
+        ENGINE_API SkeletonAnimator(void) = default;
 
-        void SetAnimation(ResourceRef<class Animation>&& anim);
+        SkeletonAnimator(SkeletonAnimator&&) = default;
+        SkeletonAnimator(const SkeletonAnimator&) = default;
 
-        void PauseAnimation(void);
-        void PlayAnimation(void);
+        ENGINE_API void SetAnimation(ResourceRef<Animation>&& anim, bool crossfade);
+        ENGINE_API void SetModel(const ResourceRef<class Model>& model);
 
-        void SetKeyFrame(int32 keyIndex);
-        void SetAnimSpeed(uint32 ticksPerSecond);
+        ENGINE_API void PauseAnimation(void);
+        ENGINE_API void PlayAnimation(void);
+        ENGINE_API void StopAnimation(void);
+
+        ENGINE_API void Update(f32 deltaTime);
+        ENGINE_API void SetKeyFrame(int32 keyIndex);
+        ENGINE_API void SetAnimationSpeed(f32 speedMultiplier);
+
+        ENGINE_API bool IsLooped(void) const;
+        ENGINE_API void SetLooped(bool looped);
+
+        ENGINE_API const ResourceRef<Animation>& GetAnimation(void) const;
+        ENGINE_API f32 GetAnimationSpeed(void) const;
+        ENGINE_API int32 GetCurrentKeyFrame(void) const;
+
+        ENGINE_API bool IsPlaying(void) const;
+        ENGINE_API bool IsPaused(void) const;
+
+        ENGINE_API void InitBuffer(void);
+        ENGINE_API void UseSkinningBuffer(void);
+        ENGINE_API void ResizeIndexArrays(void);
+
+        ENGINE_API void RetrieveDataFromCache(const SkeletonAnimator& cached);
+
+        ENGINE_API SkeletonAnimator& operator=(SkeletonAnimator&&) noexcept = default;
 
     private:
 
-        std::vector<BoneFrameIndex>     m_animIndices;
-        ResourceRef<class Animation>    m_currentAnim;
-        ResourceRef<class Animation>    m_nextAnim;
+        void InitAnimation(bool current);
+       
+        void MapBonesByName(std::vector<BoneIndex>& indices, const ResourceRef<Animation>& anim);
+
+        void UpdateSingleBone(int32 index, f32 lerpTime);
+        EAnimationState UpdateNextKeyFrame(void);
+        int32 CalculateNextKeyFrameIndex(void);
+        void CalculateSkinningMatrices(void);
+
+        std::vector<BoneIndex>          m_currentAnimIndices;
+        std::vector<BoneIndex>          m_nextAnimIndices;
+        std::vector<BoneTransform>      m_transforms;
+        std::vector<math::Matrix4f>     m_skinningMatrices;
+
+        ResourceRef<Animation>          m_currentAnim;
+        ResourceRef<Animation>          m_nextAnim;
+                                        
+        ResourceRef<class Model>        m_model;
+                      
+
         int32                           m_currentKeyFrame = -1;
-        std::atomic<bool>               m_isUpdating = false;
+        f32                             m_targetInterval = -1.f;
+        f32                             m_speedMultiplier = 1.f;
+        f32                             m_elapsed = 0.f;
+
+        Buffer                          m_skinningSSBO = 0;
+        EAnimationState                 m_animState = EAnimationState::STOPPED;
+        bool                            m_looped = false;
+        bool                            m_forceNextUpdate = false;
     };
 }

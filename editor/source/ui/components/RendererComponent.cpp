@@ -3,11 +3,13 @@
 
 #include <engine/resource/model/Model.h>
 #include <engine/resource/shader/Shader.h>
+#include <engine/resource/animation/Animation.h>
 #include <engine/resource/material/MeshMaterial.h>
 #include <engine/resource/ResourceManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
 #include <engine/ui/UIStyle.h>
+#include <engine/ConsoleLog.hpp>
 
 #define NO_MODEL_NAME "None##model"
 #define NO_FRAG_NAME "None##shader"
@@ -70,7 +72,6 @@ void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
         ui::EndDragDropTarget();
     }
 
-    // Formatting
     ui::VerticalSpacing();
 }
 

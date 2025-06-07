@@ -62,9 +62,17 @@ void engine::ThreadManager::SynchronizeGameThread(SceneGraph* scene)
         scene->CacheComponents();
 }
 
+void engine::ThreadManager::TickAnimations(SceneGraph* scene, f32 deltaTime)
+{
+    GetInstance()->m_animationUpdateFinished =
+        AddTaskWithResult([scene, deltaTime]() {scene->UpdateAnimators(deltaTime); });
+}
+
 void engine::ThreadManager::RenderScene(SceneGraph* scene)
 {
     ExecuteRenderThreadTasks();
+
+    SynchronizeAnimationThread();
 
     if (scene)
         scene->RenderFromCache();
@@ -75,18 +83,24 @@ void engine::ThreadManager::ExecuteRenderThreadTasks(void)
     ThreadManager* instance = GetInstance();
     TaskQueue& tasks = instance->GetQueue<ETaskType::GRAPHICS>();
 
-    instance->m_poolMutex.lock();
 
     while (!tasks.empty())
     {
-        std::function<void()>& function = tasks.front();
+        instance->m_poolMutex.lock();
+        std::function<void()> function = std::move(tasks.front());
+        tasks.pop();
+        instance->m_poolMutex.unlock();
 
         function();
-        tasks.pop();
         OpenGLError();
     }
 
-    instance->m_poolMutex.unlock();
+}
+
+void engine::ThreadManager::SynchronizeAnimationThread(void)
+{
+    if (GetInstance()->m_animationUpdateFinished.valid())
+        GetInstance()->m_animationUpdateFinished.get();
 }
 
 void engine::ThreadManager::ThreadLoop(void)
