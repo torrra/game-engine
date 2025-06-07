@@ -30,8 +30,12 @@
 [Script]
    uint64 | index=0
    int64 | owner=0
-   uint64 | count=1
+   uint64 | count=5
    string | scriptObject="ControllerScript"
+   string | scriptObject="BaseGun"
+   string | scriptObject="Life"
+   string | scriptObject="Shotgun"
+   string | scriptObject="WeaponController"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=0

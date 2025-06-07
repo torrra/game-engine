@@ -46,6 +46,8 @@ namespace engine
         ENGINE_API void UpdateGameplay(void);
         ENGINE_API void UpdateApplicationWindow(void);
 
+        ENGINE_API void ResetApplication(void);
+
         ENGINE_API void LoadNewScene(bool serialize, const std::filesystem::path& path);
         ENGINE_API void LoadDefaultScene(void);
 

@@ -60,6 +60,10 @@ namespace engine
     {
     }
 
+    void Application::ResetApplication(void)
+    {
+    }
+
     void  Application::LoadNewScene(GameScene& activeScene,
                                     const std::filesystem::path& filePath)
     {

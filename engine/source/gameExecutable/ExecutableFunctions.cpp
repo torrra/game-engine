@@ -19,7 +19,6 @@ void* InitializeEngine(void)
 
         const std::filesystem::path& filePath = entry.path();
         uint64 size = filePath.native().size();
-        std::cout << "Directory entry: " << filePath << '\n';
 
         constexpr wchar_t extension[] = L".mustang";
         constexpr uint64 arrayLength = sizeof(extension) / sizeof(extension[0]) - 1;
@@ -34,6 +33,7 @@ void* InitializeEngine(void)
             engine::Engine* defaultEngine = new engine::Engine(false);
             defaultEngine->OpenProject(filePath);
             defaultEngine->Startup();
+            defaultEngine->LoadDefaultScene();
             return defaultEngine;
         }
 

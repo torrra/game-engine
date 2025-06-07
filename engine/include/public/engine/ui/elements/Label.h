@@ -22,6 +22,9 @@ namespace engine
     class Label : public UIElement
     {
     public:
+
+        using UIElement::UIElement;
+
         ENGINE_API			Label(void) = delete;
         ENGINE_API			Label(const char* text, math::Vector2f const& position);
         ENGINE_API virtual ~Label(void) override = default;

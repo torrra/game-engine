@@ -13,6 +13,8 @@
 #include <math/Vector2.hpp>
 #include <math/Vector4.hpp>
 
+#include <mutex>
+
 namespace engine
 {
     /*
@@ -36,10 +38,16 @@ namespace engine
     {
     public:
         ENGINE_API							UIElement(void);
+
+                                            UIElement(const UIElement&) = delete;
+        ENGINE_API                          UIElement(UIElement&&) noexcept = default;
+
         ENGINE_API virtual					~UIElement(void) = default;
 
         ENGINE_API virtual math::Vector2f	GetPosition(void) const noexcept;
         ENGINE_API virtual math::Vector2f	GetScale(void) const noexcept;
+
+        ENGINE_API std::mutex&              GetMutex(void);
 
         ENGINE_API virtual void				SetPosition(math::Vector2f const& position);
         ENGINE_API virtual void				SetScale(math::Vector2f const& scale);
@@ -54,6 +62,8 @@ namespace engine
         void	SetUID(int32 const& uid);
 
     protected:
+
+        std::mutex  m_mutex;
         UITransform	m_transform;
         int32		m_uid;
         bool		m_autoScale;

@@ -13,8 +13,8 @@ function Canvas:CreateCanvas(canvasName, canvasWidth, canvasHeight)
 	return canvas
 end
 
-function Canvas:DeleteCanvas()
-	CanvasRef = CanvasRef.DeleteCanvas(self._name)
+function Canvas:DestroyCanvas()
+	CanvasRef = CanvasRef.DestroyCanvas(self._name)
 
 	return nil
 end
@@ -45,4 +45,8 @@ end
 function Canvas:AddProgressBar(xPos, yPos, width, height, minRange, maxRange)
 	newProgressBarRef = CanvasRef.AddProgressBar(self._name, xPos, yPos, width, height, minRange, maxRange)
 	return ProgressBar:_new(newProgressBarRef)
+end
+
+function Canvas:GetScreenSize()
+	return CanvasRef.GetScreenSize(self._name)
 end

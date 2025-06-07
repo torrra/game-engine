@@ -23,30 +23,34 @@ engine::ProgressBar::ProgressBar(math::Vector2f const& position, math::Vector2f 
 
 void engine::ProgressBar::Render(void)
 {
+    std::lock_guard lock(m_mutex);
     static const f32 denominator = 1.0f / (m_range[1] - m_range[0]);
 
     ImGui::PushStyleColor(ImGuiCol_FrameBg, m_bgColor);
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, m_fillColor);
     
     ImGui::SetCursorPos(m_transform.m_position);
-    ImGui::ProgressBar(m_value * denominator, m_range, NO_TEXT);
-
+    ImGui::ProgressBar(m_value * denominator, m_transform.m_sizePx, NO_TEXT);
+    
     ImGui::PopStyleColor(2);
 }
 
 void engine::ProgressBar::SetValue(f32 value)
 {
+    std::lock_guard lock(m_mutex);
     // Limit value to progress bar range
     m_value = math::Clamp(value, m_range[0], m_range[1]);
 }
 
 void engine::ProgressBar::SetBgColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_bgColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::ProgressBar::SetFillColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_fillColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 

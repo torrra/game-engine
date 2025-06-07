@@ -18,6 +18,7 @@ engine::Label::Label(const char* text, math::Vector2f const& position)
 
 void engine::Label::Render(void)
 {
+    std::lock_guard lock(m_mutex);
     ImGui::SetCursorPos(m_transform.m_position);
 
     if (m_font)
@@ -48,11 +49,13 @@ void engine::Label::Render(void)
 
 void engine::Label::SetTextColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_textColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Label::SetFont(const char* fontName, f32 fontSize)
 {
+    std::lock_guard lock(m_mutex);
     m_font = ResourceManager::GetResource<Font>(fontName)->GetFont();
 
     if (m_font &&
@@ -65,5 +68,6 @@ void engine::Label::SetFont(const char* fontName, f32 fontSize)
 
 void engine::Label::WrapText(f32 maxWidthPx)
 {
+    std::lock_guard lock(m_mutex);
     m_textBoxWidth = maxWidthPx;
 }

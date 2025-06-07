@@ -10,6 +10,7 @@
 #include "scripting/ui/InGameUI.h"
 #include "scripting/ui/Text.h"
 #include "scripting/ui/Button.h"
+#include "scripting/ui/Image.h"
 #include "scripting/ui/ProgressBar.h"
 #include "scripting/physics/RaycastFunctions.h"
 #include "scripting/physics/RigidBodyDynamicFunctions.h"
@@ -17,3 +18,4 @@
 #include "scripting/ecs/AudioPlayerFunctions.h"
 #include "scripting/ecs/RendererFunctions.h"
 #include "scripting/ResourceFunctions.h"
+#include "scripting/ecs/SceneFunction.h"

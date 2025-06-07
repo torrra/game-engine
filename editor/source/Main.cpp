@@ -51,6 +51,8 @@ int main(void)
 	// Memory leak check
 	if (!_CrtDumpMemoryLeaks())
 		engine::PrintLog(engine::SuccessPreset(), "No memory leak detected.");
+    else
+		engine::PrintLog(engine::ErrorPreset(), "Memory leaks detected.");
     
     return res;
 }

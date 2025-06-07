@@ -11,6 +11,12 @@ ResourceTypes =
     MATERIAL = 6,
 }
 
+
+function SetCurrentFolder(path)
+
+    package.path = path.."/?.lua;" .. package.path
+end
+
 function Utils.AlmostEqual(valA, valB)
 
     return math.abs(valA - valB) < 0.00001
