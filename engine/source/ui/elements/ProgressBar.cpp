@@ -29,8 +29,8 @@ void engine::ProgressBar::Render(void)
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, m_fillColor);
     
     ImGui::SetCursorPos(m_transform.m_position);
-    ImGui::ProgressBar(m_value * denominator, m_range, NO_TEXT);
-
+    ImGui::ProgressBar(m_value * denominator, m_transform.m_sizePx, NO_TEXT);
+    
     ImGui::PopStyleColor(2);
 }
 
