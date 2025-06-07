@@ -6,6 +6,13 @@
 
 #pragma endregion
 
+#pragma region engine
+
+#include "engine/core/TypesECS.h"
+#include "physics/ICollisionListener.h"
+
+#pragma endregion
+
 namespace engine
 {
     class SimulationEventCallback : public physx::PxSimulationEventCallback
@@ -31,6 +38,12 @@ namespace engine
 
         void onSleep(physx::PxActor** actors,
                      physx::PxU32 count) override;
+
+
+
+        bool GetCollisionListener(struct RigidBodyData* inData,
+                                 ICollisionListener*& outListener,
+                                 EntityHandle& outOwner);
 
     }; // !Class SimulationEventCallback
 } // !Namespace engine
