@@ -14,12 +14,11 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
-    m_transform = m_currentScene->GetComponent<engine::Transform>(m_owner);
-    if (m_transform)
+    if (Transform* transform = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
         // Add to transform translation
         math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
-        m_transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
+        transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
     }
 }
 
@@ -151,8 +150,6 @@ void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
 	output << "\n    ";
 	text::Serialize(output, "rotationEuler", m_rotation);
 	output << "\n    ";
-	//text::Serialize(output, "position", m_transform->SetPosition());
-	//output << "\n    ";
 	text::Serialize(output, "flags", m_flags);
 	output << '\n';
 }
