@@ -44,7 +44,8 @@ end
 
 function Entity:GetParent()
 
-    return EntityRef.GetParent(self.ref)
+    local handle = EntityRef.GetParent(self.ref)
+    return Entity:_NewNativeEntity(handle)
 end
 
 function Entity:HasParent()
