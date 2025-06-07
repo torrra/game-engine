@@ -24,6 +24,10 @@ namespace engine
     class Button : public UIElement
     {
     public:
+
+        using UIElement::UIElement;
+
+
         ENGINE_API				Button(void) = delete;
         ENGINE_API				Button(const char* text, math::Vector2f const& position, math::Vector2f const& size);
         ENGINE_API virtual		~Button(void) override = default;

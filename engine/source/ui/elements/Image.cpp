@@ -14,7 +14,8 @@
 engine::Image::Image(const char* fileName, math::Vector2f const& position)
     : m_fileName(fileName), m_keepAspectRatio(true)
 {
-    m_data = ResourceManager::GetResource<Texture>(m_fileName.c_str());
+    ResourceManager::Load<Texture>(fileName);
+    m_data = ResourceManager::GetResource<Texture>(m_fileName);
     
     // Set transform
     SetPosition(position);
@@ -36,6 +37,7 @@ engine::Image::Image(const char* fileName, math::Vector2f const& position)
 
 void engine::Image::Render(void)
 {
+    std::lock_guard lock(m_mutex);
     ImGuiWindow* window = ImGui::GetCurrentWindow();
 
     if (window->SkipItems)
@@ -79,16 +81,19 @@ void engine::Image::Render(void)
 
 void engine::Image::ConstantAspectRatio(bool value)
 {
+    std::lock_guard lock(m_mutex);
     m_keepAspectRatio = value;
 }
 
 void engine::Image::SetBorderColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_borderColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Image::SetImageTint(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_tint = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 

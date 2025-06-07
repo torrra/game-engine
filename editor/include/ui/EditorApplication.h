@@ -26,6 +26,8 @@ namespace editor
         void LoadNewScene(class ::engine::GameScene& activeScene,
                           const std::filesystem::path& filePath);
 
+        void ResetApplication(void) override;
+
         void Shutdown(void) override;
 
         AssetDetailsWnd& GetAssetDetailsWindow(void);
@@ -43,6 +45,7 @@ namespace editor
         Viewport*                   m_gameSimulationView;
         class ::engine::GameScene*  m_currentScene = nullptr;
         MenuBar                     m_menuBar;
+        bool                        m_isResetScheduled = false;
 
         friend class MenuBar;
         friend class Viewport;

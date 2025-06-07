@@ -18,6 +18,7 @@ engine::Rectangle::Rectangle(math::Vector2f const& position, math::Vector2f cons
 
 void engine::Rectangle::Render(void)
 {
+    std::lock_guard lock(m_mutex);
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     const ImGuiID& id = window->GetID(m_uid); // TODO: check, this may cause later issues
 
@@ -34,10 +35,12 @@ void engine::Rectangle::Render(void)
 
 void engine::Rectangle::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_color = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Rectangle::SetRounding(f32 rounding)
 {
+    std::lock_guard lock(m_mutex);
     m_rounding = rounding;
 }

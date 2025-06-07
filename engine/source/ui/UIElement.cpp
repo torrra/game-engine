@@ -51,3 +51,8 @@ void engine::UIElement::AutoScale(f32 regionRatio)
     m_transform.m_sizePx *= regionRatio;
 }
 
+std::mutex& engine::UIElement::GetMutex(void)
+{
+    return m_mutex;
+}
+

@@ -12,6 +12,9 @@ namespace engine
     class Rectangle : public UIElement
     {
     public:
+
+        using UIElement::UIElement;
+
         ENGINE_API			Rectangle(void) = delete;
         ENGINE_API			Rectangle(math::Vector2f const& position, math::Vector2f const& size);
         ENGINE_API virtual ~Rectangle(void) override = default;

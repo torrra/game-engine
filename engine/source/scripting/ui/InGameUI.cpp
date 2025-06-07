@@ -229,6 +229,28 @@ int script_RemoveElement(lua_State* luaState)
     return 0;
 }
 
+int script_GetScreenSize(lua_State* luaState)
+{
+    math::Vector2f size(0.0f);
+
+    int argumentCount = lua_gettop(luaState);
+    if (argumentCount != 1)
+        luaL_error(luaState, "Expected 1 arguments (canvasID)");
+    else
+    {
+        std::string canvasName = luaL_checkstring(luaState, 1);
+        engine::Canvas* canvas = engine::Engine::GetEngine()->GetUIManager().GetCanvas(canvasName);
+
+        if (canvas)
+            size = canvas->GetSize();
+    }
+
+    lua_pushnumber(luaState, size.GetX());
+    lua_pushnumber(luaState, size.GetY());
+
+    return 2;
+}
+
 void engine::RegisterUIFunctions(lua_State* luaState)
 {
     constexpr luaL_Reg uiFuncs[]
@@ -242,6 +264,7 @@ void engine::RegisterUIFunctions(lua_State* luaState)
         {"AddButton", script_AddButton},
         {"AddProgressBar", script_AddProgressBar},
         {"RemoveElement", script_RemoveElement},
+        {"GetScreenSize", script_GetScreenSize},
         {NULL, NULL}
     };
 

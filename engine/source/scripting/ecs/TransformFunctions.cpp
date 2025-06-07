@@ -60,13 +60,14 @@ int script_GetTransformRotation(lua_State* luaState)
     {
         math::Quatf rotation = transform->GetRotation();
 
-        lua_pushnumber(luaState, static_cast<lua_Number>(rotation.GetW()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(rotation.GetX()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(rotation.GetY()));
-        lua_pushnumber(luaState, static_cast<lua_Number>(rotation.GetZ()));
+        math::Vector3f eulerRotation = rotation.EulerAngles();
+
+        lua_pushnumber(luaState, static_cast<lua_Number>(eulerRotation.GetX()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(eulerRotation.GetY()));
+        lua_pushnumber(luaState, static_cast<lua_Number>(eulerRotation.GetZ()));
     }
 
-    return 4;
+    return 3;
 }
 
 int script_GetTransformScale(lua_State* luaState)
@@ -159,17 +160,23 @@ int script_SetTransformRotation(lua_State* luaState)
 {
     int argumentCount = lua_gettop(luaState);
 
-    if (argumentCount != 5)
-        luaL_error(luaState, "Expected 5 arguments (self, w, x, y, z)");
+    if (argumentCount != 4)
+        luaL_error(luaState, "Expected 4 arguments (self, x, y, z)");
 
     else if (engine::Transform* transform = (engine::Transform*)lua_touserdata(luaState, 1))
     {
-        f32 wRotation = static_cast<f32>(lua_tonumber(luaState, 2));
-        f32 xRotation = static_cast<f32>(lua_tonumber(luaState, 3));
-        f32 yRotation = static_cast<f32>(lua_tonumber(luaState, 4));
-        f32 zRotation = static_cast<f32>(lua_tonumber(luaState, 5));
+        f32 xRotation = static_cast<f32>(lua_tonumber(luaState, 2));
+        f32 yRotation = static_cast<f32>(lua_tonumber(luaState, 3));
+        f32 zRotation = static_cast<f32>(lua_tonumber(luaState, 4));
 
-        transform->SetRotation({wRotation, xRotation, yRotation, zRotation });
+        math::Quatf quat =
+        {
+            math::Radian(xRotation),
+            math::Radian(yRotation),
+            math::Radian(zRotation),
+        };
+
+        transform->SetRotation(quat);
     }
 
     return 0;
