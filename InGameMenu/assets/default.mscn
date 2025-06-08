@@ -1,0 +1,20 @@
+[Entity]
+   string | name="Player"
+   int64 | handle=0
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=34
+[Camera]
+    int64 | owner=0
+    f32 | near=0.005
+    f32 | far=250
+    f32 | fov=1.0472
+    f32 | aspectRatio=1.77778
+    vec3f32 | rotationEuler={0,0,0}
+    uint64 | flags=0
+[Script]
+   uint64 | index=0
+   int64 | owner=0
+   uint64 | count=1
+   string | scriptObject="Menu"
+   uint64 | flags=0
