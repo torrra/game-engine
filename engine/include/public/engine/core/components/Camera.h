@@ -32,7 +32,7 @@ namespace engine
         ENGINE_API ~Camera(void) = default;
 
         ENGINE_API void Move(const math::Vector3f& translation, f32 speed, f32 deltaTime);
-        ENGINE_API void Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed);
+        ENGINE_API void Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll);
         ENGINE_API math::Matrix4f ViewProjection(void);
 
         ENGINE_API void Register(void) override;
@@ -74,9 +74,8 @@ namespace engine
     private:
         void CalculateProjectionMatrix(void);
 
-        f32 RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed);
+        f32 RotateAxis(f32 existingAngle, f32 deltaAngle);
 
-        Transform*     m_transform;
         Frustum        m_frustum;
         math::Quatf    m_rotQuat = math::Quatf(1.f, 0.f, 0.f, 0.f);
         math::Matrix4f m_projectionMatrix{1.f};

@@ -30,9 +30,9 @@ function Camera:Move(x, y, z, speed, deltaTime)
 	CamRef.Move(self.ref, x, y, z, speed, deltaTime)
 end
 
-function Camera:Rotate(x, y, z, speed)
+function Camera:Rotate(x, y, z)
 
-	CamRef.Rotate(self.ref, x, y, z, speed)
+	CamRef.Rotate(self.ref, x, y, z)
 end
 
 function Camera:GetPosition()

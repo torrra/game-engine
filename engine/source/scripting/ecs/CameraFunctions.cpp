@@ -56,8 +56,8 @@ int script_RotateCameraEulers(lua_State* luaState)
 {
     int argumentCount = lua_gettop(luaState);
 
-    if (argumentCount != 5)
-        luaL_error(luaState, "Expected 5 arguments (self, x, y, z, speed)");
+    if (argumentCount != 4)
+        luaL_error(luaState, "Expected 4 arguments (self, x, y, z)");
 
     else if (engine::Camera* camera = (engine::Camera*)lua_touserdata(luaState, 1))
     {
@@ -65,9 +65,7 @@ int script_RotateCameraEulers(lua_State* luaState)
         f32 yRotation = static_cast<f32>(lua_tonumber(luaState, 3));
         f32 zRotation = static_cast<f32>(lua_tonumber(luaState, 4));
 
-        f32 speed = static_cast<f32>(lua_tonumber(luaState, 5));
-
-        camera->Rotate(xRotation, yRotation, zRotation, speed);
+        camera->Rotate(xRotation, yRotation, zRotation);
     }
 
     return 0;

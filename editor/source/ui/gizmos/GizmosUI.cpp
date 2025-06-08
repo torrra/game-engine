@@ -28,8 +28,7 @@ editor::GizmosUI::~GizmosUI(void)
     delete m_translationGizmos;
     delete m_toolbar;
 
-    m_transform = nullptr;
-    m_currentGizmos = NO_GIZMOS;
+    DeselectEntity();
 }
 
 void editor::GizmosUI::Render(void)
@@ -135,6 +134,19 @@ void editor::GizmosUI::UpdateGizmos(const char* wndName)
     default:
         break;
     }
+}
+
+void editor::GizmosUI::DeselectEntity(void)
+{
+    // Unselect to reset button and gizmos state
+    m_toolbar->SetSelected(-1);
+    m_currentGizmos = NO_GIZMOS;
+    m_transform = nullptr;
+
+    // Ensure all gizmos are not visible
+    m_translationGizmos->HideGizmos(true);
+    m_rotationGizmos->HideGizmos(true);
+    m_scaleGizmos->HideGizmos(true);
 }
 
 void editor::GizmosUI::SetSelectedTransform(engine::Transform* transform)

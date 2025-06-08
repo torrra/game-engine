@@ -90,13 +90,13 @@ inline void editor::CameraComponent::InputRotation(engine::Camera* camera, const
         switch (index)
         {
         case 0:
-            camera->Rotate(m_rotation[index] - m_lastRot[index], 0.0f, 0.0f, 1.0f);
+            camera->Rotate(m_rotation[index] - m_lastRot[index], 0.0f, 0.0f);
             break;
         case 1:
-            camera->Rotate(0.0f, m_rotation[index] - m_lastRot[index], 0.0f, 1.0f);
+            camera->Rotate(0.0f, m_rotation[index] - m_lastRot[index], 0.0f);
             break;
         case 2:
-            camera->Rotate(0.0f, 0.0f, m_rotation[index] - m_lastRot[index], 1.0f);
+            camera->Rotate(0.0f, 0.0f, m_rotation[index] - m_lastRot[index]);
             break;
         default:
             break;

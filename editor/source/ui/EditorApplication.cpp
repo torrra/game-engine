@@ -101,6 +101,7 @@ namespace editor
 
         m_graphView.ClearGraph();
         m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+        m_gizmosUI->DeselectEntity();
         activeScene.GetGraph()->CleanRigidBodies();
 
         activeScene.LoadNewScene(false, filePath);
@@ -121,6 +122,7 @@ namespace editor
         //RigidBodyDynamicComponent::ReleaseStaticData();
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
+        m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         delete m_gizmosUI;
