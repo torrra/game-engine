@@ -76,7 +76,6 @@ namespace engine
 
         f32 RotateAxis(f32 existingAngle, f32 deltaAngle);
 
-        Transform*     m_transform;
         Frustum        m_frustum;
         math::Quatf    m_rotQuat = math::Quatf(1.f, 0.f, 0.f, 0.f);
         math::Matrix4f m_projectionMatrix{1.f};
