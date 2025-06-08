@@ -35,18 +35,6 @@ int appMain(void)
             if (engine::InputHandler::IsInputReleased(KEY_S))
                 engine.SaveProject();
         }
-
-        /*if (engine::Input::IsInputDown(KEY_R))
-        {
-            auto size = engine.GetWindow()->GetSize<f32>();
-
-            engine::Canvas* sceneCanvas = new engine::Canvas(size, math::Vector4f::Zero());
-
-            auto rec = sceneCanvas->AddRectangle(size / 2.f, { 2.f, 2.f });
-
-            rec->SetColor(1.f, 1.f, 1.f, 1.f);
-        }*/
-
         engine.UpdateApplicationWindow();
 	}
 
@@ -63,6 +51,8 @@ int main(void)
 	// Memory leak check
 	if (!_CrtDumpMemoryLeaks())
 		engine::PrintLog(engine::SuccessPreset(), "No memory leak detected.");
+    else
+		engine::PrintLog(engine::ErrorPreset(), "Memory leaks detected.");
     
     return res;
 }

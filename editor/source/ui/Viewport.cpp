@@ -76,8 +76,9 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
         static_cast<int32>(m_size.GetY())
     });
     SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
-    engine::ThreadManager::ExecuteRenderThreadTasks();
-    
+
+    engine::ThreadManager::ExecuteRenderThreadTasks(); 
+
     if (m_graph)
     {
         m_graph->RenderFromCacheSingleCamera(viewProjection);

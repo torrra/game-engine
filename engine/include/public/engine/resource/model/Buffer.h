@@ -12,7 +12,7 @@ namespace engine
 	public:
 					Buffer(void);
                     Buffer(int32);
-                    Buffer(const Buffer&) = delete;
+                    Buffer(const Buffer&) = default;
                     Buffer(Buffer&&) noexcept = default;
 					~Buffer(void) = default;
 
@@ -21,6 +21,8 @@ namespace engine
 		void		SetData(void* data, uint64 size);
 		void		SetData(void* data, uint64 size, uint32 offset);
 		void		DeleteData(void);
+
+        Buffer& operator=(Buffer&&) noexcept = default;
 
 	private:
 

@@ -33,7 +33,7 @@ engine::TriangleMesh::TriangleMesh(EntityHandle inOwner, class SceneGraph* inSce
     m_triangleMeshImpl  = new TriangleMeshImpl();
 
     m_data.m_index = 0;
-    m_data.m_type = EShapeType::STATIC;
+    m_data.m_type = EShapeType::TRIANGLE;
 
     // Set the owner and the current scene
     m_owner             = inOwner;
@@ -50,7 +50,7 @@ void engine::TriangleMesh::CreateTriangleMesh(void)
         m_triangleMeshImpl = new TriangleMeshImpl();
 
         m_data.m_index = 0;
-        m_data.m_type = EShapeType::STATIC;
+        m_data.m_type = EShapeType::TRIANGLE;
     }
     // Get the model and return if failed
     if (engine::Renderer* renderer = m_currentScene->GetComponent<engine::Renderer>(m_owner))
@@ -127,15 +127,22 @@ const char* engine::TriangleMesh::DeserializeText(const char* text, const char* 
 
 void engine::TriangleMesh::CleanUpTriangleMesh(void)
 {   
-    m_triangleMeshImpl->m_triangleMeshDesc.setToDefault();
+    if (m_triangleMeshImpl != nullptr)
+    {
+        m_triangleMeshImpl->m_triangleMeshDesc.setToDefault();
 
-    PhysicsEngine::Get().GetImpl().m_scene->removeActor(*m_triangleMeshImpl->m_actor);
-    // Release the triangle mesh
-    PX_RELEASE(m_triangleMeshImpl->m_triangleMesh);
+        PhysicsEngine::Get().GetImpl().m_scene->removeActor(*m_triangleMeshImpl->m_actor);
 
-    // Delete the triangle mesh implementation
-    delete m_triangleMeshImpl;
-    m_triangleMeshImpl = nullptr;
+        if (m_triangleMeshImpl->m_triangleMesh != nullptr)
+        {
+            // Release the triangle mesh
+            PX_RELEASE(m_triangleMeshImpl->m_triangleMesh);
+        }
+
+        // Delete the triangle mesh implementation
+        delete m_triangleMeshImpl;
+        m_triangleMeshImpl = nullptr;
+    }
 }
 
 void engine::TriangleMesh::UpdateEntity(void)
@@ -143,12 +150,13 @@ void engine::TriangleMesh::UpdateEntity(void)
     if (m_triangleMeshImpl->m_actor != nullptr)
     {
         // Update the entity transform in regard to the rigid body
-        Transform* transform = m_currentScene->GetComponent<Transform>(m_owner);
+        if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+        {
+            Transform updatedTransform = ToTransform(m_triangleMeshImpl->m_actor->getGlobalPose());
 
-        Transform updatedTransform = ToTransform(m_triangleMeshImpl->m_actor->getGlobalPose());
-
-        transform->CopyPosition(updatedTransform);
-        transform->CopyRotation(updatedTransform);
+            transform->CopyPosition(updatedTransform);
+            transform->CopyRotation(updatedTransform);
+        }
     }
 }
 
@@ -157,14 +165,14 @@ void engine::TriangleMesh::UpdateTriangleMesh(void)
     if (m_triangleMeshImpl->m_actor != nullptr)
     {
         Transform worldTransform;
+        if (Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner))
+        {
+            worldTransform.SetPosition(Transform::ToWorldPosition(*entityTransform));
+            worldTransform.SetRotation(Transform::ToWorldRotation(*entityTransform));
 
-        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
-
-        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
-
-        // Update the transform of the rigid body in regard to the entity
-        m_triangleMeshImpl->m_actor->setGlobalPose(ToPxTransform(worldTransform));
+            // Update the transform of the rigid body in regard to the entity
+            m_triangleMeshImpl->m_actor->setGlobalPose(ToPxTransform(worldTransform));
+        }
     }
 }
 
@@ -198,27 +206,33 @@ void engine::TriangleMesh::CookTriangleMesh(void)
     physx::PxMaterial* material = PhysicsEngine::Get().GetImpl().m_physics->createMaterial(0.5f,
                                                                                            0.5f,
                                                                                            0.6f);
-    // Create the static rigid body
-    m_triangleMeshImpl->m_actor =
-        physx::PxCreateStatic(*PhysicsEngine::Get().GetImpl().m_physics,
-            ToPxTransform(m_currentScene->GetComponent<engine::Transform>(
-                m_owner)->GetTransform()), physx::PxTriangleMeshGeometry(
-                    m_triangleMeshImpl->m_triangleMesh), *material);
+    if (m_currentScene->GetEntity(m_owner)->HasComponent<engine::Transform>())
+    {
+        // Create the static rigid body
+        m_triangleMeshImpl->m_actor =
+            physx::PxCreateStatic(*PhysicsEngine::Get().GetImpl().m_physics,
+                ToPxTransform(m_currentScene->GetComponent<engine::Transform>(
+                    m_owner)->GetTransform()), physx::PxTriangleMeshGeometry(
+                        m_triangleMeshImpl->m_triangleMesh), *material);
+    }
 
-    // Set the visualization of the rigid body to false by default
-    m_triangleMeshImpl->m_actor->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+    if (m_triangleMeshImpl->m_actor != nullptr)
+    {
+        // Set the visualization of the rigid body to false by default
+        m_triangleMeshImpl->m_actor->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 
-    m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
-    m_data.m_type = EShapeType::STATIC;
-    void** dataPtr = reinterpret_cast<void**>(&m_data);
-    m_triangleMeshImpl->m_actor->userData = *dataPtr;
+        m_data.m_index = static_cast<uint32>(m_currentScene->GetThisIndex(this));
+        m_data.m_type = EShapeType::TRIANGLE;
+        void** dataPtr = reinterpret_cast<void**>(&m_data);
+        m_triangleMeshImpl->m_actor->userData = *dataPtr;
 
-    SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup), 
-                             collision::GetCollisionMask(m_collisionGroup));
+        SetCollisionGroupAndMask(static_cast<uint32>(m_collisionGroup),
+            collision::GetCollisionMask(m_collisionGroup));
 
-    // Add the actor to the physics scene
-    PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_triangleMeshImpl->m_actor);
-    m_shape = EGeometryType::TRIANGLE_MESH;
+        // Add the actor to the physics scene
+        PhysicsEngine::Get().GetImpl().m_scene->addActor(*m_triangleMeshImpl->m_actor);
+        m_shape = EGeometryType::TRIANGLE_MESH;
+    }
 }
 
 void engine::TriangleMesh::SetCollisionGroupAndMask(uint32 inCollisionGroup, uint32 inCollisionMask)

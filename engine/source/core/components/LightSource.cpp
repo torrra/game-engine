@@ -173,14 +173,10 @@ namespace engine
         if (const Transform* transform = m_currentScene->GetCachedTransform(m_owner))
             position = Transform::ToWorldPosition(*transform);
 
-        OpenGLError();
         buffer.SetData(&position, sizeof(position), bytesOffset);
         bytesOffset += sizeof(position);
 
-        OpenGLError();
         buffer.SetData((void*) &m_ambientColor, omniDataSize, bytesOffset);
-
-        OpenGLError();
     }
 
     void LightSource::AddDirectionalToBuffer(Buffer& buffer, uint32 bytesOffset) const
@@ -194,7 +190,6 @@ namespace engine
         bytesOffset += sizeof(direction);
 
         buffer.SetData((void*)&m_ambientColor, directionalDataSize, bytesOffset);
-        OpenGLError();
     }
 
     void LightSource::AddSpotToBuffer(Buffer& buffer, uint32 bytesOffset) const
@@ -213,7 +208,6 @@ namespace engine
 
         buffer.SetData((void*)&m_ambientColor, spotDataSize, bytesOffset);
 
-        OpenGLError();
     }
 
 }

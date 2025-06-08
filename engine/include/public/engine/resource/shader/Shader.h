@@ -22,7 +22,7 @@ namespace engine
 		ENGINE_API ShaderProgram(const char* vertexShader, const char* fragShader);
 		ENGINE_API virtual ~ShaderProgram(void) override = default;
 
-		bool LoadResource(const char* filePath) override;
+		ENGINE_API bool LoadResource(const char* filePath) override;
 
 		ENGINE_API void Use(void) const;
 

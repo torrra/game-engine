@@ -9,7 +9,7 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
 {
     m_owner = owner;
     m_currentScene = scene;
-    GetProjectionMatrix();
+    CalculateProjectionMatrix();
 }
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
@@ -112,21 +112,21 @@ void engine::Camera::SetFOV(f32 fov)
 {
     m_frustum.m_fovRad = fov;
 
-    GetProjectionMatrix();
+    CalculateProjectionMatrix();
 }
 
 void engine::Camera::SetNearPlane(f32 nearPlane)
 {
     m_frustum.m_near = nearPlane;
 
-    GetProjectionMatrix();
+    CalculateProjectionMatrix();
 }
 
 void engine::Camera::SetFarPlane(f32 farPlane)
 {
     m_frustum.m_far = farPlane;
 
-    GetProjectionMatrix();
+    CalculateProjectionMatrix();
 }
 
 void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
@@ -201,7 +201,12 @@ math::Matrix4f engine::Camera::GetViewMatrix(Transform* inTransform)
     return quat.Inverse().RotationMatrix() * matrix;
 }
 
-void engine::Camera::GetProjectionMatrix(void)
+const math::Matrix4f& engine::Camera::GetProjectionMatrix(void) const
+{
+    return m_projectionMatrix;
+}
+
+void engine::Camera::CalculateProjectionMatrix(void)
 {
     const f32 tanAngle = tanf(m_frustum.m_fovRad * 0.5f);
     const f32 farMinusNearDenom = 1.0f / (m_frustum.m_far - m_frustum.m_near);

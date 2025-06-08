@@ -63,9 +63,11 @@ namespace editor
         if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
 
+        math::Matrix4f viewProjection = m_editorViewCamera.ViewProjection();
+
         // Editor viewport
-        m_sceneEditorView->RenderPickingPass(m_editorViewCamera.ViewProjection());
-        m_sceneEditorView->RenderToDebugViewport(m_editorViewCamera.ViewProjection());
+        m_sceneEditorView->RenderPickingPass(viewProjection);
+        m_sceneEditorView->RenderToDebugViewport(viewProjection);
         
         m_gizmosUI->Render();
         m_sceneEditorView->Render();
@@ -81,6 +83,8 @@ namespace editor
     void EditorApplication::ResetScene(::engine::GameScene& activeScene)
     {
         engine::ThreadManager::SynchronizeGameThread(nullptr);
+        engine::ThreadManager::SynchronizeAnimationThread();
+        engine::ThreadManager::ExecuteRenderThreadTasks();
         activeScene.Stop();
 
         m_graphView.ClearGraph();
@@ -106,8 +110,17 @@ namespace editor
         m_graphView.SetGraph(activeScene.GetGraph());
     }
 
+    void EditorApplication::ResetApplication(void)
+    {
+        m_graphView.ClearGraph();
+        m_properties.SetHandle(engine::Entity::INVALID_HANDLE);
+        m_graphView.SetGraph(m_currentScene->GetGraph());
+    }
+
     void EditorApplication::Shutdown(void)
     {
+        //RigidBodyDynamicComponent::ReleaseStaticData();
+        m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         delete m_gameSimulationView;

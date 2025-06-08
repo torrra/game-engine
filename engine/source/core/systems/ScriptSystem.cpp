@@ -34,49 +34,8 @@ namespace engine
 
         luaL_openlibs(GetInstance()->m_luaState);
 
-        RegisterEntityFunctions(GetInstance()->m_luaState);
-        RegisterComponentFunctions(GetInstance()->m_luaState);
-        RegisterScriptComponentFunctions(GetInstance()->m_luaState);
-        RegisterCameraFunctions(GetInstance()->m_luaState);
-        RegisterTransformFunctions(GetInstance()->m_luaState);
-        RegisterInputFunctions(GetInstance()->m_luaState);
-        RegisterUIFunctions(GetInstance()->m_luaState);
-        RegisterUITextFunctions(GetInstance()->m_luaState);
-        RegisterUIButtonFunctions(GetInstance()->m_luaState);
-        RegisterUIProgressBarFunctions(GetInstance()->m_luaState);
-        RegisterVector2Functions(GetInstance()->m_luaState);
-        RegisterVector3Functions(GetInstance()->m_luaState);
-        RegisterRaycastFunctions(GetInstance()->m_luaState);
-        RegisterNavPointFunctions(GetInstance()->m_luaState);
-        RegisterRigidBodyDynamicFunctions(GetInstance()->m_luaState);
-        RegisterRigidBodyStaticFunctions(GetInstance()->m_luaState);
-        RegisterAudioPlayerFunctions(GetInstance()->m_luaState);
-
-        RunConfigScript("Utils.lua");
-        RunConfigScript("Component.lua");
-        RunConfigScript("Entity.lua");
-        RunConfigScript("ScriptObject.lua");
-        RunConfigScript("Script.lua");
-        RunConfigScript("Camera.lua");
-        RunConfigScript("Transform.lua");
-        RunConfigScript("Input.lua");
-        RunConfigScript("NavPoint.lua");
-
-        RunConfigScript("ui/Canvas.lua");
-        RunConfigScript("ui/Text.lua");
-        RunConfigScript("ui/Image.lua");
-        RunConfigScript("ui/Button.lua");
-        RunConfigScript("ui/ProgressBar.lua");
-
-        RunConfigScript("vector/Vector2.lua");
-        RunConfigScript("vector/Vector3.lua");
-
-        RunConfigScript("physics/Raycast.lua");
-        RunConfigScript("physics/RigidBodyDynamic.lua");
-        RunConfigScript("physics/RigidBodyStatic.lua");
-
-        RunConfigScript("AudioPlayer.lua");
-
+        RegisterEngineFunctions();
+        RunAllConfigScripts();
         RunAllUserScripts();
     }
 
@@ -381,12 +340,69 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         lua_pop(GetInstance()->m_luaState, 1);
     }
 
+    void ScriptSystem::RegisterEngineFunctions(void)
+    {
+        lua_State* state = GetInstance()->m_luaState;
+
+        RegisterResourceFunctions(state);
+        RegisterEntityFunctions(state);
+        RegisterComponentFunctions(state);
+        RegisterScriptComponentFunctions(state);
+        RegisterCameraFunctions(state);
+        RegisterTransformFunctions(state);
+        RegisterInputFunctions(state);
+        RegisterUIFunctions(state);
+        RegisterUITextFunctions(state);
+        RegisterUIButtonFunctions(state);
+        RegisterUIImageFunctions(state);
+        RegisterUIProgressBarFunctions(state);
+        RegisterVector2Functions(state);
+        RegisterVector3Functions(state);
+        RegisterRaycastFunctions(state);
+        RegisterNavPointFunctions(state);
+        RegisterRigidBodyDynamicFunctions(state);
+        RegisterRigidBodyStaticFunctions(state);
+        RegisterAudioPlayerFunctions(state);
+        RegisterRendererFunctions(state);
+        RegisterSceneFunctions(state);
+    }
+
     void ScriptSystem::RunConfigScript(const char* script)
     {
         std::string path = ScriptSystem::GetConfigScriptsLocation() + script;
 
         if (luaL_dofile(GetInstance()->m_luaState, path.c_str()) != LUA_OK)
             LogLuaError();
+    }
+
+    void ScriptSystem::RunAllConfigScripts(void)
+    {
+        RunConfigScript("Utils.lua");
+        RunConfigScript("ecs/Component.lua");
+        RunConfigScript("ecs/Entity.lua");
+        RunConfigScript("ScriptObject.lua");
+        RunConfigScript("ecs/Script.lua");
+        RunConfigScript("ecs/Camera.lua");
+        RunConfigScript("ecs/Transform.lua");
+        RunConfigScript("Input.lua");
+        RunConfigScript("ecs/NavPoint.lua");
+
+        RunConfigScript("ui/Canvas.lua");
+        RunConfigScript("ui/Text.lua");
+        RunConfigScript("ui/Image.lua");
+        RunConfigScript("ui/Button.lua");
+        RunConfigScript("ui/ProgressBar.lua");
+
+        RunConfigScript("vector/Vector2.lua");
+        RunConfigScript("vector/Vector3.lua");
+
+        RunConfigScript("physics/Raycast.lua");
+        RunConfigScript("physics/RigidBodyDynamic.lua");
+        RunConfigScript("physics/RigidBodyStatic.lua");
+
+        RunConfigScript("ecs/AudioPlayer.lua");
+        RunConfigScript("ecs/Renderer.lua");
+        RunConfigScript("Scene.lua");
     }
 
     std::string ScriptSystem::FormatLuaClassName(const char* name)
@@ -431,6 +447,12 @@ ScriptObjectTypes.%s = %s\nreturn %s";
         if (!std::filesystem::exists(GetInstance()->m_userScriptsLocation))
             return;
 
+        lua_getglobal(GetInstance()->m_luaState, "SetCurrentFolder");
+        lua_pushstring(GetInstance()->m_luaState, GetInstance()->m_userScriptsLocation.c_str());
+
+        if (lua_pcall(GetInstance()->m_luaState, 1, 0, 0) != LUA_OK)
+            LogLuaError();
+
         for (auto& file : std::filesystem::recursive_directory_iterator(GetInstance()->m_userScriptsLocation))
         {
             if (!file.exists())
@@ -446,7 +468,6 @@ ScriptObjectTypes.%s = %s\nreturn %s";
             if (filenameLength <= 4 || memcmp(filename.data() + filenameLength - 4, ".lua", 4))
                 continue;
 
-            std::cout << "Running file: " << filename << '\n';
             RunUserScript(filename);
         }	
     }

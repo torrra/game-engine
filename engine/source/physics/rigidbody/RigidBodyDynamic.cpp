@@ -211,13 +211,16 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
     {
         Transform worldTransform;
 
-        Transform& entityTransform = *m_currentScene->GetComponent<Transform>(m_owner);
+        Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner);
 
-        worldTransform.SetPosition(Transform::ToWorldPosition(entityTransform));
-        worldTransform.SetRotation(Transform::ToWorldRotation(entityTransform));
+        if (entityTransform != nullptr)
+        {
+            worldTransform.SetPosition(Transform::ToWorldPosition(*entityTransform));
+            worldTransform.SetRotation(Transform::ToWorldRotation(*entityTransform));
 
-        // Update the transform of the rigid body in regard to the entity
-        m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
+            // Update the transform of the rigid body in regard to the entity
+            m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
+        }
     }
 }
 
@@ -705,66 +708,6 @@ engine::EForceMode engine::RigidBodyDynamic::SetForceMode(uint32 inForceMode)
     default:
         return EForceMode::FORCE;
     }
-}
-
-void engine::RigidBodyDynamic::OnCollisionEnter(EntityHandle inOther)
-{
-    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) +
-                                  " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
-
-    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) + 
-                                  " with static " + std::to_string(rbStatic->m_data.m_index));
-
-    else
-        PrintLog(ErrorPreset(), "[Collision] enter between : " + std::to_string(m_data.m_index) + 
-                                " with wrong entity");
-}
-
-void engine::RigidBodyDynamic::OnCollisionExit(EntityHandle inOther)
-{
-    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
-
-    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
-            " with static " + std::to_string(rbStatic->m_data.m_index));
-
-    else
-        PrintLog(ErrorPreset(), "[Collision] exit between : " + std::to_string(m_data.m_index) +
-            " with wrong entity");
-}
-
-void engine::RigidBodyDynamic::OnTriggerEnter(EntityHandle inOther)
-{
-    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
-
-    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
-            " with static " + std::to_string(rbStatic->m_data.m_index));
-
-    else
-        PrintLog(ErrorPreset(), "[Trigger] enter between : " + std::to_string(m_data.m_index) +
-            " with wrong entity");
-}
-
-void engine::RigidBodyDynamic::OnTriggerExit(EntityHandle inOther)
-{
-    if (RigidBodyDynamic* rbDynamic = m_currentScene->GetComponent<RigidBodyDynamic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
-            " with dynamic " + std::to_string(rbDynamic->m_data.m_index));
-
-    else if (RigidBodyStatic* rbStatic = m_currentScene->GetComponent<RigidBodyStatic>(inOther))
-        PrintLog(SuccessPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
-            " with static " + std::to_string(rbStatic->m_data.m_index));
-
-    else
-        PrintLog(ErrorPreset(), "[Trigger] exit between : " + std::to_string(m_data.m_index) +
-            " with wrong entity");
 }
 
 void engine::RigidBodyDynamic::AddForce(const math::Vector3f& inForce, EForceMode inForceMode, bool inAutoWake)

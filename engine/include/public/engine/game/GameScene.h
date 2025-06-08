@@ -35,7 +35,7 @@ namespace engine
 
         GameScene(const GameScene&) = delete;
 
-        ENGINE_API GameScene(GameScene&&) = default;
+        ENGINE_API GameScene(GameScene&&) noexcept = default;
         ENGINE_API ~GameScene(void) = default;
 
         ENGINE_API void InitBuffers(void);
@@ -62,8 +62,7 @@ namespace engine
         ENGINE_API bool IsRunning(void) const;
         ENGINE_API const Time& GetTime(void) const;
 
-        ENGINE_API GameScene& operator=(GameScene&&) = default;
-
+        ENGINE_API GameScene& operator=(GameScene&&) noexcept = default;
 
     private:
 

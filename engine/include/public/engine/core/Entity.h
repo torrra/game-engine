@@ -22,7 +22,6 @@ namespace engine
             UID_MASK = 0xFFFFFFFF00000000
         };
 
-    private:
         // Makes it easier to know which components an entity has
         enum EComponentFlags : uint64
         {

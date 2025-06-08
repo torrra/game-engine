@@ -68,6 +68,8 @@ int16 engine::Engine::Startup(uint32 threadCount)
 
 void engine::Engine::ShutDown(void)
 {
+    ThreadManager::SynchronizeAnimationThread();
+    ThreadManager::ExecuteRenderThreadTasks();
     m_activeScene.GetGraph()->CleanRigidBodies();
     m_activeScene.Reset(false);
     ThreadManager::Shutdown();
@@ -122,6 +124,11 @@ void engine::Engine::UpdateApplicationWindow(void)
     m_uiManager.EndFrame();
     m_application->EndFrame();
     InputHandler::UpdateKeyState();
+}
+
+void engine::Engine::ResetApplication(void)
+{
+    m_application->ResetApplication();
 }
 
 bool engine::Engine::HasEditor(void)

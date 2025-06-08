@@ -11,16 +11,17 @@ namespace engine
 {
     struct BoneWeight
     {
-        math::Vector4<uint32>   m_boneIndices{ 0 };
+        math::Vector4i          m_boneIndices{ -1 };
         math::Vector4f          m_weights{ 0.f };
-        uint32                  m_weightCount = 0;
     };
 
     struct Bone
     {
+
+        math::Matrix4f  m_localTransform{ 1.f };
         math::Matrix4f  m_inverseBindPose{ 1.f };
         std::string     m_name;
-        int64		    m_parent = -1;
+        int32		    m_parent = -1;
     };
 
 
@@ -29,7 +30,7 @@ namespace engine
 
     private:
 
-        using BoneIndexMap = std::unordered_map<void*, int64>;
+        using BoneIndexMap = std::unordered_map<void*, int32>;
         using BoneNameMap = std::unordered_map<uint64, int32>;
 
     public:
@@ -46,14 +47,16 @@ namespace engine
 
         ENGINE_API const Bone& GetBone(int32 index) const;
         ENGINE_API int32 GetBoneIndex(const std::string& name) const;
+        ENGINE_API uint64 GetBoneCount(void) const;
+
+        ENGINE_API bool ProcessSkeleton(const void* mesh);
 
     private:
 
         void ProcessWeights(const void* bone, uint32 boneIndex);
-        bool ProcessSkeleton(const void* mesh);
         void ProcessBone(Bone& newBone, void* bonePtr, const BoneIndexMap& nodes);
         void PopulateBoneNameMap(void);
-        void SortSkeleton(std::vector<Bone>& boneArray);
+        std::vector<int32> SortSkeleton(std::vector<Bone>& boneArray);
 
         void SortChildrenBones(int32 oldParentIndex, int32 newIndex,
                                std::vector<Bone>& boneArray,   

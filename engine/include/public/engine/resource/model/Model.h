@@ -31,6 +31,7 @@ namespace engine
         ENGINE_API uint32 GetMeshCount(void) const;
 
         ENGINE_API std::string GetName(void) const;
+        ENGINE_API uint64 GetBoneCount(void) const;
 
         // This function is meant to be used by renderer components, and ONLY from the
         // render thread.
@@ -39,6 +40,7 @@ namespace engine
 
         ENGINE_API
         const std::vector<DynamicMesh>& GetDynamicMeshes(void) const;
+
 
     private:
 
@@ -52,6 +54,7 @@ namespace engine
         std::vector<DynamicMesh>      m_dynamicMeshes;
         std::vector<Mesh>			  m_staticMeshes;
         std::string                   m_modelName;
+        uint64                        m_boneCount = 0;
         uint8						  m_loadStatus = 0;
         bool                          m_isDynamic = false;
     };

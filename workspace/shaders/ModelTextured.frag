@@ -4,42 +4,41 @@
 
 struct OnmidirectionalLight
 {
-    vec3 position;
+    float positionArr[3];
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float ambientArr[3];
+    float diffuseArr[3];
+    float specularArr[3];
 
-    vec3 attenuation;
+    float attenuationArr[3];
 };
 
 struct DirectionalLight
 {
-    vec3 direction;
+    float directionArr[3];
     
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float ambientArr[3];
+    float diffuseArr[3];
+    float specularArr[3];
 
-    vec3 attenuation; 
+    float attenuationArr[3]; 
 };
 
 
 struct SpotLight
 {
-    vec3 position;
-    vec3 direction;
+    float positionArr[3];
+    float directionArr[3];
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float ambientArr[3];
+    float diffuseArr[3];
+    float specularArr[3];
 
-    vec3 attenuation;
+    float attenuationArr[3];
 
     float innerCutoff;
     float outerCutoff;
 };
-
 
 const int DIFFUSE_MAP_BIT = 1;
 const int NORMAL_MAP_BIT = 1 << 1;
@@ -57,14 +56,18 @@ layout(binding = 4) uniform sampler2D ambientOcclusionMap;
 
 layout (std430, binding = 0) readonly buffer Material
 {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    vec3 emissive;
 
+    // Can't use vec3 here because it messes up my precious, precious
+    // buffer layout (vec3 aren't 12 bytes)
+
+    float ambientArr[3];
+    float diffuseArr[3];
+    float specularArr[3];
+    float emissiveArr[3];
+
+    float shininess;
     float refractionIndex;
     float opacity;
-    float shininess;
 
     int useMapsBits;
 };
@@ -101,21 +104,24 @@ in vec2 TexCoord;
 
 out vec4 FragColor;
 
+// Material constants converted from their respective 32-bit float arrays
+const vec3 ambient = vec3(ambientArr[0], ambientArr[1], ambientArr[2]);
+const vec3 diffuse = vec3(diffuseArr[0], diffuseArr[1], diffuseArr[2]);
+const vec3 specular = vec3(specularArr[0], specularArr[1], specularArr[2]);
+
+
+// Color taken from texutre or material depnding
+// on whether there is a texture or not
+vec3 g_objectDiffuse;
+
 vec3 ApplyOmniLights(vec3 normal, vec3 viewDir);
 vec3 ApplyDirLights(vec3 normal, vec3 viewDir);
 vec3 ApplySpotLights(vec3 normal, vec3 viewDir);
 
 
-
-// Global variables
-vec3 g_objectDiffuse;
-
-
-
 void main()
 {
     vec4 diffuse4;
-
 
     if (bool(useMapsBits & DIFFUSE_MAP_BIT))
     {
@@ -124,7 +130,7 @@ void main()
     }
     else
     {
-        g_objectDiffuse = diffuse;
+        g_objectDiffuse = vec3(diffuse);
         diffuse4 = vec4(diffuse, opacity);
     }
 
@@ -133,7 +139,7 @@ void main()
     vec3 viewDirection = normalize(viewPos - FragPos);
 
     if (0 == omniCount && 0 == dirCount && 0 == spotCount)
-        FragColor = vec4(0.0, 1.0, 0.5, 1.0);
+        FragColor = diffuse4;
 
     else
     {
@@ -152,27 +158,46 @@ vec3 ApplyOmniLights(vec3 normal, vec3 viewDir)
 
     for (uint lightNum = 0; lightNum < omniCount; ++lightNum)
     {
-        vec3 ambientResult = omniLights[lightNum].ambient * ambient;
-        vec3 lightDirection = normalize(omniLights[lightNum].position - FragPos);
+        
+        vec3 lightPosition = vec3(omniLights[lightNum].positionArr[0],
+                                 omniLights[lightNum].positionArr[1],
+                                 omniLights[lightNum].positionArr[2]);
+
+        vec3 lightAmbient = vec3(omniLights[lightNum].ambientArr[0],
+                                 omniLights[lightNum].ambientArr[1],
+                                 omniLights[lightNum].ambientArr[2]);
+
+        vec3 lightDiffuse = vec3(omniLights[lightNum].diffuseArr[0],
+                                 omniLights[lightNum].diffuseArr[1],
+                                 omniLights[lightNum].diffuseArr[2]);
+
+        vec3 lightSpecular = vec3(omniLights[lightNum].specularArr[0],
+                                  omniLights[lightNum].specularArr[1],
+                                  omniLights[lightNum].specularArr[2]);
+
+        vec3 ambientResult = lightAmbient * ambient;
+        vec3 lightDirection = normalize(lightPosition - FragPos);
         float cosTheta = max(dot(normal, lightDirection), 0.f);
-        vec3 diffuseResult = omniLights[lightNum].diffuse * (cosTheta * g_objectDiffuse);
+        vec3 diffuseResult = lightDiffuse * (cosTheta * g_objectDiffuse);
 
         // Find halfway direction between light and eye direction for blinn-phong shading
         vec3 halfwayDir = normalize(lightDirection + viewDir);
 
         float specularFactor = pow(max(dot(normal, halfwayDir), 0.f), shininess);
-        vec3 specularResult = omniLights[lightNum].specular * (specularFactor * specular);
+        vec3 specularResult = lightSpecular * (specularFactor * specular);
 
         // Apply attenuation if applicable
-        if (omniLights[lightNum].attenuation != vec3(0.f, 0.f, 0.f))
+        if ((omniLights[lightNum].attenuationArr[0] != 0.f) ||
+            (omniLights[lightNum].attenuationArr[1] != 0.f) ||
+            (omniLights[lightNum].attenuationArr[2] != 0.f))
         {
              // Find fragment distance to light
-            float dist = length(omniLights[lightNum].position - FragPos);
+            float dist = length(lightPosition - FragPos);
 
-            float atten = omniLights[lightNum].attenuation.x;
+            float atten = omniLights[lightNum].attenuationArr[0];
 
-            atten += omniLights[lightNum].attenuation.y * dist;
-            atten += omniLights[lightNum].attenuation.z * (dist * dist);
+            atten += omniLights[lightNum].attenuationArr[1] * dist;
+            atten += omniLights[lightNum].attenuationArr[2] * (dist * dist);
             atten = 1.f / atten;
 
             ambientResult *= atten;
@@ -194,15 +219,32 @@ vec3 ApplyDirLights(vec3 normal, vec3 viewDir)
 
     for (uint lightNum = 0; lightNum < dirCount; ++lightNum)
     {
-        vec3 ambientResult = dirLights[lightNum].ambient * ambient;
-        vec3 lightDirection = normalize(-dirLights[lightNum].direction);
+
+        vec3 lightDirection = vec3(dirLights[lightNum].directionArr[0],
+                                 dirLights[lightNum].directionArr[1],
+                                 dirLights[lightNum].directionArr[2]);
+
+        vec3 lightAmbient = vec3(dirLights[lightNum].ambientArr[0],
+                                 dirLights[lightNum].ambientArr[1],
+                                 dirLights[lightNum].ambientArr[2]);
+
+        vec3 lightDiffuse = vec3(dirLights[lightNum].diffuseArr[0],
+                                 dirLights[lightNum].diffuseArr[1],
+                                 dirLights[lightNum].diffuseArr[2]);
+
+        vec3 lightSpecular = vec3(dirLights[lightNum].specularArr[0],
+                                  dirLights[lightNum].specularArr[1],
+                                  dirLights[lightNum].specularArr[2]);
+
+        vec3 ambientResult = lightAmbient * ambient;
+        lightDirection = normalize(lightDirection);
         float cosTheta = max(dot(normal, lightDirection), 0.f);
-        vec3 diffuseResult = dirLights[lightNum].diffuse * (cosTheta * g_objectDiffuse);
+        vec3 diffuseResult = lightDiffuse * (cosTheta * g_objectDiffuse);
 
         // Find halfway direction between light and eye direction for blinn-phong shading
         vec3 halfwayDir = normalize(lightDirection + viewDir);
         float specularFactor = pow(max(dot(normal, halfwayDir), 0.f), shininess);
-        vec3 specularResult = dirLights[lightNum].specular * (specularFactor * specular);
+        vec3 specularResult = lightSpecular * (specularFactor * specular);
 
         // Update fragment color (ambient + diffuse + specular)
         resultColor += ambientResult + diffuseResult + specularResult;
@@ -216,38 +258,63 @@ vec3 ApplySpotLights(vec3 normal, vec3 viewDir)
     vec3 resultColor;
 
     for (uint lightNum = 0; lightNum < spotCount; ++lightNum)
-    {        
+    {
+
+       vec3 lightPosition = vec3(spotLights[lightNum].positionArr[0],
+                                 spotLights[lightNum].positionArr[1],
+                                 spotLights[lightNum].positionArr[2]);
+
+    
+        vec3 lightDirection = vec3(spotLights[lightNum].directionArr[0],
+                                   spotLights[lightNum].directionArr[1],
+                                   spotLights[lightNum].directionArr[2]);
+
+        vec3 lightAmbient = vec3(spotLights[lightNum].ambientArr[0],
+                                 spotLights[lightNum].ambientArr[1],
+                                 spotLights[lightNum].ambientArr[2]);
+
+        vec3 lightDiffuse = vec3(spotLights[lightNum].diffuseArr[0],
+                                 spotLights[lightNum].diffuseArr[1],
+                                 spotLights[lightNum].diffuseArr[2]);
+
+        vec3 lightSpecular = vec3(spotLights[lightNum].specularArr[0],
+                                  spotLights[lightNum].specularArr[1],
+                                  spotLights[lightNum].specularArr[2]);
+
+
         // Find ambient light
-        vec3 ambientResult = spotLights[lightNum].ambient * ambient;
-        vec3 fragTolight = normalize(spotLights[lightNum].position - FragPos);
-        vec3 lightDirection = normalize(-spotLights[lightNum].direction);
+        vec3 ambientResult = lightAmbient * ambient;
+        vec3 fragTolight = normalize(lightPosition - FragPos);
+        lightDirection = normalize(lightDirection);
 
         // Get incidence angle cosine
         float cosTheta = max(dot(normal, lightDirection), 0.f);
-        vec3 diffuseResult = spotLights[lightNum].diffuse * (cosTheta * g_objectDiffuse);
+        vec3 diffuseResult = lightDiffuse * (cosTheta * g_objectDiffuse);
         float theta = dot(fragTolight, lightDirection);
 
         // Find difference beween cutoff cosines
-        float epsilon   =  spotLights[lightNum].innerCutoff - spotLights[lightNum].outerCutoff;
+        float epsilon   =  spotLights[lightNum].outerCutoff - spotLights[lightNum].innerCutoff;
         float intensity = clamp((theta - spotLights[lightNum].outerCutoff) / epsilon, 0.0f, 1.0f);
         vec3 halfwayDir = normalize(lightDirection + viewDir);
 
         float specularFactor = pow(max(dot(normal, halfwayDir), 0.f), shininess);
-        vec3 specularResult = spotLights[lightNum].specular * (specularFactor * specular);
+        vec3 specularResult = lightSpecular * (specularFactor * specular);
 
         // Decrease intensity if fragment is far fron the cone's center
         diffuseResult  *= intensity;
         specularResult *= intensity;
 
         // Apply attenuation if applicable
-        if (spotLights[lightNum].attenuation != vec3(0.f, 0.f, 0.f))
+        if ((spotLights[lightNum].attenuationArr[0] != 0.f) ||
+            (spotLights[lightNum].attenuationArr[1] != 0.f) ||
+            (spotLights[lightNum].attenuationArr[2] != 0.f))
         {
              // Find fragment distance to light
-            float dist = length(spotLights[lightNum].position - FragPos);
-            float atten = spotLights[lightNum].attenuation.x;
+            float dist = length(lightPosition - FragPos);
+            float atten = spotLights[lightNum].attenuationArr[0];
 
-            atten += spotLights[lightNum].attenuation.y * dist;
-            atten += spotLights[lightNum].attenuation.z * (dist * dist);
+            atten += spotLights[lightNum].attenuationArr[1] * dist;
+            atten += spotLights[lightNum].attenuationArr[2] * (dist * dist);
             atten = 1.f / atten;
 
             // Update color components

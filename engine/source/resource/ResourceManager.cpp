@@ -27,12 +27,37 @@ void engine::ResourceManager::LoadShader(
     newShader->CreateProgram(isVertAbsolute, isFragAbsolute);
 }
 
+std::string engine::ResourceManager::LoadShaderFromFrag(const std::string& fragShader)
+{
+    constexpr const char* defaultVertexShader = ".\\shaders\\ModelTextured.vert";
+
+    uint64 startOffset = fragShader.find_last_of('\\') + 1;
+    uint64 endOffset = fragShader.find_last_of('.');
+
+    if (startOffset < endOffset)
+    {
+        std::string fragName = fragShader.substr(startOffset);
+        std::string programName = "program" + fragName.substr(0, endOffset);
+
+        engine::ResourceManager::LoadShader(programName.c_str(),
+            defaultVertexShader,
+            fragShader.c_str(), true);
+
+        return programName;
+    }
+
+    return {};
+}
+
 void engine::ResourceManager::Unload(std::string const& fileName)
 {
+    std::lock_guard lock(m_mutex);
+
 	// Check resource exists
 	if (!HasResource(fileName))
 		return;
 
+    printf("Unloaded %s\n", fileName.c_str());
     GetInstance()->m_resources.erase(fileName);
 }
 

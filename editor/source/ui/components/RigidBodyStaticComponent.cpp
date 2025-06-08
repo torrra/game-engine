@@ -5,6 +5,7 @@
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIStyle.h>
 #include <engine/Engine.h>
+#include <engine/resource/model/Model.h>
 
 #pragma endregion
 
@@ -24,6 +25,15 @@ void editor::RigidBodyStaticComponent::SectionContent(void)
 {
     if (engine::RigidBodyStatic* rigidBodyStatic = GetData<engine::RigidBodyStatic>())
     {
+        if (!m_isInitialized)
+        {
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
+                rigidBodyStatic->GetOwner(),
+                static_cast<engine::EGeometryType>(rigidBodyStatic->m_rigidBodyShape));
+
+            m_isInitialized = true;
+        }
+
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyStatic->m_rigidBodyShape);
         
         int32 currentIndex = static_cast<int32>(currentShape);
@@ -90,10 +100,10 @@ void editor::RigidBodyStaticComponent::UpdateShapeGeometry(
                 inRigidBodyStatic->GetOwner(),
                 engine::EGeometryType::PLANE);
             break;
-        case engine::EGeometryType::TRIANGLE_MESH:
-            engine::TriangleMeshStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
-                                                            inRigidBodyStatic->GetOwner());
         default:
+            engine::RigidBodyStaticFactory::CreateStatic(engine::Engine::GetEngine()->GetGraph(),
+                inRigidBodyStatic->GetOwner(),
+                engine::EGeometryType::BOX);
             break;
         }
     }

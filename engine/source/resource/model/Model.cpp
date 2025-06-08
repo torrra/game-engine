@@ -80,6 +80,9 @@ bool engine::Model::IsDynamic(void) const
 
 void engine::Model::Draw(void) const
 {
+    if (!CanRender())
+        return;
+
     if (m_isDynamic)
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
@@ -98,6 +101,9 @@ void engine::Model::Draw(void) const
 
 void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials) const
 {
+    if (!CanRender())
+        return;
+
     if (m_isDynamic)
     {
         for (uint32 meshIndex = 0; meshIndex < m_dynamicMeshes.size(); ++meshIndex)
@@ -117,6 +123,9 @@ void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials
 
             m_dynamicMeshes[meshIndex].Draw(useDefaultMat);
         }
+
+        // Unbind skinning matrix buffer
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, 0);
     }
     else
     {
@@ -137,7 +146,8 @@ void engine::Model::Draw(const std::vector<ResourceRef<MeshMaterial>>& materials
 
             m_staticMeshes[meshIndex].Draw(useDefaultMat);
         }
-    } 
+    }
+
 }
 
 uint32 engine::Model::GetMeshCount(void) const
@@ -152,6 +162,11 @@ uint32 engine::Model::GetMeshCount(void) const
 std::string engine::Model::GetName(void) const
 {
     return m_modelName;
+}
+
+uint64 engine::Model::GetBoneCount(void) const
+{
+    return m_boneCount;
 }
 
 const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const
@@ -243,21 +258,48 @@ void engine::Model::ProcessMeshes(const void* scene, const void* node, const std
     const aiScene*  sceneImpl = reinterpret_cast<const aiScene*>(scene);
     const aiNode*   nodeImpl = reinterpret_cast<const aiNode*>(node);
 
-    for (uint32 meshIndex = 0; meshIndex < nodeImpl->mNumMeshes; ++meshIndex)
-    {
-        // Use a pointer to pick between static and dynamic mesh without needing
-        // to initialize it right away like a reference
-        Mesh* mesh;
-        
-        if (m_isDynamic)
-            mesh = &m_dynamicMeshes.emplace_back();
-        else
-            mesh = &m_staticMeshes.emplace_back();
 
-        aiMesh* importedMesh = sceneImpl->mMeshes[nodeImpl->mMeshes[meshIndex]];
-        mesh->ProcessMesh(importedMesh);
-        mesh->ProcessMaterial(sceneImpl->mMaterials[importedMesh->mMaterialIndex], name);
+    std::vector<std::future<void>> meshThreads;
+    meshThreads.reserve(nodeImpl->mNumMeshes);
+    uint64 oldSize = 0;
+
+    if (m_isDynamic)
+    {
+        oldSize = m_dynamicMeshes.size();
+        m_dynamicMeshes.resize(oldSize + nodeImpl->mNumMeshes);
     }
+    else
+    {
+        oldSize = m_staticMeshes.size();
+        m_staticMeshes.resize(oldSize + nodeImpl->mNumMeshes);
+    }
+
+    for (uint32 meshIndex = 0; meshIndex < nodeImpl->mNumMeshes; ++meshIndex)
+    {     
+        meshThreads.emplace_back(ThreadManager::AddTaskWithResult(
+          [nodeImpl, meshIndex, sceneImpl, &name, this, index = oldSize + meshIndex]()
+           {
+
+            // Use a pointer to pick between static and dynamic mesh without needing
+            // to initialize it right away like a reference
+            Mesh* mesh;
+
+            if (m_isDynamic)
+                mesh = &m_dynamicMeshes[index];
+            else
+                mesh = &m_staticMeshes[index];
+
+            aiMesh* importedMesh = sceneImpl->mMeshes[nodeImpl->mMeshes[meshIndex]];
+            mesh->ProcessMesh(importedMesh);
+            mesh->ProcessMaterial(sceneImpl->mMaterials[importedMesh->mMaterialIndex], name);
+
+            }));
+        
+        
+    }
+
+    for (std::future<void>& finishedMesh : meshThreads)
+        finishedMesh.get();
 
     for (uint32 childIndex = 0; childIndex < nodeImpl->mNumChildren; ++childIndex)
         ProcessMeshes(scene, nodeImpl->mChildren[childIndex], name);
@@ -292,8 +334,12 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     ProcessTextures(scene); 
     ProcessMeshes(scene, scene->mRootNode, dir);
 
+
     if (scene->HasAnimations())
         Animation::LoadExtraAnimations(scene);
+
+    for (DynamicMesh& mesh : m_dynamicMeshes)
+        m_boneCount += mesh.GetBoneCount();
 
     m_loadStatus |= LOADED;
 
@@ -309,7 +355,7 @@ void engine::Model::RenderThreadSetup(void)
         for (DynamicMesh& mesh : m_dynamicMeshes)
         {
             mesh.SetupGraphics();
-            mesh.RenderThreadSkeletonSetup();
+            ThreadManager::AddTask([&mesh]() { mesh.RenderThreadSkeletonSetup(); });
         }
     }
     else

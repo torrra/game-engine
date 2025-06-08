@@ -56,6 +56,7 @@ namespace engine
             CopyableComponentArray<Transform>			m_transformRenderCache;
             CopyableComponentArray<Camera>				m_cameraRenderCache;
             CopyableComponentArray<LightSource>         m_lightRenderCache;
+            std::vector<SkeletonAnimator>               m_animatorCache;
         };
 
 
@@ -175,6 +176,9 @@ namespace engine
         ENGINE_API
         void UpdateSceneLights(class Buffer& omniBuffer,
                                class Buffer& directionalBuffer, class Buffer& spotBuffer);
+
+        ENGINE_API
+        void UpdateAnimators(f32 deltaTime);
 
         ENGINE_API
         const ComponentArray<LightSource>& GetCachedLights(void) const;

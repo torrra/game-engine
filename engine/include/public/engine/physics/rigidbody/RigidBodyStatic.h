@@ -186,7 +186,7 @@ namespace engine
             <param> [in] inOther : The other entity which collides with this
         */
         ENGINE_API  
-            void                OnCollisionEnter(EntityHandle inOther) override;
+            void                OnCollisionEnter([[maybe_unused]] EntityHandle inOther) override {};
         ENGINE_API [[maybe_unused]]
             void                OnCollisionStay([[maybe_unused]] EntityHandle inOther) override {}
         /*
@@ -194,14 +194,14 @@ namespace engine
             <param> [in] inOther : The other entity which collides with this
         */
         ENGINE_API  
-            void                OnCollisionExit(EntityHandle inOther) override;
+            void                OnCollisionExit([[maybe_unused]] EntityHandle inOther) override {};
 
         /*
             Check the trigger collision at the begining
             <param> [in] inOther : The other entity which enter in this trigger
         */
         ENGINE_API  
-            void                OnTriggerEnter(EntityHandle inOther) override;
+            void                OnTriggerEnter([[maybe_unused]] EntityHandle inOther) override {};
         ENGINE_API [[maybe_unused]] [[deprecated]]
             void                OnTriggerStay([[maybe_unused]] EntityHandle inOther) override {}
         /*
@@ -209,7 +209,7 @@ namespace engine
             <param> [in] inOther : The other entity which enter in this trigger
         */
         ENGINE_API  
-            void                OnTriggerExit(EntityHandle inOther) override;
+            void                OnTriggerExit([[maybe_unused]] EntityHandle inOther) override {};
 
         /// Public members
         // RigidBody shape { Box, Sphere, Capsule }

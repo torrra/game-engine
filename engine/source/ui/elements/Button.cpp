@@ -27,6 +27,8 @@ engine::Button::Button(const char* text, math::Vector2f const& position, math::V
 
 void engine::Button::Render(void)
 {
+    std::lock_guard lock(m_mutex);
+
     // Condition to avoid negative or null button size
     if (m_transform.m_sizePx.GetX() + m_transform.m_sizePx.GetY() <= 0.0f)
         CalcSize();
@@ -77,6 +79,7 @@ void engine::Button::Render(void)
 
 void engine::Button::SetText(const char* text)
 {
+    std::lock_guard lock(m_mutex);
     m_text = text;
 
     CalcSize();
@@ -84,26 +87,31 @@ void engine::Button::SetText(const char* text)
 
 void engine::Button::SetColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_regularColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Button::SetHoveredColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_hoveredColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Button::SetPressedColor(f32 red, f32 green, f32 blue, f32 alpha)
 {
+    std::lock_guard lock(m_mutex);
     m_pressedColor = ImGui::ColorConvertFloat4ToU32({red, green, blue, alpha});
 }
 
 void engine::Button::SetRounding(f32 rounding)
 {
+    std::lock_guard lock(m_mutex);
     m_rounding = rounding;
 }
 
 void engine::Button::SetPadding(math::Vector2<f32> paddingPx)
 {
+    std::lock_guard lock(m_mutex);
     m_padding = paddingPx;
 }
 

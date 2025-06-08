@@ -32,6 +32,14 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
 {
     if (engine::RigidBodyDynamic* rigidBodyDynamic = GetData<engine::RigidBodyDynamic>())
     {
+        if (!m_isInitialize)
+        {
+            engine::RigidBodyDynamicFactory::CreateDynamic(engine::Engine::GetEngine()->GetGraph(),
+                rigidBodyDynamic->GetOwner(),
+                static_cast<engine::EGeometryType>(rigidBodyDynamic->m_rigidBodyShape));
+            m_isInitialize = true;
+        }
+
         engine::EGeometryType currentShape = static_cast<engine::EGeometryType>(rigidBodyDynamic->m_rigidBodyShape);
         
         int32 currentIndex = static_cast<int32>(currentShape);
