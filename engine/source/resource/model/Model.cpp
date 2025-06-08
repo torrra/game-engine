@@ -31,6 +31,8 @@ namespace engine::importer
 
 engine::Model::~Model(void)
 {
+    while (!(m_loadStatus & FAILED) && !(m_loadStatus & LOADED));
+
     for (DynamicMesh& mesh : m_dynamicMeshes)
         mesh.DeleteMesh();
     
@@ -299,10 +301,20 @@ void engine::Model::ProcessMeshes(const void* scene, const void* node, const std
     }
 
     for (std::future<void>& finishedMesh : meshThreads)
-        finishedMesh.get();
+    {
+        if (finishedMesh.valid())
+            finishedMesh.get();
+        else
+            return;
+    }
 
     for (uint32 childIndex = 0; childIndex < nodeImpl->mNumChildren; ++childIndex)
+    {
         ProcessMeshes(scene, nodeImpl->mChildren[childIndex], name);
+
+        if (ThreadManager::IsShutDown())
+            return;
+    }
 }
 
 void engine::Model::WorkerThreadLoad(const std::string& name)
@@ -317,6 +329,7 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::printf("Failed to load model '%s'. Error: %s\n", name.c_str(), importer::g_importer.GetErrorString());
+        m_loadStatus |= FAILED;
         return;
     }
 

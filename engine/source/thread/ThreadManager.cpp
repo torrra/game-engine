@@ -4,6 +4,7 @@
 
 engine::ThreadManager* engine::ThreadManager::m_instance = nullptr;
 std::once_flag			engine::ThreadManager::m_instanceCreatedFlag;
+bool                    engine::ThreadManager::m_stopped = true;
 
 void engine::ThreadManager::Startup(uint32 numThreads)
 {
@@ -14,12 +15,30 @@ void engine::ThreadManager::Startup(uint32 numThreads)
     // Launch threads
     for (uint32 thread = 0; thread < numThreads; ++thread)
         GetInstance()->m_workers.emplace_back(&ThreadManager::ThreadLoop, GetInstance());
+
+    m_stopped = false;
+}
+
+bool engine::ThreadManager::IsShutDown(void)
+{
+    return m_stopped;
 }
 
 void engine::ThreadManager::Shutdown(void)
 {
-    SynchronizeGameThread(nullptr);
-    ExecuteRenderThreadTasks();
+   
+
+   // TaskQueue& tasks = GetInstance()->GetQueue<ETaskType::GENERAL>();
+
+    //while (!tasks.empty());
+    /*{
+        GetInstance()->m_poolMutex.lock();
+        std::function<void()> function = std::move(tasks.front());
+        tasks.pop();
+        GetInstance()->m_poolMutex.unlock();
+
+        function();
+    }*/
 
     // lock mutex here, we want
     // the bool to be assigned BEFORE
@@ -37,6 +56,7 @@ void engine::ThreadManager::Shutdown(void)
     GetInstance()->m_workers.clear();
 
     delete m_instance;
+    m_stopped = true;
 }
 
 void engine::ThreadManager::UpdateGameLogic(SceneGraph* scene, f32 deltaTime)
