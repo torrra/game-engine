@@ -1,0 +1,3 @@
+string | defaultGameScene="default.mscn"
+string | defaultEditorScene="default.mscn"
+string | executableName="PlayerController"

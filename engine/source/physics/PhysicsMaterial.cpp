@@ -23,7 +23,7 @@ engine::Material::Material(void)
         <param> [in] Restitution : coefficient of restitution set to 0.6
     */
     m_materialImpl->m_material = PhysicsEngine::Get().GetImpl().m_physics->createMaterial(
-        0.5f, 0.5f, 0.6f);
+        0.5f, 0.5f, 0.0f);
 }
 
 engine::Material::Material(f32 inStaticFriction, f32 inDynamicFriction, f32 inRestitution)

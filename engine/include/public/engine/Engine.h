@@ -35,7 +35,6 @@ namespace engine
 
         ENGINE_API void		ShutDown(void);
 
-        ENGINE_API void			SetProject(const char* projectDir);
         ENGINE_API void         SetEditorApplication(Application* ptr);
         ENGINE_API Window*		GetWindow(void) const noexcept;
 
@@ -77,7 +76,6 @@ namespace engine
 
     private:
 
-        inline int16		InitScriptSystem(const char* projectDir);
         inline int16		LoadEngineResources(void);
 
         void DeserializeProjectFile(const char* cursor, const char* end);

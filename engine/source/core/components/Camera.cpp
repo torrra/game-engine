@@ -14,20 +14,19 @@ engine::Camera::Camera(EntityHandle owner, SceneGraph* scene)
 
 void engine::Camera::Move(const math::Vector3f& translation, f32 speed, f32 deltaTime)
 {
-    // Get or add transform
-
-    if (Transform* transform = m_currentScene->GetComponent<Transform>(m_owner))
+    if (Transform* transform = m_currentScene->GetComponent<engine::Transform>(m_owner))
     {
+        // Add to transform translation
         math::Vector3f camSpaceDir = m_rotQuat.Rotate(translation);
         transform->SetPosition() += camSpaceDir.Normalized() * speed * deltaTime;
     }
 }
 
-void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll, f32 rotationSpeed)
+void engine::Camera::Rotate(f32 deltaPitch, f32 deltaYaw, f32 deltaRoll)
 {
-    m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch, rotationSpeed);	// Pitch
-    m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw, rotationSpeed);	// Yaw
-    m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll, rotationSpeed);	// Roll
+    m_rotation[0] = RotateAxis(m_rotation[0], -deltaPitch);	// Pitch
+    m_rotation[1] = RotateAxis(m_rotation[1], -deltaYaw);	// Yaw
+    m_rotation[2] = RotateAxis(m_rotation[2], -deltaRoll);	// Roll
 
     // Clamp pitch // TODO: fix pitch
     if (m_rotation[0] > 90.0f)
@@ -151,8 +150,6 @@ void engine::Camera::SerializeText(std::ostream& output, EntityHandle owner,
 	output << "\n    ";
 	text::Serialize(output, "rotationEuler", m_rotation);
 	output << "\n    ";
-	//text::Serialize(output, "position", m_transform->SetPosition());
-	//output << "\n    ";
 	text::Serialize(output, "flags", m_flags);
 	output << '\n';
 }
@@ -232,7 +229,7 @@ void engine::Camera::CalculateProjectionMatrix(void)
     m_projectionMatrix[3][3] = 0.0f;
 }
 
-f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSpeed)
+f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle)
 {
     f32 maxDelta = 5.0f;
 
@@ -242,7 +239,7 @@ f32 engine::Camera::RotateAxis(f32 existingAngle, f32 deltaAngle, f32 rotationSp
     else if (deltaAngle > maxDelta)
         deltaAngle = maxDelta;
 
-    existingAngle += deltaAngle * rotationSpeed;
+    existingAngle += deltaAngle;
 
     // Wrap angle
     return existingAngle;

@@ -243,12 +243,13 @@ void editor::MenuBar::CreateProject(void)
                     if (engine)
                     {
                         // Close project
-                        engine::ThreadManager::SynchronizeGameThread(engine->GetCurrentScene().GetGraph());
+                        engine::ThreadManager::ExecuteRenderThreadTasks();
                         engine->SaveProject();
 
                         // Clean editor prior to opening new project
                         m_application->m_properties.SetHandle(engine::Entity::EHandleUtils::INVALID_HANDLE);
                         m_application->m_graphView.ClearGraph();
+                        engine->GetCurrentScene().Reset(false);
 
                         if (engine->CreateProject(projectPath.string(), projectName))
                         {

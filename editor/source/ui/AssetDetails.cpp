@@ -28,17 +28,15 @@ editor::AssetDetailsWnd::~AssetDetailsWnd(void)
 void editor::AssetDetailsWnd::SelectAsset(const std::string& path, EAssetType type)
 {
     ResetData();
-
     switch (type)
     {
     case EAssetType::MATERIAL:
         engine::ResourceManager::Load<engine::MeshMaterial>(path);
 
-
         m_selectedResource =
-        engine::ResourceManager::GetEditableResource<engine::MeshMaterial>(path);
+            engine::ResourceManager::GetEditableResource<engine::MeshMaterial>(path);
 
-        InitMaterialData();      
+        InitMaterialData();
         break;
 
     default:

@@ -151,6 +151,11 @@ bool engine::RigidBodyStatic::GetIsTrigger(void) const
     return m_isTrigger;
 }
 
+engine::EGeometryType engine::RigidBodyStatic::GetShape(void) const
+{
+    return static_cast<EGeometryType>(m_rigidBodyShape);
+}
+
 void engine::RigidBodyStatic::SetBoxHalfExtents(const math::Vector3f& inHalfExtents)
 {
     // Set the box half extents by using the shape of rigid body to access the good geometry
@@ -448,7 +453,7 @@ void engine::RigidBodyStatic::CreateStaticBoxRigidBody(void)
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new static rigid body with box geometry and default values
         m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
