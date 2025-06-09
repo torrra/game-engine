@@ -101,6 +101,10 @@ function WeaponController:Start()
         self:OnDeath()
     end
 
+    self.life.CustomRegenFunction = function(_, regen)
+        self:OnLifeUpdated(-regen)
+    end
+
     self.uiCanvas = Canvas:CreateCanvas("WeaponControllerUI", 1920, 1080)
 
     self:UpdateAmmoText()
@@ -154,6 +158,10 @@ function WeaponController:Update(deltaTime)
 
     if IsInputPressed(InputCode.MOUSE_BUTTON_RIGHT) then
         self.life:TakeDamage(1)
+    end
+
+    if IsInputPressed(InputCode.KEY_N) then
+        self.life:RegenHealth(1)
     end
 
 end

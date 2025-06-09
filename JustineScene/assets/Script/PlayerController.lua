@@ -10,10 +10,6 @@ function PlayerController:Start()
     local downDir = Vector3.new(0, -1, 0)
     self.raycast:SetDirection(downDir)
     self.raycast:SetDistance(0.05)
-
-    local gunScript = GetScriptComponent(self.entity.handle)
-
-    self.gun = gunScript.BaseGun
 end
 
 
@@ -25,12 +21,11 @@ function PlayerController:Update(deltaTime)
 
     -- Get cursor delta position for camera rotation
     local xCursor, yCursor = GetCursorDeltaPos()
-
     -- Set camera rotation
     self.camera:Rotate(yCursor * vSpeed, xCursor * hSpeed, 0, deltaTime)
 
     local rotationX, rotationY, rotationZ = self.camera:GetRotation()
-
+    self.transform:SetRotation(0, rotationY, 0)
     
     local forwardMovementSpeed = 5
     local backMovementSpeed = forwardMovementSpeed * 0.75
@@ -70,11 +65,6 @@ function PlayerController:Update(deltaTime)
         end
     end
 
-    if IsInputDown(InputCode.MOUSE_BUTTON_LEFT) then
-        self.gun:Fire()
-    end
-
-    --self.transform:SetRotation(0, rotationY, 0)
 
 end
 

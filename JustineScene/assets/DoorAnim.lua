@@ -11,8 +11,12 @@ function DoorAnim:Start()
     self.isDoorOpened = false
     
     self.renderer = GetRendererComponent(self.entity.handle)
+    self.renderer:RefreshRef()
     self.isPlaying = false
 
+    self.renderer:SetAnimation("Armature|ArmatureAction")
+
+    self.renderer:PlayAnimation()
 end
 
 
@@ -23,11 +27,10 @@ function DoorAnim:Update(deltaTime)
     self.isPlaying = self.renderer:IsAnimationPlaying()
     
     if self.isDoorOpened == true then
-        print("play")
-        self.renderer:PlayAnimation()
+        -- print("play")
     elseif self.isPlaying == true then
-        print("stop")
-        self.renderer:StopAnimation()
+        -- print("stop")
+        -- self.renderer:StopAnimation()
     end
 
 end

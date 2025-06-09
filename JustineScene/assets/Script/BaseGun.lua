@@ -53,11 +53,10 @@ function BaseGun:Fire()
     self.lastFireTime = os.clock() 
     self.ammoCount = self.ammoCount - 1
 
-    local direction = Vector3.new(1.0, 0.0, 0.0):Rotate(self.transform:GetRotation())
+    local direction = Vector3.new(0.0, 0.0, -1.0):Rotate(self.transform:GetRotation())
 
     local position = Vector3.new(self.transform:GetPosition())
-    local offset = 0.5
-    position = position + Vector3.new(direction.x * offset, direction.y * offset, direction.z * offset)
+    position = position + Vector3.new(direction.x, direction.y, direction.z)
 
     self.gunRay:SetOrigin(position)
     self.gunRay:SetDirection(direction)

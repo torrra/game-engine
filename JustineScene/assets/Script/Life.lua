@@ -1,8 +1,9 @@
 Life = ScriptObject:_new()
 
-Life.health = 3
+Life.health = 50
 Life.CustomDamageFunction = nil
 Life.CustomDeathFunction = nil
+Life.CustomRegenFunction = nil
 
 -- Is executed once when the object becomes active
 function Life:Start()
@@ -42,6 +43,11 @@ end
 
 function Life:RegenHealth(amount)
     self.health = self.health + amount
+
+    if self.CustomRegenFunction then
+        self:CustomRegenFunction(amount)
+    end
+
     print("Health: "..self.health)
 end
 
