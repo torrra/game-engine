@@ -68,24 +68,47 @@ namespace engine
         ReadAnimation(animData);
     }
 
+    Animation::Animation(const void* animData, int32)
+    {
+        const aiScene* scene = static_cast<const aiScene*>(animData);
+
+        if (scene && scene->HasAnimations())
+        {
+            ProcessImportedData(scene);
+        }
+        else
+            m_statusFlags |= FAILED;
+    }
+
     bool Animation::LoadResource(const char* filePath)
     {
         const aiScene* scene = importer::g_animImporter.ReadFile(filePath, 0);
 
         if (scene && scene->HasAnimations())
         {
-            ReadAnimation(scene->mAnimations[0]);
-            LoadExtraAnimations(scene, 1);
-            importer::g_animImporter.FreeScene();
+            ProcessImportedData(scene);
             return true;
         }
 
+        m_statusFlags |= FAILED;
         return false;
     }
 
     const std::vector<AnimBone>& Animation::GetBoneData(void) const
     {
         return m_boneData;
+    }
+
+    void Animation::ProcessImportedData(const void* data)
+    {
+        const aiScene* scene = static_cast<const aiScene*>(data);
+
+        ThreadManager::AddTask([this, scene]()
+            {
+                ReadAnimation(scene->mAnimations[0]);
+                LoadExtraAnimations(scene, 1);
+                m_statusFlags |= LOADED;
+            });
     }
 
     void Animation::ReadAnimation(const void* animation)
@@ -260,6 +283,16 @@ namespace engine
             return &(bone->second);
         else
             return nullptr;
+    }
+
+    bool Animation::IsLoaded(void) const
+    {
+        return m_statusFlags & IResource::LOADED;
+    }
+
+    bool Animation::HasFailedToLoad(void) const
+    {
+        return m_statusFlags & IResource::FAILED;
     }
 
 }

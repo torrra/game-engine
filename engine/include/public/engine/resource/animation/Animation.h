@@ -40,6 +40,7 @@ namespace engine
 
         ENGINE_API Animation(void) = default;
         ENGINE_API Animation(const void* animData);
+        ENGINE_API Animation(const void* animData, int32);
                    Animation(const Animation&) = delete;
         ENGINE_API Animation(Animation&&) noexcept = default;
         ENGINE_API ~Animation(void) = default;
@@ -58,7 +59,12 @@ namespace engine
 
         ENGINE_API const AnimBone* GetBoneAnimData(const std::string& boneName) const;
 
+        ENGINE_API bool IsLoaded(void) const;
+        ENGINE_API bool HasFailedToLoad(void) const;
+
     private:
+
+        void ProcessImportedData(const void* data);
 
         // Read entire animation
         void ReadAnimation(const void* animation);
@@ -73,5 +79,6 @@ namespace engine
         std::vector<AnimBone>       m_boneData;
         int32                       m_tickCount = -1;
         f32                         m_ticksPerSecond = 0.f;
+        uint8                       m_statusFlags = 0;
     };
 }
