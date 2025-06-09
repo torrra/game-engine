@@ -9,7 +9,7 @@ function TriggerScript:Start()
     return
   end
 
-  self.enemyScript = parentScript.EnemyScript2
+  self.enemyScript = parentScript.EnemyScript
   
 end
 
