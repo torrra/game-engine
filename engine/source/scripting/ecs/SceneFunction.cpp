@@ -151,10 +151,18 @@ int script_DestroyComponent(lua_State* luaState)
             break;
 
         case engine::Entity::RIGIDBODY_DYNAMIC:
+            if (graph->GetEntity(owner)->HasComponent<engine::Transform>())
+            {
+                graph->DestroyComponent<engine::Transform>(owner);
+            }
             graph->DestroyComponent<engine::RigidBodyDynamic>(owner);
             break;
 
         case engine::Entity::RIGIDBODY_STATIC:
+            if (graph->GetEntity(owner)->HasComponent<engine::Transform>())
+            {
+                graph->DestroyComponent<engine::Transform>(owner);
+            }
             graph->DestroyComponent<engine::RigidBodyStatic>(owner);
             break;
 
@@ -167,6 +175,10 @@ int script_DestroyComponent(lua_State* luaState)
             break;
 
         case engine::Entity::TRIANGLE_MESH:
+            if (graph->GetEntity(owner)->HasComponent<engine::Transform>())
+            {
+                graph->DestroyComponent<engine::Transform>(owner);
+            }
             graph->DestroyComponent<engine::TriangleMesh>(owner);
             break;
 
