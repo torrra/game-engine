@@ -118,7 +118,7 @@ function EnemyScript2:Move(deltaTime)
     local currentPos = Vector3.new(self.transform:GetPosition())
     local targetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
     local targetPos = Vector3.new(targetPoint:GetPosition())
-    local direction = Vector3.new(targetPos.x - currentPos.x, currentPos.y, targetPos.z - currentPos.z)
+    local direction = Vector3.new(targetPos.x - currentPos.x, targetPos.y - currentPos.y, targetPos.z - currentPos.z)
     local distance = Length(targetPos, currentPos)
 
     if self.state == State.Moving then
@@ -196,7 +196,7 @@ function EnemyScript2:Attack(deltaTime)
 
     local currentPosition = Vector3.new(self.transform:GetPosition())
     local targetPosition = Vector3.new(self.playerTransform:GetPosition())
-    local direction = Vector3.new(targetPosition.x - currentPosition.x, currentPosition.y, targetPosition.z - currentPosition.z)
+    local direction = Vector3.new(targetPosition.x - currentPosition.x, targetPosition.y - currentPosition.y, targetPosition.z - currentPosition.z)
     local distance = Length(targetPosition, currentPosition)
 
     local targetDistance = 4.0
@@ -261,6 +261,7 @@ function EnemyScript2:Attack(deltaTime)
         local move = Vector3.new(moveDirection.x * self.speed * deltaTime, currentPosition.y, moveDirection.z * self.speed * deltaTime)
         local newPosition = currentPosition + move
         self.transform:SetPosition(newPosition.x, currentPosition.y, newPosition.z)
+        self.gun:Fire()
     else
         -- Reset rotation attaque si plus de détection
         self.attackCurrentRotation = nil
@@ -276,6 +277,10 @@ function EnemyScript2:Start()
     self:Initialize()
 
     self.playerTransform = GetTransformComponent(GetEntity("Player").handle)
+
+    local gunScript = GetScriptComponent(self.entity.handle)
+
+    self.gun = gunScript.BaseGun
 end
 
 function EnemyScript2:Update(deltaTime)
