@@ -4,6 +4,7 @@
 
 #include "physics/InternalPhysXStruct.hpp"
 #include "physics/InternalPhyxConversion.hpp"
+#include "physics/IgnoreTriggersFilterCallback.hpp"
 
 #pragma endregion
 
@@ -22,6 +23,9 @@
 
 #pragma endregion
 
+
+#include <string>
+#include <ostream>
 std::vector<engine::Raycast> engine::Raycast::m_existingRays;
 
 engine::Raycast::Raycast(void)
@@ -145,16 +149,19 @@ void engine::Raycast::SetFlags(ERaycastFlags inFlags)
     {
     case engine::ERaycastFlags::DYNAMIC :
         // Set the raycast filter to detect dynamic objects with the raycast
-        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC);
+        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC |
+                                                                    physx::PxQueryFlag::ePREFILTER);
         break;
     case engine::ERaycastFlags::STATIC :
         // Set the raycast filter to detect static objects with the raycast
-        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eSTATIC);
+        m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eSTATIC |
+                                                                    physx::PxQueryFlag::ePREFILTER);
         break;
     case engine::ERaycastFlags::ALL :
         // Set the raycast filter to detect all objects with the raycast
         m_raycastImpl->m_queryFilterData = physx::PxQueryFilterData(physx::PxQueryFlag::eDYNAMIC |
-                                                                    physx::PxQueryFlag::eSTATIC);
+                                                                    physx::PxQueryFlag::eSTATIC |
+                                                                    physx::PxQueryFlag::ePREFILTER);
         break;
     case engine::ERaycastFlags::NONE :
         // Set the raycast filter to detect no objects with the raycast
@@ -183,7 +190,7 @@ bool engine::Raycast::HasHit(HitData* outData)
     */
     physx::PxHitFlags hitFlags = physx::PxHitFlag::ePOSITION | physx::PxHitFlag::eNORMAL | 
                                  physx::PxHitFlag::eUV;
-
+    IgnoreTriggersFilterCallback filterCallback;
     /*
         Performs a raycast against objects in the scene, returns results in a PxRaycastBuffer object
 		or via a custom user callback implementation inheriting from PxRaycastCallback.
@@ -214,16 +221,20 @@ bool engine::Raycast::HasHit(HitData* outData)
                     PxQueryFlag::eANY_HIT was specified.
     */
     bool status = PhysicsEngine::Get().GetImpl().m_scene->raycast(ToPxVec3(m_origin),
-                                                                  ToPxVec3(m_direction.Normalized()),
-                                                                  m_distance, *m_raycastImpl->m_hit,
-                                                                  hitFlags, 
-                                                                  m_raycastImpl->m_queryFilterData);
+        ToPxVec3(m_direction.Normalized()),
+        m_distance, *m_raycastImpl->m_hit,
+        hitFlags,
+        m_raycastImpl->m_queryFilterData, &filterCallback);
 
     if (status && m_raycastImpl->m_hit->hasBlock)
     {
+        const physx::PxRaycastHit& block = m_raycastImpl->m_hit->block;
+
+        if (block.shape->getFlags() & physx::PxShapeFlag::eTRIGGER_SHAPE)
+            return false;
+        
         if (outData)
         {
-            const physx::PxRaycastHit& block = m_raycastImpl->m_hit->block;
             const RigidBodyData* actorData = reinterpret_cast<const RigidBodyData*>(&block.actor->userData);
 
 
