@@ -53,7 +53,7 @@ function BaseGunEnemy:Fire()
     self.lastFireTime = os.clock() 
     self.ammoCount = self.ammoCount - 1
 
-    local direction = Vector3.new(0.0, 0.0, -1.0):Rotate(self.transform:GetRotation())
+    local direction = Vector3.new(1.0, 0.0, 0.0):Rotate(self.transform:GetRotation())
 
     local position = Vector3.new(self.transform:GetPosition())
     position = position + Vector3.new(direction.x, direction.y, direction.z)

@@ -280,7 +280,9 @@ function EnemyScript2:Start()
 
     local gunScript = GetScriptComponent(self.entity.handle)
 
-    self.gun = gunScript.BaseGun
+    self.gun = gunScript.BaseGunEnemy
+
+    gunScript.Life.health = 3
 end
 
 function EnemyScript2:Update(deltaTime)

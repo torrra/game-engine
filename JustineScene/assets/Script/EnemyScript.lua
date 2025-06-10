@@ -255,7 +255,7 @@ function EnemyScript:Start()
 
     local gunScript = GetScriptComponent(self.entity.handle)
 
-    self.gun = gunScript.BaseGun
+    self.gun = gunScript.BaseGunEnemy
 
     gunScript.Life.health = 3
 end

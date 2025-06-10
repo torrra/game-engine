@@ -135,8 +135,8 @@
    int64 | owner=10
    uint64 | count=3
    string | scriptObject="EnemyScript"
-   string | scriptObject="BaseGun"
    string | scriptObject="Life"
+   string | scriptObject="BaseGunEnemy1"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=10
@@ -754,9 +754,10 @@
 [Script]
    uint64 | index=5
    int64 | owner=40
-   uint64 | count=2
+   uint64 | count=3
    string | scriptObject="EnemyScript2"
-   string | scriptObject="BaseGun"
+   string | scriptObject="BaseGunEnemy"
+   string | scriptObject="Life"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=40
@@ -798,6 +799,23 @@
    int64 | parent=40
    uint64 | flags=0
    uint64 | components=5
+[Transform]
+    uint64 | index=29
+    int64 | owner=42
+    quat32 | rotation={0.707097,0,-0.707117,0}
+    vec3f32 | position={0.04,0.2,-0.65}
+    vec3f32 | scale={0.05,0.05,0.05}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=42
+    string | model="\Rifle\sci fi m254 gun - high poly.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=2
+    string | material="\Rifle\Material\RifleMat0.mmat"
+    string | material="\Rifle\Material\RifleMat0.mmat"
+    uint64 | flags=0
 [Entity]
    string | name="Enemy2Trigger"
    int64 | handle=43
