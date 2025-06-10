@@ -66,9 +66,9 @@ namespace editor
 
         m_properties.Render();
 
-        //m_gameSimulationView->RenderToViewport();
-        //m_gameSimulationView->Render();
-        //m_gameSimulationView->RenderInGameUI();
+        m_gameSimulationView->RenderToViewport();
+        m_gameSimulationView->Render();
+        m_gameSimulationView->RenderInGameUI();
 
         
         // Editor camera
