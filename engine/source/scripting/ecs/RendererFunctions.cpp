@@ -153,9 +153,6 @@ int script_SetAnimatorAnimation(lua_State* luaState)
     {
         std::string key = luaL_checkstring(luaState, 2);
 
-       engine::ThreadManager::AddTask([key, renderer]()
-       {
-
         engine::ResourceRef<engine::Animation> anim =
             engine::ResourceManager::GetResource<engine::Animation>(key);
 
@@ -168,7 +165,7 @@ int script_SetAnimatorAnimation(lua_State* luaState)
                     engine::PrintLog(engine::ErrorPreset(), "No model found on entity " +
                         std::to_string(renderer->GetOwner()) + "\n");
 
-                    return;
+                    return 0;
                 }
 
                 if (!renderer->GetModel()->IsLoaded())
@@ -179,13 +176,12 @@ int script_SetAnimatorAnimation(lua_State* luaState)
                     while (!renderer->GetModel()->IsLoaded() && !renderer->GetModel()->HasFailedToLoad());
 
                     if (renderer->GetModel()->HasFailedToLoad())
-                        return;
+                        return 0;
                 }
 
                 if (anim->IsLoaded())
                     renderer->GetAnimator().SetAnimation(std::move(anim));
             }
-       });
     }
 
     return 0;
