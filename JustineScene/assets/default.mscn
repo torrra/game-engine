@@ -843,3 +843,21 @@
      vec3f32 | box half extents={4,0.5,4}
      bool | trigger=1
      uint64 | flags=0
+[Entity]
+   string | name="BackgroundMusic"
+   int64 | handle=44
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=66
+[Script]
+   uint64 | index=7
+   int64 | owner=44
+   uint64 | count=1
+   string | scriptObject="BackgroundMusicScript"
+   uint64 | flags=0
+[AudioPlayer]
+     int64 | owner=44
+     string | sound="\Sound\Falling_In_Reverse-Im_Not_A_Vampire.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=0
+     uint64 | flags=0
