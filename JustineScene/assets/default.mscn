@@ -804,3 +804,24 @@
    int64 | parent=40
    uint64 | flags=0
    uint64 | components=19
+[Transform]
+    uint64 | index=28
+    int64 | owner=43
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={0,0,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=6
+   int64 | owner=43
+   uint64 | count=1
+   string | scriptObject="TriggerScript2"
+   uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=43
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={4,0.5,4}
+     bool | trigger=1
+     uint64 | flags=0
