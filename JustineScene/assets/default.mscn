@@ -22,7 +22,7 @@
     string | model="\Level\Level1\Room4_low.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
     string | material="\Level\Level1\Material\LevelMat.mmat"
     uint64 | flags=0
@@ -50,7 +50,7 @@
     string | model="\Level\Level2\Room_1.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="ModelTextured.frag"
     uint64 | materialCount=1
     string | material="\Level\Level2\Material\Level2Mat.mmat"
     uint64 | flags=0
@@ -169,7 +169,7 @@
     string | model="\Character\Ch44_nonPBR.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=0
     uint64 | flags=0
 [Entity]
@@ -190,7 +190,7 @@
     string | model="\Rifle\sci fi m254 gun - high poly.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
     string | material="\Rifle\Material\RifleMat0.mmat"
     uint64 | flags=0
@@ -283,7 +283,7 @@
     string | model="\Level\Door\DoorLoops.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=12
     string | material="\DoorMat0.mmat"
     string | material="\DoorMat1.mmat"
@@ -549,7 +549,7 @@
     string | model="\Level\Door\DoorLoops.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=12
     string | material="\DoorMat0.mmat"
     string | material="\DoorMat1.mmat"
@@ -645,7 +645,7 @@
     string | model="\Level\Door\DoorLoops.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=9
     string | material="\DoorMat0.mmat"
     string | material="\DoorMat1.mmat"
@@ -702,7 +702,7 @@
     string | model="\Level\Platform\tech_pedestal.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
     string | material="\Level\Platform\Material\PlatformMat.mmat"
     uint64 | flags=0
@@ -789,7 +789,7 @@
     string | model="\Character\Ch44_nonPBR.fbx"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="\shaders\ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=0
     uint64 | flags=0
 [Entity]
