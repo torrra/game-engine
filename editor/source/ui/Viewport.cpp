@@ -148,6 +148,25 @@ const math::Vector2f& editor::Viewport::GetViewportSize(void) const
     return m_size;
 }
 
+void editor::Viewport::Bind(void)
+{
+    m_fbo.Bind();
+
+    // Use the size of this viewport
+    SetViewportTransform({ 0, 0 },
+    {
+        static_cast<int32>(m_size.GetX()),
+        static_cast<int32>(m_size.GetY())
+    });
+    SetViewportBg(m_bgColor[0], m_bgColor[1], m_bgColor[2], m_bgColor[3]);
+
+}
+
+void editor::Viewport::Unbind(void)
+{
+    m_fbo.Unbind();
+}
+
 void editor::Viewport::RenderContents(void)
 {
     // Transform
