@@ -930,3 +930,111 @@
      vec3f32 | box half extents={2.2,1.55,1}
      bool | trigger=1
      uint64 | flags=0
+[Entity]
+   string | name="Collectible"
+   int64 | handle=46
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=0
+[Entity]
+   string | name="Ammo"
+   int64 | handle=47
+   int64 | parent=46
+   uint64 | flags=0
+   uint64 | components=19
+[Transform]
+    uint64 | index=32
+    int64 | owner=47
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={34,24.95,-53}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=10
+   int64 | owner=47
+   uint64 | count=2
+   string | scriptObject="LightAmmoCollectible"
+   string | scriptObject="Collectible"
+   uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=47
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={0.95,0.8,0.95}
+     bool | trigger=1
+     uint64 | flags=0
+[Entity]
+   string | name="AmmoMesh"
+   int64 | handle=48
+   int64 | parent=47
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=33
+    int64 | owner=48
+    quat32 | rotation={0.707107,0,0.707107,0}
+    vec3f32 | position={0,0,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=48
+    string | model="\Collectible\Box_final.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=1
+    string | material="\AmmoMat0.mmat"
+    uint64 | flags=0
+[Entity]
+   string | name="Life"
+   int64 | handle=49
+   int64 | parent=46
+   uint64 | flags=0
+   uint64 | components=19
+[Transform]
+    uint64 | index=34
+    int64 | owner=49
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={34,24.55,-56.2}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=11
+   int64 | owner=49
+   uint64 | count=2
+   string | scriptObject="Collectible"
+   string | scriptObject="LifeCollectible"
+   uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=49
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={0.5,0.5,0.5}
+     bool | trigger=1
+     uint64 | flags=0
+[Entity]
+   string | name="LifeMesh"
+   int64 | handle=50
+   int64 | parent=49
+   uint64 | flags=0
+   uint64 | components=5
+[Transform]
+    uint64 | index=35
+    int64 | owner=50
+    quat32 | rotation={0.707107,0,0.707107,0}
+    vec3f32 | position={0,0,0}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=50
+    string | model="\Collectible\lp.fbx"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=3
+    string | material="\HealthMat0.mmat"
+    string | material="\HealthMat1.mmat"
+    string | material="\HealthMat2.mmat"
+    uint64 | flags=0
