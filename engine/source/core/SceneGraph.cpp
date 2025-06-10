@@ -288,7 +288,7 @@ namespace engine
         {
             for (Entity& entity : m_sceneEntities)
             {
-                if (entity.m_parent == children[index])
+                if (entity.IsValid() && entity.m_parent == children[index])
                     children.push_back(entity.m_handle);
             }
 
