@@ -49,8 +49,10 @@ void editor::RendererComponent::SectionContent(void)
 void editor::RendererComponent::ModelInput(engine::Renderer* renderer)
 {
     // Get file name
-    m_modelName = (renderer->GetModel()) ? renderer->GetModel()->GetName() : NO_MODEL_NAME;
-    m_fragName = (renderer->GetShader()) ? renderer->GetShader()->GetFragmentShaderName() : NO_FRAG_NAME;
+    m_modelName = (renderer->GetModel() && !(renderer->GetModel()->GetName().empty())) ? 
+        renderer->GetModel()->GetName() : NO_MODEL_NAME;
+    m_fragName = (renderer->GetShader() && !(renderer->GetShader()->GetFragmentShaderName().empty())) ? 
+        renderer->GetShader()->GetFragmentShaderName() : NO_FRAG_NAME;
 
     // Model input
     ui::Text("Model: ");

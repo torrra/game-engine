@@ -7,9 +7,9 @@ function PlayerController:Start()
     self.rigidbody = GetRigidBodyDynamicComponent(self.entity.handle)
     self.raycast = Raycast.new()
 
-    local downDir = Vector3.new(0, -1, 0)
+    local downDir = Vector3.new(0, -0.05, 0)
     self.raycast:SetDirection(downDir)
-    self.raycast:SetDistance(0.05)
+    self.raycast:SetDistance(0.5)
 end
 
 

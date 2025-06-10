@@ -116,13 +116,16 @@ namespace engine
     ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
                                                     const ResourceRef<TResourceType>& rhs)
     {
-        DecrementRefCount();
+        if (*this != rhs)
+        {
+            DecrementRefCount();
 
-        m_controlBlock = rhs.m_controlBlock;
-        m_raw = rhs.m_raw;
+            m_controlBlock = rhs.m_controlBlock;
+            m_raw = rhs.m_raw;
 
-        if (rhs.m_controlBlock)
-            rhs.m_controlBlock->AddRef();
+            if (rhs.m_controlBlock)
+                rhs.m_controlBlock->AddRef();
+        }
 
         return *this;
     }
@@ -132,10 +135,13 @@ namespace engine
     ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
                                                      ResourceRef<TResourceType>&& rhs) noexcept
     {
-        DecrementRefCount();
+        if (*this != rhs)
+        {
+            DecrementRefCount();
 
-        m_controlBlock = rhs.m_controlBlock;
-        m_raw = rhs.m_raw;
+            m_controlBlock = rhs.m_controlBlock;
+            m_raw = rhs.m_raw;
+        }
 
         rhs.m_controlBlock = nullptr;
         rhs.m_raw = nullptr;
@@ -191,13 +197,16 @@ namespace engine
     ResourceRef<TResourceType>&
     ResourceRef<TResourceType>::operator=(const ResourceRef<TOtherType>& rhs)
     {
-        DecrementRefCount();
+        if (m_raw != (const void*)&rhs)
+        {
+            DecrementRefCount();
 
-        m_controlBlock = rhs.m_controlBlock;
-        m_raw = rhs.m_raw;
+            m_controlBlock = rhs.m_controlBlock;
+            m_raw = rhs.m_raw;
 
-        if (rhs.m_controlBlock)
-            rhs.m_controlBlock->AddRef();
+            if (rhs.m_controlBlock)
+                rhs.m_controlBlock->AddRef();
+        }
 
         return *this;
     }
@@ -207,13 +216,18 @@ namespace engine
         ResourceRef<TResourceType>&
         ResourceRef<TResourceType>::operator=(ResourceRef<TOtherType>&& rhs) noexcept
     {
-        DecrementRefCount();
+        if (m_raw != (void*)&rhs)
+        {
+            DecrementRefCount();
 
-        m_controlBlock = rhs.m_controlBlock;
-        m_raw = rhs.m_raw;
+            m_controlBlock = rhs.m_controlBlock;
+            m_raw = rhs.m_raw;
+        }
 
-        rhs.m_controlBlock = nullptr;
-        rhs.m_raw = nullptr;
+        //rhs.m_controlBlock = nullptr;
+        //rhs.m_raw = nullptr;
+
+        memset(&rhs, 0, sizeof(rhs));
 
         return *this;
     }
@@ -223,12 +237,15 @@ namespace engine
         EditableRef<TResourceType>&
         EditableRef<TResourceType>::operator=(const EditableRef<TOtherType>& rhs)
     {
-        ResourceRef<TResourceType>::DecrementRefCount();
+        if (ResourceRef<TResourceType>::m_raw != (const void*)&rhs)
+        {
+            ResourceRef<TResourceType>::DecrementRefCount();
 
-        memccpy(this, &rhs, sizeof(*this));
+            memccpy(this, &rhs, sizeof(*this));
 
-        if (ResourceRef<TResourceType>::m_controlBlock)
-            ResourceRef<TResourceType>::m_controlBlock->AddRef();
+            if (ResourceRef<TResourceType>::m_controlBlock)
+                ResourceRef<TResourceType>::m_controlBlock->AddRef();
+        }
 
         return *this;
     }
@@ -238,9 +255,12 @@ namespace engine
         EditableRef<TResourceType>&
         EditableRef<TResourceType>::operator=(EditableRef<TOtherType>&& rhs) noexcept
     {
-       ResourceRef<TResourceType>::DecrementRefCount();
+        if (ResourceRef<TResourceType>::m_raw != (void*)&rhs)
+        {
+            ResourceRef<TResourceType>::DecrementRefCount();
 
-        memcpy(this, &rhs, sizeof(*this));
+            memcpy(this, &rhs, sizeof(*this));
+        }
         memset(&rhs, 0, sizeof(rhs));
 
         return *this;
