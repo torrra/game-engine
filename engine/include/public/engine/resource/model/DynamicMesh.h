@@ -39,7 +39,7 @@ namespace engine
         ENGINE_API DynamicMesh(void) = default;
         ENGINE_API DynamicMesh(DynamicMesh&&) noexcept = default;
         ENGINE_API DynamicMesh(const DynamicMesh&) = delete;
-        ENGINE_API ~DynamicMesh(void) = default;
+        ENGINE_API ~DynamicMesh(void) override = default;
 
         ENGINE_API void ProcessMesh(const void* mesh) override;
         ENGINE_API void DeleteMesh(void) override;

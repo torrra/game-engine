@@ -83,17 +83,9 @@ void editor::Viewport::RenderToDebugViewport(const math::Matrix4f& viewProjectio
     {
         m_graph->RenderFromCacheSingleCamera(viewProjection);
 
-        engine::ResourceRef<engine::Model> lightBall =
-        engine::ResourceManager::GetResource<engine::Model>("./assets/lightBall.obj");
 
-        engine::ResourceRef<engine::Model> lightArrow =
-        engine::ResourceManager::GetResource<engine::Model>("./assets/lightArrow.obj");
-
-        engine::ResourceRef<engine::ShaderProgram> basicShader =
-        engine::ResourceManager::GetResource<engine::ShaderProgram>("lightProgram");
-
-        if (lightBall && lightArrow && basicShader)
-            RenderDebugLights(lightBall, lightArrow, basicShader, viewProjection);
+        RenderDebugLights(m_editorApp->GetLightBall(), m_editorApp->GetLightArrow(),
+                          m_editorApp->GetLightShader(), viewProjection);
     }
 
     engine::PhysicsEngine::Get().UpdateDebugDraw(&viewProjection);

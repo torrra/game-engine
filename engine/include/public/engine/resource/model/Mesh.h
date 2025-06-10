@@ -49,11 +49,11 @@ namespace engine
 
 
        ENGINE_API   Mesh(void);
-       ENGINE_API   Mesh(Mesh&&) noexcept = default;
+       ENGINE_API   Mesh(Mesh&&) noexcept;
        ENGINE_API   Mesh(const Mesh&) = delete;
 
        ENGINE_API
-       virtual     ~Mesh(void) = default;
+       virtual     ~Mesh(void);
 
        ENGINE_API MeshMaterial&        Material(void);
        ENGINE_API const MeshMaterial&  GetMaterial(void) const;

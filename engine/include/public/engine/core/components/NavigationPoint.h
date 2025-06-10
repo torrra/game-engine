@@ -4,6 +4,7 @@
 
 #include "engine/EngineExport.h"
 #include "engine/CoreTypes.h"
+#include "engine/utility/ResourceRefDecl.h"
 
 #pragma endregion
 
@@ -102,6 +103,8 @@ namespace engine
 
         /// Private members
         math::Vector3f m_position = math::Vector3f::Zero();
+        ResourceRef<class Model> m_model;
+        ResourceRef<class ShaderProgram> m_shader;
 
     }; // !Class NavigationPoint
 

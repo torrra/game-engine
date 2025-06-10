@@ -33,9 +33,11 @@ function CreateEntity(name, parent)
 	
 end
 
-function DestroyEntity(entity)
+function DestroyEntity(entity, propagate)
 
-	Scene.DestroyEntity(entity.handle)
+	propagate = propagate or false
+
+	Scene.DestroyEntity(entity.handle, propagate)
 end
 
 function CreateTransformComponent(owner)

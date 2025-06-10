@@ -2,6 +2,7 @@
 
 #include "resource/ResourceManager.h"
 #include "resource/font/Font.h"
+#include "utility/ResourceRef.h"
 
 #include <math/Vector2.hpp>
 #include <math/Vector4.hpp>

@@ -222,7 +222,7 @@ namespace engine
         return parents;
     }
 
-    void SceneGraph::DestroyEntity(EntityHandle entity)
+    void SceneGraph::DestroyEntity(EntityHandle entity, bool propagate)
     {
         if (Entity* entityPtr = GetEntity(entity))
         {
@@ -245,7 +245,13 @@ namespace engine
             // invalid entity's parent becomes children's parent so
             // that we don't delete children
             for (EntityHandle child : children)
-                ReparentEntity(GetEntity(child), entityPtr->m_parent);
+            {
+                if (propagate)
+                    DestroyEntity(child, true);
+
+                else
+                    ReparentEntity(GetEntity(child), entityPtr->m_parent);
+            }
         }
     }
 
@@ -288,7 +294,7 @@ namespace engine
         {
             for (Entity& entity : m_sceneEntities)
             {
-                if (entity.m_parent == children[index])
+                if (entity.IsValid() && entity.m_parent == children[index])
                     children.push_back(entity.m_handle);
             }
 

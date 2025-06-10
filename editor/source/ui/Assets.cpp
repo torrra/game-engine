@@ -58,17 +58,13 @@ bool DirUpdated(std::string const& projectPath, std::string const& path)
     switch (result)
     {
     case WAIT_OBJECT_0:
-        printf("Refresh required (file)\n");
         newChanges = true;
-        printf("DIR UPDATE\n");
         if (!FindNextChangeNotification(handles[0]))
             printf("[ERROR]: FindNextChangeNotification failed, error code %lu.\n", GetLastError());
         break;
     case WAIT_OBJECT_0 + 1:
         // Refresh directory
-        printf("Refresh required (dir)\n");
         newChanges = true;
-        printf("DIR UPDATE\n");
         if (!FindNextChangeNotification(handles[1]))
             printf("[ERROR]: FindNextChangeNotification failed, error code %lu.\n", GetLastError());
 
@@ -151,6 +147,7 @@ void editor::AssetsWnd::SetPath(std::filesystem::path const& projectDir)
     m_path = projectDir;
     m_rootNode = InitDirectoryRecursively(m_path);
     m_selectedDirectory = m_rootNode;
+    OnSelectDir();
 }
 
 void editor::AssetsWnd::RenderContents(void)
