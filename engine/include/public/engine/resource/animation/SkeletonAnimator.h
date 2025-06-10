@@ -36,8 +36,10 @@ namespace engine
 
         SkeletonAnimator(SkeletonAnimator&&) = default;
         SkeletonAnimator(const SkeletonAnimator&) = default;
+        ENGINE_API ~SkeletonAnimator(void) = default;
 
-        ENGINE_API void SetAnimation(ResourceRef<Animation>&& anim, bool crossfade);
+        ENGINE_API void SetAnimation(ResourceRef<Animation>&& anim);
+        ENGINE_API void SetAnimation(const ResourceRef<Animation>& anim);
         ENGINE_API void SetModel(const ResourceRef<class Model>& model);
 
         ENGINE_API void PauseAnimation(void);
@@ -59,6 +61,8 @@ namespace engine
         ENGINE_API bool IsPaused(void) const;
 
         ENGINE_API void InitBuffer(void);
+        ENGINE_API void DeleteBuffer(void);
+
         ENGINE_API void UseSkinningBuffer(void);
         ENGINE_API void ResizeIndexArrays(void);
 
@@ -78,7 +82,6 @@ namespace engine
         void CalculateSkinningMatrices(void);
 
         std::vector<BoneIndex>          m_currentAnimIndices;
-        std::vector<BoneIndex>          m_nextAnimIndices;
         std::vector<BoneTransform>      m_transforms;
         std::vector<math::Matrix4f>     m_skinningMatrices;
 
@@ -97,5 +100,6 @@ namespace engine
         EAnimationState                 m_animState = EAnimationState::STOPPED;
         bool                            m_looped = false;
         bool                            m_forceNextUpdate = false;
+        bool                            m_lockedInPlace = true;
     };
 }
