@@ -98,7 +98,10 @@ void editor::MenuBar::ProjectMenu(::engine::GameScene& scene)
         {
             std::filesystem::path buildPath;
             SelectFolder(buildPath);
-            engine::Engine::GetEngine()->BuildProjectExecutable(buildPath);
+
+            if (!buildPath.empty())
+                engine::Engine::GetEngine()->BuildProjectExecutable(buildPath);
+           
         }
 
         ui::EndMenu();
