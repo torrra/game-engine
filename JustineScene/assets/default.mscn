@@ -728,10 +728,31 @@
    uint64 | components=0
 [Entity]
    string | name="DeathZone1"
-   int64 | handle=4294967333
+   int64 | handle=8589934629
    int64 | parent=36
    uint64 | flags=0
    uint64 | components=19
+[Transform]
+    uint64 | index=30
+    int64 | owner=8589934629
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={11.85,12.35,-94}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=8
+   int64 | owner=8589934629
+   uint64 | count=1
+   string | scriptObject="DeathZoneScript"
+   uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=8589934629
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={5,0.5,5}
+     bool | trigger=1
+     uint64 | flags=0
 [Entity]
    string | name="NavPoint3"
    int64 | handle=38
@@ -881,4 +902,31 @@
      string | sound="\Sound\ambient-soundscapes-007-space-atmosphere-304974.mp3"
     f32 | volume=1
      uint32 | 3D sound=0
+     uint64 | flags=0
+[Entity]
+   string | name="WinZone"
+   int64 | handle=45
+   int64 | parent=-1
+   uint64 | flags=0
+   uint64 | components=19
+[Transform]
+    uint64 | index=31
+    int64 | owner=45
+    quat32 | rotation={1,0,0,0}
+    vec3f32 | position={36.2,25.5,-145.15}
+    vec3f32 | scale={1,1,1}
+    uint64 | flags=0
+[Script]
+   uint64 | index=9
+   int64 | owner=45
+   uint64 | count=1
+   string | scriptObject="WinZone"
+   uint64 | flags=0
+[RigidBodyStatic]
+     int64 | owner=45
+     uint32 | type=1
+     uint64 | shape=0
+     uint32 | collision group=4
+     vec3f32 | box half extents={2.2,1.55,1}
+     bool | trigger=1
      uint64 | flags=0
