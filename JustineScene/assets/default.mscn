@@ -50,7 +50,7 @@
     string | model="\Level\Level2\Room_1.obj"
     string | shader="programModelTextured"
         string | vertexShader=".\shaders\ModelTextured.vert"
-        string | fragmentShader="ModelTextured.frag"
+        string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=1
     string | material="\Level\Level2\Material\Level2Mat.mmat"
     uint64 | flags=0
