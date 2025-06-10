@@ -1,8 +1,25 @@
 #include "resource/ResourceManager.h"
 #include "resource/shader/Shader.h"
+#include "resource/model/Model.h"
+#include "resource/animation/Animation.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 std::mutex               engine::ResourceManager::m_mutex;
 engine::ResourceManager* engine::ResourceManager::m_instance = nullptr;
+
+
+namespace engine::importer
+{
+    // global variable to avoid exposing assimp to
+    // Model.h by having it as a class member.
+    // Creating an importer is an expensive operation,
+    // so we keep one per thread
+    thread_local Assimp::Importer g_resourceManagerImporter;
+}
+
 
 void engine::ResourceManager::LoadShader(
 		const char* shaderProgramName,
@@ -47,6 +64,39 @@ std::string engine::ResourceManager::LoadShaderFromFrag(const std::string& fragS
     }
 
     return {};
+}
+
+engine::ResourceManager::EAsyncResourceType engine::ResourceManager::LoadAsyncResource(
+                                                               std::string const& fileName)
+{
+    std::string resourcePath;
+
+    resourcePath = Engine::GetEngine()->GetProjectDir().string();
+    resourcePath.push_back('\\');
+    resourcePath += fileName;
+    
+    const aiScene* scene = importer::g_resourceManagerImporter.ReadFile(resourcePath,
+        aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+        aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData
+    );
+
+
+    if (!scene)
+        return EAsyncResourceType::INVALID;
+
+    if (scene->HasMeshes())
+    {
+        CreateFromData<Model>(fileName, scene, fileName);
+        return EAsyncResourceType::MODEL;
+    }
+    else if (scene->HasAnimations())
+    {
+        CreateFromData<Animation>(fileName, scene, 0);
+        return EAsyncResourceType::ANIMATION;
+    }
+    
+    return EAsyncResourceType::INVALID;
+
 }
 
 void engine::ResourceManager::Unload(std::string const& fileName)

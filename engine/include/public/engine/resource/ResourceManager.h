@@ -23,6 +23,15 @@ namespace engine
 	class ResourceManager
 	{
 	public:
+
+        enum class EAsyncResourceType
+        {
+            INVALID,
+            MODEL,
+            ANIMATION
+        };
+
+
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName, bool absolute = false);
 
@@ -33,6 +42,9 @@ namespace engine
                                         bool isVertAbsolute = false, bool isFragAbsolute = false);
 
         ENGINE_API static std::string LoadShaderFromFrag(const std::string& fragShader);
+
+        ENGINE_API static EAsyncResourceType LoadAsyncResource(std::string const& fileName);
+
 
         // Create a resource from data that already exists in memory instead
         // of loading a file from disk
