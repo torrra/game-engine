@@ -193,11 +193,10 @@ namespace engine
     {
         DecrementRefCount();
 
-        m_controlBlock = rhs.m_controlBlock;
-        m_raw = rhs.m_raw;
+         memcpy(this, &rhs, sizeof(*this));
 
-        if (rhs.m_controlBlock)
-            rhs.m_controlBlock->AddRef();
+        if (m_controlBlock)
+            m_controlBlock->AddRef();
 
         return *this;
     }
@@ -209,11 +208,8 @@ namespace engine
     {
         DecrementRefCount();
 
-        m_controlBlock = rhs.m_controlBlock;
-        m_raw = rhs.m_raw;
-
-        rhs.m_controlBlock = nullptr;
-        rhs.m_raw = nullptr;
+        memcpy(this, &rhs, sizeof(*this));
+        memset(&rhs, 0, sizeof(rhs));
 
         return *this;
     }
