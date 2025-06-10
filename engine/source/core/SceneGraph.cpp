@@ -394,6 +394,9 @@ namespace engine
         m_renderCache.m_transformRenderCache = m_sceneTransforms;
         m_renderCache.m_lightRenderCache = m_sceneLights;
 
+        ThreadManager::SynchronizeAnimationThread();
+        ThreadManager::ExecuteRenderThreadTasks();
+
         m_renderCache.m_animatorCache.clear();
         m_renderCache.m_animatorCache.reserve(m_sceneRenderers.GetSize());
 

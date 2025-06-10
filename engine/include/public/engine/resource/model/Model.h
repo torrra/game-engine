@@ -15,12 +15,14 @@ namespace engine
         
     public:
         ENGINE_API		Model(void) = default;
+        ENGINE_API      Model(const void* data, const std::string& name);
         ENGINE_API      ~Model(void);
 
         ENGINE_API bool LoadResource(const char* fileName) override;
 
         ENGINE_API bool CanRender(void) const;
         ENGINE_API bool HasFailedToLoad(void) const;
+        ENGINE_API bool IsLoaded(void) const;
 
         ENGINE_API bool IsDynamic(void) const;
 
@@ -44,6 +46,7 @@ namespace engine
 
     private:
 
+        void ProcessImportedData(const void* data, const std::string& name);
         void ProcessTextures(const void* scene);
         std::string GetDirectory(const std::string& modelPath);
              

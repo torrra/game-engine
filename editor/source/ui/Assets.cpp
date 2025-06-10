@@ -470,6 +470,7 @@ void editor::AssetsWnd::SelectResource(void)
     constexpr uint64 sceneStrLen = sizeof(SCENE_PAYLOAD) - 1;
     constexpr uint64 scriptStrLen = sizeof(SCRIPT_PAYLOAD) - 1;
     constexpr uint64 materialStrLen = sizeof(MATERIAL_PAYLOAD) - 1;
+    constexpr uint64 modelStrLen = sizeof(MODEL_PAYLOAD) - 1;
 
     Asset& selectedAsset = m_assets[m_selectedIndex];
     AssetDetailsWnd::EAssetType type = AssetDetailsWnd::EAssetType::INVALID;
@@ -503,6 +504,29 @@ void editor::AssetsWnd::SelectResource(void)
                  AssetDetailsWnd::EAssetType::MATERIAL);
 
         return;
+
+    }
+    else if (selectedAsset.m_payloadType.size() == modelStrLen &&
+        memcmp(selectedAsset.m_payloadType.c_str(), MODEL_PAYLOAD, modelStrLen) == 0)
+    {
+        std::string resourcePath = selectedAsset.m_path.string();
+
+        engine::ResourceManager::EAsyncResourceType type =
+            engine::ResourceManager::LoadAsyncResource(resourcePath);
+
+        if (type == engine::ResourceManager::EAsyncResourceType::MODEL)
+        {
+
+            m_ownerApplication->GetAssetDetailsWindow().SelectAsset(resourcePath,
+            AssetDetailsWnd::EAssetType::MODEL);
+            return;
+        }
+        else if (type == engine::ResourceManager::EAsyncResourceType::ANIMATION)
+        {
+            m_ownerApplication->GetAssetDetailsWindow().SelectAsset(resourcePath,
+                AssetDetailsWnd::EAssetType::ANIMATION);
+            return;
+        }
 
     }
 

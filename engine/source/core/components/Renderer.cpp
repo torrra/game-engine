@@ -26,6 +26,20 @@ namespace engine
 
     }
 
+    Renderer::Renderer(Renderer&& other) noexcept
+        : Component(other)
+    {
+        m_animator = std::move(other.m_animator);
+        m_materials = std::move(other.m_materials);
+        m_model = std::move(other.m_model);
+        m_shader = std::move(other.m_shader);
+    }
+
+    Renderer::~Renderer(void)
+    {
+        m_animator.DeleteBuffer();
+    }
+
     void Renderer::Register(void)
     {
         engine::ScriptSystem::RegisterNewComponent("_NewRendererComponent", m_owner);

@@ -127,7 +127,7 @@
     uint64 | index=3
     int64 | owner=10
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={10,1,-14}
+    vec3f32 | position={13.2063,0.95,-14}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Script]
@@ -163,12 +163,12 @@
    int64 | handle=11
    int64 | parent=10
    uint64 | flags=0
-   uint64 | components=5
+   uint64 | components=7
 [Transform]
     uint64 | index=4
     int64 | owner=11
     quat32 | rotation={0.707107,0,0.707107,0}
-    vec3f32 | position={0,-0.95,0}
+    vec3f32 | position={0,0,0}
     vec3f32 | scale={0.01,0.01,0.01}
     uint64 | flags=0
 [Renderer]
@@ -179,6 +179,12 @@
         string | fragmentShader="\ModelTextured.frag"
     uint64 | materialCount=0
     uint64 | flags=0
+[Script]
+   uint64 | index=6
+   int64 | owner=11
+   uint64 | count=1
+   string | scriptObject="EnemyAnimation"
+   uint64 | flags=0
 [Entity]
    string | name="Rifle"
    int64 | handle=12
@@ -189,7 +195,7 @@
     uint64 | index=5
     int64 | owner=12
     quat32 | rotation={-1.39094e-08,1.49012e-08,0.999999,1.49012e-08}
-    vec3f32 | position={0.65,0.2,0.04}
+    vec3f32 | position={0.6,0.2,0.15}
     vec3f32 | scale={0.05,0.05,0.05}
     uint64 | flags=0
 [Renderer]
@@ -220,7 +226,7 @@
     f32 | far=250
     f32 | fov=1.0472
     f32 | aspectRatio=1.77778
-    vec3f32 | rotationEuler={0,0,0}
+    vec3f32 | rotationEuler={-5,-44.6,0}
     uint64 | flags=0
 [Script]
    uint64 | index=1
@@ -783,7 +789,7 @@
     uint64 | index=25
     int64 | owner=40
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={36,1,-26}
+    vec3f32 | position={36,0.95,-29.204}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Script]

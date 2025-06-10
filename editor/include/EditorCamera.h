@@ -21,9 +21,10 @@ namespace editor
 
        math::Matrix4f   ViewProjection(void);
        math::Matrix4f   GetViewMatrix(void) const;
-       math::Vector3f   GetPosition(void) const;
+       const math::Vector3f&   GetPosition(void) const;
+       const math::Vector2f&   GetRotation(void) const;
 
-       const math::Matrix4f& GetProjectionMatrix(void) const;
+       math::Matrix4f GetProjectionMatrix(void) const;
 
        EditorCamera& operator=(EditorCamera&&) noexcept = default;
 

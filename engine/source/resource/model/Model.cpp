@@ -29,6 +29,11 @@ namespace engine::importer
     thread_local Assimp::Importer g_importer;
 }
 
+engine::Model::Model(const void* data, const std::string& name)
+{
+    ThreadManager::AddTask(&Model::ProcessImportedData, this, data, std::string(name));
+}
+
 engine::Model::~Model(void)
 {
     while (!(m_loadStatus & FAILED) && !(m_loadStatus & LOADED));
@@ -73,6 +78,11 @@ bool engine::Model::CanRender(void) const
 bool engine::Model::HasFailedToLoad(void) const
 {
     return m_loadStatus & FAILED;
+}
+
+bool engine::Model::IsLoaded(void) const
+{
+    return m_loadStatus & LOADED;
 }
 
 bool engine::Model::IsDynamic(void) const
@@ -179,6 +189,46 @@ const std::vector<engine::Mesh>& engine::Model::GetStaticMeshes(void) const
 const std::vector<engine::DynamicMesh>& engine::Model::GetDynamicMeshes(void) const
 {
     return m_dynamicMeshes;
+}
+
+void engine::Model::ProcessImportedData(const void* data, const std::string& name)
+{
+    const aiScene* scene = static_cast<const aiScene*>(data);
+
+    // Error management
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::printf("Failed to load model '%s'. Error: %s\n", name.c_str(), importer::g_importer.GetErrorString());
+        m_loadStatus |= FAILED;
+        return;
+    }
+
+    for (uint32 numMesh = 0; numMesh < scene->mNumMeshes; ++numMesh)
+    {
+        if (scene->mMeshes[numMesh]->HasBones())
+        {
+            m_isDynamic = true;
+            break;
+        }
+    }
+
+    std::string dir = GetDirectory(name);
+
+    ProcessTextures(scene);
+    ProcessMeshes(scene, scene->mRootNode, dir);
+
+
+    if (scene->HasAnimations())
+        Animation::LoadExtraAnimations(scene);
+
+    for (DynamicMesh& mesh : m_dynamicMeshes)
+        m_boneCount += mesh.GetBoneCount();
+
+    m_loadStatus |= LOADED;
+
+    // Send OpenGL setup to render thread
+    ThreadManager::AddTask<ThreadManager::ETaskType::GRAPHICS>(&Model::RenderThreadSetup, this);
+    importer::g_importer.FreeScene();
 }
 
 void engine::Model::ProcessTextures(const void* scene)

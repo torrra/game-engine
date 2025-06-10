@@ -1,11 +1,13 @@
 #include "ui/AssetDetails.h"
 #include "ui/Assets.h"
+#include "ui/ResourceVizualizer.h"
 
 #include <engine/resource/ResourceManager.h>
 #include <engine/resource/material/MeshMaterial.h>
 #include <engine/resource/texture/Texture.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/ui/UIDragDrop.h>
+
 
 // leave data union uninitialized as it will be initialized and
 // destroyed in SelectAsset depending on asset type
@@ -39,6 +41,21 @@ void editor::AssetDetailsWnd::SelectAsset(const std::string& path, EAssetType ty
         InitMaterialData();
         break;
 
+    case EAssetType::ANIMATION:
+
+        InitAnimationData(path);
+
+        m_selectedResource =
+            engine::ResourceManager::GetEditableResource<engine::Animation>(path);
+
+        m_visualizer->SelectAnimation(
+            engine::ResourceManager::GetEditableResource<engine::Animation>(path));
+        break;
+
+    case EAssetType::MODEL:
+        std::cout << "loading model\n";
+        break;
+
     default:
         m_selectedResource = engine::EditableRef<engine::IResource>();
         break;
@@ -47,16 +64,98 @@ void editor::AssetDetailsWnd::SelectAsset(const std::string& path, EAssetType ty
     m_selectedAssetType = type;
 }
 
+void editor::AssetDetailsWnd::SetVisualizer(ResourceVisualizerWnd* window)
+{
+    m_visualizer = window;
+}
+
 void editor::AssetDetailsWnd::RenderContents(void)
 {
     switch (m_selectedAssetType)
     {
-    case editor::AssetDetailsWnd::EAssetType::MATERIAL:
+    case EAssetType::MATERIAL:
         RenderMaterialWindow();
+        break;
+
+    case EAssetType::ANIMATION:
+        RenderAnimationWindow();
         break;
     default:
         break;
     }
+}
+
+void editor::AssetDetailsWnd::RenderAnimationWindow(void)
+{
+    ui::Text("Current animation : %s", m_animName.c_str());
+    ui::VerticalSpacing();
+
+    ui::Text("Display model: ");
+    ui::SameLine(150.f);
+
+    if (m_visualizer->GetDisplayModel())
+        ui::Button(m_visualizer->GetDisplayModel()->GetName().c_str());
+    else
+        ui::Button("No display model");
+
+    if (ui::StartDragDropTarget())
+    {
+        // Check asset type
+        if (const ui::Payload payload = ui::AcceptPayload(MODEL_PAYLOAD, 0))
+        {
+            Asset* payloadData = reinterpret_cast<Asset*>(payload.GetData());
+            std::string pathStr = payloadData->m_path.string();
+            engine::ResourceManager::Load<engine::Model>(pathStr);
+
+           m_visualizer->SetDisplayModel(engine::ResourceManager::GetResource<engine::Model>(pathStr));
+        }
+
+        ui::EndDragDropTarget();
+    }
+
+    // Formatting
+    ui::VerticalSpacing();
+    RenderAnimationInputWindow();
+}
+
+void editor::AssetDetailsWnd::RenderAnimationInputWindow(void)
+{
+    f32 speed = m_visualizer->GetAnimator().GetAnimationSpeed();
+
+    ui::Text("Speed: ");
+    ui::SameLine(150.f);
+
+    if (ui::InputBox("##speed", &speed, 0.1f))
+        m_visualizer->GetAnimator().SetAnimationSpeed(speed);
+
+    ui::VerticalSpacing();
+
+    if (m_visualizer->GetAnimator().IsPaused())
+    {
+        ui::Text("Current frame: ");
+        ui::SameLine(150.f);
+
+        f32 keyframe = m_visualizer->GetAnimator().GetCurrentKeyFrame();
+
+        if (ui::InputBox("##keyframe", &keyframe, 0.f))
+            m_visualizer->GetAnimator().SetKeyFrame((int32)keyframe);
+
+        ui::VerticalSpacing();
+    }
+    
+    if (m_visualizer->GetAnimator().IsPlaying())
+    {
+        if (ui::Button("Pause"))
+            m_visualizer->GetAnimator().PauseAnimation();
+    }
+    else
+    {
+        if (ui::Button("Play"))
+            m_visualizer->GetAnimator().PlayAnimation();
+    }
+
+    ui::VerticalSpacing();
+
 }
 
 void editor::AssetDetailsWnd::RenderMaterialWindow(void)
@@ -230,6 +329,10 @@ void editor::AssetDetailsWnd::ResetData(void)
         DestroyMaterialData();
         break;
 
+    case EAssetType::ANIMATION:
+        m_animName.~basic_string();
+        break;
+
     default:
         break;
     }
@@ -263,4 +366,9 @@ void editor::AssetDetailsWnd::InitMaterialData(void)
         m_matData.m_mapNames[index] = (textureName) ? *textureName : "No " + GetTextureName(index);
     }
 
+}
+
+void editor::AssetDetailsWnd::InitAnimationData(const std::string& name)
+{
+    new(&m_animName) std::string(name);
 }

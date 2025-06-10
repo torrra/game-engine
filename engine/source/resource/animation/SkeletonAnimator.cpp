@@ -12,20 +12,16 @@
 
 namespace engine
 {
-    void SkeletonAnimator::SetAnimation(ResourceRef<class Animation>&& anim, bool crossfade)
+    void SkeletonAnimator::SetAnimation(ResourceRef<Animation>&& anim)
     {
-        if (crossfade)
-        {
-            // do stuff
-        }
-        else
-        {
-            m_nextAnim = ResourceRef<Animation>();
-            m_nextAnimIndices.clear();
-            m_currentAnim = std::forward<ResourceRef<Animation>>(anim);
+        m_currentAnim = std::forward<ResourceRef<Animation>>(anim);
+        InitAnimation(true);
+    }
 
-            InitAnimation(true);
-        }
+    void SkeletonAnimator::SetAnimation(const ResourceRef<Animation>& anim)
+    {
+        m_currentAnim = anim;
+        InitAnimation(true);
     }
 
     void SkeletonAnimator::SetModel(const ResourceRef<Model>& model)
@@ -48,7 +44,7 @@ namespace engine
         if (m_animState == EAnimationState::PAUSED)
             m_animState = EAnimationState::PLAYING;
 
-        else
+        else if (m_animState != EAnimationState::PLAYING)
         {
             m_animState = EAnimationState::PLAYING;
             m_elapsed = 0.f;
@@ -154,9 +150,24 @@ namespace engine
         return m_animState == EAnimationState::PAUSED;
     }
 
+    bool SkeletonAnimator::IsLockedInPlace(void) const
+    {
+        return m_lockedInPlace;
+    }
+
+    void SkeletonAnimator::SetLockedInPlace(bool locked)
+    {
+        m_lockedInPlace = locked;
+    }
+
     void SkeletonAnimator::InitBuffer(void)
     {
         m_skinningSSBO.Init();
+    }
+
+    void SkeletonAnimator::DeleteBuffer(void)
+    {
+        m_skinningSSBO.DeleteData();
     }
 
     void SkeletonAnimator::UseSkinningBuffer(void)
@@ -167,7 +178,7 @@ namespace engine
 
     void SkeletonAnimator::InitAnimation(bool current)
     {
-        if (!m_model || !m_model->CanRender())
+        if (!m_model || !m_model->IsLoaded())
         {
             PrintLog(ErrorPreset(), "Unable to init animation, model is invalid \
 or has not finished loading!");
@@ -184,12 +195,7 @@ or has not finished loading!");
                 m_targetInterval = defaultInterval;
 
             MapBonesByName(m_currentAnimIndices, m_currentAnim);
-        }
-        
-        else
-            MapBonesByName(m_nextAnimIndices, m_nextAnim);
-
-        
+        }       
     }
 
     void SkeletonAnimator::MapBonesByName(std::vector<BoneIndex>& indices,
@@ -245,6 +251,9 @@ or has not finished loading!");
         else
             keyFrame = boneKeyFrames[m_currentKeyFrame];
 
+        if (m_lockedInPlace && indices.m_parentIndex == -1)
+            keyFrame.m_position = math::Vector3f::Zero();
+
     }
  
     SkeletonAnimator::EAnimationState SkeletonAnimator::UpdateNextKeyFrame(void)
@@ -266,11 +275,9 @@ or has not finished loading!");
         if (m_model && m_model->IsDynamic())
         {
             m_currentAnimIndices.clear();
-            m_nextAnimIndices.clear();
             m_transforms.clear();
 
             m_currentAnimIndices.resize(m_model->GetBoneCount());
-            m_nextAnimIndices.resize(m_model->GetBoneCount());
             m_transforms.resize(m_model->GetBoneCount());
         }
     }
@@ -300,6 +307,9 @@ or has not finished loading!");
         
         matrices.resize(m_transforms.size(), {1.f});
         m_skinningMatrices.resize(m_transforms.size(), {1.f});
+
+        if (m_skinningMatrices.empty())
+            return;
 
         int64 currentBone = 0;
         

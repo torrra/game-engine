@@ -36,6 +36,7 @@
      uint32 | lock X axis=1
      uint32 | lock Y axis=1
      uint32 | lock Z axis=1
+     uint32 | kinematic=0
      uint64 | flags=0
 [Entity]
    string | name="Ground"

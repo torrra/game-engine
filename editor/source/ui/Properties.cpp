@@ -157,7 +157,7 @@ void editor::PropertyWnd::InitComponents(void)
 
 void editor::PropertyWnd::RenderMenuBar(void)
 {
-    ui::StartDisabledSection(!m_graph || m_handle == INVALID_HANDLE);
+    ui::StartDisabledSection(!m_graph || m_handle == INVALID_HANDLE || engine::Engine::GetEngine()->GetCurrentScene().IsRunning());
     if (ui::StartMenuBar())
     {
         if (ui::StartMenu("Add Component"))

@@ -9,6 +9,7 @@
 #include <engine/ui/UIStyle.h>
 #include <engine/input/InputHandler.h>
 #include <engine/utility/MemoryCheck.h>
+#include <engine/Engine.h>
 
 #define INVALID_HANDLE engine::Entity::EHandleUtils::INVALID_HANDLE
 
@@ -409,7 +410,7 @@ int32 editor::SceneGraphUI::GetDragDropFlags(int64 const nodeHandle) const
 
 void editor::SceneGraphUI::RenderMenuBar(void)
 {
-    ::ui::StartDisabledSection(!m_graph);
+    ::ui::StartDisabledSection(!m_graph || engine::Engine::GetEngine()->GetCurrentScene().IsRunning());
     if (::ui::StartMenuBar())
     {
         if (::ui::Button("Add Entity"))
@@ -423,7 +424,7 @@ void editor::SceneGraphUI::RenderMenuBar(void)
 void editor::SceneGraphUI::RenderPopupMenu(TreeNode* node)
 {
     // Scene graph right click menu
-    if (::ui::StartPopUp("Options"))
+    if (!engine::Engine::GetEngine()->GetCurrentScene().IsRunning() && ::ui::StartPopUp("Options"))
     {
         // Add
         if (::ui::MenuItem("Add Entity"))
