@@ -110,6 +110,8 @@ end
 -- Is executed every tick
 function BaseGun:Update(deltaTime)
 
+    self.transform = GetTransformComponent(self.entity.handle)
+
 end
 
 
