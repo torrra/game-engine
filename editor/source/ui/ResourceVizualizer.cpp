@@ -70,7 +70,7 @@ void editor::ResourceVisualizerWnd::SetDisplayModel(engine::ResourceRef<engine::
 void editor::ResourceVisualizerWnd::Init(void)
 {
     engine::ResourceManager::LoadShader("vizualizerShader", "./shaders/ModelTextured.vert",
-        "./shaders/ModelTextured.frag", true, true);
+        "./shaders/Model.frag", true, true);
 
     m_displayShader = engine::ResourceManager::GetResource<engine::ShaderProgram>("vizualizerShader");
     m_animator.InitBuffer();
