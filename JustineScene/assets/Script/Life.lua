@@ -23,7 +23,7 @@ function Life:OnDeath()
     end
     
     print("Entity has died")
-    DestroyEntity(self.entity)
+    DestroyEntity(self.entity, true)
     self.entity = nil
 end
 
