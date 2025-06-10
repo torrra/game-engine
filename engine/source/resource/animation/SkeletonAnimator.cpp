@@ -44,7 +44,7 @@ namespace engine
         if (m_animState == EAnimationState::PAUSED)
             m_animState = EAnimationState::PLAYING;
 
-        else
+        else if (m_animState != EAnimationState::PLAYING)
         {
             m_animState = EAnimationState::PLAYING;
             m_elapsed = 0.f;
@@ -307,6 +307,9 @@ or has not finished loading!");
         
         matrices.resize(m_transforms.size(), {1.f});
         m_skinningMatrices.resize(m_transforms.size(), {1.f});
+
+        if (m_skinningMatrices.empty())
+            return;
 
         int64 currentBone = 0;
         
