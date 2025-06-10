@@ -59,6 +59,8 @@ namespace engine
 
         ENGINE_API bool IsPlaying(void) const;
         ENGINE_API bool IsPaused(void) const;
+        ENGINE_API bool IsLockedInPlace(void) const;
+        ENGINE_API void SetLockedInPlace(bool locked);
 
         ENGINE_API void InitBuffer(void);
         ENGINE_API void DeleteBuffer(void);

@@ -150,6 +150,16 @@ namespace engine
         return m_animState == EAnimationState::PAUSED;
     }
 
+    bool SkeletonAnimator::IsLockedInPlace(void) const
+    {
+        return m_lockedInPlace;
+    }
+
+    void SkeletonAnimator::SetLockedInPlace(bool locked)
+    {
+        m_lockedInPlace = locked;
+    }
+
     void SkeletonAnimator::InitBuffer(void)
     {
         m_skinningSSBO.Init();
