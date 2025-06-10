@@ -10,6 +10,7 @@
 #include "ui/Assets.h"
 #include "ui/AssetDetails.h"
 #include "ui/gizmos/GizmosUI.h"
+#include "ui/ResourceVizualizer.h"
 
 namespace editor
 {
@@ -45,6 +46,7 @@ namespace editor
     private:
         void PickEntity(void);
 
+        ResourceVisualizerWnd       m_visualizer;
         AssetsWnd                   m_assetWnd;
         AssetDetailsWnd             m_assetDetails;
         PropertyWnd                 m_properties;
@@ -60,7 +62,6 @@ namespace editor
         Viewport*                   m_gameSimulationView;
         class ::engine::GameScene*  m_currentScene = nullptr;
         MenuBar                     m_menuBar;
-        bool                        m_isResetScheduled = false;
 
         friend class MenuBar;
         friend class Viewport;

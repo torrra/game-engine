@@ -79,8 +79,6 @@ void engine::ThreadManager::RenderScene(SceneGraph* scene)
 {
     ExecuteRenderThreadTasks();
 
-    SynchronizeAnimationThread();
-
     if (scene)
         scene->RenderFromCache();
 }

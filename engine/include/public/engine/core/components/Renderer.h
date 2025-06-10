@@ -27,10 +27,10 @@ namespace engine
         Renderer(EntityHandle owner, class SceneGraph* scene);
 
         ENGINE_API
-        Renderer(Renderer&&) = default;
+        Renderer(Renderer&& other) noexcept;
 
         ENGINE_API
-        ~Renderer(void) = default;
+        ~Renderer(void);
 
         ENGINE_API
         void Register(void) override;

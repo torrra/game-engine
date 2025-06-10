@@ -35,6 +35,9 @@ namespace editor
         bool HasWindowResized(void) const;
         const math::Vector2f& GetViewportSize(void) const;
 
+        void Bind(void);
+        void Unbind(void);
+
     protected:
         virtual void RenderContents(void) override;
     

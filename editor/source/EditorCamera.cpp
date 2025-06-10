@@ -51,12 +51,17 @@ math::Matrix4f editor::EditorCamera::ViewProjection(void)
     return m_projectionMatrix * GetViewMatrix();
 }
 
-math::Vector3f editor::EditorCamera::GetPosition(void) const
+const math::Vector3f& editor::EditorCamera::GetPosition(void) const
 {
     return m_position;
 }
 
-const math::Matrix4f& editor::EditorCamera::GetProjectionMatrix(void) const
+const math::Vector2f& editor::EditorCamera::GetRotation(void) const
+{
+    return m_rotationEuler;
+}
+
+math::Matrix4f editor::EditorCamera::GetProjectionMatrix(void) const
 {
     return m_projectionMatrix;
 }

@@ -14,6 +14,8 @@ extern "C"
 #include "resource/shader/Shader.h"
 #include "scripting/ecs/RendererFunctions.h"
 
+#include "ConsoleLog.hpp"
+
 int script_GetRendererRef(lua_State* luaState)
 {
     engine::Renderer* renderer = nullptr;
@@ -151,11 +153,39 @@ int script_SetAnimatorAnimation(lua_State* luaState)
     {
         std::string key = luaL_checkstring(luaState, 2);
 
+       engine::ThreadManager::AddTask([key, renderer]()
+       {
+
         engine::ResourceRef<engine::Animation> anim =
             engine::ResourceManager::GetResource<engine::Animation>(key);
 
-        if (anim)
-            renderer->GetAnimator().SetAnimation(std::move(anim), false);
+            if (anim)
+            {
+                while (!anim->IsLoaded() && !anim->HasFailedToLoad());
+
+                if (!renderer->GetModel())
+                {
+                    engine::PrintLog(engine::ErrorPreset(), "No model found on entity " +
+                        std::to_string(renderer->GetOwner()) + "\n");
+
+                    return;
+                }
+
+                if (!renderer->GetModel()->IsLoaded())
+                {
+                    engine::PrintLog(engine::WarningPreset(),
+                        "Model not fully loaded yet. Animation will be set once it has finished loading");
+
+                    while (!renderer->GetModel()->IsLoaded() && !renderer->GetModel()->HasFailedToLoad());
+
+                    if (renderer->GetModel()->HasFailedToLoad())
+                        return;
+                }
+
+                if (anim->IsLoaded())
+                    renderer->GetAnimator().SetAnimation(std::move(anim));
+            }
+       });
     }
 
     return 0;

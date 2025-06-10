@@ -33,7 +33,9 @@ namespace editor
             INVALID,
             SCENE,
             SCRIPT,
-            MATERIAL
+            MATERIAL,
+            ANIMATION,
+            MODEL
         };
 
 
@@ -44,11 +46,15 @@ namespace editor
         ~AssetDetailsWnd(void);
 
         void SelectAsset(const std::string& path, EAssetType type);
+        void SetVisualizer(class ResourceVisualizerWnd* window);
 
     private:
 
         void RenderContents(void) override;
 
+        void InitAnimationData(const std::string& name);
+        void RenderAnimationWindow(void);
+        void RenderAnimationInputWindow(void);
 
         void RenderMaterialWindow(void);
         void RenderMaterialTextureInput(engine::MeshMaterial* material);
@@ -66,9 +72,11 @@ namespace editor
         union
         {
             MeshMaterialData m_matData;
+            std::string      m_animName;
         };
 
-        EAssetType         m_selectedAssetType = EAssetType::INVALID;
+        class ResourceVisualizerWnd*    m_visualizer;
+        EAssetType                      m_selectedAssetType = EAssetType::INVALID;
 
     };
 }

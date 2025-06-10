@@ -11,7 +11,9 @@
 #include "engine/Engine.h"
 
 #include "engine/utility/ResourceContainer.h"
-//#include "engine/utility/ResourceRefDecl.h"
+#include "engine/utility/ResourceRefDecl.h"
+#include "engine/ConsoleLog.hpp"
+
 /*
 *	-------- Resource Manager --------
 *	- Meta data
@@ -23,6 +25,15 @@ namespace engine
 	class ResourceManager
 	{
 	public:
+
+        enum class EAsyncResourceType
+        {
+            INVALID,
+            MODEL,
+            ANIMATION
+        };
+
+
 		template<typename TResourceType>
 		static void					Load(std::string const& fileName, bool absolute = false);
 
@@ -33,6 +44,9 @@ namespace engine
                                         bool isVertAbsolute = false, bool isFragAbsolute = false);
 
         ENGINE_API static std::string LoadShaderFromFrag(const std::string& fragShader);
+
+        ENGINE_API static EAsyncResourceType LoadAsyncResource(std::string const& fileName);
+
 
         // Create a resource from data that already exists in memory instead
         // of loading a file from disk
@@ -139,21 +153,20 @@ namespace engine
         if (!HasResource(fileName))
             return {};
 
-       ResourceContainer& container = GetInstance()->m_resources[fileName];
-       TResourceType* resource = dynamic_cast<TResourceType*>(container.GetResource());
+        ResourceContainer& container = GetInstance()->m_resources[fileName];
+        TResourceType* resource = dynamic_cast<TResourceType*>(container.GetResource());
 
         if constexpr (!IsLoadedAsync<TResourceType>::m_value)
             return EditableRef<TResourceType>(&container, resource);
 
+        else if (resource)
+            return EditableRef<TResourceType>(&container, resource);
         else
         {
-
-            if (!resource->HasFailedToLoad())
-                return EditableRef<TResourceType>(&container, resource);
-
-            Unload(fileName);
+            engine::PrintLog(engine::ErrorPreset(), "Attempting to get null resource");
             return {};
         }
+
     }
 
     template <typename TResourceType> inline

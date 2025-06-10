@@ -75,10 +75,10 @@ void engine::Engine::ShutDown(void)
     m_activeScene.GetGraph()->CleanRigidBodies();
     m_activeScene.Reset(false);
     PhysicsEngine::Get().CleanUp();
-    m_application->Shutdown();
-    ResourceManager::ShutDown();
     ThreadManager::Shutdown();
     ScriptSystem::Shutdown();
+    m_application->Shutdown();
+    ResourceManager::ShutDown();
     InputHandler::ShutDown();
     m_uiManager.ShutDown();
     SoundEngine::Get().CloseSoundEngine();
