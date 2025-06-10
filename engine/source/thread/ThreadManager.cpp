@@ -26,19 +26,6 @@ bool engine::ThreadManager::IsShutDown(void)
 
 void engine::ThreadManager::Shutdown(void)
 {
-   
-
-   // TaskQueue& tasks = GetInstance()->GetQueue<ETaskType::GENERAL>();
-
-    //while (!tasks.empty());
-    /*{
-        GetInstance()->m_poolMutex.lock();
-        std::function<void()> function = std::move(tasks.front());
-        tasks.pop();
-        GetInstance()->m_poolMutex.unlock();
-
-        function();
-    }*/
 
     // lock mutex here, we want
     // the bool to be assigned BEFORE

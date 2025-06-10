@@ -1,0 +1,14 @@
+["DoorMat7.mmat"]
+    vec3f32 | ambient={0,0,0}
+    vec3f32 | diffuse={0,0,0}
+    vec3f32 | specular={0,0,0}
+    vec3f32 | emissive={0,0,0}
+    f32 | shininess=1
+    f32 | refractionIndex=1
+    f32 | opacity=1
+    bool | hasDiffuseMap=1
+    string | diffuseMap="\Level\Door\Texture\MAT_Scifi_Door_5_Base_Color.png"
+    bool | hasNormalMap=0
+    bool | hasSpecularMap=0
+    bool | hasAmbientOcclusionMap=0
+    bool | hasDiffuseRoughnessMap=0

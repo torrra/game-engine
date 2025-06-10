@@ -203,6 +203,29 @@ void engine::RigidBodyDynamic::UpdateEntity()
         transform->CopyPosition(updatedTransform);
         transform->CopyRotation(updatedTransform);
     }
+
+    //if (!m_rigidBodyImpl || !m_rigidBodyImpl->m_rigidBodyDynamic || m_rigidBodyShape == EGeometryType::PLANE)
+    //    return;
+
+    //Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner);
+    //if (entityTransform)
+    //    return;
+
+    //EntityHandle parent = m_currentScene->GetEntity(m_owner)->GetParent();
+    //physx::PxTransform updatedTransform = m_rigidBodyImpl->m_rigidBodyDynamic->getGlobalPose();
+
+    //if (parent)
+    //{
+    //    physx::PxTransform parentTransform = ToPxTransform(*m_currentScene->GetComponent<Transform>(parent));
+
+    //    entityTransform->CopyPosition(ToTransform(parentTransform * updatedTransform));
+    //    entityTransform->CopyRotation(ToTransform(parentTransform * updatedTransform));
+    //}
+    //else
+    //{
+    //    entityTransform->CopyPosition(ToTransform(updatedTransform));
+    //    entityTransform->CopyRotation(ToTransform(updatedTransform));
+    //}
 }
 
 void engine::RigidBodyDynamic::UpdateRigidBody()
@@ -222,6 +245,41 @@ void engine::RigidBodyDynamic::UpdateRigidBody()
             m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(ToPxTransform(worldTransform));
         }
     }
+
+    //if (!m_rigidBodyImpl || !m_rigidBodyImpl->m_rigidBodyDynamic || m_rigidBodyShape == EGeometryType::PLANE)
+    //    return;
+
+    //// Récupérer transform entité
+    //physx::PxTransform pose = physx::PxTransform(physx::PxIdentity);
+
+    //const Transform* entityTransform = m_currentScene->GetComponent<Transform>(m_owner);
+    //if (!entityTransform)
+    //    return;
+
+    //pose = ToPxTransform(*entityTransform);
+
+    //// Récupérer transform parent s'il existe
+    //physx::PxTransform parentPose = physx::PxTransform(physx::PxIdentity);
+    //EntityHandle parent = m_currentScene->GetEntity(m_owner)->GetParent();
+    //if (parent)
+    //{
+    //    const Transform* parentTransform = m_currentScene->GetComponent<Transform>(parent);
+    //    if (parentTransform)
+    //        parentPose = ToPxTransform(*parentTransform);
+    //    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(parentPose * pose);
+    //}
+    //else
+    //{
+    //    m_rigidBodyImpl->m_rigidBodyDynamic->setGlobalPose(pose);
+    //}
+}
+
+void engine::RigidBodyDynamic::MoveKinematicBody(const math::Vector3f& inDestPos,
+                                                 const math::Quatf& inDestRot)
+{
+    physx::PxTransform* transform = new physx::PxTransform(ToPxVec3(inDestPos), ToPxQuat(inDestRot));
+
+    m_rigidBodyImpl->m_rigidBodyDynamic->setKinematicTarget(*transform);
 }
 
 void engine::RigidBodyDynamic::RigidBodyDynamicCleanUp(void)
@@ -297,6 +355,8 @@ void engine::RigidBodyDynamic::SerializeText(std::ostream& output, EntityHandle 
     output << "\n     ";
     text::Serialize(output, "lock Z axis", static_cast<uint32>(m_isZLock));
     output << "\n     ";
+    text::Serialize(output, "kinematic", static_cast<uint32>(m_isKinematic));
+    output << "\n     ";
     text::Serialize(output, "flags", m_flags);
     output << '\n';
 }
@@ -355,6 +415,11 @@ const char* engine::RigidBodyDynamic::DeserializeText(const char* text, const ch
     uint32 isZLock = 1;
     text = text::DeserializeInteger(text, isZLock);
     m_isZLock = static_cast<bool>(isZLock);
+    
+    MOVE_TEXT_CURSOR(text, end);
+    uint32 isKinematic = 1;
+    text = text::DeserializeInteger(text, isKinematic);
+    m_isKinematic = static_cast<bool>(isKinematic);
 
     MOVE_TEXT_CURSOR(text, end);
     return text::DeserializeInteger(text, m_flags);
@@ -492,6 +557,11 @@ bool engine::RigidBodyDynamic::GetIsZAxisLock(void) const
 engine::EGeometryType engine::RigidBodyDynamic::GetShape(void) const
 {
     return static_cast<EGeometryType>(m_rigidBodyShape);
+}
+
+bool engine::RigidBodyDynamic::GetIsKinematic(void) const
+{
+    return m_isKinematic;
 }
 
 void engine::RigidBodyDynamic::SetGravityDisabled(bool inIsGravityDisabled)
@@ -708,6 +778,12 @@ engine::EForceMode engine::RigidBodyDynamic::SetForceMode(uint32 inForceMode)
     default:
         return EForceMode::FORCE;
     }
+}
+
+void engine::RigidBodyDynamic::SetKinematic(bool inIsKinematic)
+{
+    m_isKinematic = inIsKinematic;
+    m_rigidBodyImpl->m_rigidBodyDynamic->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, inIsKinematic);
 }
 
 void engine::RigidBodyDynamic::AddForce(const math::Vector3f& inForce, EForceMode inForceMode, bool inAutoWake)

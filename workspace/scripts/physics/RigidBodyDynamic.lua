@@ -149,3 +149,8 @@ function RigidBodyDynamic:AddTorque(x, y, z, forceMode, autoWake)
 
 	RigidBodyDynamicRef.AddTorque(self.ref, x, y, z, forceMode, autoWake)
 end
+
+function RigidBodyDynamic:MoveKinematic(xPos, yPos, zPos, xRot, yRot, zRot)
+	
+	RigidBodyDynamicRef.MoveKinematic(self.ref, xPos, yPos, zPos, xRot, yRot, zRot)
+end 

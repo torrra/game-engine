@@ -48,6 +48,7 @@ namespace editor
         void            GravityUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
         void            TriggerUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
         void            LockAxisUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
+        void            KinematicUI(engine::RigidBodyDynamic* inRigidBodyDynamic);
 
         /// Private members
         /*static*/  std::vector<const char*>    m_shapeTypes = { "Box", "Sphere", "Capsule" };

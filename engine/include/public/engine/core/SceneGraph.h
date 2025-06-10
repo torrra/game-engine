@@ -131,8 +131,9 @@ namespace engine
 
 
         // Permanently set an entity for destruction/overwrite.
+        // Children will also be destroyed in propagate is set to 'true'
         ENGINE_API
-        void	DestroyEntity(EntityHandle entity);
+        void	DestroyEntity(EntityHandle entity, bool propagate = false);
         
         // Give a new parent to an entity
         ENGINE_API

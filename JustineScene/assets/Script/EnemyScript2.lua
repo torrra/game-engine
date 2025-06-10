@@ -1,6 +1,6 @@
-EnemyScript = ScriptObject:_new()
+EnemyScript2 = ScriptObject:_new()
 
-EnemyScript.hasDetected = false
+EnemyScript2.hasDetected = false
 
 local State = 
 {
@@ -51,11 +51,11 @@ local function NormalizeAngle(angle)
     return angle - math.pi
 end
 
-function EnemyScript:Initialize()
+function EnemyScript2:Initialize()
 
     self.transform = GetTransformComponent(self.entity.handle)
-    self.navPoint1 = GetNavigationPointComponent(GetEntity("NavPoint.NavPoint1").handle)
-    self.navPoint2 = GetNavigationPointComponent(GetEntity("NavPoint.NavPoint2").handle)
+    self.navPoint1 = GetNavigationPointComponent(GetEntity("NavPoint.NavPoint3").handle)
+    self.navPoint2 = GetNavigationPointComponent(GetEntity("NavPoint.NavPoint4").handle)
     self.navPoint1:RefreshRef()
     self.navPoint2:RefreshRef()
     self.transform:RefreshRef()
@@ -64,6 +64,30 @@ function EnemyScript:Initialize()
     self.height = yHeight
     local x, _, z = self.navPoint1:GetPosition()
     self.transform:SetPosition(x, self.height, z)
+
+    -- Calculer la direction initiale vers la cible (NavPoint2 car goingToPoint1 = false)
+    local targetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
+    local targetPos = Vector3.new(targetPoint:GetPosition())
+    local currentPos = Vector3.new(self.transform:GetPosition())
+    local direction = Vector3.new(targetPos.x - currentPos.x, currentPos.y, targetPos.z - currentPos.z)
+    direction:Normalize()
+
+    -- Calculer l'angle de rotation vers la cible
+    local angleY = Atan2(-direction.x, -direction.z)
+
+    -- Appliquer cette rotation dès le départ
+    self.currentRotation = {
+        x = 0,
+        y = angleY,
+        z = 0
+    }
+    self.targetRotation = {
+        x = 0,
+        y = angleY,
+        z = 0
+    }
+
+    self.transform:SetRotation(0, angleY, 0)
 
     self.speed = 3.0
     self.goingToPoint1 = false
@@ -86,9 +110,10 @@ function EnemyScript:Initialize()
     self.attackRotationProgress = 0
     self.attackRotationSpeed = 0.5 -- rotation rapide vers le joueur en 0.5s par exemple
 
+    print("Initialize")
 end
 
-function EnemyScript:Move(deltaTime)
+function EnemyScript2:Move(deltaTime)
 
     local currentPos = Vector3.new(self.transform:GetPosition())
     local targetPoint = self.goingToPoint1 and self.navPoint1 or self.navPoint2
@@ -118,7 +143,7 @@ function EnemyScript:Move(deltaTime)
             local newDir = Vector3.new(newTargetPos.x - currentPos.x, currentPos.y, newTargetPos.z - currentPos.z)
             newDir:Normalize()
 
-            local angleY = -Atan2(newDir.z, newDir.x)
+            local angleY = Atan2(-newDir.x, -newDir.z)
 
             self.targetRotation = {
                 x = 0,
@@ -167,7 +192,7 @@ function EnemyScript:Move(deltaTime)
     end
 end
 
-function EnemyScript:Attack(deltaTime)
+function EnemyScript2:Attack(deltaTime)
 
     local currentPosition = Vector3.new(self.transform:GetPosition())
     local targetPosition = Vector3.new(self.playerTransform:GetPosition())
@@ -179,7 +204,7 @@ function EnemyScript:Attack(deltaTime)
     if self.hasDetected then
         if direction.x ~= 0 or direction.z ~= 0 then
             direction:Normalize()
-            local angleY = -Atan2(direction.z, direction.x) -- cible angle rotation
+            local angleY = Atan2(-direction.x, -direction.z) -- cible angle rotation
 
             -- Initialiser la rotation d'attaque si pas déjà initialisée
             if not self.attackCurrentRotation then
@@ -247,7 +272,7 @@ function EnemyScript:Attack(deltaTime)
 end
 
 
-function EnemyScript:Start()
+function EnemyScript2:Start()
     
     self:Initialize()
 
@@ -256,11 +281,9 @@ function EnemyScript:Start()
     local gunScript = GetScriptComponent(self.entity.handle)
 
     self.gun = gunScript.BaseGun
-
-    gunScript.Life.health = 3
 end
 
-function EnemyScript:Update(deltaTime)
+function EnemyScript2:Update(deltaTime)
     
     if self.hasDetected then
         self:Attack(deltaTime)
@@ -271,5 +294,5 @@ function EnemyScript:Update(deltaTime)
 
 end
 
-ScriptObjectTypes.EnemyScript = EnemyScript
-return EnemyScript
+ScriptObjectTypes.EnemyScript2 = EnemyScript2
+return EnemyScript2

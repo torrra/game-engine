@@ -396,6 +396,35 @@ int script_AddTorque(lua_State* luaState)
     return 0;
 }
 
+int script_MoveKinematicBody(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+    if (argumentCount < 7)
+        luaL_error(
+            luaState, "Expected 7 arguments (self, xPos, yPos, zPos, xRot, yRot, zRot");
+
+    if (engine::RigidBodyDynamic* rigidBody =
+        (engine::RigidBodyDynamic*)lua_touserdata(luaState, 1))
+    {
+        f32 xRotation = static_cast<f32>(lua_tonumber(luaState, 2));
+        f32 yRotation = static_cast<f32>(lua_tonumber(luaState, 3));
+        f32 zRotation = static_cast<f32>(lua_tonumber(luaState, 4));
+
+        math::Quatf quat =
+        {
+            math::Radian(xRotation),
+            math::Radian(yRotation),
+            math::Radian(zRotation),
+        };
+        rigidBody->MoveKinematicBody(math::Vector3f(
+            static_cast<f32>(lua_tonumber(luaState, 2)),
+            static_cast<f32>(lua_tonumber(luaState, 3)),
+            static_cast<f32>(lua_tonumber(luaState, 4))),
+            quat);
+    }
+    return 0;
+}
+
 void engine::RegisterRigidBodyDynamicFunctions(lua_State* luaState)
 {
     constexpr luaL_Reg rigidBodyDynamicFuncs[] =
@@ -426,6 +455,7 @@ void engine::RegisterRigidBodyDynamicFunctions(lua_State* luaState)
 
         {"AddForce", script_AddForce},
         {"AddTorque", script_AddTorque},
+        {"MoveKinematic", script_MoveKinematicBody},
 
         {NULL, NULL}
     };
