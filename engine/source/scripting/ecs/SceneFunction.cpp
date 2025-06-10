@@ -35,18 +35,19 @@ int script_CreateEntity(lua_State* luaState)
 
 int script_DestroyEntity(lua_State* luaState)
 {
-    if (lua_gettop(luaState) != 1)
-        luaL_error(luaState, "Expected 1 argument (entity)");
+    if (lua_gettop(luaState) != 2)
+        luaL_error(luaState, "Expected 2 argument (entity, shouldPropagate)");
 
     else
     {
         engine::EntityHandle entity = lua_tointeger(luaState, 1);
+        bool propagate = lua_toboolean(luaState, 2);
 
         engine::ThreadManager::AddTask<engine::ThreadManager::ETaskType::GRAPHICS>(
-            [entity]()
+            [entity, propagate]()
             {
                 engine::ThreadManager::SynchronizeGameThread();
-                engine::ScriptSystem::GetCurrentScene()->DestroyEntity(entity);
+                engine::ScriptSystem::GetCurrentScene()->DestroyEntity(entity, propagate);
                 engine::Engine::GetEngine()->ResetApplication();
             });
     }
@@ -151,10 +152,18 @@ int script_DestroyComponent(lua_State* luaState)
             break;
 
         case engine::Entity::RIGIDBODY_DYNAMIC:
+            if (graph->GetEntity(owner)->HasComponent<engine::Transform>())
+            {
+                graph->DestroyComponent<engine::Transform>(owner);
+            }
             graph->DestroyComponent<engine::RigidBodyDynamic>(owner);
             break;
 
         case engine::Entity::RIGIDBODY_STATIC:
+            if (graph->GetEntity(owner)->HasComponent<engine::Transform>())
+            {
+                graph->DestroyComponent<engine::Transform>(owner);
+            }
             graph->DestroyComponent<engine::RigidBodyStatic>(owner);
             break;
 
@@ -167,6 +176,10 @@ int script_DestroyComponent(lua_State* luaState)
             break;
 
         case engine::Entity::TRIANGLE_MESH:
+            if (graph->GetEntity(owner)->HasComponent<engine::Transform>())
+            {
+                graph->DestroyComponent<engine::Transform>(owner);
+            }
             graph->DestroyComponent<engine::TriangleMesh>(owner);
             break;
 

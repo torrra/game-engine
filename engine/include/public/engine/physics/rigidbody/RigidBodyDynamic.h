@@ -140,6 +140,10 @@ namespace engine
         ENGINE_API
             EGeometryType GetShape(void) const;
 
+            
+        ENGINE_API [[nodiscard]]
+            bool                GetIsKinematic(void) const;
+
         /// Setter
         /*
             Set the gravity status of the rigid body
@@ -233,6 +237,8 @@ namespace engine
             void                SetZAxisLock(bool inAxisLock);
         ENGINE_API
             EForceMode          SetForceMode(uint32 inForceMode);
+        ENGINE_API
+            void                SetKinematic(bool inIsKinematic);
 
         /// Functions
         // Update the entity transform in reference to the dynamic rigid body
@@ -241,6 +247,9 @@ namespace engine
         // Update the dynamic rigid body transform in reference to the entity
         ENGINE_API	
             void		        UpdateRigidBody(void);
+        ENGINE_API
+            void                MoveKinematicBody(const math::Vector3f& inDestPos,
+                                                  const math::Quatf& inDestRot);
         // Delete the dynamic rigid body
         ENGINE_API	
             void		        RigidBodyDynamicCleanUp(void);
@@ -400,6 +409,7 @@ namespace engine
         bool                    m_isXLock           = false;
         bool                    m_isYLock           = false;
         bool                    m_isZLock           = false;
+        bool m_isKinematic = false;
 
     }; // !Class RigidBodyDynamic
 

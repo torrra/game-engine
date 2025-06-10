@@ -147,13 +147,13 @@ engine::Image* engine::Canvas::AddImage(
     const char* fileName, 
     math::Vector2f const& position)
 {
-    std::lock_guard lock(m_canvasMutex);
-
+        //std::lock_guard lock(m_canvasMutex);
+    m_canvasMutex.lock();
     m_elements.push_back(new Image(fileName, position));
 
     UIElement* element = m_elements[m_elements.size() - 1];
     element->SetUID(++m_uidCounter);
-
+    m_canvasMutex.unlock();
     Image* image = dynamic_cast<Image*>(element);
     
     // Error handling
@@ -162,6 +162,7 @@ engine::Image* engine::Canvas::AddImage(
         // TODO: add logging
         std::printf("Failed to create & add image to UI. Error: image '%s' could not be found.\n", fileName);
         RemoveElement(image);
+        image = nullptr;
     }
 
     return image;

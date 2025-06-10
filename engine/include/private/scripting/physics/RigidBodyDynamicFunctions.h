@@ -28,6 +28,7 @@ extern "C"
 
     int script_AddForce(struct lua_State* luaState);
     int script_AddTorque(struct lua_State* luaState);
+    int script_MoveKinematicBody(struct lua_State* luaState);
 }
 
 namespace engine

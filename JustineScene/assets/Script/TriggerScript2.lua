@@ -1,7 +1,7 @@
-TriggerScript = ScriptObject:_new()
+TriggerScript2 = ScriptObject:_new()
 
 -- Is executed once when the object becomes active
-function TriggerScript:Start()
+function TriggerScript2:Start()
   local parentEntity = self.entity:GetParent()
   local parentScript = GetScriptComponent(parentEntity.handle)
 
@@ -9,24 +9,24 @@ function TriggerScript:Start()
     return
   end
 
-  self.enemyScript = parentScript.EnemyScript
+  self.enemyScript = parentScript.EnemyScript2
   
 end
 
 -- Is executed every tick
-function TriggerScript:Update(deltaTime)
+function TriggerScript2:Update(deltaTime)
 
 end
 
-function TriggerScript:OnTriggerEnter(otherEntity)
+function TriggerScript2:OnTriggerEnter(otherEntity)
 
     if self.enemyScript then
       self.enemyScript.hasDetected = true
-      print("Trigger")
+      print("Trigger player")
     end
 
 end
 
 -- Engine definitions
-ScriptObjectTypes.TriggerScript = TriggerScript
-return TriggerScript
+ScriptObjectTypes.TriggerScript2 = TriggerScript2
+return TriggerScript2

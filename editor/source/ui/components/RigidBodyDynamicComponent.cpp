@@ -60,6 +60,7 @@ void editor::RigidBodyDynamicComponent::SectionContent(void)
         GravityUI(rigidBodyDynamic);
         TriggerUI(rigidBodyDynamic);
         LockAxisUI(rigidBodyDynamic);
+        KinematicUI(rigidBodyDynamic);
     }
 }
 
@@ -204,5 +205,18 @@ void editor::RigidBodyDynamicComponent::LockAxisUI(engine::RigidBodyDynamic* inR
         ui::EndSection();
 
         ui::TreePop();
+    }
+}
+
+void editor::RigidBodyDynamicComponent::KinematicUI(engine::RigidBodyDynamic* inRigidBodyDynamic)
+{
+    bool isKinematic = inRigidBodyDynamic->GetIsKinematic();
+    const char* textKinematic = "Is kinematic: ";
+    math::Vector2f textKinematicSize = ui::GetTextSize(textKinematic);
+    ui::Text(textKinematic);
+    ui::SameLine(textKinematicSize.GetX() + 5.f);
+    if (ui::Checkbox("##Kinematic", &isKinematic))
+    {
+        inRigidBodyDynamic->SetKinematic(isKinematic);
     }
 }
