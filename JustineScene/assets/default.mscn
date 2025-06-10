@@ -227,11 +227,11 @@
    int64 | owner=13
    uint64 | count=6
    string | scriptObject="Life"
-   string | scriptObject="TeleportScript"
    string | scriptObject="BaseGun"
    string | scriptObject="WeaponController"
    string | scriptObject="PlayerController"
    string | scriptObject="GunShotScript"
+   string | scriptObject="TeleportScript"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=13

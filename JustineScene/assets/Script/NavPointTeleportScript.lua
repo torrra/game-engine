@@ -34,7 +34,6 @@ end
 function NavPointTeleportScript:OnTriggerExit(otherEntity)
 
     if otherEntity == self.playerEntity then
-        -- On ne remet pas hasToTeleport ici, le cooldown le gérera
     end
 
 end
