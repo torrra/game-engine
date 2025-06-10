@@ -23,6 +23,8 @@ namespace editor
         m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, this, { 0.1f, 0.1f, 0.1f, 1.0f });
         m_sceneEditorView = new Viewport(EDITOR_VIEW_WINDOW, scene, this, { 0.1f, 0.1f, 0.1f, 1.0f });
         m_gizmosUI = new GizmosUI();
+        m_visualizer.Init();
+        m_assetDetails.SetVisualizer(&m_visualizer);
 
         engine::ResourceManager::Load<engine::Model>("./assets/lightBall.obj", true);
         engine::ResourceManager::Load<engine::Model>("./assets/lightArrow.obj", true);
@@ -47,11 +49,13 @@ namespace editor
         if (!m_currentScene)
             return;
 
+        engine::ThreadManager::ExecuteRenderThreadTasks();
         static bool lockMouse = false;
         LockMousePosition(SIMULATION_VIEW_WINDOW, lockMouse);
 
         // Render editor windows
         m_assetDetails.Render();
+        m_visualizer.Update(m_currentScene->GetTime().GetDeltaTime());
         m_assetWnd.Render();
         m_menuBar.Render(*m_currentScene);
         m_graphView.Render();
@@ -62,14 +66,15 @@ namespace editor
 
         m_properties.Render();
 
-        m_gameSimulationView->RenderToViewport();
-        m_gameSimulationView->Render();
-        m_gameSimulationView->RenderInGameUI();
+        //m_gameSimulationView->RenderToViewport();
+        //m_gameSimulationView->Render();
+        //m_gameSimulationView->RenderInGameUI();
 
         
         // Editor camera
         if (m_sceneEditorView->HasWindowResized())
             m_editorViewCamera.UpdateAspectRatio(m_sceneEditorView->GetViewportSize());
+
 
         if (ui::IsWindowSelected(EDITOR_VIEW_WINDOW))
             m_editorViewCamera.Update(m_currentScene->GetTime().GetDeltaTime());
@@ -133,6 +138,7 @@ namespace editor
         //RigidBodyDynamicComponent::ReleaseStaticData();
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
+        m_visualizer.Reset();
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
 
         m_lightBall = ModelRef();
