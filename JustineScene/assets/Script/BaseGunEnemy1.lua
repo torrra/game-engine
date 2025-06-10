@@ -1,4 +1,4 @@
-BaseGunEnemy = ScriptObject:_new()
+BaseGunEnemy1 = ScriptObject:_new()
 
 AmmoTypes =
 {
@@ -7,24 +7,24 @@ AmmoTypes =
     ROCKET = {damage = 10},
 }
 
-BaseGunEnemy.ammoType = AmmoTypes.LIGHT
-BaseGunEnemy.magazineSize = 30
-BaseGunEnemy.ammoCount = BaseGunEnemy.magazineSize
-BaseGunEnemy.backupAmmoCount = BaseGunEnemy.magazineSize
-BaseGunEnemy.fireRate = 0.5
-BaseGunEnemy.lastFireTime = 0.0
-BaseGunEnemy.canFire = true
-BaseGunEnemy.range = 10.0
-BaseGunEnemy.name = "Gun"
+BaseGunEnemy1.ammoType = AmmoTypes.LIGHT
+BaseGunEnemy1.magazineSize = 30
+BaseGunEnemy1.ammoCount = BaseGunEnemy.magazineSize
+BaseGunEnemy1.backupAmmoCount = BaseGunEnemy.magazineSize
+BaseGunEnemy1.fireRate = 0.5
+BaseGunEnemy1.lastFireTime = 0.0
+BaseGunEnemy1.canFire = true
+BaseGunEnemy1.range = 10.0
+BaseGunEnemy1.name = "Gun"
 
-function BaseGunEnemy:new(obj)
+function BaseGunEnemy1:new(obj)
     obj = obj or {}
     setmetatable(obj, self)
     self.__index = self
     return obj
 end
 
-function BaseGunEnemy:GetHitEntityLife(hitEntity)
+function BaseGunEnemy1:GetHitEntityLife(hitEntity)
 
     local script = GetScriptComponent(hitEntity.handle)
     if script then
@@ -38,7 +38,7 @@ function BaseGunEnemy:GetHitEntityLife(hitEntity)
     return nil
 end
 
-function BaseGunEnemy:Fire()
+function BaseGunEnemy1:Fire()
 
     if not self.canFire or (os.clock() - self.lastFireTime < self.fireRate) then
         -- print("No can shoot")
@@ -81,7 +81,7 @@ function BaseGunEnemy:Fire()
 end
 
 
-function BaseGunEnemy:Reload()
+function BaseGunEnemy1:Reload()
 
     if self.backupAmmoCount <= 0 then
         return
@@ -99,7 +99,7 @@ function BaseGunEnemy:Reload()
 end
 
 -- Is executed once when the object becomes active
-function BaseGunEnemy:Start()
+function BaseGunEnemy1:Start()
 
     self.transform = GetTransformComponent(self.entity.handle)
     self.gunRay = Raycast.new()
@@ -108,7 +108,7 @@ end
 
 
 -- Is executed every tick
-function BaseGunEnemy:Update(deltaTime)
+function BaseGunEnemy1:Update(deltaTime)
 
     self.transform = GetTransformComponent(self.entity.handle)
 
@@ -116,5 +116,5 @@ end
 
 
 -- Engine definitions
-ScriptObjectTypes.BaseGunEnemy = BaseGunEnemy
-return BaseGunEnemy
+ScriptObjectTypes.BaseGunEnemy1 = BaseGunEnemy1
+return BaseGunEnemy1
