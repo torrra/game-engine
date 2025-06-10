@@ -59,12 +59,11 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
     }
     else
     {
-        printf("No Editor\n");
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewport->Size);
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, {1.0f, 0.0f, 0.0f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, {0.0f, 0.0f, 0.0f, 0.0f});
         
         ImGui::Begin("Canvas", nullptr, flags);
         

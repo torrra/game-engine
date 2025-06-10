@@ -260,60 +260,25 @@ void engine::Model::ProcessMeshes(const void* scene, const void* node, const std
     const aiScene*  sceneImpl = reinterpret_cast<const aiScene*>(scene);
     const aiNode*   nodeImpl = reinterpret_cast<const aiNode*>(node);
 
-
-    std::vector<std::future<void>> meshThreads;
-    meshThreads.reserve(nodeImpl->mNumMeshes);
-    uint64 oldSize = 0;
-
-    if (m_isDynamic)
-    {
-        oldSize = m_dynamicMeshes.size();
-        m_dynamicMeshes.resize(oldSize + nodeImpl->mNumMeshes);
-    }
-    else
-    {
-        oldSize = m_staticMeshes.size();
-        m_staticMeshes.resize(oldSize + nodeImpl->mNumMeshes);
-    }
-
     for (uint32 meshIndex = 0; meshIndex < nodeImpl->mNumMeshes; ++meshIndex)
-    {     
-        meshThreads.emplace_back(ThreadManager::AddTaskWithResult(
-          [nodeImpl, meshIndex, sceneImpl, &name, this, index = oldSize + meshIndex]()
-           {
-
-            // Use a pointer to pick between static and dynamic mesh without needing
-            // to initialize it right away like a reference
-            Mesh* mesh;
-
-            if (m_isDynamic)
-                mesh = &m_dynamicMeshes[index];
-            else
-                mesh = &m_staticMeshes[index];
-
-            aiMesh* importedMesh = sceneImpl->mMeshes[nodeImpl->mMeshes[meshIndex]];
-            mesh->ProcessMesh(importedMesh);
-            mesh->ProcessMaterial(sceneImpl->mMaterials[importedMesh->mMaterialIndex], name);
-
-            }));
-        
-        
-    }
-
-    for (std::future<void>& finishedMesh : meshThreads)
     {
-        if (finishedMesh.valid())
-            finishedMesh.get();
+        // Use a pointer to pick between static and dynamic mesh without needing
+        // to initialize it right away like a reference
+        Mesh* mesh;
+        
+        if (m_isDynamic)
+            mesh = &m_dynamicMeshes.emplace_back();
         else
-            return;
+            mesh = &m_staticMeshes.emplace_back();
+
+        aiMesh* importedMesh = sceneImpl->mMeshes[nodeImpl->mMeshes[meshIndex]];
+        mesh->ProcessMesh(importedMesh);
+        mesh->ProcessMaterial(sceneImpl->mMaterials[importedMesh->mMaterialIndex], name);
     }
 
     for (uint32 childIndex = 0; childIndex < nodeImpl->mNumChildren; ++childIndex)
     {
         ProcessMeshes(scene, nodeImpl->mChildren[childIndex], name);
-
-        if (ThreadManager::IsShutDown())
-            return;
     }
 }
 
@@ -347,7 +312,6 @@ void engine::Model::WorkerThreadLoad(const std::string& name)
     ProcessTextures(scene); 
     ProcessMeshes(scene, scene->mRootNode, dir);
 
-
     if (scene->HasAnimations())
         Animation::LoadExtraAnimations(scene);
 
@@ -368,7 +332,7 @@ void engine::Model::RenderThreadSetup(void)
         for (DynamicMesh& mesh : m_dynamicMeshes)
         {
             mesh.SetupGraphics();
-            ThreadManager::AddTask([&mesh]() { mesh.RenderThreadSkeletonSetup(); });
+            mesh.RenderThreadSkeletonSetup();
         }
     }
     else
