@@ -11,7 +11,9 @@
 #include "engine/Engine.h"
 
 #include "engine/utility/ResourceContainer.h"
-//#include "engine/utility/ResourceRefDecl.h"
+#include "engine/utility/ResourceRefDecl.h"
+#include "engine/ConsoleLog.hpp"
+
 /*
 *	-------- Resource Manager --------
 *	- Meta data
