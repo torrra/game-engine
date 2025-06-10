@@ -9,7 +9,7 @@ namespace engine
 {
     template <typename TResourceType>
     class ResourceRef
-    {  
+    {
 
     public:
 
@@ -38,15 +38,15 @@ namespace engine
         bool operator!=(const TResourceType* rhs) const;
 
         operator bool(void) const;
-        
+
     protected:
 
         void DecrementRefCount(void);
 
         TResourceType* m_raw = nullptr;
         ResourceContainer* m_controlBlock = nullptr;
-       
-    }; 
+
+    };
 
     template <typename TResourceType>
     class EditableRef : public ResourceRef<TResourceType>
@@ -80,8 +80,8 @@ namespace engine
 
 
     template<typename TResourceType> inline
-    ResourceRef<TResourceType>::ResourceRef(ResourceContainer* controlBlock,
-                                            TResourceType* rawVal)
+        ResourceRef<TResourceType>::ResourceRef(ResourceContainer* controlBlock,
+                                                TResourceType* rawVal)
         : m_controlBlock(controlBlock), m_raw(rawVal)
     {
         if (m_controlBlock)
@@ -89,8 +89,8 @@ namespace engine
     }
 
     template<typename TResourceType> inline
-    ResourceRef<TResourceType>::ResourceRef(const ResourceRef& other)
-       : m_controlBlock(other.m_controlBlock), m_raw(other.m_raw)
+        ResourceRef<TResourceType>::ResourceRef(const ResourceRef& other)
+        : m_controlBlock(other.m_controlBlock), m_raw(other.m_raw)
     {
         if (m_controlBlock)
             m_controlBlock->AddRef();
@@ -107,14 +107,15 @@ namespace engine
     }
 
     template<typename TResourceType> inline
-    ResourceRef<TResourceType>::~ResourceRef(void)
+        ResourceRef<TResourceType>::~ResourceRef(void)
     {
-        DecrementRefCount();
+        if (m_controlBlock)
+            m_controlBlock->RemoveRef();
     }
 
     template<typename TResourceType> inline
-    ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
-                                                    const ResourceRef<TResourceType>& rhs)
+        ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
+                                                        const ResourceRef<TResourceType>& rhs)
     {
         if (*this != rhs)
         {
@@ -132,8 +133,8 @@ namespace engine
 
 
     template<typename TResourceType> inline
-    ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
-                                                     ResourceRef<TResourceType>&& rhs) noexcept
+        ResourceRef<TResourceType>& ResourceRef<TResourceType>::operator=(
+                                                         ResourceRef<TResourceType>&& rhs) noexcept
     {
         if (*this != rhs)
         {
@@ -194,10 +195,10 @@ namespace engine
 
     template<typename TResourceType>
     template <std::derived_from<TResourceType> TOtherType> inline
-    ResourceRef<TResourceType>&
-    ResourceRef<TResourceType>::operator=(const ResourceRef<TOtherType>& rhs)
+        ResourceRef<TResourceType>&
+        ResourceRef<TResourceType>::operator=(const ResourceRef<TOtherType>& rhs)
     {
-        if (m_raw != (const void*)&rhs)
+        if (m_raw != (const void*) &rhs)
         {
             DecrementRefCount();
 
@@ -216,7 +217,7 @@ namespace engine
         ResourceRef<TResourceType>&
         ResourceRef<TResourceType>::operator=(ResourceRef<TOtherType>&& rhs) noexcept
     {
-        if (m_raw != (void*)&rhs)
+        if (m_raw != (void*) &rhs)
         {
             DecrementRefCount();
 
@@ -237,7 +238,7 @@ namespace engine
         EditableRef<TResourceType>&
         EditableRef<TResourceType>::operator=(const EditableRef<TOtherType>& rhs)
     {
-        if (ResourceRef<TResourceType>::m_raw != (const void*)&rhs)
+        if (ResourceRef<TResourceType>::m_raw != (const void*) &rhs)
         {
             ResourceRef<TResourceType>::DecrementRefCount();
 
@@ -255,7 +256,7 @@ namespace engine
         EditableRef<TResourceType>&
         EditableRef<TResourceType>::operator=(EditableRef<TOtherType>&& rhs) noexcept
     {
-        if (ResourceRef<TResourceType>::m_raw != (void*)&rhs)
+        if (ResourceRef<TResourceType>::m_raw != (void*) &rhs)
         {
             ResourceRef<TResourceType>::DecrementRefCount();
 
