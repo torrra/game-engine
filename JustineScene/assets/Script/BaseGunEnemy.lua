@@ -53,9 +53,9 @@ function BaseGun:Fire()
     self.lastFireTime = os.clock() 
     self.ammoCount = self.ammoCount - 1
 
-    local direction = Vector3.new(0.0, 0.0, -1.0):Rotate(self.camera:GetRotation())
+    local direction = Vector3.new(0.0, 0.0, -1.0):Rotate(self.transform:GetRotation())
 
-    local position = Vector3.new(self.camera:GetPosition())
+    local position = Vector3.new(self.transform:GetPosition())
     position = position + Vector3.new(direction.x, direction.y, direction.z)
 
     self.gunRay:SetOrigin(position)
@@ -101,7 +101,7 @@ end
 -- Is executed once when the object becomes active
 function BaseGun:Start()
 
-    self.camera = GetCameraComponent(self.entity.handle)
+    self.transform = GetTransformComponent(self.entity.handle)
     self.gunRay = Raycast.new()
     self.gunRay:SetDistance(self.range)
 end
@@ -110,7 +110,7 @@ end
 -- Is executed every tick
 function BaseGun:Update(deltaTime)
 
-    self.camera = GetCameraComponent(self.entity.handle)
+    self.transform = GetTransformComponent(self.entity.handle)
 
 end
 
