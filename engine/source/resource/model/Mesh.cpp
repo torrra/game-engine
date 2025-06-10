@@ -15,6 +15,23 @@ engine::Mesh::Mesh(void)
     m_texturePaths = new std::string[pathNum];
 }
 
+engine::Mesh::Mesh(Mesh&& other) noexcept
+    : m_vertices(std::move(other.m_vertices)),
+    m_vertexAttributes(std::move(other.m_vertexAttributes)),
+    m_indices(std::move(other.m_indices)), m_material(std::move(other.m_material)),
+    m_positionVBO(std::move(other.m_positionVBO)),
+    m_attributesVBO(std::move(other.m_attributesVBO)),
+    m_ebo(std::move(other.m_ebo))
+{
+    m_texturePaths = other.m_texturePaths;
+    m_metaData = other.m_metaData;
+    m_indexCount = other.m_indexCount;
+    m_vao = other.m_vao;
+
+    other.m_texturePaths = nullptr;
+    other.m_vao = 0;
+}
+
 void engine::Mesh::ProcessMesh(const void* mesh)
 {
     const aiMesh* meshImpl = reinterpret_cast<const aiMesh*>(mesh);
@@ -305,6 +322,12 @@ uint32 engine::Mesh::GetVertexArrayID(void) const
 uint32 engine::Mesh::GetIndexCount(void) const
 {
     return m_indexCount;
+}
+
+engine::Mesh::~Mesh(void)
+{
+    delete[] m_texturePaths;
+    m_texturePaths = nullptr;
 }
 
 engine::MeshMaterial& engine::Mesh::Material(void)

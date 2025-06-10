@@ -55,6 +55,9 @@ namespace engine
         
         ENGINE_API
         static void Startup(uint32 numThreads = DEFAULT_NUM_THREADS);
+
+        ENGINE_API
+        static bool IsShutDown(void);
         
         // Finish existing tasks and join all threads
         ENGINE_API
@@ -122,6 +125,7 @@ namespace engine
 
         static std::once_flag               m_instanceCreatedFlag;
         static ThreadManager*               m_instance;
+        static bool                         m_stopped;
 
     };
 
@@ -134,13 +138,17 @@ namespace engine
         static_assert(std::is_invocable_v<TFunctionType, TVariadicArgs...>,
             "Argument 'function' is not invocable");
 
+        // We don't want another thread to touch the queue while we add a task
+        std::lock_guard lock(GetInstance()->m_poolMutex);
+
+        if (GetInstance()->m_stopThreads)
+            return;
+
         std::function<void()> packagedFunc = std::bind(std::forward<TFunctionType>(function),
             std::forward<TVariadicArgs>(args)...);
 
-        // We don't want another thread to touch the queue while we add a task
-        GetInstance()->m_poolMutex.lock();
+
         GetInstance()->GetQueue<TTaskEnum>().push(packagedFunc);
-        GetInstance()->m_poolMutex.unlock();
 
         if constexpr (TTaskEnum != ETaskType::GRAPHICS)
             GetInstance()->m_conditionVariable.notify_one();
@@ -160,6 +168,13 @@ namespace engine
         // Packaged task type, with the function's declared type as template argument
         using TTaskType = std::packaged_task<decltype(function(args...))()>;
 
+        // lock to ensure that only this thread can write into the queue
+        // We don't want another thread to touch the queue while we add a task
+        std::lock_guard lock(GetInstance()->m_poolMutex);
+
+        if (GetInstance()->m_stopThreads)
+            return std::future<TReturnType>{};
+
         // std::bind return value type is unspecified, see:
         // https://en.cppreference.com/w/cpp/utility/functional/bind
         auto packagedFunc = std::bind(std::forward<TFunctionType>(function),
@@ -171,12 +186,9 @@ namespace engine
         TTaskType* task = new TTaskType(packagedFunc);
         std::future<TReturnType> future = task->get_future();
 
-        // lock to ensure that only this thread can write into the queue
-        GetInstance()->m_poolMutex.lock();
 
         // use lambda so that the task is stored as a void() function
         GetInstance()->GetQueue<TTaskEnum>().push([task]() -> void {(*task)(); delete task; });
-        GetInstance()->m_poolMutex.unlock();
 
         if constexpr (TTaskEnum != ETaskType::GRAPHICS)
             GetInstance()->m_conditionVariable.notify_one();

@@ -109,8 +109,7 @@ namespace engine
     template<typename TResourceType> inline
     ResourceRef<TResourceType>::~ResourceRef(void)
     {
-        if (m_controlBlock)
-            m_controlBlock->RemoveRef();
+        DecrementRefCount();
     }
 
     template<typename TResourceType> inline

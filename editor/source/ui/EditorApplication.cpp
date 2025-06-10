@@ -5,6 +5,8 @@
 #include <engine/thread/ThreadManager.h>
 #include <engine/ui/UIComponent.h>
 #include <engine/input/InputHandler.h>
+#include <engine/resource/model/Model.h>
+#include <engine/resource/ResourceManager.h>
 #include <engine/Engine.h>
 
 #include "ui/components/RigidBodyDynamicComponent.h"
@@ -21,6 +23,15 @@ namespace editor
         m_gameSimulationView = new Viewport(SIMULATION_VIEW_WINDOW, scene, this, { 0.1f, 0.1f, 0.1f, 1.0f });
         m_sceneEditorView = new Viewport(EDITOR_VIEW_WINDOW, scene, this, { 0.1f, 0.1f, 0.1f, 1.0f });
         m_gizmosUI = new GizmosUI();
+
+        engine::ResourceManager::Load<engine::Model>("./assets/lightBall.obj", true);
+        engine::ResourceManager::Load<engine::Model>("./assets/lightArrow.obj", true);
+        engine::ResourceManager::LoadShader("lightProgram", "./shaders/Model.vs",
+                                            "./shaders/Model.frag", true, true);
+
+        m_lightBall = engine::ResourceManager::GetResource<engine::Model>("./assets/lightBall.obj");
+        m_lightArrow = engine::ResourceManager::GetResource<engine::Model>("./assets/lightArrow.obj");
+        m_lightShader = engine::ResourceManager::GetResource<engine::ShaderProgram>("lightProgram");
     }
 
     void EditorApplication::SetCurrentScene(::engine::GameScene* scene)
@@ -123,6 +134,11 @@ namespace editor
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
         engine::Engine::GetEngine()->GetUIManager().ClearAllCanvases();
         m_assetDetails.SelectAsset("", AssetDetailsWnd::EAssetType::INVALID);
+
+        m_lightBall = ModelRef();
+        m_lightArrow = ModelRef();
+        m_lightShader = ShaderRef();
+
         delete m_gameSimulationView;
         delete m_sceneEditorView;
         delete m_gizmosUI;
@@ -132,6 +148,21 @@ namespace editor
     AssetDetailsWnd& EditorApplication::GetAssetDetailsWindow(void)
     {
         return m_assetDetails;
+    }
+
+    const EditorApplication::ModelRef& EditorApplication::GetLightArrow(void) const
+    {
+        return m_lightArrow;
+    }
+
+    const EditorApplication::ModelRef& EditorApplication::GetLightBall(void) const
+    {
+        return m_lightBall;
+    }
+
+    const EditorApplication::ShaderRef& EditorApplication::GetLightShader(void) const
+    {
+        return m_lightShader;
     }
 
     void EditorApplication::PickEntity(void)

@@ -68,17 +68,19 @@ int16 engine::Engine::Startup(uint32 threadCount)
 
 void engine::Engine::ShutDown(void)
 {
+    m_activeScene.Stop();
+    ThreadManager::SynchronizeGameThread(nullptr);
     ThreadManager::SynchronizeAnimationThread();
     ThreadManager::ExecuteRenderThreadTasks();
     m_activeScene.GetGraph()->CleanRigidBodies();
     m_activeScene.Reset(false);
+    PhysicsEngine::Get().CleanUp();
     ThreadManager::Shutdown();
     ScriptSystem::Shutdown();
     m_application->Shutdown();
     ResourceManager::ShutDown();
     InputHandler::ShutDown();
     m_uiManager.ShutDown();
-    PhysicsEngine::Get().CleanUp();
     SoundEngine::Get().CloseSoundEngine();
 
     if (m_application)
@@ -89,9 +91,6 @@ void engine::Engine::SetEditorApplication(Application* ptr)
 {
     m_application = ptr;
     ptr->SetCurrentScene(&m_activeScene);
-    ResourceManager::Load<Model>("./assets/lightBall.obj", true);
-    ResourceManager::Load<Model>("./assets/lightArrow.obj", true);
-    ResourceManager::LoadShader("lightProgram", "./shaders/Model.vs", "./shaders/Model.frag", true, true);
 }
 
 engine::Window* engine::Engine::GetWindow(void) const noexcept

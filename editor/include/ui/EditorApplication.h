@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/ui/Application.h>
+#include <engine/utility/ResourceRef.h>
 #include "EditorCamera.h"
 #include "ui/MenuBar.h"
 #include "ui/Properties.h"
@@ -14,6 +15,11 @@ namespace editor
 {
     class EditorApplication final : public ::engine::Application
     {
+    private:
+
+        using ModelRef = engine::ResourceRef<engine::Model>;
+        using ShaderRef = engine::ResourceRef<engine::ShaderProgram>;
+
     public:
 
         EditorApplication(const char* title, class ::engine::SceneGraph* scene);
@@ -32,6 +38,10 @@ namespace editor
 
         AssetDetailsWnd& GetAssetDetailsWindow(void);
 
+        const ModelRef& GetLightArrow(void) const;
+        const ModelRef& GetLightBall(void) const;
+        const ShaderRef& GetLightShader(void) const;
+
     private:
         void PickEntity(void);
 
@@ -40,6 +50,11 @@ namespace editor
         PropertyWnd                 m_properties;
         EditorCamera                m_editorViewCamera;
         SceneGraphUI                m_graphView;
+
+        ModelRef                    m_lightArrow;
+        ModelRef                    m_lightBall;
+        ShaderRef                   m_lightShader;
+
         GizmosUI*                   m_gizmosUI;
         Viewport*                   m_sceneEditorView;
         Viewport*                   m_gameSimulationView;
