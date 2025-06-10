@@ -77,6 +77,9 @@ function BaseGun:Fire()
 
     if entityLife then
         entityLife:TakeDamage(self.ammoType.damage)
+        self.gunShot.shotSound:PlaySound()
+
+        
     end
 end
 
@@ -104,6 +107,10 @@ function BaseGun:Start()
     self.camera = GetCameraComponent(self.entity.handle)
     self.gunRay = Raycast.new()
     self.gunRay:SetDistance(self.range)
+
+    local gunScript = GetScriptComponent(self.entity.handle)
+    
+    self.gunShot = gunScript.GunShotScript
 end
 
 

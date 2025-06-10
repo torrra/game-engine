@@ -283,6 +283,7 @@ function EnemyScript2:Start()
     self.gun = gunScript.BaseGunEnemy
 
     gunScript.Life.health = 3
+
 end
 
 function EnemyScript2:Update(deltaTime)

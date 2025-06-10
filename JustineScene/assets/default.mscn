@@ -122,7 +122,7 @@
    int64 | handle=10
    int64 | parent=6
    uint64 | flags=0
-   uint64 | components=11
+   uint64 | components=75
 [Transform]
     uint64 | index=3
     int64 | owner=10
@@ -133,10 +133,11 @@
 [Script]
    uint64 | index=0
    int64 | owner=10
-   uint64 | count=3
+   uint64 | count=4
    string | scriptObject="EnemyScript"
    string | scriptObject="Life"
    string | scriptObject="BaseGunEnemy1"
+   string | scriptObject="GunShotScript"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=10
@@ -150,6 +151,12 @@
      uint32 | lock Y axis=1
      uint32 | lock Z axis=1
      uint32 | kinematic=0
+     uint64 | flags=0
+[AudioPlayer]
+     int64 | owner=10
+     string | sound="\Sound\gunshot-352466.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=0
      uint64 | flags=0
 [Entity]
    string | name="Enemy1Mesh"
@@ -199,7 +206,7 @@
    int64 | handle=13
    int64 | parent=-1
    uint64 | flags=0
-   uint64 | components=43
+   uint64 | components=107
 [Transform]
     uint64 | index=6
     int64 | owner=13
@@ -218,12 +225,13 @@
 [Script]
    uint64 | index=1
    int64 | owner=13
-   uint64 | count=5
+   uint64 | count=6
    string | scriptObject="Life"
    string | scriptObject="TeleportScript"
    string | scriptObject="BaseGun"
    string | scriptObject="WeaponController"
    string | scriptObject="PlayerController"
+   string | scriptObject="GunShotScript"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=13
@@ -237,6 +245,12 @@
      uint32 | lock Y axis=1
      uint32 | lock Z axis=1
      uint32 | kinematic=0
+     uint64 | flags=0
+[AudioPlayer]
+     int64 | owner=13
+     string | sound="\Sound\gunshot-352466.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=0
      uint64 | flags=0
 [Entity]
    string | name="Enemy1Trigger"
@@ -743,7 +757,7 @@
    int64 | handle=40
    int64 | parent=6
    uint64 | flags=0
-   uint64 | components=11
+   uint64 | components=75
 [Transform]
     uint64 | index=25
     int64 | owner=40
@@ -754,10 +768,11 @@
 [Script]
    uint64 | index=5
    int64 | owner=40
-   uint64 | count=3
+   uint64 | count=4
    string | scriptObject="EnemyScript2"
    string | scriptObject="BaseGunEnemy"
    string | scriptObject="Life"
+   string | scriptObject="GunShotScript"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=40
@@ -771,6 +786,12 @@
      uint32 | lock Y axis=1
      uint32 | lock Z axis=1
      uint32 | kinematic=0
+     uint64 | flags=0
+[AudioPlayer]
+     int64 | owner=40
+     string | sound="\Sound\gunshot-352466.mp3"
+    f32 | volume=1
+     uint32 | 3D sound=0
      uint64 | flags=0
 [Entity]
    string | name="Enemy2Mesh"
@@ -857,7 +878,7 @@
    uint64 | flags=0
 [AudioPlayer]
      int64 | owner=44
-     string | sound="\Sound\Falling_In_Reverse-Im_Not_A_Vampire.mp3"
+     string | sound="\Sound\ambient-soundscapes-007-space-atmosphere-304974.mp3"
     f32 | volume=1
      uint32 | 3D sound=0
      uint64 | flags=0
