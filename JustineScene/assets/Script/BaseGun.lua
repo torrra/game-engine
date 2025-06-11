@@ -46,7 +46,7 @@ function BaseGun:Fire()
     end
 
     if self.ammoCount <= 0 then
-        print("Out of ammo")
+        --print("Out of ammo")
         return
     end
 
