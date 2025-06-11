@@ -13,8 +13,8 @@ void editor::LockMousePosition(const char* wndName, bool& state)
             (state) ?
             engine::ECursorMode::MODE_DISABLED : engine::ECursorMode::MODE_NORMAL
         );
+        
+        engine::UIManager::LockCursor(state);
     }
 
-    if (state)
-        engine::UIManager::LockCursor();
 }

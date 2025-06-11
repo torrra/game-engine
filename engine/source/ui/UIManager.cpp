@@ -93,9 +93,13 @@ void engine::UIManager::RenderCanvases(math::Vector2f const& position, math::Vec
     }
 }
 
-void engine::UIManager::LockCursor(void)
+void engine::UIManager::LockCursor(bool isLocked)
 {
-    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+
+    if (isLocked)
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+    else
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
 }
 
 void engine::UIManager::ClearAllCanvases(void)

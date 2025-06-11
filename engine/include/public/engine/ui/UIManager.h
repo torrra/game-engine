@@ -40,7 +40,7 @@ namespace engine
         ENGINE_API void RenderCanvases(math::Vector2f const& position, math::Vector2f const& viewportSize);
 
 
-        ENGINE_API static void LockCursor(void);
+        ENGINE_API static void LockCursor(bool isLocked);
 	
 	private:
 		void			InitUI(wnd::Wnd* window);
