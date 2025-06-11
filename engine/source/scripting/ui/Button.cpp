@@ -80,6 +80,23 @@ int script_SetPressedColor(lua_State* luaState)
     return 0;
 }
 
+int script_SetButtonSize(lua_State* luaState)
+{
+    int argumentCount = lua_gettop(luaState);
+
+    if (argumentCount != 3)
+        luaL_error(luaState, "Expected 3 argument (element, width, height)");
+    else if (engine::Button* button = (engine::Button*) lua_touserdata(luaState, 1))
+    {
+        button->SetScale({
+            static_cast<f32>(lua_tonumber(luaState, 2)),
+            static_cast<f32>(lua_tonumber(luaState, 3))
+        });
+    }
+
+    return 0;
+}
+
 void engine::RegisterUIButtonFunctions(lua_State* luaState)
 {
     constexpr luaL_Reg uiFuncs[]
@@ -88,6 +105,7 @@ void engine::RegisterUIButtonFunctions(lua_State* luaState)
         {"SetColor", script_SetColor},
         {"SetHoveredColor", script_SetHoveredColor},
         {"SetPressedColor", script_SetPressedColor},
+        {"SetButtonSize", script_SetButtonSize},
         {NULL, NULL}
     };
 
