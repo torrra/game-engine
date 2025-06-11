@@ -3,8 +3,18 @@ DeathZoneScript = ScriptObject:_new()
 -- Is executed once when the object becomes active
 function DeathZoneScript:Start()
 
-    self.playerEntity = GetEntity("Player").handle
+    self.player = GetEntity("Player").handle
+    
+    local script = GetScriptComponent(self.entity.handle)
+    local playerScript = GetScriptComponent(self.player)
 
+    if script then
+        self.menu = script.Menu
+    end
+
+    if playerScript then
+        self.playerLife = playerScript.Life
+    end
 end
 
 
@@ -13,12 +23,19 @@ function DeathZoneScript:Update(deltaTime)
 
 end
 
-function DeathZoneScript:OnTriggerEnter(otherEntity)
+function DeathZoneScript:OnTriggerEnter(other)
 
-    if otherEntity == self.playerEntity then
-        print("Player is dead game over")
-    end
+    if other == self.player and self.menu then
+        self.menu:OpenMenu("You died...")
+        self.playerLife:TakeDamage(150)
 
+        local allEnemies = GetEntity("Enemy")
+
+        if allEnemies then
+            DestroyEntity(allEnemies, true)
+        end
+
+    end 
 end
 
 -- Engine definitions

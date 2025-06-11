@@ -14,9 +14,7 @@ function Canvas:CreateCanvas(canvasName, canvasWidth, canvasHeight)
 end
 
 function Canvas:DestroyCanvas()
-	CanvasRef = CanvasRef.DestroyCanvas(self._name)
-
-	return nil
+	 CanvasRef.DestroyCanvas(self._name)
 end
 
 function Canvas:RemoveElement(element)
