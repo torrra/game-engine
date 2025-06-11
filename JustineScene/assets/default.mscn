@@ -231,13 +231,14 @@
 [Script]
    uint64 | index=1
    int64 | owner=13
-   uint64 | count=6
+   uint64 | count=7
    string | scriptObject="Life"
    string | scriptObject="BaseGun"
    string | scriptObject="WeaponController"
    string | scriptObject="PlayerController"
    string | scriptObject="GunShotScript"
    string | scriptObject="TeleportScript"
+   string | scriptObject="Menu"
    uint64 | flags=0
 [RigidBodyDynamic]
      int64 | owner=13
@@ -742,21 +743,22 @@
     uint64 | index=30
     int64 | owner=8589934629
     quat32 | rotation={1,0,0,0}
-    vec3f32 | position={11.85,12.35,-94}
+    vec3f32 | position={11.85,6.25,-93.65}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Script]
    uint64 | index=9
    int64 | owner=8589934629
-   uint64 | count=1
+   uint64 | count=2
    string | scriptObject="DeathZoneScript"
+   string | scriptObject="Menu"
    uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=8589934629
      uint32 | type=1
      uint64 | shape=0
      uint32 | collision group=4
-     vec3f32 | box half extents={5,0.5,5}
+     vec3f32 | box half extents={5,12.05,4.5}
      bool | trigger=1
      uint64 | flags=0
 [Entity]
@@ -931,8 +933,9 @@
 [Script]
    uint64 | index=10
    int64 | owner=45
-   uint64 | count=1
+   uint64 | count=2
    string | scriptObject="WinZone"
+   string | scriptObject="Menu"
    uint64 | flags=0
 [RigidBodyStatic]
      int64 | owner=45

@@ -46,7 +46,7 @@ function BaseGun:Fire()
     end
 
     if self.ammoCount <= 0 then
-        print("Out of ammo")
+        --print("Out of ammo")
         return
     end
 
@@ -77,7 +77,6 @@ function BaseGun:Fire()
 
     if entityLife then
         entityLife:TakeDamage(self.ammoType.damage)
-        self.gunShot.shotSound:PlaySound()
 
         
     end
@@ -108,9 +107,7 @@ function BaseGun:Start()
     self.gunRay = Raycast.new()
     self.gunRay:SetDistance(self.range)
 
-    local gunScript = GetScriptComponent(self.entity.handle)
     
-    self.gunShot = gunScript.GunShotScript
 end
 
 

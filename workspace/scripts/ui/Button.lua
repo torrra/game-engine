@@ -26,3 +26,7 @@ end
 function Button:SetPressedColor(red, green, blue, alpha)
     return ButtonRef.SetPressedColor(self.buttonRef, red, green, blue, alpha)
 end
+
+function Button:SetButtonSize(width, height)
+    return ButtonRef.SetButtonSize(self.buttonRef, width, height)
+end
