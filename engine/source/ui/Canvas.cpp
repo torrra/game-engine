@@ -35,10 +35,10 @@ void engine::Canvas::Render(math::Vector2f const& position, math::Vector2f const
     // Window needs to be different if the scene is rendered is
     if (engine::Engine::GetEngine()->HasEditor())
     {
-        
         ImGui::Begin("Simulation view", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::SetCursorPos(ImGui::GetWindowContentRegionMin());
         ImGui::PushStyleColor(ImGuiCol_ChildBg, m_bgColor);
+        ImGui::SetWindowFontScale(3.0);
         
         ImGui::BeginChild("Canvas", size, ImGuiChildFlags_NavFlattened, flags);
         
