@@ -121,6 +121,10 @@ function WeaponController:Start()
     self.crosshair = self.uiCanvas:AddImage("crosshair.png", 0, 0)
     self.crosshair:SetScale(self.crosshairSize.x, self.crosshairSize.y)
 
+    local gunScript = GetScriptComponent(self.entity.handle)
+    
+    self.gunShot = gunScript.GunShotScript
+
 end
 
 
@@ -149,6 +153,8 @@ function WeaponController:Update(deltaTime)
     if IsInputPressed(self.fireKey) and self.currentGun then
         self.currentGun:Fire()
         self:UpdateAmmoText()
+        self.gunShot.shotSound:PlaySound()
+
     end
 
     if IsInputPressed(self.reloadKey) and self.currentGun then
