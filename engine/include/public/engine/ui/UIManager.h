@@ -38,7 +38,9 @@ namespace engine
         ENGINE_API void DeleteAllCanvases(void);
         ENGINE_API void DeleteCanvas(std::string const& name);
         ENGINE_API void RenderCanvases(math::Vector2f const& position, math::Vector2f const& viewportSize);
-        
+
+
+        ENGINE_API static void LockCursor(void);
 	
 	private:
 		void			InitUI(wnd::Wnd* window);

@@ -93,6 +93,11 @@ void engine::UIManager::RenderCanvases(math::Vector2f const& position, math::Vec
     }
 }
 
+void engine::UIManager::LockCursor(void)
+{
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+}
+
 void engine::UIManager::ClearAllCanvases(void)
 {
     for (auto& canvas : m_canvasMap)
