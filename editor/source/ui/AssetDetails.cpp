@@ -87,7 +87,7 @@ void editor::AssetDetailsWnd::RenderContents(void)
 
 void editor::AssetDetailsWnd::RenderAnimationWindow(void)
 {
-    ui::Text("Current animation : %s", m_animName.c_str());
+    ui::Text("Current animation : %s", m_animData.m_animName.c_str());
     ui::VerticalSpacing();
 
     ui::Text("Display model: ");
@@ -116,6 +116,7 @@ void editor::AssetDetailsWnd::RenderAnimationWindow(void)
     // Formatting
     ui::VerticalSpacing();
     RenderAnimationInputWindow();
+    RenderAnimationTransformWindow();
 }
 
 void editor::AssetDetailsWnd::RenderAnimationInputWindow(void)
@@ -124,25 +125,24 @@ void editor::AssetDetailsWnd::RenderAnimationInputWindow(void)
 
     ui::Text("Speed: ");
     ui::SameLine(150.f);
+    ui::ItemWidth(60.f);
 
     if (ui::InputBox("##speed", &speed, 0.1f))
         m_visualizer->GetAnimator().SetAnimationSpeed(speed);
 
     ui::VerticalSpacing();
 
-    if (m_visualizer->GetAnimator().IsPaused())
-    {
-        ui::Text("Current frame: ");
-        ui::SameLine(150.f);
-
-        f32 keyframe = m_visualizer->GetAnimator().GetCurrentKeyFrame();
-
-        if (ui::InputBox("##keyframe", &keyframe, 0.f))
-            m_visualizer->GetAnimator().SetKeyFrame((int32)keyframe);
-
-        ui::VerticalSpacing();
-    }
+    ui::Text("Current frame: ");
+    ui::SameLine(150.f);
+    ui::ItemWidth(60.f);
     
+    f32 keyframe = m_visualizer->GetAnimator().GetCurrentKeyFrame();
+    
+    if (ui::InputBox("##keyframe", &keyframe, 1.f))
+        m_visualizer->GetAnimator().SetKeyFrame((int32)keyframe);
+    
+    ui::VerticalSpacing();
+     
     if (m_visualizer->GetAnimator().IsPlaying())
     {
         if (ui::Button("Pause"))
@@ -156,6 +156,128 @@ void editor::AssetDetailsWnd::RenderAnimationInputWindow(void)
 
     ui::VerticalSpacing();
 
+}
+
+void editor::AssetDetailsWnd::RenderAnimationTransformWindow(void)
+{
+    ui::VerticalSpacing();
+    ui::Separator("Display transform");
+    ui::VerticalSpacing();
+
+    RenderAnimationPositionInput();
+    RenderAnimationRotationInput();
+    RenderAnimationScaleInput();
+
+    ui::VerticalSpacing();
+    ui::Separator("Display color");
+    ui::VerticalSpacing();
+
+    if (ui::ColorEdit("##color", (f32*)&m_animData.m_color))
+        m_visualizer->SetDisplayColor(m_animData.m_color);
+    
+}
+
+void editor::AssetDetailsWnd::RenderAnimationPositionInput(void)
+{
+    ui::Text("Position: ");
+    ui::SameLine(80.f);
+    ui::ItemWidth(60.f);
+
+    if (ui::InputBox("##posX", &m_animData.m_position.X(), 0.1f))
+    {
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+    ui::SameLine(145.f);
+    ui::ItemWidth(60.f);
+
+
+    if (ui::InputBox("##posY", &m_animData.m_position.Y(), 0.1f))
+    {
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+    ui::SameLine(210.f);
+    ui::ItemWidth(60.f);
+
+
+    if (ui::InputBox("##posZ", &m_animData.m_position.Z(), 0.1f))
+    {
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+}
+
+void editor::AssetDetailsWnd::RenderAnimationRotationInput(void)
+{
+    ui::VerticalSpacing();
+    ui::Text("Rotation: ");
+
+    ui::SameLine(80.f);
+    ui::ItemWidth(60.f);
+
+    if (ui::InputBox("##rotationX", &m_animData.m_rotationEuler.X(), 0.1f))
+    {
+        m_animData.m_rotation = math::Quatf(math::Degree(m_animData.m_rotationEuler.GetX()),
+            math::Degree(m_animData.m_rotationEuler.GetY()), math::Degree(m_animData.m_rotationEuler.GetZ()));
+
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+    ui::SameLine(145.f);
+    ui::ItemWidth(60.f);
+
+    if (ui::InputBox("##rotationY", &m_animData.m_rotationEuler.Y(), 0.1f))
+    {
+        m_animData.m_rotation = math::Quatf(math::Degree(m_animData.m_rotationEuler.GetX()),
+            math::Degree(m_animData.m_rotationEuler.GetY()), math::Degree(m_animData.m_rotationEuler.GetZ()));
+
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+
+    ui::SameLine(210.f);
+    ui::ItemWidth(60.f);
+
+    if (ui::InputBox("##rotationZ", &m_animData.m_rotationEuler.Z(), 0.1f))
+    {
+        m_animData.m_rotation = math::Quatf(math::Degree(m_animData.m_rotationEuler.GetX()),
+            math::Degree(m_animData.m_rotationEuler.GetY()), math::Degree(m_animData.m_rotationEuler.GetZ()));
+
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+}
+
+void editor::AssetDetailsWnd::RenderAnimationScaleInput(void)
+{
+    ui::VerticalSpacing();
+    ui::Text("Scale: ");
+    ui::SameLine(80.f);
+    ui::ItemWidth(60.f);
+
+
+    if (ui::InputBox("##scaleX", &m_animData.m_scale.X(), 0.1f))
+    {
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+    ui::SameLine(145.f);
+    ui::ItemWidth(60.f);
+
+    if (ui::InputBox("##scaleY", &m_animData.m_scale.Y(), 0.1f))
+    {
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
+    ui::SameLine(210.f);
+    ui::ItemWidth(60.f);
+
+    if (ui::InputBox("##scaleZ", &m_animData.m_scale.Z(), 0.1f))
+    {
+        m_visualizer->SetTransformMat(math::TransformMatrix(
+            m_animData.m_rotation, m_animData.m_position, m_animData.m_scale));
+    }
 }
 
 void editor::AssetDetailsWnd::RenderMaterialWindow(void)
@@ -203,7 +325,10 @@ void editor::AssetDetailsWnd::RenderMaterialTextureInput(engine::MeshMaterial* m
                 std::string pathStr = payloadData->m_path.string();
                 engine::ResourceManager::Load<engine::Texture>(pathStr);
 
-                m_matData.m_mapNames[index] = pathStr;
+                char writeBuf[512]{};
+                sprintf_s(writeBuf, "%s (%zu)", pathStr.c_str(), index);
+
+                m_matData.m_mapNames[index] = writeBuf;
                 material->SetTexture(engine::ResourceManager::GetResource<engine::Texture>(pathStr), index);
             }
 
@@ -330,7 +455,7 @@ void editor::AssetDetailsWnd::ResetData(void)
         break;
 
     case EAssetType::ANIMATION:
-        m_animName.~basic_string();
+        m_animData.m_animName.~basic_string();
         break;
 
     default:
@@ -363,12 +488,23 @@ void editor::AssetDetailsWnd::InitMaterialData(void)
     for (uint64 index = 0; index < mapNameCount; ++index)
     {
         const std::string* textureName = engine::ResourceManager::FindKeyByVal<engine::Texture>(textures[index]);
-        m_matData.m_mapNames[index] = (textureName) ? *textureName : "No " + GetTextureName(index);
+
+        char writeBuf[512]{};
+
+        if (textureName)
+            sprintf_s(writeBuf, "%s (%zu)", textureName->c_str(), index);
+
+        m_matData.m_mapNames[index] = (textureName) ? writeBuf : "No " + GetTextureName(index);
     }
 
 }
 
 void editor::AssetDetailsWnd::InitAnimationData(const std::string& name)
 {
-    new(&m_animName) std::string(name);
+    new(&m_animData.m_animName) std::string(name);
+    m_animData.m_position = math::Vector3f::Zero();
+    m_animData.m_scale = math::Vector3f::One();
+    m_animData.m_rotation = math::Quatf::Identity();
+    m_animData.m_rotationEuler = math::Vector3f::Zero();
+    m_animData.m_color = math::Vector3f::One();
 }
