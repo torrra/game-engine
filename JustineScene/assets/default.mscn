@@ -217,7 +217,7 @@
     uint64 | index=6
     int64 | owner=13
     quat32 | rotation={-1,0,0,0}
-    vec3f32 | position={5.2,1,-13.65}
+    vec3f32 | position={5.2,1.25,-13.65}
     vec3f32 | scale={1,1,1}
     uint64 | flags=0
 [Camera]
@@ -1050,3 +1050,31 @@
     string | material="\HealthMat1.mmat"
     string | material="\HealthMat2.mmat"
     uint64 | flags=0
+[Entity]
+   string | name="gun"
+   int64 | handle=51
+   int64 | parent=13
+   uint64 | flags=0
+   uint64 | components=7
+[Transform]
+    uint64 | index=36
+    int64 | owner=51
+    quat32 | rotation={0.108869,0,-0.994053,0}
+    vec3f32 | position={0.7,-0.95,-0.2}
+    vec3f32 | scale={0.1,0.1,0.1}
+    uint64 | flags=0
+[Renderer]
+    int64 | owner=51
+    string | model="\Rifle\sci fi m254 gun - high poly.obj"
+    string | shader="programModelTextured"
+        string | vertexShader=".\shaders\ModelTextured.vert"
+        string | fragmentShader="\ModelTextured.frag"
+    uint64 | materialCount=1
+    string | material="\Rifle\Material\RifleMat0.mmat"
+    uint64 | flags=0
+[Script]
+   uint64 | index=14
+   int64 | owner=51
+   uint64 | count=1
+   string | scriptObject="playerGun"
+   uint64 | flags=0
