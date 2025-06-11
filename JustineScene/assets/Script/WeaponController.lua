@@ -10,13 +10,13 @@ WeaponController.reloadKey = InputCode.KEY_R
 
 WeaponController.currentGun = nil
 
-WeaponController.ammoTextPosition = Vector2.new(100, 150)
+
+WeaponController.ammoTextPosition = Vector2.new(10, 0)
 WeaponController.lifeBarPosition = Vector2.new(100, 100)
 WeaponController.lifeBarSize = Vector2.new(200, 25)
 WeaponController.crosshairSize = Vector2.new(50, 50)
 
 function WeaponController:UpdateAmmoText()
-
     local canvasString = string.format(
        "%s   |   Ammo: %d / %d   |   %d",
         self.currentGun.name, self.currentGun.ammoCount, self.currentGun.magazineSize,
