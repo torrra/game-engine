@@ -36,19 +36,26 @@ namespace editor
         void SelectAnimation(const engine::ResourceRef<class engine::Animation>& anim);
         void SetDisplayModel(engine::ResourceRef<engine::Model>&& model);
 
+        void SetTransformMat(const math::Matrix4f& mat);
+        void SetDisplayColor(const math::Vector3f& color);
+
     private:
 
         void RenderAnimation(f32 deltaTime);
 
-        class Viewport*             m_viewport = nullptr;
+
         engine::SkeletonAnimator    m_animator;
+
+        math::Matrix4f m_modelMat{ 1.f };
 
         engine::ResourceRef<engine::IResource>      m_resource;
         engine::ResourceRef<engine::Model>          m_displayModel;
         engine::ResourceRef<engine::ShaderProgram>  m_displayShader;
 
-        EditorCamera                m_camera;
-
+        EditorCamera                  m_camera;
+        math::Vector3f                m_color{ 1.f };
         AssetDetailsWnd::EAssetType   m_resourceType = AssetDetailsWnd::EAssetType::INVALID;
+
+        class Viewport*               m_viewport = nullptr;
     };
 }

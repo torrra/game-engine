@@ -66,6 +66,15 @@ void editor::ResourceVisualizerWnd::SetDisplayModel(engine::ResourceRef<engine::
         m_animator.SetAnimation(m_animator.GetAnimation());
 }
 
+void editor::ResourceVisualizerWnd::SetTransformMat(const math::Matrix4f& mat)
+{
+    m_modelMat = mat;
+}
+
+void editor::ResourceVisualizerWnd::SetDisplayColor(const math::Vector3f& color)
+{
+    m_color = color;
+}
 
 void editor::ResourceVisualizerWnd::Init(void)
 {
@@ -104,16 +113,16 @@ void editor::ResourceVisualizerWnd::RenderAnimation(f32 deltaTime)
 
     if (m_displayModel && m_displayModel->IsDynamic())
     {
-        math::Matrix4f viewProjection = m_camera.ViewProjection();
-        math::Matrix4f identity4x4{ 1.f };
+        math::Matrix4f mvp = m_camera.ViewProjection() * m_modelMat;
         math::Matrix3f identity3x3{ 1.f };
 
         m_viewport->Bind();
         m_displayShader->Use();
 
-        m_displayShader->Set("model", &identity4x4);
-        m_displayShader->Set("mvp", &viewProjection);
+        m_displayShader->Set("model", &m_modelMat);
+        m_displayShader->Set("mvp", &mvp);
         m_displayShader->Set("normalMat", &identity3x3);
+        m_displayShader->Set("objectColor", m_color);
 
         if (m_animator.IsPaused() || m_animator.IsPlaying())
         {

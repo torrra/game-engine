@@ -26,6 +26,16 @@ namespace editor
             std::string m_mapNames[5]{};
         };
 
+        struct AnimData
+        {
+            std::string    m_animName;
+            math::Quatf    m_rotation;
+            math::Vector3f m_position;
+            math::Vector3f m_scale;
+            math::Vector3f m_rotationEuler;
+            math::Vector3f m_color;
+        };
+
     public:
 
         enum class EAssetType
@@ -55,6 +65,10 @@ namespace editor
         void InitAnimationData(const std::string& name);
         void RenderAnimationWindow(void);
         void RenderAnimationInputWindow(void);
+        void RenderAnimationTransformWindow(void);
+        void RenderAnimationPositionInput(void);
+        void RenderAnimationRotationInput(void);
+        void RenderAnimationScaleInput(void);
 
         void RenderMaterialWindow(void);
         void RenderMaterialTextureInput(engine::MeshMaterial* material);
@@ -72,7 +86,7 @@ namespace editor
         union
         {
             MeshMaterialData m_matData;
-            std::string      m_animName;
+            AnimData         m_animData;
         };
 
         class ResourceVisualizerWnd*    m_visualizer;
