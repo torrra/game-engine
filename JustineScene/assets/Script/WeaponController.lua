@@ -155,15 +155,6 @@ function WeaponController:Update(deltaTime)
         self.currentGun:Reload()
         self:UpdateAmmoText()
     end
-
-    if IsInputPressed(InputCode.MOUSE_BUTTON_RIGHT) then
-        self.life:TakeDamage(1)
-    end
-
-    if IsInputPressed(InputCode.KEY_N) then
-        self.life:RegenHealth(1)
-    end
-
 end
 
 

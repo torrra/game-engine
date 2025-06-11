@@ -485,7 +485,7 @@ void engine::RigidBodyStatic::CreateStaticSphereRigidBody(void)
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new static rigid body with sphere geometry and default values
         m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
@@ -517,7 +517,7 @@ void engine::RigidBodyStatic::CreateStaticCapsuleRigidBody(void)
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new static rigid body with capsule geometry and default values
         m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreateStatic(
@@ -551,7 +551,7 @@ void engine::RigidBodyStatic::CreateStaticPlaneRigidBody(void)
     if (m_rigidBodyStaticImpl != nullptr && m_rigidBodyStaticImpl->m_rigidBodyStatic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new static rigid body with plane geometry and default values
         m_rigidBodyStaticImpl->m_rigidBodyStatic = physx::PxCreatePlane(

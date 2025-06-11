@@ -16,7 +16,7 @@ void editor::ScriptComponent::SetScript(uint32 script)
 
 void editor::ScriptComponent::SectionContent(void)
 {
-    ui::Text("Script data... WIP");
+    ui::Text("User script");
 }
 
 void editor::ScriptComponent::RenderSection(engine::SceneGraph* graph,

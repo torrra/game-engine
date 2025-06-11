@@ -74,7 +74,7 @@ void engine::RigidBodyDynamic::CreateDynamicBoxRigidBody(void)
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new dynamic rigid body with box geometry and default values
         m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
@@ -114,7 +114,7 @@ void engine::RigidBodyDynamic::CreateDynamicSphereRigidBody(void)
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new dynamic rigid body with sphere geometry and default values
         m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
@@ -153,7 +153,7 @@ void engine::RigidBodyDynamic::CreateDynamicCapsuleRigidBody(void)
     if (m_rigidBodyImpl != nullptr && m_rigidBodyImpl->m_rigidBodyDynamic == nullptr)
     {
         // Create a new material with default values
-        m_materialImpl = new Material(0.5f, 0.5f, 0.6f);
+        m_materialImpl = new Material(0.5f, 0.5f, 0.0f);
 
         // Create a new dynamic rigid body with capsule geometry and default values
         m_rigidBodyImpl->m_rigidBodyDynamic = physx::PxCreateDynamic(
