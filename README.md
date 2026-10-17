@@ -91,12 +91,12 @@ This project uses CMake as its build system. To build it you will need:
 Open CMD and move open the directory in which you wish to install the repo. You can either press your Win key and type out 'cmd', then use 'cd <target_folder>", or open windows file explorer and right click inside to open in terminal. You can now enter the following command:
 
 ```bash
-git clone git@github.com:torrra/spectrum-retreat-clone.git
+git clone https://github.com/torrra/game-engine.git
 ```
 
 ### Step 2 : generate visual studio solution
 
-Once you have downloaded the repo, you need to open the folder with `cd spectrum-asylum-clone`, and run CMake with either:
+Once you have downloaded the repo, you need to open the folder with `cd game-engine`, and run CMake with either:
 
 ```bash
 cd build
