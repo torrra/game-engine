@@ -8,17 +8,17 @@ Note: This project was developed for Windows and MSVC.
 
 ## Table of contents
 
-* [Contributors](https://github.com/torrra/game-engine/main/README.md#contributors)
-* [Features](https://github.com/torrra/game-engine/main/README.md#features)
-* [Third-party dependencies](https://github.com/torrra/game-engine/main/README.md#dependencies)
+* [Contributors](https://github.com/torrra/game-engine#contributors)
+* [Features](https://github.com/torrra/game-engine#features)
+* [Third-party dependencies](https://github.com/torrra/game-engine#dependencies)
 * [The game](https://github.com/torrra/game-engine/edit/main/README.md#the-game)
-* [Build](https://github.com/torrra/game-engine/main/README.md#build)
+* [Build](https://github.com/torrra/game-engine#build)
 
 <br>
 
 ## Contributors
 
-* [MetaXGhost](https://github.com/MetaXGhost) : Project build system, external library integration and main developer on [the game](https://github.com/torrra/game-engine/main/README.md#the-game)  
+* [MetaXGhost](https://github.com/MetaXGhost) : Project build system, external library integration and main developer on [the game](https://github.com/torrra/game-engine#the-game)  
 * [MLev29](https://github.com/MLev29) : UI, Resource management, Input API  
 * [Torra](https://github.com/torrra) : Math, scripting, entity-component-systems implementation
 
@@ -64,7 +64,7 @@ Windowing: glfw
 
 In-engine scripting: Lua  
   
-No worries, CMake takes care of them all (see [Build](https://github.com/torrra/game-engine/main/README.md#build) for more)
+No worries, CMake takes care of them all (see [Build](https://github.com/torrra/game-engine#build) for more)
 
 <br>
 
